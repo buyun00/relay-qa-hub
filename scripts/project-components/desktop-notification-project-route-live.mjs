@@ -1,11 +1,30 @@
 import assert from "node:assert/strict";
-import { createHash, randomUUID } from "node:crypto";
-import { execFile, spawn } from "node:child_process";
+import { createHash, createPublicKey, randomUUID, verify } from "node:crypto";
+import { execFile, execFileSync, spawn } from "node:child_process";
 import fs from "node:fs";
 import net from "node:net";
 import path from "node:path";
 import { promisify } from "node:util";
 import { fileURLToPath } from "node:url";
+
+import asar from "@electron/asar";
+
+import {
+  assertReleaseContentBinding,
+  assertSignedUpdateManifest,
+  fetchReleaseBytes,
+  serializeReleaseAttestation,
+  snapshotInstalledPreviewDirectory,
+  snapshotReleaseAsarDirectory,
+  snapshotReleasePackageAsar,
+  validateReleaseContentSnapshot,
+  verifyPreviewInstallerPayload,
+} from "./release-content-binding.mjs";
+import {
+  assertPinnedPackageToolchainProvenance,
+  verifyPinnedWindowsPublicationToolchain,
+} from "./package-toolchain-provenance.mjs";
+import { derivePreviewPackageIdentity } from "./preview-package-identity.mjs";
 
 const execFileAsync = promisify(execFile);
 const sourcePath = fileURLToPath(import.meta.url);
@@ -13,6 +32,10 @@ const sourceRoot = path.resolve(path.dirname(sourcePath), "../..");
 const BLOCKED_PORTS = new Set([4319, 4174, 4320]);
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/iu;
 const INSTANCE_ID = /^qa-hub-preview-[a-z0-9](?:[a-z0-9-]{1,54}[a-z0-9])$/u;
+const RELEASE_ID = /^\d{8}T\d{9}Z$/u;
+const SOURCE_COMMIT = /^[0-9a-f]{40}$/u;
+const SHA256 = /^[0-9a-f]{64}$/u;
+const ED25519_SIGNATURE = /^[A-Za-z0-9+/]{86}==$/u;
 const INACCESSIBLE_TEXT = "通知所属项目当前不可访问，已保持当前项目并刷新项目列表。";
 const TOAST_TITLE = "QA Hub · 这个单子已创建";
 const TIMEOUT = 20_000;
@@ -60,9 +83,51 @@ function assertNoProductionOverlap(candidate, label, env = process.env) {
   }
 }
 
+function gitSourceAttributionState(allowedUntrackedRoot = null) {
+  const head = execFileSync("git", ["rev-parse", "HEAD"], {
+    cwd: sourceRoot,
+    encoding: "utf8",
+    windowsHide: true,
+  }).trim();
+  const raw = execFileSync("git", ["status", "--porcelain=v1", "-z", "--untracked-files=all"], {
+    cwd: sourceRoot,
+    encoding: "utf8",
+    windowsHide: true,
+  });
+  const trackedChanges = [];
+  const unexpectedUntracked = [];
+  let allowedUntrackedFiles = 0;
+  for (const entry of raw.split("\0").filter(Boolean)) {
+    if (!entry.startsWith("?? ")) {
+      trackedChanges.push(entry);
+      continue;
+    }
+    const relative = entry.slice(3);
+    const absolute = path.resolve(sourceRoot, relative);
+    if (
+      allowedUntrackedRoot !== null &&
+      !path.isAbsolute(relative) &&
+      containedBy(allowedUntrackedRoot, absolute)
+    ) {
+      allowedUntrackedFiles += 1;
+    } else {
+      unexpectedUntracked.push(relative);
+    }
+  }
+  return { head, trackedChanges, unexpectedUntracked, allowedUntrackedFiles };
+}
+
 export function parseArguments(argv) {
   if (argv.length === 0) return { usageOnly: true, execute: false };
-  const result = { instancePath: "", executablePath: "", execute: false, usageOnly: false };
+  const result = {
+    instancePath: "",
+    executablePath: "",
+    expectedPublicKeySha256: "",
+    expectedReleaseId: "",
+    expectedVersion: "",
+    execute: false,
+    usageOnly: false,
+  };
   for (let index = 0; index < argv.length; index += 1) {
     const item = argv[index];
     if (item === "--run") {
@@ -70,10 +135,22 @@ export function parseArguments(argv) {
       result.execute = true;
       continue;
     }
-    if (item === "--instance" || item === "--exe") {
+    if (
+      item === "--instance" ||
+      item === "--exe" ||
+      item === "--key-sha256" ||
+      item === "--release-id" ||
+      item === "--version"
+    ) {
       const value = argv[++index];
       assert.ok(value && !value.startsWith("--"), `${item.slice(2).toUpperCase()}_VALUE_REQUIRED`);
-      const key = item === "--instance" ? "instancePath" : "executablePath";
+      const key = {
+        "--instance": "instancePath",
+        "--exe": "executablePath",
+        "--key-sha256": "expectedPublicKeySha256",
+        "--release-id": "expectedReleaseId",
+        "--version": "expectedVersion",
+      }[item];
       assert.equal(result[key], "", `DUPLICATE_${item.slice(2).toUpperCase()}`);
       result[key] = value;
       continue;
@@ -82,6 +159,9 @@ export function parseArguments(argv) {
   }
   assert.ok(result.instancePath, "EXPLICIT_INSTANCE_REQUIRED");
   assert.ok(result.executablePath, "EXPLICIT_EXE_REQUIRED");
+  assert.match(result.expectedPublicKeySha256, SHA256, "EXPLICIT_PUBLIC_KEY_SHA256_REQUIRED");
+  assert.match(result.expectedReleaseId, RELEASE_ID, "EXPLICIT_RELEASE_ID_REQUIRED");
+  assert.match(result.expectedVersion, /^0\.2\.0-preview\.[1-9]\d*$/u, "EXPLICIT_VERSION_REQUIRED");
   assert.ok(path.isAbsolute(result.instancePath), "INSTANCE_MUST_BE_ABSOLUTE");
   assert.ok(path.isAbsolute(result.executablePath), "EXE_MUST_BE_ABSOLUTE");
   return result;
@@ -100,6 +180,143 @@ export function durableToastBody(notification) {
   return body;
 }
 
+export function normalizePreviewPackageConfigIdentity(preview, instanceId) {
+  assert.ok(preview && typeof preview === "object" && !Array.isArray(preview), "PREVIEW_INVALID");
+  const expectedPackageIdentity = derivePreviewPackageIdentity(instanceId);
+  const legacyPackageIdentity = expectedPackageIdentity.protocolScheme !== instanceId;
+  const appScheme =
+    preview.appScheme === undefined && legacyPackageIdentity
+      ? expectedPackageIdentity.protocolScheme
+      : preview.appScheme;
+  assert.equal(appScheme, expectedPackageIdentity.protocolScheme, "PREVIEW_SCHEME_MISMATCH");
+  const appUserModelId =
+    preview.appUserModelId === undefined && legacyPackageIdentity
+      ? expectedPackageIdentity.appUserModelId
+      : preview.appUserModelId;
+  assert.equal(
+    appUserModelId,
+    expectedPackageIdentity.appUserModelId,
+    "PREVIEW_AUMID_IDENTITY_MISMATCH",
+  );
+  const toastActivatorClsid =
+    preview.toastActivatorClsid === undefined
+      ? expectedPackageIdentity.toastActivatorClsid
+      : preview.toastActivatorClsid;
+  assert.equal(
+    toastActivatorClsid,
+    expectedPackageIdentity.toastActivatorClsid,
+    "PREVIEW_TOAST_CLSID_IDENTITY_MISMATCH",
+  );
+  return {
+    expectedPackageIdentity,
+    normalizedPreview: { ...preview, appScheme, appUserModelId, toastActivatorClsid },
+  };
+}
+
+function assertExactFields(value, fields, label) {
+  assert.ok(value && typeof value === "object" && !Array.isArray(value), `${label}_INVALID`);
+  assert.deepEqual(Object.keys(value).sort(), [...fields].sort(), `${label}_FIELDS_INVALID`);
+}
+
+export function assertReleaseAttestation(release, publicKeyPem) {
+  assertExactFields(
+    release,
+    [
+      "attestationSignature",
+      "build",
+      "instanceId",
+      "packageContent",
+      "packageIdentity",
+      "preload",
+      "releaseId",
+      "schemaVersion",
+      "sourceCommit",
+      "sourceDirty",
+      "version",
+    ],
+    "RELEASE",
+  );
+  assertExactFields(
+    release.packageIdentity,
+    [
+      "appUserModelId",
+      "displayName",
+      "executableBaseName",
+      "installDirectoryName",
+      "instanceId",
+      "protocolScheme",
+      "shortcutName",
+      "toastActivatorClsid",
+      "uninstallRegistryKey",
+    ],
+    "RELEASE_IDENTITY",
+  );
+  assertExactFields(release.preload, ["bytes", "modules", "sha256"], "RELEASE_PRELOAD");
+  assert.ok(
+    Number.isSafeInteger(release.preload.bytes) && release.preload.bytes > 0,
+    "RELEASE_PRELOAD_BYTES_INVALID",
+  );
+  assert.match(release.preload.sha256, SHA256, "RELEASE_PRELOAD_SHA256_INVALID");
+  assert.ok(
+    Array.isArray(release.preload.modules) &&
+      release.preload.modules.length > 0 &&
+      release.preload.modules.length <= 64 &&
+      release.preload.modules.every((item) => typeof item === "string" && item.length <= 128),
+    "RELEASE_PRELOAD_MODULES_INVALID",
+  );
+  assertExactFields(release.build, ["artifacts", "producer", "toolchain"], "RELEASE_BUILD");
+  assert.equal(release.build.producer, "package-preview.mjs", "RELEASE_PRODUCER_INVALID");
+  assertExactFields(release.build.artifacts, ["desktop", "web"], "RELEASE_ARTIFACTS");
+  validateReleaseContentSnapshot(release.build.artifacts.desktop, "RELEASE_DESKTOP_CONTENT");
+  validateReleaseContentSnapshot(release.build.artifacts.web, "RELEASE_WEB_CONTENT");
+  const toolchain = assertPinnedPackageToolchainProvenance(release.build.toolchain, sourceRoot);
+  validateReleaseContentSnapshot(release.packageContent, "RELEASE_PACKAGE_CONTENT");
+  assert.match(release.attestationSignature, ED25519_SIGNATURE, "RELEASE_SIGNATURE_INVALID");
+  const signatureBytes = Buffer.from(release.attestationSignature, "base64");
+  assert.equal(signatureBytes.length, 64, "RELEASE_SIGNATURE_BYTES_INVALID");
+  assert.equal(
+    signatureBytes.toString("base64"),
+    release.attestationSignature,
+    "RELEASE_SIGNATURE_ENCODING_INVALID",
+  );
+  assert.equal(typeof publicKeyPem, "string", "RELEASE_PUBLIC_KEY_INVALID");
+  const publicKey = createPublicKey(publicKeyPem);
+  assert.equal(publicKey.asymmetricKeyType, "ed25519", "RELEASE_PUBLIC_KEY_TYPE_INVALID");
+  assert.equal(
+    verify(null, serializeReleaseAttestation(release), publicKey, signatureBytes),
+    true,
+    "RELEASE_ATTESTATION_INVALID",
+  );
+  return {
+    algorithm: "Ed25519",
+    attestationValid: true,
+    signatureBytes: signatureBytes.length,
+    publicKeySha256: sha256(publicKey.export({ type: "spki", format: "der" })),
+    toolchain: {
+      pinSha256: toolchain.pin.sha256,
+      nodeSha256: toolchain.node.sha256,
+      nodeModulesDigest: toolchain.nodeModules.digest,
+      electronZipSha256: toolchain.electron.zipSha256,
+      nsisDigest: toolchain.nsis.digest,
+      windowsPowerShellSha256: toolchain.windowsPowerShell.sha256,
+      moveFileWriteThroughSha256: toolchain.moveFileWriteThrough.sha256,
+    },
+  };
+}
+
+export function assertExpectedRelease(release, expectedReleaseId, expectedVersion, label) {
+  assert.ok(release && typeof release === "object" && !Array.isArray(release), `${label}_INVALID`);
+  assert.match(expectedReleaseId, RELEASE_ID, `${label}_EXPECTED_RELEASE_ID_INVALID`);
+  assert.match(
+    expectedVersion,
+    /^0\.2\.0-preview\.[1-9]\d*$/u,
+    `${label}_EXPECTED_VERSION_INVALID`,
+  );
+  assert.equal(release.releaseId, expectedReleaseId, `${label}_RELEASE_ID_MISMATCH`);
+  assert.equal(release.version, expectedVersion, `${label}_VERSION_MISMATCH`);
+  return release;
+}
+
 function assertLoopbackUrl(value, port, label) {
   const url = new URL(value);
   assert.equal(url.protocol, "http:", `${label}_HTTP_REQUIRED`);
@@ -111,13 +328,21 @@ function assertLoopbackUrl(value, port, label) {
   return url;
 }
 
-export function validateStaticScope(instancePathInput, executablePathInput, env = process.env) {
+export function validateStaticScope(
+  instancePathInput,
+  executablePathInput,
+  expectedPublicKeySha256,
+  expectedReleaseId,
+  expectedVersion,
+  env = process.env,
+) {
   assert.equal(process.platform, "win32", "WINDOWS_INTERACTIVE_DESKTOP_REQUIRED");
   const instancePath = canonicalExisting(instancePathInput, "INSTANCE");
   const executablePath = canonicalExisting(executablePathInput, "EXE");
   const instance = readJson(instancePath);
   assert.equal(instance.schemaVersion, 1, "INSTANCE_SCHEMA_REFUSED");
   assert.ok(INSTANCE_ID.test(instance.instanceId), "PREVIEW_INSTANCE_ID_REQUIRED");
+  const expectedPackageIdentity = derivePreviewPackageIdentity(instance.instanceId);
   const runtimeRoot = canonicalExisting(instance.runtimeRoot, "RUNTIME_ROOT");
   assert.equal(
     path.dirname(instancePath).toLowerCase(),
@@ -152,16 +377,15 @@ export function validateStaticScope(instancePathInput, executablePathInput, env 
   }
   assert.equal(path.extname(executablePath).toLowerCase(), ".exe", "EXE_EXTENSION_REQUIRED");
   assertNoProductionOverlap(executablePath, "EXE", env);
-  assert.ok(
-    path.basename(executablePath).toLowerCase().startsWith("relayqahubpreview-"),
-    "INSTANCE_NAMED_PREVIEW_EXE_REQUIRED",
+  assert.equal(
+    path.basename(executablePath).toLowerCase(),
+    `${expectedPackageIdentity.executableBaseName}.exe`.toLowerCase(),
+    "RELEASE_EXECUTABLE_IDENTITY_MISMATCH",
   );
-  assert.ok(
-    path
-      .dirname(executablePath)
-      .toLowerCase()
-      .includes(instance.instanceId.slice("qa-hub-preview-".length)),
-    "EXE_INSTANCE_DIRECTORY_MISMATCH",
+  assert.equal(
+    path.basename(path.dirname(executablePath)).toLowerCase(),
+    expectedPackageIdentity.installDirectoryName.toLowerCase(),
+    "EXE_INSTALL_DIRECTORY_IDENTITY_MISMATCH",
   );
   const installedRoot = path.dirname(executablePath);
   const asarPath = canonicalExisting(path.join(installedRoot, "resources", "app.asar"), "ASAR");
@@ -173,13 +397,19 @@ export function validateStaticScope(instancePathInput, executablePathInput, env 
   assert.equal(preview.schemaVersion, 1, "PREVIEW_CONFIG_SCHEMA_REFUSED");
   assert.equal(preview.instanceId, instance.instanceId, "PREVIEW_INSTANCE_MISMATCH");
   assert.equal(preview.cookieName, instance.cookieName, "PREVIEW_COOKIE_MISMATCH");
-  assert.equal(preview.appScheme, instance.instanceId, "PREVIEW_SCHEME_MISMATCH");
   assert.equal(preview.mcpPort, instance.desktopMcpPort, "PREVIEW_MCP_PORT_MISMATCH");
+  const { normalizedPreview } = normalizePreviewPackageConfigIdentity(preview, instance.instanceId);
   assertLoopbackUrl(preview.apiBaseUrl, instance.apiPort, "PREVIEW_API");
   const csrf = assertLoopbackUrl(preview.csrfOrigin, instance.webPort, "PREVIEW_CSRF");
   const manifest = assertLoopbackUrl(preview.updateManifestUrl, instance.webPort, "PREVIEW_UPDATE");
   assert.equal(manifest.origin, csrf.origin, "PREVIEW_UPDATE_ORIGIN_MISMATCH");
-  assert.ok(manifest.pathname.includes(instance.instanceId), "PREVIEW_UPDATE_CHANNEL_MISMATCH");
+  assert.equal(
+    manifest.pathname,
+    `/downloads/${instance.instanceId}-windows-latest.json`,
+    "PREVIEW_UPDATE_CHANNEL_MISMATCH",
+  );
+  assert.equal(manifest.search, "", "PREVIEW_UPDATE_QUERY_REFUSED");
+  assert.equal(manifest.hash, "", "PREVIEW_UPDATE_FRAGMENT_REFUSED");
   assert.ok(
     containedBy(instance.desktopRoot, preview.profileDirectory),
     "PREVIEW_PROFILE_OUTSIDE_DESKTOP_ROOT",
@@ -188,16 +418,223 @@ export function validateStaticScope(instancePathInput, executablePathInput, env 
     preview.updatePublicKeyPem?.startsWith("-----BEGIN PUBLIC KEY-----"),
     "PREVIEW_KEY_INVALID",
   );
+  const runtimePublicKeyPath = canonicalExisting(
+    path.join(runtimeRoot, "desktop-signing", "public.pem"),
+    "RUNTIME_UPDATE_PUBLIC_KEY",
+  );
+  const runtimePublicKeyPem = fs.readFileSync(runtimePublicKeyPath, "utf8");
+  assert.equal(
+    normalizedPreview.updatePublicKeyPem,
+    runtimePublicKeyPem,
+    "RUNTIME_PREVIEW_PUBLIC_KEY_MISMATCH",
+  );
+  const releaseBytes = asar.extractFile(asarPath, "release.json");
+  assert.ok(
+    releaseBytes.length > 0 && releaseBytes.length <= 1024 * 1024,
+    "RELEASE_JSON_SIZE_INVALID",
+  );
+  const release = JSON.parse(releaseBytes.toString("utf8").replace(/^\uFEFF/u, ""));
+  const releaseAttestation = assertReleaseAttestation(release, runtimePublicKeyPem);
+  const windowsPublicationToolchain = verifyPinnedWindowsPublicationToolchain({
+    sourceRoot,
+    provenance: release.build.toolchain,
+  });
+  assert.equal(
+    releaseAttestation.publicKeySha256,
+    expectedPublicKeySha256,
+    "EXPLICIT_PUBLIC_KEY_PIN_MISMATCH",
+  );
+  assert.equal(release.schemaVersion, 1, "RELEASE_SCHEMA_REFUSED");
+  assert.match(release.releaseId, RELEASE_ID, "RELEASE_ID_INVALID");
+  assert.match(release.version, /^0\.2\.0-preview\.[1-9]\d*$/u, "RELEASE_VERSION_INVALID");
+  assertExpectedRelease(release, expectedReleaseId, expectedVersion, "INSTALLED_RELEASE");
+  assert.match(release.sourceCommit, SOURCE_COMMIT, "RELEASE_SOURCE_COMMIT_INVALID");
+  assert.equal(release.sourceDirty, false, "RELEASE_DIRTY_SOURCE_REFUSED");
+  assert.equal(release.instanceId, instance.instanceId, "RELEASE_INSTANCE_MISMATCH");
+  assert.deepEqual(release.packageIdentity, expectedPackageIdentity, "RELEASE_IDENTITY_MISMATCH");
+  assert.equal(
+    expectedPackageIdentity.executableBaseName,
+    path.basename(executablePath, path.extname(executablePath)),
+    "RELEASE_EXECUTABLE_IDENTITY_MISMATCH",
+  );
+  assert.equal(release.build?.producer, "package-preview.mjs", "RELEASE_PRODUCER_INVALID");
+  const packageContent = assertReleaseContentBinding(
+    release.packageContent,
+    snapshotReleasePackageAsar(asarPath),
+    "INSTALLED_PACKAGE_CONTENT",
+  );
+  const desktopArtifacts = assertReleaseContentBinding(
+    release.build?.artifacts?.desktop,
+    snapshotReleaseAsarDirectory(asarPath, "dist"),
+    "INSTALLED_DESKTOP_CONTENT",
+  );
+  const webArtifacts = assertReleaseContentBinding(
+    release.build?.artifacts?.web,
+    snapshotReleaseAsarDirectory(asarPath, "web"),
+    "INSTALLED_WEB_CONTENT",
+  );
+  const preloadArtifact = desktopArtifacts.files.find((file) => file.path === "preload.cjs");
+  assert.ok(preloadArtifact, "RELEASE_PRELOAD_ARTIFACT_MISSING");
+  assert.equal(release.preload?.bytes, preloadArtifact.bytes, "RELEASE_PRELOAD_BYTES_MISMATCH");
+  assert.equal(release.preload?.sha256, preloadArtifact.sha256, "RELEASE_PRELOAD_SHA256_MISMATCH");
+  const packageJsonBytes = asar.extractFile(asarPath, "package.json");
+  assert.ok(
+    packageJsonBytes.length > 0 && packageJsonBytes.length <= 64 * 1024,
+    "RELEASE_PACKAGE_JSON_SIZE_INVALID",
+  );
+  const packageJson = JSON.parse(packageJsonBytes.toString("utf8").replace(/^\uFEFF/u, ""));
+  assert.deepEqual(
+    packageJson,
+    {
+      name: `qa-hub-project-preview-${instance.instanceId.slice("qa-hub-preview-".length)}`,
+      version: release.version,
+      type: "module",
+      main: "dist/main.js",
+      productName: expectedPackageIdentity.displayName,
+      private: true,
+    },
+    "RELEASE_PACKAGE_JSON_INVALID",
+  );
+  const sourceAttribution = gitSourceAttributionState();
+  assert.equal(
+    sourceAttribution.head,
+    release.sourceCommit,
+    "INSTALLED_RELEASE_SOURCE_HEAD_MISMATCH",
+  );
+  assert.deepEqual(sourceAttribution.trackedChanges, [], "LIVE_RUNNER_TRACKED_SOURCE_DIRTY");
+  assert.deepEqual(sourceAttribution.unexpectedUntracked, [], "LIVE_RUNNER_UNTRACKED_SOURCE_DIRTY");
+  const releaseProvenance = {
+    schemaVersion: release.schemaVersion,
+    releaseId: release.releaseId,
+    version: release.version,
+    sourceCommit: release.sourceCommit,
+    sourceDirty: release.sourceDirty,
+    releaseJsonBytes: releaseBytes.length,
+    releaseJsonSha256: sha256(releaseBytes),
+    appAsarBytes: fs.statSync(asarPath).size,
+    appAsarSha256: fileSha256(asarPath),
+    releaseAttestation,
+    explicitPublicKeyPin: {
+      basis: "operator-supplied-before-upgrade",
+      format: "spki-der",
+      algorithm: "sha256",
+      expected: expectedPublicKeySha256,
+      installed: releaseAttestation.publicKeySha256,
+      matched: true,
+    },
+    packageContent: { files: packageContent.files.length, digest: packageContent.digest },
+    desktop: { files: desktopArtifacts.files.length, digest: desktopArtifacts.digest },
+    web: { files: webArtifacts.files.length, digest: webArtifacts.digest },
+  };
   return {
     instancePath,
     executablePath,
     installedRoot,
     asarPath,
     previewConfigPath,
+    runtimePublicKeyPath,
     instance,
-    preview,
+    preview: normalizedPreview,
+    release,
+    releaseProvenance,
+    windowsPowerShellPath: windowsPublicationToolchain.windowsPowerShellPath,
+    moveFileWriteThroughPath: windowsPublicationToolchain.moveFileWriteThroughPath,
+    sourceAttribution,
     runtimeRoot,
     apiOrigin: `http://127.0.0.1:${instance.apiPort}`,
+    manifestUrl: manifest,
+  };
+}
+
+export async function validatePublishedRelease(
+  scope,
+  expectedReleaseId,
+  expectedVersion,
+  fetchImpl = globalThis.fetch,
+) {
+  const manifestBytes = await fetchReleaseBytes(
+    scope.manifestUrl,
+    64 * 1024,
+    "RUNNER_SERVED_MANIFEST",
+    fetchImpl,
+  );
+  const manifest = assertSignedUpdateManifest(
+    JSON.parse(manifestBytes.toString("utf8").replace(/^\uFEFF/u, "")),
+    scope.preview.updatePublicKeyPem,
+    "RUNNER_SERVED_MANIFEST",
+  );
+  assertExpectedRelease(manifest, expectedReleaseId, expectedVersion, "RUNNER_FEED");
+  assert.equal(manifest.releaseId, scope.release.releaseId, "RUNNER_INSTALLED_RELEASE_ID_MISMATCH");
+  assert.equal(manifest.version, scope.release.version, "RUNNER_INSTALLED_VERSION_MISMATCH");
+  const expectedInstallerName = `${scope.instance.instanceId}-windows-${expectedVersion}-${expectedReleaseId}.exe`;
+  assert.equal(
+    manifest.archive.url,
+    `/downloads/${expectedInstallerName}`,
+    "RUNNER_FEED_INSTALLER_URL_MISMATCH",
+  );
+
+  const downloadsRoot = canonicalExisting(scope.instance.downloadsRoot, "DOWNLOADS_ROOT");
+  assert.ok(containedBy(scope.runtimeRoot, downloadsRoot), "DOWNLOADS_ROOT_OUTSIDE_RUNTIME");
+  assertNoProductionOverlap(downloadsRoot, "DOWNLOADS_ROOT");
+  const manifestPath = canonicalExisting(
+    path.join(downloadsRoot, `${scope.instance.instanceId}-windows-latest.json`),
+    "PUBLISHED_MANIFEST",
+  );
+  assert.ok(containedBy(downloadsRoot, manifestPath), "PUBLISHED_MANIFEST_OUTSIDE_DOWNLOADS");
+  const localManifestBytes = fs.readFileSync(manifestPath);
+  assert.ok(localManifestBytes.equals(manifestBytes), "RUNNER_SERVED_MANIFEST_BYTES_MISMATCH");
+
+  const installerPath = canonicalExisting(
+    path.join(downloadsRoot, expectedInstallerName),
+    "PUBLISHED_INSTALLER",
+  );
+  assert.ok(containedBy(downloadsRoot, installerPath), "PUBLISHED_INSTALLER_OUTSIDE_DOWNLOADS");
+  const localInstallerBytes = fs.readFileSync(installerPath);
+  assert.equal(localInstallerBytes.length, manifest.archive.size, "RUNNER_INSTALLER_SIZE_MISMATCH");
+  assert.equal(
+    fileSha256(installerPath),
+    manifest.archive.sha256,
+    "RUNNER_INSTALLER_SHA256_MISMATCH",
+  );
+  const installerUrl = new URL(manifest.archive.url, scope.manifestUrl);
+  assert.equal(installerUrl.origin, scope.manifestUrl.origin, "RUNNER_INSTALLER_ORIGIN_MISMATCH");
+  const servedInstallerBytes = await fetchReleaseBytes(
+    installerUrl,
+    manifest.archive.size,
+    "RUNNER_SERVED_INSTALLER",
+    fetchImpl,
+  );
+  assert.ok(
+    servedInstallerBytes.equals(localInstallerBytes),
+    "RUNNER_SERVED_INSTALLER_BYTES_MISMATCH",
+  );
+  assert.equal(
+    sha256(servedInstallerBytes),
+    manifest.archive.sha256,
+    "RUNNER_SERVED_INSTALLER_SHA256_MISMATCH",
+  );
+
+  const installedContent = snapshotInstalledPreviewDirectory(scope.installedRoot);
+  const extractedInstallerContent = verifyPreviewInstallerPayload(
+    servedInstallerBytes,
+    installedContent,
+    scope.runtimeRoot,
+    "RUNNER_INSTALLER_INSTALLED_CONTENT",
+  );
+  return {
+    releaseId: manifest.releaseId,
+    version: manifest.version,
+    sourceCommit: scope.release.sourceCommit,
+    manifestUrl: scope.manifestUrl.href,
+    manifestPath,
+    manifestBytes: manifestBytes.length,
+    manifestSha256: sha256(manifestBytes),
+    installerUrl: installerUrl.href,
+    installerPath,
+    installerBytes: servedInstallerBytes.length,
+    installerSha256: sha256(servedInstallerBytes),
+    installedContent,
+    extractedInstallerContent,
   };
 }
 
@@ -243,6 +680,110 @@ export function notificationProjectKey(compactRunId, suffix) {
   assert.match(compactRunId, /^[0-9a-f]{32}$/iu, "RUN_ID_INVALID");
   assert.match(suffix, /^[AB]$/u, "PROJECT_SUFFIX_INVALID");
   return `N${compactRunId.slice(0, 10).toUpperCase()}${suffix}`;
+}
+
+export function expectedBugKey(projectKey, ordinal) {
+  assert.match(projectKey, /^[A-Z][A-Z0-9]{1,15}$/u, "PROJECT_KEY_INVALID");
+  assert.ok(Number.isSafeInteger(ordinal) && ordinal > 0, "BUG_ORDINAL_INVALID");
+  return `${projectKey}-${ordinal}`;
+}
+
+function wpnEventsWithinBoundary(boundary, snapshot, appUserModelId) {
+  assert.ok(Number.isSafeInteger(boundary?.newestRecordId), "WPN_BOUNDARY_RECORD_INVALID");
+  const boundaryAt = Date.parse(boundary?.capturedAt);
+  const queriedAt = Date.parse(snapshot?.queriedAt);
+  assert.ok(Number.isFinite(boundaryAt), "WPN_BOUNDARY_TIME_INVALID");
+  assert.ok(Number.isFinite(queriedAt) && queriedAt >= boundaryAt, "WPN_QUERY_TIME_INVALID");
+  assert.ok(typeof appUserModelId === "string" && appUserModelId.length > 0, "WPN_AUMID_REQUIRED");
+  return (snapshot.events ?? []).filter((event) => {
+    const eventAt = Date.parse(event.timeCreated);
+    return (
+      event.appUserModelId === appUserModelId &&
+      Number.isSafeInteger(event.recordId) &&
+      event.recordId > boundary.newestRecordId &&
+      Number.isFinite(eventAt) &&
+      eventAt >= boundaryAt &&
+      eventAt <= queriedAt
+    );
+  });
+}
+
+export function correlateWpnToastEvents(boundary, snapshot, appUserModelId) {
+  const events = wpnEventsWithinBoundary(boundary, snapshot, appUserModelId);
+  const accepted = events.filter(
+    (event) => event.eventId === 2418 && event.notificationType === "toast",
+  );
+  if (accepted.length === 0) return null;
+  assert.equal(accepted.length, 1, "WPN_EVENT_CORRELATION_AMBIGUOUS");
+  const trackingId = String(accepted[0].trackingId ?? "");
+  assert.ok(trackingId.length > 0, "WPN_TRACKING_ID_MISSING");
+  const delivered = events.filter(
+    (event) => event.eventId === 3052 && String(event.trackingId ?? "") === trackingId,
+  );
+  const presented = events.filter(
+    (event) => event.eventId === 3153 && String(event.trackingId ?? "") === trackingId,
+  );
+  if (delivered.length === 0 || presented.length === 0) return null;
+  assert.equal(delivered.length, 1, "WPN_DELIVERY_EVENT_AMBIGUOUS");
+  assert.equal(presented.length, 1, "WPN_PRESENTATION_EVENT_AMBIGUOUS");
+  const destinationSessionId = Number(delivered[0].sessionId);
+  assert.ok(Number.isSafeInteger(destinationSessionId), "WPN_DESTINATION_SESSION_INVALID");
+  assert.equal(Number(presented[0].sessionId), destinationSessionId, "WPN_SESSION_CHAIN_MISMATCH");
+  const messageId = String(delivered[0].messageId ?? "");
+  assert.ok(messageId.length > 0, "WPN_MESSAGE_ID_MISSING");
+  assert.equal(String(presented[0].messageId ?? ""), messageId, "WPN_MESSAGE_CHAIN_MISMATCH");
+  assert.ok(
+    accepted[0].recordId < delivered[0].recordId && delivered[0].recordId < presented[0].recordId,
+    "WPN_RECORD_CHAIN_ORDER_INVALID",
+  );
+  const eventTimes = [accepted[0], delivered[0], presented[0]].map((event) =>
+    Date.parse(event.timeCreated),
+  );
+  assert.ok(eventTimes.every(Number.isFinite), "WPN_EVENT_TIME_INVALID");
+  assert.ok(
+    eventTimes[0] <= eventTimes[1] && eventTimes[1] <= eventTimes[2],
+    "WPN_TIME_CHAIN_ORDER_INVALID",
+  );
+  return {
+    appUserModelId,
+    trackingId,
+    messageId,
+    destinationSessionId,
+    boundary: { capturedAt: boundary.capturedAt, newestRecordId: boundary.newestRecordId },
+    queriedAt: snapshot.queriedAt,
+    events: [accepted[0], delivered[0], presented[0]],
+  };
+}
+
+export function assertToastSessionMatch(correlation, watcherReady) {
+  const destinationSessionId = Number(correlation?.destinationSessionId);
+  const appSessionId = Number(watcherReady?.appSessionId);
+  const observerSessionId = Number(watcherReady?.observerSessionId);
+  if (
+    !Number.isSafeInteger(destinationSessionId) ||
+    !Number.isSafeInteger(appSessionId) ||
+    !Number.isSafeInteger(observerSessionId) ||
+    destinationSessionId !== appSessionId ||
+    destinationSessionId !== observerSessionId
+  ) {
+    const error = new Error("WINDOWS_TOAST_SESSION_MISMATCH");
+    error.code = "WINDOWS_TOAST_SESSION_MISMATCH";
+    error.classification = "environment_blocker";
+    error.details = { destinationSessionId, appSessionId, observerSessionId };
+    throw error;
+  }
+  return true;
+}
+
+export function exactNotificationHistoryV2Entry(history, expectedEntry) {
+  assert.equal(history?.schemaVersion, 2, "NOTIFICATION_HISTORY_SCHEMA_V2_REQUIRED");
+  assert.ok(Array.isArray(history?.entries), "NOTIFICATION_HISTORY_ENTRIES_REQUIRED");
+  const matches = history.entries.filter(
+    (entry) => entry?.notificationId === expectedEntry.notificationId,
+  );
+  assert.equal(matches.length, 1, "NOTIFICATION_HISTORY_ENTRY_COUNT_MISMATCH");
+  assert.deepEqual(matches[0], expectedEntry, "NOTIFICATION_HISTORY_ROUTE_MISMATCH");
+  return matches[0];
 }
 
 export function liveRequestAccept(pathname) {
@@ -294,29 +835,193 @@ async function allocatePorts(instance) {
   return result;
 }
 
-const HOST_SNAPSHOT_PS = String.raw`
+export const HOST_SNAPSHOT_PS = String.raw`
 param([Parameter(Mandatory=$true)][string]$InputPath)
 $ErrorActionPreference = 'Stop'
+Add-Type -TypeDefinition @"
+using System;
+using System.Collections.Generic;
+using System.Runtime.InteropServices;
+public static class QaHubWtsNative {
+  public sealed class WtsSession {
+    public int SessionId { get; set; }
+    public string StationName { get; set; }
+    public int State { get; set; }
+  }
+  [StructLayout(LayoutKind.Sequential)]
+  private struct WTS_SESSION_INFO {
+    public int SessionId;
+    public IntPtr StationName;
+    public int State;
+  }
+  [DllImport("wtsapi32.dll", EntryPoint="WTSEnumerateSessionsW", CharSet=CharSet.Unicode, SetLastError=true)]
+  private static extern bool WTSEnumerateSessions(IntPtr server, int reserved, int version, out IntPtr sessions, out int count);
+  [DllImport("wtsapi32.dll")]
+  private static extern void WTSFreeMemory(IntPtr memory);
+  [DllImport("kernel32.dll")]
+  public static extern uint WTSGetActiveConsoleSessionId();
+  public static WtsSession[] EnumerateSessions() {
+    IntPtr buffer = IntPtr.Zero;
+    int count = 0;
+    if (!WTSEnumerateSessions(IntPtr.Zero, 0, 1, out buffer, out count)) {
+      throw new System.ComponentModel.Win32Exception(Marshal.GetLastWin32Error());
+    }
+    try {
+      var result = new List<WtsSession>();
+      int size = Marshal.SizeOf(typeof(WTS_SESSION_INFO));
+      for (int index = 0; index < count; index++) {
+        var row = (WTS_SESSION_INFO)Marshal.PtrToStructure(IntPtr.Add(buffer, index * size), typeof(WTS_SESSION_INFO));
+        result.Add(new WtsSession {
+          SessionId = row.SessionId,
+          StationName = row.StationName == IntPtr.Zero ? "" : Marshal.PtrToStringUni(row.StationName),
+          State = row.State
+        });
+      }
+      return result.ToArray();
+    } finally {
+      if (buffer != IntPtr.Zero) WTSFreeMemory(buffer);
+    }
+  }
+}
+"@
 $inputData = Get-Content -LiteralPath $InputPath -Raw -Encoding utf8 | ConvertFrom-Json
 $processes = @(Get-CimInstance Win32_Process | Where-Object { $_.Name -like 'RelayQaHub*.exe' } | ForEach-Object {
   $created = try { ([datetime]$_.CreationDate).ToUniversalTime().ToString('o') } catch { [string]$_.CreationDate }
-  [pscustomobject]@{ pid=[int]$_.ProcessId; parentPid=[int]$_.ParentProcessId; name=[string]$_.Name; path=[string]$_.ExecutablePath; commandLine=[string]$_.CommandLine; startedAt=$created }
+  [pscustomobject]@{ pid=[int]$_.ProcessId; parentPid=[int]$_.ParentProcessId; sessionId=[int]$_.SessionId; name=[string]$_.Name; path=[string]$_.ExecutablePath; commandLine=[string]$_.CommandLine; startedAt=$created }
 })
+$desktopProcesses = @(Get-CimInstance Win32_Process | Where-Object { $_.Name -in @('explorer.exe','ShellExperienceHost.exe') } | ForEach-Object {
+  [pscustomobject]@{ pid=[int]$_.ProcessId; sessionId=[int]$_.SessionId; name=[string]$_.Name }
+})
+$wtsSessions = @([QaHubWtsNative]::EnumerateSessions() | Sort-Object SessionId | ForEach-Object {
+  [pscustomobject]@{ sessionId=[int]$_.SessionId; stationName=[string]$_.StationName; state=[int]$_.State }
+})
+$activeConsoleRaw = [QaHubWtsNative]::WTSGetActiveConsoleSessionId()
+$activeConsoleSessionId = if ($activeConsoleRaw -eq [uint32]::MaxValue) { $null } else { [int]$activeConsoleRaw }
 $listeners = @($inputData.ports | ForEach-Object {
   $port = [int]$_
   $rows = @(Get-NetTCPConnection -State Listen -LocalPort $port -ErrorAction SilentlyContinue)
   if ($rows.Count -eq 0) { [pscustomobject]@{ port=$port; listening=$false } }
   else { $rows | ForEach-Object { [pscustomobject]@{ port=$port; listening=$true; address=[string]$_.LocalAddress; pid=[int]$_.OwningProcess } } }
 })
-[pscustomobject]@{ capturedAt=[datetime]::UtcNow.ToString('o'); sessionId=[Diagnostics.Process]::GetCurrentProcess().SessionId; processes=$processes; listeners=$listeners } | ConvertTo-Json -Depth 6 -Compress
+[pscustomobject]@{
+  capturedAt=[datetime]::UtcNow.ToString('o')
+  sessionId=[Diagnostics.Process]::GetCurrentProcess().SessionId
+  sessionTopology=[pscustomobject]@{
+    runnerSessionId=[Diagnostics.Process]::GetCurrentProcess().SessionId
+    activeConsoleSessionId=$activeConsoleSessionId
+    wtsSessions=$wtsSessions
+    explorer=@($desktopProcesses | Where-Object { $_.name -eq 'explorer.exe' })
+    shellExperienceHost=@($desktopProcesses | Where-Object { $_.name -eq 'ShellExperienceHost.exe' })
+  }
+  processes=$processes
+  listeners=$listeners
+} | ConvertTo-Json -Depth 8 -Compress
+`;
+
+export const ATOMIC_EXCLUSIVE_JSON_PS = String.raw`
+function WriteExclusiveJson($file, $value) {
+  $target = [IO.Path]::GetFullPath([string]$file)
+  $directory = [IO.Path]::GetDirectoryName($target)
+  $leaf = [IO.Path]::GetFileName($target)
+  $temporary = [IO.Path]::Combine($directory, [string]::Concat($leaf, '.tmp-', [Diagnostics.Process]::GetCurrentProcess().Id, '-', [guid]::NewGuid().ToString('N')))
+  $bytes = [Text.Encoding]::UTF8.GetBytes(($value | ConvertTo-Json -Depth 8 -Compress))
+  $temporaryCreated = $false
+  $published = $false
+  try {
+    $stream = [IO.File]::Open($temporary, [IO.FileMode]::CreateNew, [IO.FileAccess]::Write, [IO.FileShare]::None)
+    $temporaryCreated = $true
+    try {
+      $stream.Write($bytes, 0, $bytes.Length)
+      $stream.Flush($true)
+    } finally {
+      $stream.Dispose()
+    }
+    [IO.File]::Move($temporary, $target)
+    $published = $true
+  } finally {
+    if ($temporaryCreated -and -not $published -and [IO.File]::Exists($temporary)) {
+      [IO.File]::Delete($temporary)
+    }
+  }
+}
 `;
 
 export const TOAST_UIA_PS = String.raw`
 param([Parameter(Mandatory=$true)][string]$InputPath)
 $ErrorActionPreference = 'Stop'
+Add-Type -TypeDefinition @"
+using System;
+using System.Collections.Generic;
+using System.Runtime.InteropServices;
+public static class QaHubToastWtsNative {
+  public sealed class WtsSession {
+    public int SessionId { get; set; }
+    public string StationName { get; set; }
+    public int State { get; set; }
+  }
+  [StructLayout(LayoutKind.Sequential)]
+  private struct WTS_SESSION_INFO {
+    public int SessionId;
+    public IntPtr StationName;
+    public int State;
+  }
+  [DllImport("wtsapi32.dll", EntryPoint="WTSEnumerateSessionsW", CharSet=CharSet.Unicode, SetLastError=true)]
+  private static extern bool WTSEnumerateSessions(IntPtr server, int reserved, int version, out IntPtr sessions, out int count);
+  [DllImport("wtsapi32.dll")]
+  private static extern void WTSFreeMemory(IntPtr memory);
+  [DllImport("kernel32.dll")]
+  public static extern uint WTSGetActiveConsoleSessionId();
+  public static WtsSession[] EnumerateSessions() {
+    IntPtr buffer = IntPtr.Zero;
+    int count = 0;
+    if (!WTSEnumerateSessions(IntPtr.Zero, 0, 1, out buffer, out count)) {
+      throw new System.ComponentModel.Win32Exception(Marshal.GetLastWin32Error());
+    }
+    try {
+      var result = new List<WtsSession>();
+      int size = Marshal.SizeOf(typeof(WTS_SESSION_INFO));
+      for (int index = 0; index < count; index++) {
+        var row = (WTS_SESSION_INFO)Marshal.PtrToStructure(IntPtr.Add(buffer, index * size), typeof(WTS_SESSION_INFO));
+        result.Add(new WtsSession {
+          SessionId = row.SessionId,
+          StationName = row.StationName == IntPtr.Zero ? "" : Marshal.PtrToStringUni(row.StationName),
+          State = row.State
+        });
+      }
+      return result.ToArray();
+    } finally {
+      if (buffer != IntPtr.Zero) WTSFreeMemory(buffer);
+    }
+  }
+}
+"@
 Add-Type -AssemblyName UIAutomationClient
 Add-Type -AssemblyName UIAutomationTypes
 $inputData = Get-Content -LiteralPath $InputPath -Raw -Encoding utf8 | ConvertFrom-Json
+$appRows = @(Get-CimInstance Win32_Process -Filter ("ProcessId = " + [int]$inputData.appPid))
+if ($appRows.Count -ne 1) { throw 'TOAST_APP_PROCESS_NOT_FOUND' }
+$desktopProcesses = @(Get-CimInstance Win32_Process | Where-Object { $_.Name -in @('explorer.exe','ShellExperienceHost.exe') } | ForEach-Object {
+  [pscustomobject]@{ pid=[int]$_.ProcessId; sessionId=[int]$_.SessionId; name=[string]$_.Name }
+})
+$wtsSessions = @([QaHubToastWtsNative]::EnumerateSessions() | Sort-Object SessionId | ForEach-Object {
+  [pscustomobject]@{ sessionId=[int]$_.SessionId; stationName=[string]$_.StationName; state=[int]$_.State }
+})
+$activeConsoleRaw = [QaHubToastWtsNative]::WTSGetActiveConsoleSessionId()
+$activeConsoleSessionId = if ($activeConsoleRaw -eq [uint32]::MaxValue) { $null } else { [int]$activeConsoleRaw }
+${ATOMIC_EXCLUSIVE_JSON_PS}
+$ready = [ordered]@{
+  schemaVersion=1
+  ready=$true
+  readyAt=[datetime]::UtcNow.ToString('o')
+  observerPid=[Diagnostics.Process]::GetCurrentProcess().Id
+  observerSessionId=[Diagnostics.Process]::GetCurrentProcess().SessionId
+  appPid=[int]$appRows[0].ProcessId
+  appSessionId=[int]$appRows[0].SessionId
+  activeConsoleSessionId=$activeConsoleSessionId
+  wtsSessions=$wtsSessions
+  explorer=@($desktopProcesses | Where-Object { $_.name -eq 'explorer.exe' })
+  shellExperienceHost=@($desktopProcesses | Where-Object { $_.name -eq 'ShellExperienceHost.exe' })
+}
 $root = [System.Windows.Automation.AutomationElement]::RootElement
 $walker = [System.Windows.Automation.TreeWalker]::ControlViewWalker
 function Ancestors($element) {
@@ -326,6 +1031,7 @@ function Ancestors($element) {
   return $items
 }
 function Same($a,$b) { return [System.Windows.Automation.Automation]::Compare($a,$b) }
+WriteExclusiveJson $inputData.readyPath $ready
 $deadline = [datetime]::UtcNow.AddMilliseconds([int]$inputData.timeoutMs)
 do {
   $titles = @($root.FindAll([System.Windows.Automation.TreeScope]::Descendants, (New-Object System.Windows.Automation.PropertyCondition([System.Windows.Automation.AutomationElement]::NameProperty,[string]$inputData.title))))
@@ -345,8 +1051,8 @@ do {
   if($matches.Count -eq 1){
     $match=$matches[0]
     $evidence=[ordered]@{ observedAt=[datetime]::UtcNow.ToString('o'); title=$match.title.Current.Name; body=$match.body.Current.Name; titleOffscreen=$match.title.Current.IsOffscreen; bodyOffscreen=$match.body.Current.IsOffscreen; invokeName=$match.invoke.Current.Name; invokeControlType=$match.invoke.Current.ControlType.ProgrammaticName; invoked=$false }
+    WriteExclusiveJson $inputData.observedPath $evidence
     if($inputData.mode -eq 'observe-wait-invoke'){
-      $evidence | ConvertTo-Json -Compress | Set-Content -LiteralPath $inputData.observedPath -Encoding utf8 -NoNewline
       $signalDeadline=[datetime]::UtcNow.AddMilliseconds([int]$inputData.signalTimeoutMs)
       while(-not (Test-Path -LiteralPath $inputData.signalPath) -and [datetime]::UtcNow -lt $signalDeadline){ Start-Sleep -Milliseconds 50 }
       if(-not (Test-Path -LiteralPath $inputData.signalPath)){ throw 'TOAST_INVOKE_SIGNAL_TIMEOUT' }
@@ -361,6 +1067,43 @@ do {
 throw 'EXACT_TOAST_NOT_FOUND'
 `;
 
+export const WPN_EVENT_PS = String.raw`
+param([Parameter(Mandatory=$true)][string]$InputPath)
+$ErrorActionPreference = 'Stop'
+$inputData = Get-Content -LiteralPath $InputPath -Raw -Encoding utf8 | ConvertFrom-Json
+$logName = 'Microsoft-Windows-PushNotification-Platform/Operational'
+if ($inputData.mode -eq 'boundary') {
+  $latest = @(Get-WinEvent -LogName $logName -MaxEvents 1 -ErrorAction Stop)
+  $newestRecordId = if ($latest.Count -eq 0) { 0 } else { [long]$latest[0].RecordId }
+  [pscustomobject]@{ schemaVersion=1; capturedAt=[datetime]::UtcNow.ToString('o'); newestRecordId=$newestRecordId } | ConvertTo-Json -Compress
+  exit 0
+}
+if ($inputData.mode -ne 'query') { throw 'WPN_MODE_REFUSED' }
+$boundaryAt = [datetime]::Parse([string]$inputData.boundary.capturedAt).ToUniversalTime()
+$rows = @(Get-WinEvent -FilterHashtable @{ LogName=$logName; StartTime=$boundaryAt.AddSeconds(-1) } -ErrorAction SilentlyContinue | Where-Object {
+  [long]$_.RecordId -gt [long]$inputData.boundary.newestRecordId -and $_.Id -in @(2418,3052,3153)
+} | ForEach-Object {
+  $event = $_
+  $xml = [xml]$event.ToXml()
+  $fields = @{}
+  foreach ($item in @($xml.Event.EventData.Data)) { $fields[[string]$item.Name] = [string]$item.'#text' }
+  if ([StringComparer]::Ordinal.Equals([string]$fields['AppUserModelId'], [string]$inputData.appUserModelId)) {
+    [pscustomobject]@{
+      eventId=[int]$event.Id
+      recordId=[long]$event.RecordId
+      timeCreated=$event.TimeCreated.ToUniversalTime().ToString('o')
+      providerProcessId=[int]$xml.Event.System.Execution.ProcessID
+      appUserModelId=[string]$fields['AppUserModelId']
+      notificationType=[string]$fields['NotificationType']
+      trackingId=[string]$fields['TrackingId']
+      sessionId=if ($null -eq $fields['SessionId'] -or [string]$fields['SessionId'] -eq '') { $null } else { [int]$fields['SessionId'] }
+      messageId=[string]$fields['MessageId']
+    }
+  }
+})
+[pscustomobject]@{ schemaVersion=1; queriedAt=[datetime]::UtcNow.ToString('o'); events=@($rows | Sort-Object recordId) } | ConvertTo-Json -Depth 6 -Compress
+`;
+
 function sanitizeHostSnapshot(value, secrets) {
   return {
     capturedAt: value.capturedAt,
@@ -368,6 +1111,7 @@ function sanitizeHostSnapshot(value, secrets) {
     processes: (value.processes ?? []).map((item) => ({
       pid: item.pid,
       parentPid: item.parentPid,
+      sessionId: item.sessionId,
       name: item.name,
       path: item.path,
       startedAt: item.startedAt,
@@ -379,6 +1123,13 @@ function sanitizeHostSnapshot(value, secrets) {
         secrets,
       ),
     })),
+    sessionTopology: {
+      runnerSessionId: value.sessionTopology?.runnerSessionId,
+      activeConsoleSessionId: value.sessionTopology?.activeConsoleSessionId ?? null,
+      wtsSessions: value.sessionTopology?.wtsSessions ?? [],
+      explorer: value.sessionTopology?.explorer ?? [],
+      shellExperienceHost: value.sessionTopology?.shellExperienceHost ?? [],
+    },
     listeners: value.listeners ?? [],
   };
 }
@@ -609,11 +1360,39 @@ function criticalFiles(scope) {
     scope.executablePath,
     scope.asarPath,
     scope.previewConfigPath,
+    scope.runtimePublicKeyPath,
     scope.instance.secretsFile,
-  ].map((file) => ({ path: file, bytes: fs.statSync(file).size, sha256: fileSha256(file) }));
+    scope.publishedRelease?.manifestPath,
+    scope.publishedRelease?.installerPath,
+    scope.windowsPowerShellPath,
+    scope.moveFileWriteThroughPath,
+  ]
+    .filter(Boolean)
+    .map((file) => ({ path: file, bytes: fs.statSync(file).size, sha256: fileSha256(file) }));
+}
+
+function reverifyWindowsPublicationToolchain(scope) {
+  const verified = verifyPinnedWindowsPublicationToolchain({
+    sourceRoot,
+    provenance: scope.release.build.toolchain,
+    windowsPowerShellExecutable: scope.windowsPowerShellPath,
+    moveFileWriteThroughPath: scope.moveFileWriteThroughPath,
+  });
+  assert.equal(
+    verified.windowsPowerShellPath,
+    scope.windowsPowerShellPath,
+    "LIVE_WINDOWS_POWERSHELL_PATH_CHANGED",
+  );
+  assert.equal(
+    verified.moveFileWriteThroughPath,
+    scope.moveFileWriteThroughPath,
+    "LIVE_MOVE_FILE_WRITE_THROUGH_PATH_CHANGED",
+  );
 }
 
 async function runLive(scope) {
+  reverifyWindowsPublicationToolchain(scope);
+  const criticalBefore = criticalFiles(scope);
   const runId = randomUUID();
   const compact = runId.replaceAll("-", "");
   const experiment = path.join(
@@ -639,12 +1418,20 @@ async function runLive(scope) {
     runId,
     startedAt: new Date().toISOString(),
     instanceId: scope.instance.instanceId,
+    releaseProvenance: scope.releaseProvenance,
     passed: false,
     checks: [],
     fixtures: {},
     requests: [],
     processes: [],
     network: [],
+    watchers: [],
+    wpn: [],
+    sessionPreflight: {
+      environmentOnly: true,
+      productPass: false,
+      status: "pending",
+    },
     guarantees: {
       productionRootsRejected: blockedRoots(),
       productionPortsRejected: [...BLOCKED_PORTS],
@@ -656,25 +1443,22 @@ async function runLive(scope) {
     },
   };
   const check = (label, actual, expected = true) => {
-    const passed =
-      typeof expected === "function"
-        ? expected(actual)
-        : JSON.stringify(actual) === JSON.stringify(expected);
+    const passed = JSON.stringify(actual) === JSON.stringify(expected);
     proof.checks.push({
       label,
       passed,
       actual: redactEvidence(actual, knownSecrets),
-      expected: typeof expected === "function" ? "predicate" : expected,
+      expected: redactEvidence(expected, knownSecrets),
       at: new Date().toISOString(),
     });
     assert.ok(passed, label);
   };
   const ports = await allocatePorts(scope.instance);
   proof.ports = ports;
-  const criticalBefore = criticalFiles(scope);
   proof.inputFingerprints = criticalBefore;
   writeExclusive(path.join(experiment, "host-snapshot.ps1"), HOST_SNAPSHOT_PS);
   writeExclusive(path.join(experiment, "toast-uia.ps1"), TOAST_UIA_PS);
+  writeExclusive(path.join(experiment, "wpn-events.ps1"), WPN_EVENT_PS);
   check("canonical inputs unchanged before preparation", criticalFiles(scope), criticalBefore);
   const configFor = (name) => {
     const profileDirectory = path.join(experiment, "profiles", scope.instance.instanceId, name);
@@ -708,8 +1492,9 @@ async function runLive(scope) {
   const snapshotHost = async (phase) => {
     const input = path.join(experiment, `host-${phase}-input.json`);
     writeExclusive(input, { ports: watchedPorts });
+    reverifyWindowsPublicationToolchain(scope);
     const { stdout } = await execFileAsync(
-      "powershell.exe",
+      scope.windowsPowerShellPath,
       [
         "-NoProfile",
         "-NonInteractive",
@@ -726,12 +1511,144 @@ async function runLive(scope) {
     writeExclusive(path.join(evidence, "raw", `host-${phase}.json`), value);
     return value;
   };
+  let wpnQuerySequence = 0;
+  const runWpnHelper = async (label, inputValue) => {
+    const sequence = ++wpnQuerySequence;
+    const input = path.join(
+      experiment,
+      `${label}-wpn-${String(sequence).padStart(3, "0")}-input.json`,
+    );
+    writeExclusive(input, inputValue);
+    try {
+      reverifyWindowsPublicationToolchain(scope);
+      const { stdout } = await execFileAsync(
+        scope.windowsPowerShellPath,
+        [
+          "-NoProfile",
+          "-NonInteractive",
+          "-ExecutionPolicy",
+          "Bypass",
+          "-File",
+          path.join(experiment, "wpn-events.ps1"),
+          "-InputPath",
+          input,
+        ],
+        { windowsHide: true, timeout: TIMEOUT, maxBuffer: 4 * 1024 * 1024 },
+      );
+      return { sequence, value: JSON.parse(stdout) };
+    } catch (error) {
+      const failure = {
+        schemaVersion: 1,
+        recordedAt: new Date().toISOString(),
+        label,
+        mode: inputValue.mode,
+        sequence,
+        error: {
+          name: error?.name ?? "Error",
+          code: error?.code ?? null,
+          message: redactEvidence(error?.message ?? String(error), knownSecrets),
+        },
+      };
+      writeExclusive(
+        path.join(
+          evidence,
+          "raw",
+          `${label}-wpn-${inputValue.mode}-error-${String(sequence).padStart(3, "0")}.json`,
+        ),
+        failure,
+      );
+      throw error;
+    }
+  };
+  const captureWpnBoundary = async (label) => {
+    const { value: boundary } = await runWpnHelper(label, { mode: "boundary" });
+    check(`${label} WPN boundary schema`, boundary.schemaVersion, 1);
+    check(
+      `${label} WPN boundary record valid`,
+      Number.isSafeInteger(boundary.newestRecordId),
+      true,
+    );
+    check(
+      `${label} WPN boundary time valid`,
+      Number.isFinite(Date.parse(boundary.capturedAt)),
+      true,
+    );
+    writeExclusive(path.join(evidence, "raw", `${label}-wpn-boundary.json`), boundary);
+    return boundary;
+  };
+  const waitForWpnCorrelation = async (label, boundary, watcherReady) => {
+    const deadline = Date.now() + TIMEOUT;
+    let attempts = 0;
+    let lastSnapshot = null;
+    let lastQueryError = null;
+    do {
+      attempts += 1;
+      let query;
+      try {
+        query = await runWpnHelper(label, {
+          mode: "query",
+          boundary,
+          appUserModelId: scope.preview.appUserModelId,
+        });
+      } catch (error) {
+        lastQueryError = {
+          name: error?.name ?? "Error",
+          code: error?.code ?? null,
+          message: redactEvidence(error?.message ?? String(error), knownSecrets),
+        };
+        await delay(200);
+        continue;
+      }
+      const snapshot = query.value;
+      lastSnapshot = snapshot;
+      writeExclusive(
+        path.join(
+          evidence,
+          "raw",
+          `${label}-wpn-query-${String(query.sequence).padStart(3, "0")}.json`,
+        ),
+        snapshot,
+      );
+      const correlation = correlateWpnToastEvents(boundary, snapshot, scope.preview.appUserModelId);
+      if (correlation) {
+        const evidenceValue = { boundary, snapshot, correlation, watcherReady };
+        writeExclusive(path.join(evidence, "raw", `${label}-wpn-events.json`), snapshot);
+        writeExclusive(path.join(evidence, "raw", `${label}-wpn-correlation.json`), evidenceValue);
+        proof.wpn.push({ label, ...correlation });
+        assertToastSessionMatch(correlation, watcherReady);
+        check(`${label} WPN AUMID`, correlation.appUserModelId, scope.preview.appUserModelId);
+        check(
+          `${label} WPN destination app session`,
+          correlation.destinationSessionId,
+          watcherReady.appSessionId,
+        );
+        check(
+          `${label} WPN destination observer session`,
+          correlation.destinationSessionId,
+          watcherReady.observerSessionId,
+        );
+        return correlation;
+      }
+      await delay(200);
+    } while (Date.now() < deadline);
+    writeExclusive(path.join(evidence, "raw", `${label}-wpn-timeout.json`), {
+      schemaVersion: 1,
+      timedOutAt: new Date().toISOString(),
+      boundary,
+      attempts,
+      lastSnapshot,
+      lastQueryError,
+    });
+    throw new Error(`${label}_WPN_EVENT_CORRELATION_TIMEOUT`);
+  };
   let hostBefore;
   let child = null;
   let mainInspector = null;
   let renderer = null;
   let processEvents = [];
   let activeLaunch = null;
+  let nativeSessionPreflightPassed = false;
+  const sessionProbeSlot = `__qaHubNotificationSessionProbe_${compact}`;
   const launch = async (phase, config) => {
     check(
       `${phase} canonical inputs unchanged before launch`,
@@ -968,6 +1885,13 @@ async function runLive(scope) {
     throw new Error(`${label}_APP_EVENT_TIMEOUT`);
   };
   const api = async (label, method, pathname, options = {}) => {
+    if (method !== "GET") {
+      assert.equal(
+        nativeSessionPreflightPassed,
+        true,
+        "BUSINESS_WRITE_BEFORE_NATIVE_SESSION_PREFLIGHT",
+      );
+    }
     const parsedPath = new URL(pathname, "http://local.invalid");
     const permitted =
       (method === "GET" && parsedPath.pathname === "/api/v1/health/ready" && !parsedPath.search) ||
@@ -1037,22 +1961,28 @@ async function runLive(scope) {
       );
     return value;
   };
-  const toastWatcher = async (label, body) => {
+  const armToastWatcher = async (label, body, mode = "observe-wait-invoke") => {
+    assert.ok(child && child.exitCode === null, `${label}_WATCHER_APP_NOT_RUNNING`);
+    assert.ok(["observe", "observe-wait-invoke"].includes(mode), `${label}_WATCHER_MODE_REFUSED`);
     const input = path.join(experiment, `${label}-toast-input.json`),
+      readyPath = path.join(experiment, `${label}-toast-ready.json`),
       observedPath = path.join(experiment, `${label}-toast-observed.json`),
       signalPath = path.join(experiment, `${label}-toast-invoke.signal`);
     writeExclusive(input, {
-      mode: "observe-wait-invoke",
+      mode,
       title: TOAST_TITLE,
       body,
+      appPid: child.pid,
+      readyPath,
       timeoutMs: 30_000,
-      signalTimeoutMs: 20_000,
+      signalTimeoutMs: 120_000,
       observedPath,
       signalPath,
     });
     let watcherOutcome = null;
+    reverifyWindowsPublicationToolchain(scope);
     const promise = execFileAsync(
-      "powershell.exe",
+      scope.windowsPowerShellPath,
       [
         "-NoProfile",
         "-NonInteractive",
@@ -1063,67 +1993,107 @@ async function runLive(scope) {
         "-InputPath",
         input,
       ],
-      { windowsHide: true, timeout: 55_000, maxBuffer: 1024 * 1024 },
+      { windowsHide: true, timeout: 160_000, maxBuffer: 1024 * 1024 },
     ).then(
-      (value) => (watcherOutcome = { value }),
-      (error) => (watcherOutcome = { error }),
+      (value) => {
+        watcherOutcome = { value };
+        return watcherOutcome;
+      },
+      (error) => {
+        watcherOutcome = { error };
+        return watcherOutcome;
+      },
     );
-    for (
-      let attempt = 0;
-      attempt < 300 && !fs.existsSync(observedPath) && !watcherOutcome?.error;
-      attempt += 1
-    )
-      await delay(100);
-    if (watcherOutcome?.error) throw watcherOutcome.error;
-    assert.ok(fs.existsSync(observedPath), `${label}_REAL_TOAST_NOT_OBSERVED`);
-    const observed = readJson(observedPath);
-    check(`${label} exact toast title`, observed.title, TOAST_TITLE);
-    check(`${label} exact toast body`, observed.body, body);
-    check(`${label} toast title visible`, observed.titleOffscreen, false);
-    check(`${label} toast body visible`, observed.bodyOffscreen, false);
-    writeExclusive(path.join(evidence, "raw", `${label}-toast-observed.json`), observed);
+    const waitForWatcherFile = async (file, errorLabel, attempts) => {
+      for (
+        let attempt = 0;
+        attempt < attempts && !fs.existsSync(file) && !watcherOutcome;
+        attempt += 1
+      )
+        await delay(100);
+      if (watcherOutcome?.error) throw watcherOutcome.error;
+      assert.ok(fs.existsSync(file), errorLabel);
+      return readJson(file);
+    };
+    const ready = await waitForWatcherFile(readyPath, `${label}_WATCHER_NOT_READY`, 300);
+    check(`${label} watcher ready`, ready.ready, true);
+    check(`${label} watcher app PID`, ready.appPid, child.pid);
+    check(`${label} watcher observer PID valid`, Number.isSafeInteger(ready.observerPid), true);
+    check(`${label} watcher app session valid`, Number.isSafeInteger(ready.appSessionId), true);
+    check(
+      `${label} watcher observer session valid`,
+      Number.isSafeInteger(ready.observerSessionId),
+      true,
+    );
+    writeExclusive(path.join(evidence, "raw", `${label}-toast-ready.json`), ready);
+    proof.watchers.push({ label, mode, ready });
+    // A UIAutomation observer in a different session cannot inspect the app's notification.
+    // Classify this before creating the one business fact for the case.
+    assertToastSessionMatch({ destinationSessionId: ready.appSessionId }, ready);
+    let observed = null;
+    const waitForObserved = async () => {
+      if (observed) return observed;
+      observed = await waitForWatcherFile(observedPath, `${label}_REAL_TOAST_NOT_OBSERVED`, 300);
+      check(`${label} exact toast title`, observed.title, TOAST_TITLE);
+      check(`${label} exact toast body`, observed.body, body);
+      check(`${label} toast title visible`, observed.titleOffscreen, false);
+      check(`${label} toast body visible`, observed.bodyOffscreen, false);
+      writeExclusive(path.join(evidence, "raw", `${label}-toast-observed.json`), observed);
+      return observed;
+    };
+    const finish = async () => {
+      const outcome = await promise;
+      if (outcome.error) throw outcome.error;
+      return JSON.parse(outcome.value.stdout);
+    };
     return {
-      observed,
+      ready,
+      waitForObserved,
+      finishObserve: async () => {
+        assert.equal(mode, "observe", `${label}_WATCHER_NOT_OBSERVE_ONLY`);
+        await waitForObserved();
+        const result = await finish();
+        check(`${label} UIAutomation observe only`, result.invoked, false);
+        return result;
+      },
       invoke: async () => {
+        assert.equal(mode, "observe-wait-invoke", `${label}_WATCHER_NOT_INVOKABLE`);
+        await waitForObserved();
         writeExclusive(signalPath, `${new Date().toISOString()}\n`);
-        const outcome = await promise;
-        if (outcome.error) throw outcome.error;
-        const { stdout } = outcome.value;
-        const result = JSON.parse(stdout);
+        const result = await finish();
         check(`${label} UIAutomation Invoke`, result.invoked, true);
         writeExclusive(path.join(evidence, "raw", `${label}-toast-invoked.json`), result);
         return result;
       },
     };
   };
-  const observeToast = async (label, body) => {
-    const input = path.join(experiment, `${label}-toast-input.json`);
-    writeExclusive(input, { mode: "observe", title: TOAST_TITLE, body, timeoutMs: 30_000 });
-    const { stdout } = await execFileAsync(
-      "powershell.exe",
-      [
-        "-NoProfile",
-        "-NonInteractive",
-        "-ExecutionPolicy",
-        "Bypass",
-        "-File",
-        path.join(experiment, "toast-uia.ps1"),
-        "-InputPath",
-        input,
-      ],
-      { windowsHide: true, timeout: 35_000, maxBuffer: 1024 * 1024 },
+  const showNativeSessionProbe = async (notificationId, body) => {
+    assert.ok(mainInspector && child && child.exitCode === null, "SESSION_PROBE_APP_NOT_RUNNING");
+    const electron =
+      "process.getBuiltinModule('module').createRequire(process.execPath)('electron')";
+    const result = await mainInspector.evaluate(
+      `(()=>{const electron=${electron};const supported=electron.Notification.isSupported();if(!supported)return {pid:process.pid,supported:false,submitted:false};const notification=new electron.Notification({id:${JSON.stringify(notificationId)},title:${JSON.stringify(TOAST_TITLE)},body:${JSON.stringify(body)},silent:false});globalThis[${JSON.stringify(sessionProbeSlot)}]=notification;notification.show();return {pid:process.pid,supported:true,submitted:true,notificationId:${JSON.stringify(notificationId)}}})()`,
     );
-    const result = JSON.parse(stdout);
-    check(
-      `${label} exact native toast visible`,
-      result.title === TOAST_TITLE &&
-        result.body === body &&
-        result.titleOffscreen === false &&
-        result.bodyOffscreen === false,
-      true,
-    );
-    writeExclusive(path.join(evidence, "raw", `${label}-toast-observed.json`), result);
+    writeExclusive(path.join(evidence, "raw", "session-preflight-native-submit.json"), result);
+    check("session preflight exact main PID", result.pid, child.pid);
+    if (!result.supported) {
+      const error = new Error("WINDOWS_NATIVE_NOTIFICATION_UNSUPPORTED");
+      error.code = "WINDOWS_NATIVE_NOTIFICATION_UNSUPPORTED";
+      error.classification = "environment_blocker";
+      throw error;
+    }
+    check("session preflight native notification submitted", result.submitted, true);
+    check("session preflight notification id", result.notificationId, notificationId);
     return result;
+  };
+  const closeNativeSessionProbe = async () => {
+    assert.ok(mainInspector, "SESSION_PROBE_NO_GRACEFUL_CHANNEL");
+    const result = await mainInspector.evaluate(
+      `(()=>{const slot=${JSON.stringify(sessionProbeSlot)};const notification=globalThis[slot];if(!notification)return {pid:process.pid,closed:false};try{notification.close()}finally{delete globalThis[slot]}return {pid:process.pid,closed:true}})()`,
+    );
+    writeExclusive(path.join(evidence, "raw", "session-preflight-native-close.json"), result);
+    check("session preflight close exact main PID", result.pid, child?.pid);
+    check("session preflight native notification closed", result.closed, true);
   };
   try {
     hostBefore = await snapshotHost("before");
@@ -1157,6 +2127,66 @@ async function runLive(scope) {
     );
     check("isolated API ready", ready.status, "ready");
     await launch("quit-probe", configs["quit-probe"]);
+    const sessionProbeNotificationId = randomUUID();
+    const sessionProbeBody = `通知会话预检-${compact}`;
+    let sessionProbeSubmitted = false;
+    try {
+      const sessionProbeWatcher = await armToastWatcher(
+        "session-preflight",
+        sessionProbeBody,
+        "observe",
+      );
+      const sessionProbeBoundary = await captureWpnBoundary("session-preflight");
+      await showNativeSessionProbe(sessionProbeNotificationId, sessionProbeBody);
+      sessionProbeSubmitted = true;
+      const sessionProbeCorrelation = await waitForWpnCorrelation(
+        "session-preflight",
+        sessionProbeBoundary,
+        sessionProbeWatcher.ready,
+      );
+      const sessionProbeObserved = await sessionProbeWatcher.waitForObserved();
+      await sessionProbeWatcher.finishObserve();
+      await closeNativeSessionProbe();
+      sessionProbeSubmitted = false;
+      nativeSessionPreflightPassed = true;
+      proof.sessionPreflight = {
+        environmentOnly: true,
+        productPass: false,
+        status: "passed",
+        notificationId: sessionProbeNotificationId,
+        appUserModelId: scope.preview.appUserModelId,
+        appSessionId: sessionProbeWatcher.ready.appSessionId,
+        observerSessionId: sessionProbeWatcher.ready.observerSessionId,
+        destinationSessionId: sessionProbeCorrelation.destinationSessionId,
+        observedAt: sessionProbeObserved.observedAt,
+        completedAt: new Date().toISOString(),
+      };
+    } catch (cause) {
+      if (sessionProbeSubmitted) {
+        try {
+          await closeNativeSessionProbe();
+        } catch (cleanupError) {
+          proof.sessionPreflightCleanupError = redactEvidence(
+            cleanupError?.message ?? String(cleanupError),
+            knownSecrets,
+          );
+        }
+      }
+      proof.sessionPreflight = {
+        environmentOnly: true,
+        productPass: false,
+        status: "blocked",
+        notificationId: sessionProbeNotificationId,
+        completedAt: new Date().toISOString(),
+        error: redactEvidence(cause?.message ?? String(cause), knownSecrets),
+      };
+      const blocker = new Error(cause?.message ?? "WINDOWS_NATIVE_SESSION_PREFLIGHT_FAILED", {
+        cause,
+      });
+      blocker.code = cause?.code ?? "WINDOWS_NATIVE_SESSION_PREFLIGHT_FAILED";
+      blocker.classification = "environment_blocker";
+      throw blocker;
+    }
     await stopOwn("quit-probe");
     const afterProbe = await snapshotHost("after-quit-probe");
     check(
@@ -1179,8 +2209,8 @@ async function runLive(scope) {
         0,
       );
 
-    // Business writes start only after the installed canonical EXE has proved its exact PID,
-    // isolated profile and graceful exit.
+    // Business writes start only after the exact installed EXE has produced a real native toast
+    // whose WPN destination matches both the app and UIAutomation observer sessions, then exited.
     const secrets = readJson(scope.instance.secretsFile);
     knownSecrets.add(secrets.gmPassword);
     const gm = await api("GM login", "POST", "/api/v1/auth/gm/login", {
@@ -1227,6 +2257,10 @@ async function runLive(scope) {
 
     const description1 = `通知路由A1-${compact}`;
     const bug1Input = makeBugBody(projectA.id, targetA.userId, description1);
+    const expectedBugKey1 = expectedBugKey(projectA.key, 1);
+    const body1 = `${expectedBugKey1} · ${description1}`;
+    const watcher1 = await armToastWatcher("a1", body1);
+    const wpnBoundary1 = await captureWpnBoundary("a1");
     const created1 = await api("actor creates assigned A1 Bug", "POST", "/api/v1/bugs", {
       token: actorA.accessToken,
       projectId: projectA.id,
@@ -1234,6 +2268,7 @@ async function runLive(scope) {
       body: bug1Input.body,
       status: 201,
     });
+    check("A1 deterministic first Bug key", created1.bug.key, expectedBugKey1);
     const notices1 = await api(
       "target reads durable A1 notification",
       "GET",
@@ -1242,18 +2277,26 @@ async function runLive(scope) {
     );
     const notice1 = notices1.items.find((item) => item.bugId === created1.bug.id);
     check("durable A1 notification exists", Boolean(notice1), true);
-    const body1 = durableToastBody(notice1);
-    check("durable A1 notification body", body1, `${created1.bug.key} · ${description1}`);
-    const watcher1 = await toastWatcher("a1", body1);
+    check("durable A1 notification body", durableToastBody(notice1), body1);
+    await waitForWpnCorrelation("a1", wpnBoundary1, watcher1.ready);
     await eventFor(
       (item) => item.event === "desktop.notification.shown" && item.notificationId === notice1.id,
       "A1_SHOWN",
     );
+    await watcher1.waitForObserved();
     await switchProject(renderer, projectB.id);
     const draft = `B项目唯一未提交草稿-${compact}`;
     await putDraft(renderer, draft);
     const requestStart1 = proof.network.length;
     await watcher1.invoke();
+    const clicked1 = await eventFor(
+      (item) => item.event === "desktop.notification.clicked" && item.notificationId === notice1.id,
+      "A1_GLOBAL_CLICK",
+    );
+    check("A1 click source", clicked1.source, "global");
+    check("A1 click project route", clicked1.projectId, projectA.id);
+    check("A1 click user route", clicked1.userId, targetA.userId);
+    check("A1 click Bug route", clicked1.bugId, created1.bug.id);
     const routed1 = await waitFor(
       renderer,
       (s) => s.projectId === projectA.id && s.detailOpen && s.detailKey === created1.bug.key,
@@ -1284,6 +2327,10 @@ async function runLive(scope) {
     await switchProject(renderer, projectA.id);
     const description2 = `通知撤权A2-${compact}`;
     const bug2Input = makeBugBody(projectA.id, targetA.userId, description2);
+    const expectedBugKey2 = expectedBugKey(projectA.key, 2);
+    const body2 = `${expectedBugKey2} · ${description2}`;
+    const watcher2 = await armToastWatcher("a2", body2);
+    const wpnBoundary2 = await captureWpnBoundary("a2");
     const created2 = await api("actor creates assigned A2 Bug", "POST", "/api/v1/bugs", {
       token: actorA.accessToken,
       projectId: projectA.id,
@@ -1291,6 +2338,7 @@ async function runLive(scope) {
       body: bug2Input.body,
       status: 201,
     });
+    check("A2 deterministic second Bug key", created2.bug.key, expectedBugKey2);
     const notices2 = await api(
       "target reads durable A2 notification",
       "GET",
@@ -1299,13 +2347,13 @@ async function runLive(scope) {
     );
     const notice2 = notices2.items.find((item) => item.bugId === created2.bug.id);
     check("durable A2 notification exists", Boolean(notice2), true);
-    const body2 = durableToastBody(notice2);
-    check("durable A2 notification body", body2, `${created2.bug.key} · ${description2}`);
-    const watcher2 = await toastWatcher("a2", body2);
+    check("durable A2 notification body", durableToastBody(notice2), body2);
+    await waitForWpnCorrelation("a2", wpnBoundary2, watcher2.ready);
     await eventFor(
       (item) => item.event === "desktop.notification.shown" && item.notificationId === notice2.id,
       "A2_SHOWN",
     );
+    await watcher2.waitForObserved();
     await switchProject(renderer, projectB.id);
     const usersA = await api(
       "GM reads A membership version",
@@ -1326,6 +2374,14 @@ async function runLive(scope) {
     );
     const requestStart2 = proof.network.length;
     await watcher2.invoke();
+    const clicked2 = await eventFor(
+      (item) => item.event === "desktop.notification.clicked" && item.notificationId === notice2.id,
+      "A2_GLOBAL_CLICK",
+    );
+    check("A2 click source", clicked2.source, "global");
+    check("A2 click project route", clicked2.projectId, projectA.id);
+    check("A2 click user route", clicked2.userId, targetA.userId);
+    check("A2 click Bug route", clicked2.bugId, created2.bug.id);
     const denied = await waitFor(
       renderer,
       (s) =>
@@ -1351,6 +2407,10 @@ async function runLive(scope) {
     await rendererLogin(renderer, projectB.id, targetName);
     const description3 = `通知重启B3-${compact}`;
     const bug3Input = makeBugBody(projectB.id, targetB.userId, description3);
+    const expectedBugKey3 = expectedBugKey(projectB.key, 1);
+    const body3 = `${expectedBugKey3} · ${description3}`;
+    const watcher3 = await armToastWatcher("b3", body3, "observe");
+    const wpnBoundary3 = await captureWpnBoundary("b3");
     const created3 = await api("separate actor creates assigned B3 Bug", "POST", "/api/v1/bugs", {
       token: actorB.accessToken,
       projectId: projectB.id,
@@ -1358,6 +2418,7 @@ async function runLive(scope) {
       body: bug3Input.body,
       status: 201,
     });
+    check("B3 deterministic first Bug key", created3.bug.key, expectedBugKey3);
     const notices3 = await api(
       "target reads durable unread B3 notification",
       "GET",
@@ -1370,50 +2431,134 @@ async function runLive(scope) {
       Boolean(notice3) && notice3.readAt === null,
       true,
     );
-    const body3 = durableToastBody(notice3);
-    check("durable B3 notification body", body3, `${created3.bug.key} · ${description3}`);
-    await observeToast("b3", body3);
+    check("durable B3 notification body", durableToastBody(notice3), body3);
+    await waitForWpnCorrelation("b3", wpnBoundary3, watcher3.ready);
     await eventFor(
       (item) => item.event === "desktop.notification.shown" && item.notificationId === notice3.id,
       "B3_SHOWN",
     );
+    await watcher3.waitForObserved();
+    await watcher3.finishObserve();
     const historyFile = path.join(configs.route.profileDirectory, "notification-history.json");
+    const expectedHistoryEntry3 = (acknowledged) => ({
+      notificationId: notice3.id,
+      acknowledged,
+      projectId: projectB.id,
+      userId: targetB.userId,
+      bugId: created3.bug.id,
+    });
+    const checkB3History = (phase, history, acknowledged) => {
+      const expected = expectedHistoryEntry3(acknowledged);
+      check(`B3 history schema v2 ${phase}`, history?.schemaVersion, 2);
+      check(`B3 history entries array ${phase}`, Array.isArray(history?.entries), true);
+      const matches = history.entries.filter((entry) => entry?.notificationId === notice3.id);
+      check(`B3 history exactly once ${phase}`, matches.length, 1);
+      const matched = exactNotificationHistoryV2Entry(history, expected);
+      check(`B3 history exact scoped route ${phase}`, matched, expected);
+    };
     const historyBeforeRestart = readJson(historyFile);
-    check(
-      "B3 history exactly once before restart",
-      historyBeforeRestart.notificationIds.filter((id) => id === notice3.id).length,
-      1,
-    );
+    checkB3History("before restart", historyBeforeRestart, false);
+    // Persist a signed-out profile so the restarted transport cannot reconcile
+    // until the UIA watcher and WPN boundary are armed below.
+    await signOut(renderer);
+    checkB3History("after signout before restart", readJson(historyFile), false);
     await stopOwn("controlled-restart-stop");
     await launch("route-2-restart", configs.route);
+    const watcher3Restart = await armToastWatcher("b3-restart", body3);
+    const wpnBoundary3Restart = await captureWpnBoundary("b3-restart");
+    await rendererLogin(renderer, projectB.id, targetName);
+    await waitForWpnCorrelation("b3-restart", wpnBoundary3Restart, watcher3Restart.ready);
+    await eventFor(
+      (item) => item.event === "desktop.notification.shown" && item.notificationId === notice3.id,
+      "B3_RESTART_SHOWN",
+    );
+    await watcher3Restart.waitForObserved();
     await waitFor(
       renderer,
       (s) => s.ready && s.projectId === projectB.id && s.connection?.state === "connected",
       "RESTART_REAUTH",
       30_000,
     );
-    await delay(10_000);
+    const requestStart3 = proof.network.length;
+    await watcher3Restart.invoke();
+    const clicked3 = await eventFor(
+      (item) => item.event === "desktop.notification.clicked" && item.notificationId === notice3.id,
+      "B3_RESTART_GLOBAL_CLICK",
+    );
+    check("B3 restart click source", clicked3.source, "global");
+    check("B3 restart click project route", clicked3.projectId, projectB.id);
+    check("B3 restart click user route", clicked3.userId, targetB.userId);
+    check("B3 restart click Bug route", clicked3.bugId, created3.bug.id);
+    const routed3 = await waitFor(
+      renderer,
+      (s) => s.projectId === projectB.id && s.detailOpen && s.detailKey === created3.bug.key,
+      "B3_RESTART_ROUTE",
+      30_000,
+    );
+    const details3 = proof.network
+      .slice(requestStart3)
+      .map((item) => classifyBugDetailRequest(item, created3.bug.id))
+      .filter(Boolean);
+    check("B3 restart exact detail requested", details3.length > 0, true);
+    check("B3 restart first detail carries project B", details3[0].projectId, projectB.id);
+    writeExclusive(path.join(evidence, "raw", "b3-restart-routed-renderer.json"), routed3);
+    const historyAfterClick = readJson(historyFile);
+    checkB3History("after restart global click", historyAfterClick, true);
+    await closeDetail(renderer);
+    await stopOwn("acknowledged-restart-stop");
+    await launch("route-3-acknowledged", configs.route);
+    await waitFor(
+      renderer,
+      (s) => s.ready && s.projectId === projectB.id && s.connection?.state === "connected",
+      "ACKNOWLEDGED_RESTART_REAUTH",
+      30_000,
+    );
+    const acknowledgedReconciliation = await eventFor(
+      (item) =>
+        item.event === "desktop.notification.inbox.reconciled" &&
+        item.projectId === projectB.id &&
+        Array.isArray(item.notificationIds) &&
+        item.notificationIds.includes(notice3.id) &&
+        Array.isArray(item.unreadNotificationIds) &&
+        item.unreadNotificationIds.includes(notice3.id) &&
+        Array.isArray(item.locallyAcknowledgedNotificationIds) &&
+        item.locallyAcknowledgedNotificationIds.includes(notice3.id),
+      "ACKNOWLEDGED_B3_INBOX_RECONCILED",
+      30_000,
+    );
     check(
-      "B3 not shown again after restart",
+      "acknowledged B3 reconciliation attempted no presentation",
+      acknowledgedReconciliation.presentationAttemptedNotificationIds.includes(notice3.id),
+      false,
+    );
+    writeExclusive(
+      path.join(evidence, "raw", "b3-acknowledged-inbox-reconciliation.json"),
+      acknowledgedReconciliation,
+    );
+    check(
+      "acknowledged B3 not replayed on next restart",
       processEvents.filter(
         (item) => item.event === "desktop.notification.shown" && item.notificationId === notice3.id,
       ).length,
       0,
     );
-    const historyAfterRestart = readJson(historyFile);
+    const historyAfterAcknowledgedRestart = readJson(historyFile);
+    checkB3History("after acknowledged restart", historyAfterAcknowledgedRestart, true);
     check(
-      "B3 history remains exactly once",
-      historyAfterRestart.notificationIds.filter((id) => id === notice3.id).length,
-      1,
+      "acknowledged notification history stable across restart",
+      historyAfterAcknowledgedRestart,
+      historyAfterClick,
     );
-    check("notification history stable across restart", historyAfterRestart, historyBeforeRestart);
     proof.fixtures.bugs = { a1: created1.bug, a2: created2.bug, b3: created3.bug };
     proof.fixtures.notifications = { a1: notice1.id, a2: notice2.id, b3: notice3.id };
     proof.passed = true;
   } catch (error) {
     proof.error = {
       name: error?.name ?? "Error",
+      code: error?.code ?? null,
+      classification: error?.classification ?? null,
       message: redactEvidence(error?.message ?? String(error), knownSecrets),
+      details: redactEvidence(error?.details ?? null, knownSecrets),
     };
     throw error;
   } finally {
@@ -1477,6 +2622,19 @@ async function runLive(scope) {
         criticalFiles(scope),
         criticalBefore,
       );
+      const sourceAttributionAfter = gitSourceAttributionState(evidence);
+      check(
+        "source HEAD unchanged through live run",
+        sourceAttributionAfter.head,
+        scope.release.sourceCommit,
+      );
+      check("tracked source unchanged through live run", sourceAttributionAfter.trackedChanges, []);
+      check(
+        "no unexpected untracked source through live run",
+        sourceAttributionAfter.unexpectedUntracked,
+        [],
+      );
+      proof.sourceAttributionAfter = sourceAttributionAfter;
       proof.hostAfter = hostAfter;
     } catch (error) {
       proof.finalizationError = redactEvidence(error?.message ?? String(error), knownSecrets);
@@ -1499,9 +2657,11 @@ async function runLive(scope) {
 function usage() {
   return [
     "Review/dry-run (read-only):",
-    "  node scripts/project-components/desktop-notification-project-route-live.mjs --instance <absolute-instance.json> --exe <absolute-installed-preview.exe>",
+    "  node scripts/project-components/desktop-notification-project-route-live.mjs --instance <absolute-instance.json> --exe <absolute-installed-preview.exe> --key-sha256 <pre-upgrade-spki-der-sha256> --release-id <expected-release-id> --version <expected-version>",
     "Authorized live run:",
-    "  node scripts/project-components/desktop-notification-project-route-live.mjs --instance <absolute-instance.json> --exe <absolute-installed-preview.exe> --run",
+    "  node scripts/project-components/desktop-notification-project-route-live.mjs --instance <absolute-instance.json> --exe <absolute-installed-preview.exe> --key-sha256 <pre-upgrade-spki-der-sha256> --release-id <expected-release-id> --version <expected-version> --run",
+    "The key pin is SHA-256 over the public key's SPKI DER bytes and must be recorded before the installer runs.",
+    "Dry-run fetches and verifies the exact signed feed and installer, then uses the installer's verification-only extraction mode in a contained temporary directory.",
     "The live path refuses production roots/ports and any already-running copy of the selected preview instance.",
   ].join("\n");
 }
@@ -1512,7 +2672,19 @@ async function main() {
     process.stdout.write(`${usage()}\n`);
     return;
   }
-  const scope = validateStaticScope(args.instancePath, args.executablePath);
+  const staticScope = validateStaticScope(
+    args.instancePath,
+    args.executablePath,
+    args.expectedPublicKeySha256,
+    args.expectedReleaseId,
+    args.expectedVersion,
+  );
+  const publishedRelease = await validatePublishedRelease(
+    staticScope,
+    args.expectedReleaseId,
+    args.expectedVersion,
+  );
+  const scope = { ...staticScope, publishedRelease };
   const review = {
     mode: args.execute ? "live" : "dry-run",
     instanceId: scope.instance.instanceId,
@@ -1520,6 +2692,10 @@ async function main() {
     executablePath: scope.executablePath,
     executableSha256: fileSha256(scope.executablePath),
     appAsarSha256: fileSha256(scope.asarPath),
+    publicKeySha256: scope.releaseProvenance.releaseAttestation.publicKeySha256,
+    releaseId: scope.release.releaseId,
+    version: scope.release.version,
+    publishedRelease,
     apiOrigin: scope.apiOrigin,
     productionPortsRejected: [...BLOCKED_PORTS],
     liveRequiresEmptySelectedInstance: true,
@@ -1535,7 +2711,12 @@ async function main() {
 if (path.resolve(process.argv[1] ?? "") === sourcePath) {
   main().catch((error) => {
     process.stderr.write(
-      `${JSON.stringify({ passed: false, error: redactEvidence(error?.message ?? String(error)) })}\n`,
+      `${JSON.stringify({
+        passed: false,
+        error: redactEvidence(error?.message ?? String(error)),
+        code: error?.code ?? null,
+        classification: error?.classification ?? null,
+      })}\n`,
     );
     process.exitCode = 1;
   });

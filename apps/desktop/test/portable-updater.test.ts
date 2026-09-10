@@ -118,6 +118,23 @@ test("installation rechecks latest and coalesces double clicks before the native
   assert.equal(f.quit.mock.callCount(), 0);
 });
 
+test("notification activation installs only the exact clicked release after latest revalidation", async (t) => {
+  const f = await updateFixture(t);
+  await f.updater.check();
+  const clickedReleaseId = f.intermediate.manifest.releaseId;
+  f.server.release = f.latest;
+  assert.equal(await f.updater.installRelease(clickedReleaseId), false);
+  assert.deepEqual(f.updater.state, {
+    status: "ready",
+    releaseId: f.latest.manifest.releaseId,
+    version: f.latest.manifest.version,
+    publishedAt: f.latest.manifest.publishedAt,
+  });
+  assert.deepEqual(f.archiveRequests, ["2.0.2", "2.0.10"]);
+  assert.equal(f.quit.mock.callCount(), 0);
+  assert.equal(await f.updater.installRelease("not-a-release"), false);
+});
+
 test("a release published during download is selected before reporting ready", async (t) => {
   const f = await updateFixture(t);
   f.server.afterArchiveRequest = () => {

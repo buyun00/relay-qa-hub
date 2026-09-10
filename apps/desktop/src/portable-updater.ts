@@ -5,6 +5,8 @@ import { Readable, Transform } from "node:stream";
 import { pipeline } from "node:stream/promises";
 import { spawn } from "node:child_process";
 
+import { normalizeUpdateReleaseId } from "./notification-activation.js";
+
 const RELEASE_ID_PATTERN = /^\d{8}T\d{9}Z$/u;
 const SHA256_PATTERN = /^[0-9a-f]{64}$/u;
 const VERSION_PATTERN = /^[0-9A-Za-z][0-9A-Za-z._+-]{0,63}$/u;
@@ -226,6 +228,7 @@ export class PortableUpdater {
   private readyArchive: string | null = null;
   private operation: Promise<void> | null = null;
   private installOperation: Promise<boolean> | null = null;
+  private activeInstallReleaseId: string | null = null;
 
   constructor(private readonly options: PortableUpdaterOptions) {}
 
@@ -436,15 +439,31 @@ export class PortableUpdater {
   }
 
   install(): Promise<boolean> {
-    if (this.installOperation !== null) return this.installOperation;
+    return this.beginInstall(null);
+  }
+
+  installRelease(releaseId: string): Promise<boolean> {
+    const normalized = normalizeUpdateReleaseId(releaseId);
+    if (normalized === null) return Promise.resolve(false);
+    return this.beginInstall(normalized);
+  }
+
+  private beginInstall(expectedReleaseId: string | null): Promise<boolean> {
+    if (this.installOperation !== null) {
+      return this.activeInstallReleaseId === expectedReleaseId
+        ? this.installOperation
+        : Promise.resolve(false);
+    }
     if (this.stateValue.status === "installing") return Promise.resolve(false);
-    this.installOperation = this.performInstall().finally(() => {
+    this.activeInstallReleaseId = expectedReleaseId;
+    this.installOperation = this.performInstall(expectedReleaseId).finally(() => {
       this.installOperation = null;
+      this.activeInstallReleaseId = null;
     });
     return this.installOperation;
   }
 
-  private async performInstall(): Promise<boolean> {
+  private async performInstall(expectedReleaseId: string | null): Promise<boolean> {
     // Serialize all entry points, then confirm the latest signed release at the
     // installation boundary instead of trusting an earlier ready notification.
     await this.operation;
@@ -454,6 +473,7 @@ export class PortableUpdater {
     if (manifest === null || packageFile === null || this.stateValue.status !== "ready") {
       return false;
     }
+    if (expectedReleaseId !== null && manifest.releaseId !== expectedReleaseId) return false;
     if (path.extname(packageFile).toLowerCase() !== ".exe") {
       this.emit({ status: "error", message: "UPDATE_PACKAGE_UNSUPPORTED" });
       return false;

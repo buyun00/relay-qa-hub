@@ -6,10 +6,18 @@ import {
   parseDurableInbox,
   type DurableNotification,
 } from "./notification-transport.js";
+import {
+  isNotificationPrincipalIdentity,
+  normalizeNotificationUuid,
+} from "./notification-scope.js";
 
 const MAX_PROXY_REQUEST_BYTES = 8 * 1024 * 1024;
 const MAX_PROXY_RESPONSE_BYTES = 4 * 1024 * 1024;
 const MAX_PROXY_BINARY_RESPONSE_BYTES = 32 * 1024 * 1024;
+export const INBOX_PAGE_LIMIT = 100;
+export const MAX_INBOX_PAGES = 100;
+export const MAX_INBOX_TOTAL_ITEMS = 10_000;
+export const MAX_INBOX_TOTAL_BYTES = 64 * 1024 * 1024;
 export const API_REQUEST_TIMEOUT_MS = 20_000;
 export const API_TRANSFER_TIMEOUT_MS = 60_000;
 const BROWSER_SESSION_COOKIE_NAME = "qa_hub_browser_session";
@@ -113,14 +121,49 @@ export class DesktopBrowserSessionCookieStore {
     }
   }
   rememberPrincipal(value: unknown): void {
-    if (value === null || typeof value !== "object" || Array.isArray(value)) return;
     const previous = this.snapshot();
-    const record = value as Record<string, unknown>;
-    if (typeof record["displayName"] === "string") this.rememberLoginName(record["displayName"]);
-    if (typeof record["userId"] === "string") this.userId = record["userId"];
-    if (typeof record["isGm"] === "boolean") this.identity = record["isGm"] ? "gm" : "employee";
-    else if (typeof record["identity"] === "string") this.identity = record["identity"];
-    this.rememberProjectId(record["projectId"]);
+    const record =
+      value !== null && typeof value === "object" && !Array.isArray(value)
+        ? (value as Record<string, unknown>)
+        : null;
+    this.loginName = normalizeLoginName(
+      typeof record?.["displayName"] === "string" ? record["displayName"] : null,
+    );
+    this.projectId = null;
+    this.userId = null;
+    this.identity = null;
+    this.requestedProjectId = null;
+    this.projectRequestSequence += 1;
+    if (record !== null) {
+      const userId = normalizeNotificationUuid(record["userId"]);
+      const rawProjectId = record["projectId"];
+      const projectId = normalizeNotificationUuid(rawProjectId);
+      const projectIsValid =
+        rawProjectId === undefined || rawProjectId === null || projectId !== null;
+      const identityFromBoolean =
+        typeof record["isGm"] === "boolean" ? (record["isGm"] ? "gm" : "employee") : null;
+      const identityFromString = isNotificationPrincipalIdentity(record["identity"])
+        ? record["identity"]
+        : null;
+      const hasBooleanIdentity = Object.hasOwn(record, "isGm");
+      const identity = hasBooleanIdentity ? identityFromBoolean : identityFromString;
+      const identityIsConsistent =
+        identity !== null &&
+        (record["identity"] === undefined || identityFromString === identity) &&
+        (!hasBooleanIdentity || typeof record["isGm"] === "boolean");
+      if (
+        this.loginName !== null &&
+        userId !== null &&
+        projectIsValid &&
+        identityIsConsistent &&
+        (identity === "gm" || projectId !== null)
+      ) {
+        this.userId = userId;
+        this.projectId = projectId;
+        this.identity = identity;
+        this.requestedProjectId = projectId;
+      }
+    }
     if (previous !== this.snapshot()) this.scopeVersion += 1;
   }
   snapshot(): string {
@@ -258,42 +301,135 @@ async function readBoundedBody(
   return result;
 }
 
-async function responseJson(response: Response, maxBytes: number): Promise<unknown> {
+async function responseJson(
+  response: Response,
+  maxBytes: number,
+): Promise<Readonly<{ value: unknown; bytes: number }>> {
   const body = await readBoundedBody(response, maxBytes);
-  if (body.byteLength === 0) return null;
+  if (body.byteLength === 0) return { value: null, bytes: 0 };
   try {
-    return JSON.parse(Buffer.from(body).toString("utf8")) as unknown;
+    return {
+      value: JSON.parse(Buffer.from(body).toString("utf8")) as unknown,
+      bytes: body.byteLength,
+    };
   } catch {
     throw new Error("INVALID_JSON_RESPONSE");
   }
+}
+
+function parseInboxPage(value: unknown): Readonly<{
+  items: readonly DurableNotification[];
+  nextCursor: string | null;
+  unreadCount: number;
+}> {
+  if (value === null || typeof value !== "object" || Array.isArray(value)) {
+    throw new Error("INVALID_INBOX_RESPONSE");
+  }
+  const record = value as Record<string, unknown>;
+  const keys = Object.keys(record);
+  if (
+    keys.length !== 3 ||
+    !keys.every((key) => key === "items" || key === "nextCursor" || key === "unreadCount")
+  ) {
+    throw new Error("INVALID_INBOX_RESPONSE");
+  }
+  const nextCursor = record["nextCursor"];
+  const unreadCount = record["unreadCount"];
+  if (
+    (nextCursor !== null &&
+      (typeof nextCursor !== "string" || nextCursor.length < 1 || nextCursor.length > 500)) ||
+    !Number.isSafeInteger(unreadCount) ||
+    (unreadCount as number) < 0
+  ) {
+    throw new Error("INVALID_INBOX_RESPONSE");
+  }
+  return {
+    items: parseDurableInbox(record),
+    nextCursor: nextCursor as string | null,
+    unreadCount: unreadCount as number,
+  };
 }
 
 export async function fetchDurableInbox(
   config: DesktopConfig,
   browserSessionCookie: string | null = null,
   projectId: string | null = null,
+  expectedUserId: string | null = null,
+  options: Readonly<{ fetchImpl?: typeof fetch; timeoutMs?: number }> = {},
 ): Promise<readonly DurableNotification[]> {
   if (config.accessToken === null && browserSessionCookie === null) {
     throw new Error("ACCESS_TOKEN_MISSING");
   }
-  const endpoint = new URL(NOTIFICATIONS_PATH, config.apiBaseUrl);
-  if (projectId !== null) endpoint.searchParams.set("projectId", projectId);
-  if (!isAllowedNetworkUrl(endpoint, config)) throw new Error("INBOX_ORIGIN_NOT_ALLOWED");
-  let response: Response;
-  try {
-    const headers = new Headers({ Accept: "application/json" });
-    if (config.accessToken !== null) headers.set("Authorization", `Bearer ${config.accessToken}`);
-    else if (browserSessionCookie !== null) headers.set("Cookie", browserSessionCookie);
-    response = await fetch(endpoint, {
-      headers,
-      redirect: "manual",
-    });
-  } catch {
-    throw new Error("INBOX_NETWORK_ERROR");
+  const baseEndpoint = new URL(NOTIFICATIONS_PATH, config.apiBaseUrl);
+  if (!isAllowedNetworkUrl(baseEndpoint, config)) throw new Error("INBOX_ORIGIN_NOT_ALLOWED");
+  const timeoutSignal = AbortSignal.timeout(options.timeoutMs ?? API_REQUEST_TIMEOUT_MS);
+  const headers = new Headers({ Accept: "application/json" });
+  if (config.accessToken !== null) headers.set("Authorization", `Bearer ${config.accessToken}`);
+  else if (browserSessionCookie !== null) headers.set("Cookie", browserSessionCookie);
+  const items: DurableNotification[] = [];
+  const seenCursors = new Set<string>();
+  const seenNotificationIds = new Set<string>();
+  const normalizedExpectedUserId = expectedUserId?.toLowerCase() ?? null;
+  let cursor: string | null = null;
+  let expectedUnreadCount: number | null = null;
+  let totalBytes = 0;
+  for (let pageNumber = 1; pageNumber <= MAX_INBOX_PAGES; pageNumber += 1) {
+    const endpoint = new URL(baseEndpoint);
+    if (projectId !== null) endpoint.searchParams.set("projectId", projectId);
+    endpoint.searchParams.set("unreadOnly", "true");
+    endpoint.searchParams.set("limit", String(INBOX_PAGE_LIMIT));
+    if (cursor !== null) endpoint.searchParams.set("cursor", cursor);
+    let response: Response;
+    try {
+      response = await (options.fetchImpl ?? fetch)(endpoint, {
+        headers,
+        redirect: "manual",
+        signal: timeoutSignal,
+      });
+    } catch {
+      throw new Error(timeoutSignal.aborted ? "INBOX_REQUEST_TIMEOUT" : "INBOX_NETWORK_ERROR");
+    }
+    let parsedResponse: Readonly<{ value: unknown; bytes: number }>;
+    try {
+      parsedResponse = await responseJson(response, MAX_INBOX_BYTES);
+    } catch (cause) {
+      if (timeoutSignal.aborted) throw new Error("INBOX_REQUEST_TIMEOUT");
+      throw cause;
+    }
+    if (!response.ok) throw new Error(`INBOX_HTTP_${response.status}`);
+    totalBytes += parsedResponse.bytes;
+    if (totalBytes > MAX_INBOX_TOTAL_BYTES) throw new Error("INBOX_TOTAL_BYTES_EXCEEDED");
+    const page = parseInboxPage(parsedResponse.value);
+    if (expectedUnreadCount === null) {
+      if (page.unreadCount > MAX_INBOX_TOTAL_ITEMS) {
+        throw new Error("INBOX_TOTAL_ITEMS_EXCEEDED");
+      }
+      expectedUnreadCount = page.unreadCount;
+    } else if (page.unreadCount !== expectedUnreadCount) {
+      throw new Error("INBOX_UNREAD_COUNT_CHANGED");
+    }
+    for (const item of page.items) {
+      if (item.readAt !== null) throw new Error("INBOX_READ_ITEM_RETURNED");
+      if (projectId !== null && item.projectId !== projectId.toLowerCase()) {
+        throw new Error("INBOX_PROJECT_SCOPE_MISMATCH");
+      }
+      if (normalizedExpectedUserId === null || item.userId !== normalizedExpectedUserId) {
+        throw new Error("INBOX_USER_SCOPE_MISMATCH");
+      }
+      if (seenNotificationIds.has(item.id)) throw new Error("INBOX_NOTIFICATION_REPEATED");
+      seenNotificationIds.add(item.id);
+      items.push(item);
+      if (items.length > MAX_INBOX_TOTAL_ITEMS) throw new Error("INBOX_TOTAL_ITEMS_EXCEEDED");
+    }
+    if (page.nextCursor === null) {
+      if (items.length !== expectedUnreadCount) throw new Error("INBOX_UNREAD_COUNT_MISMATCH");
+      return items;
+    }
+    if (seenCursors.has(page.nextCursor)) throw new Error("INBOX_CURSOR_REPEATED");
+    seenCursors.add(page.nextCursor);
+    cursor = page.nextCursor;
   }
-  const body = await responseJson(response, MAX_INBOX_BYTES);
-  if (!response.ok) throw new Error(`INBOX_HTTP_${response.status}`);
-  return parseDurableInbox(body);
+  throw new Error("INBOX_PAGE_LIMIT_EXCEEDED");
 }
 
 function copyRendererHeaders(request: Request): Headers {

@@ -140,7 +140,9 @@ while (Date.now() < deadline) {
       afterReload = await inspect();
       break;
     }
-  } catch {}
+  } catch {
+    // The renderer can reject probes briefly while the page reloads.
+  }
 }
 if (!afterReload) throw new Error("RELOAD_READINESS_TIMEOUT");
 await delay(1000);

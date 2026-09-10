@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 2,
+  "lock": {
+    "path": "package-lock.json",
+    "bytes": 244880,
+    "sha256": "5978aa3aa73c45a6028656ba4f5a3c496f2add4dcacb06cfc69b1b0405001c09"
+  },
+  "node": {
+    "version": "v24.19.0",
+    "platform": "win32",
+    "arch": "x64",
+    "bytes": 92825416,
+    "sha256": "3602f2bb1a10f2cbab4c36886218a33c1ab3db87290e73b033c46c77147d0237"
+  },
+  "nodeModules": {
+    "path": "node_modules",
+    "algorithm": "sha256-path-content-v1",
+    "files": 19199,
+    "links": 408,
+    "bytes": 699275125,
+    "digest": "ec3d59d7b1cf816f4441a16dfede05f375993974cd3c54ccde1a87b04c9f574f"
+  },
+  "electron": {
+    "checksumsPath": "node_modules/electron/checksums.json",
+    "checksumsSha256": "744e78425b83ad75d65e74b440f8e0b93e443b6c7d9524509ce4a15513b08310",
+    "zipName": "electron-v43.4.1-win32-x64.zip",
+    "zipSha256": "c2ef9a5f65472c34d14bd3e67b7d14e66b0c01f124aba45263d6a4232160e13a"
+  },
+  "nsis": {
+    "makensisPath": "makensis.exe",
+    "algorithm": "sha256-path-content-v1",
+    "files": 343,
+    "links": 0,
+    "bytes": 7280179,
+    "digest": "b53c80ca920a9431ae7f923b056f46aaf0734c130b17e015c8ac36a51bd782d3"
+  },
+  "windowsPowerShell": {
+    "path": "C:/Windows/System32/WindowsPowerShell/v1.0/powershell.exe",
+    "bytes": 454656,
+    "sha256": "7600ffe12da441fe89d035b13801e8e91d064bc544a27b19a5cf49f6ab8b18f5"
+  },
+  "moveFileWriteThrough": {
+    "path": "scripts/project-components/move-file-write-through.ps1",
+    "bytes": 5616,
+    "sha256": "f52003ee89347e47775bc411499ee0ffafa5dd91a603aba4edd27048d333c0ab"
+  }
+}

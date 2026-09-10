@@ -122,7 +122,7 @@ const textExtensions = new Set([".json", ".md", ".txt", ".mjs", ".ps1", ".log", 
 const credentialPatterns = [
   [
     "authorization-bearer",
-    /["']?authorization["']?\s*[:=]\s*["']?bearer\s+[a-z0-9._~+\/-]{8,}=*/iu,
+    /["']?authorization["']?\s*[:=]\s*["']?bearer\s+[a-z0-9._~+/-]{8,}=*/iu,
   ],
   [
     "access-token-json",

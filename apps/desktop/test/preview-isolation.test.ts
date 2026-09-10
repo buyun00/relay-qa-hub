@@ -5,6 +5,7 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import { generateKeyPairSync } from "node:crypto";
 import { loadPreviewDesktopIdentity } from "../src/preview-config.js";
+import { deriveToastActivatorClsid } from "../src/notification-activation.js";
 import { DesktopBrowserSessionCookieStore, proxyRendererApiRequest } from "../src/network.js";
 import { parseDesktopConfig } from "../src/config.js";
 import { DesktopQaHubApiClient } from "../src/mcp-api.js";
@@ -66,6 +67,7 @@ test("preview requires its own identity and rejects production endpoints without
       cookieName: `${instanceId}-session`,
       appScheme: instanceId,
       appUserModelId: "com.relayqahub.desktop.preview.unit",
+      toastActivatorClsid: "{CF811D77-1C3F-5A20-B2DA-30AA57C3EB86}",
       mcpPort: 4420,
       updateManifestUrl: `http://127.0.0.1:4274/downloads/${instanceId}-windows-latest.json`,
       updatePublicKeyPem: publicKey,
@@ -85,9 +87,17 @@ test("preview requires its own identity and rejects production endpoints without
     const identity = loadPreviewDesktopIdentity(source);
     assert.equal(identity.appScheme, instanceId);
     assert.equal(identity.appUserModelId, "com.relayqahub.desktop.preview.unit");
+    assert.equal(identity.toastActivatorClsid, value.toastActivatorClsid);
     assert.equal(identity.environment["QA_HUB_DESKTOP_ACCESS_TOKEN"], undefined);
     assert.equal(identity.environment["QA_HUB_DESKTOP_API_BASE_URL"], "http://127.0.0.1:4419/");
     assert.equal(identity.environment["QA_HUB_DESKTOP_APP_SCHEME"], instanceId);
+    save({ toastActivatorClsid: undefined });
+    assert.equal(
+      loadPreviewDesktopIdentity(source).toastActivatorClsid,
+      deriveToastActivatorClsid(value.appUserModelId),
+    );
+    save({ toastActivatorClsid: "{00000000-0000-5000-8000-000000000000}" });
+    assert.throws(() => loadPreviewDesktopIdentity(source), /TOAST_ACTIVATOR_CLSID_MISMATCH/);
     save({ apiBaseUrl: "http://127.0.0.1:4319" });
     assert.throws(() => loadPreviewDesktopIdentity(source), /ENDPOINT_INVALID/);
     save({ cookieName: "qa_hub_browser_session" });
@@ -110,11 +120,16 @@ test("preview requires its own identity and rejects production endpoints without
       cookieName: `${legacyInstanceId}-session`,
       appScheme: undefined,
       appUserModelId: undefined,
+      toastActivatorClsid: undefined,
       updateManifestUrl: `http://127.0.0.1:4274/downloads/${legacyInstanceId}-windows-latest.json`,
     });
     const legacyIdentity = loadPreviewDesktopIdentity(source);
     assert.equal(legacyIdentity.appScheme, "qa-hub-preview");
     assert.equal(legacyIdentity.appUserModelId, "com.relayqahub.desktop.preview");
+    assert.equal(
+      legacyIdentity.toastActivatorClsid,
+      deriveToastActivatorClsid("com.relayqahub.desktop.preview"),
+    );
     assert.equal(legacyIdentity.environment["QA_HUB_DESKTOP_APP_SCHEME"], "qa-hub-preview");
   } finally {
     rmSync(root, { recursive: true, force: true });

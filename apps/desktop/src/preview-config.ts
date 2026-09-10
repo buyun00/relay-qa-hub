@@ -2,6 +2,7 @@ import { existsSync, lstatSync, readFileSync, realpathSync } from "node:fs";
 import path from "node:path";
 
 import { APP_SCHEME } from "./config.js";
+import { deriveToastActivatorClsid } from "./notification-activation.js";
 
 const INSTANCE_PATTERN = /^qa-hub-preview-([a-z0-9](?:[a-z0-9-]{1,38}[a-z0-9]))$/u;
 const LEGACY_INSTANCE_ID = "qa-hub-preview-7c86";
@@ -10,6 +11,7 @@ export interface PreviewDesktopIdentity {
   readonly instanceId: string;
   readonly appScheme: string;
   readonly appUserModelId: string;
+  readonly toastActivatorClsid: string;
   readonly profileDirectory: string;
   readonly cookieName: string;
   readonly updateManifestUrl: string;
@@ -74,6 +76,13 @@ export function loadPreviewDesktopIdentity(
       : text("appUserModelId");
   if (appUserModelId !== expectedAppUserModelId)
     throw new Error("PREVIEW_APP_USER_MODEL_ID_MISMATCH");
+  const expectedToastActivatorClsid = deriveToastActivatorClsid(appUserModelId);
+  const toastActivatorClsid =
+    value["toastActivatorClsid"] === undefined
+      ? expectedToastActivatorClsid
+      : text("toastActivatorClsid");
+  if (toastActivatorClsid !== expectedToastActivatorClsid)
+    throw new Error("PREVIEW_TOAST_ACTIVATOR_CLSID_MISMATCH");
   const profile = text("profileDirectory");
   if (!path.isAbsolute(profile)) throw new Error("PREVIEW_PROFILE_MUST_BE_ABSOLUTE");
   const profileDirectory = canonical(profile);
@@ -147,6 +156,7 @@ export function loadPreviewDesktopIdentity(
     instanceId,
     appScheme,
     appUserModelId,
+    toastActivatorClsid,
     profileDirectory,
     cookieName,
     updateManifestUrl: manifest.toString(),

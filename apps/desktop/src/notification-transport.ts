@@ -4,10 +4,17 @@ export const MAX_PUSH_BYTES = 16 * 1024;
 export const MAX_INBOX_ITEMS = 100;
 export const MAX_INBOX_BYTES = 256 * 1024;
 export const MAX_SUMMARY_LENGTH = 300;
-export const MAX_SEEN_NOTIFICATIONS = 512;
+// One complete server Inbox snapshot is capped at 10,000 notifications.
+export const MAX_SEEN_NOTIFICATIONS = 10_000;
+// Windows retains at most 20 notifications per app in Notification Center.
+export const MAX_PENDING_NOTIFICATIONS = 20;
+const MAX_SEEN_EVENTS = 512;
+export const MAX_PENDING_EVENTS = 512;
 export const HEARTBEAT_INTERVAL_MS = 25_000;
 export const HEARTBEAT_TIMEOUT_MS = 75_000;
 export const MAX_RECONNECT_DELAY_MS = 60_000;
+export const INBOX_RETRY_BASE_DELAY_MS = 1_000;
+export const MAX_INBOX_RETRY_DELAY_MS = 60_000;
 
 export interface SafePushEvent {
   readonly type: "notification.hint";
@@ -49,6 +56,14 @@ export interface TransportStatus {
   readonly lastError: string | null;
 }
 
+export interface InboxReconciliation {
+  readonly generation: number;
+  readonly notificationIds: readonly string[];
+  readonly unreadNotificationIds: readonly string[];
+  readonly locallyAcknowledgedNotificationIds: readonly string[];
+  readonly presentationAttemptedNotificationIds: readonly string[];
+}
+
 export interface NotificationSocket {
   onOpen(listener: () => void): () => void;
   onMessage(listener: (payload: string) => void): () => void;
@@ -62,17 +77,29 @@ export interface NotificationSocket {
 
 export type NotificationSocketFactory = (url: URL, accessToken: string) => NotificationSocket;
 export type InboxFetcher = () => Promise<readonly DurableNotification[]>;
-export type NotificationSink = (notification: DesktopNotification) => void;
+export type NotificationSink = (notification: DesktopNotification) => boolean | Promise<boolean>;
+export type NotificationBatchPreparer = (
+  notifications: readonly DesktopNotification[],
+) => boolean | Promise<boolean>;
 export type TransportStatusListener = (status: TransportStatus) => void;
+export type InboxReconciliationListener = (result: InboxReconciliation) => void;
 
 export interface NotificationTransportOptions {
   readonly socketUrl: URL;
   readonly accessToken: string | null;
   readonly openSocket: NotificationSocketFactory;
   readonly fetchInbox: InboxFetcher;
+  readonly prepareNotifications?: NotificationBatchPreparer;
   readonly showNotification: NotificationSink;
+  /**
+   * Maximum number of Bug presentations that may remain pending right now.
+   * The desktop main process uses this to reserve the shared Windows per-app
+   * notification budget for update, packaging, and retained scoped toasts.
+   */
+  readonly maxPendingNotifications?: () => number;
   readonly seenNotificationIds?: readonly string[];
   readonly onStatus?: TransportStatusListener;
+  readonly onReconcile?: InboxReconciliationListener;
   readonly setTimeout?: typeof globalThis.setTimeout;
   readonly clearTimeout?: typeof globalThis.clearTimeout;
   readonly setInterval?: typeof globalThis.setInterval;
@@ -86,6 +113,28 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 
 function hasOnlyKeys(value: Record<string, unknown>, allowed: ReadonlySet<string>): boolean {
   return Object.keys(value).every((key) => allowed.has(key));
+}
+
+function newestNotificationFirst(a: DurableNotification, b: DurableNotification): number {
+  const createdAtDifference = Date.parse(b.createdAt) - Date.parse(a.createdAt);
+  if (createdAtDifference !== 0) return createdAtDifference;
+  if (a.id === b.id) return 0;
+  return a.id < b.id ? 1 : -1;
+}
+
+function desktopNotification(
+  item: DurableNotification,
+  event: SafePushEvent | null,
+): DesktopNotification {
+  return {
+    notificationId: item.id,
+    eventId: event?.eventId ?? null,
+    projectId: item.projectId,
+    userId: item.userId,
+    title: item.title,
+    body: item.body,
+    bugId: item.bugId ?? event?.bugId ?? null,
+  };
 }
 
 function boundedText(value: unknown, maxLength: number): string | null {
@@ -229,19 +278,33 @@ export class NotificationTransport {
   private readonly clearIntervalFn: typeof globalThis.clearInterval;
   private readonly now: () => number;
   private readonly seenNotifications: BoundedSet;
-  private readonly seenEvents = new BoundedSet(MAX_SEEN_NOTIFICATIONS);
+  private readonly pendingNotifications = new Set<string>();
+  private readonly attemptedNotifications = new Set<string>();
+  private readonly pendingEvents = new Set<string>();
+  private readonly seenEvents = new BoundedSet(MAX_SEEN_EVENTS);
   private readonly statusListeners = new Set<TransportStatusListener>();
   private readonly options: NotificationTransportOptions;
   private accessToken: string | null;
   private socket: NotificationSocket | null = null;
   private socketUnsubscribers: readonly (() => void)[] = [];
   private reconnectTimer: ReturnType<typeof globalThis.setTimeout> | null = null;
+  private inboxRetryTimer: ReturnType<typeof globalThis.setTimeout> | null = null;
+  private inboxRetryDelayMs: number | null = null;
   private heartbeatTimer: ReturnType<typeof globalThis.setInterval> | null = null;
   private reconnectAttempt = 0;
   private lastActivityAt = 0;
   private running = false;
   private paused = false;
-  private inboxRead: Promise<readonly DurableNotification[]> | null = null;
+  private inboxRead: Promise<{
+    readonly generation: number;
+    readonly items: readonly DurableNotification[];
+    readonly succeeded: boolean;
+  }> | null = null;
+  private inboxGeneration = 0;
+  private reconciliationFailureAttempt = 0;
+  private presentationFailureAttempt = 0;
+  private overflowReconciliationPending = false;
+  private coalescedReconciliationPending = false;
   private currentStatus: TransportStatus;
 
   constructor(options: NotificationTransportOptions) {
@@ -275,6 +338,25 @@ export class NotificationTransport {
     return () => this.statusListeners.delete(listener);
   }
 
+  acknowledge(notificationId: string): boolean {
+    const normalized = requiredUuid(notificationId);
+    if (normalized === null) return false;
+    this.seenNotifications.add(normalized);
+    this.pendingNotifications.delete(normalized);
+    this.attemptedNotifications.delete(normalized);
+    if (this.lastInboxHasRetryableNotification()) this.requestReconcile();
+    return true;
+  }
+
+  requestReconcile(): boolean {
+    if (!this.running || this.paused || this.accessToken === null) return false;
+    if (this.inboxRead !== null) {
+      this.coalescedReconciliationPending = true;
+      return true;
+    }
+    return this.scheduleInboxReconciliation(0);
+  }
+
   start(): void {
     if (this.running) return;
     this.running = true;
@@ -292,6 +374,9 @@ export class NotificationTransport {
     this.accessToken = accessToken;
     this.reconnectAttempt = 0;
     this.clearReconnectTimer();
+    this.clearInboxRetryTimer();
+    this.resetInboxRetryState();
+    this.lastInbox = [];
     this.clearHeartbeatTimer();
     this.detachSocket(true);
     if (!this.running) {
@@ -318,6 +403,9 @@ export class NotificationTransport {
     this.running = false;
     this.paused = false;
     this.clearReconnectTimer();
+    this.clearInboxRetryTimer();
+    this.resetInboxRetryState();
+    this.lastInbox = [];
     this.clearHeartbeatTimer();
     this.detachSocket(true);
     this.publish({ state: "stopped", reconnectAttempt: this.reconnectAttempt, lastError: null });
@@ -327,6 +415,8 @@ export class NotificationTransport {
     if (!this.running || this.paused) return;
     this.paused = true;
     this.clearReconnectTimer();
+    this.clearInboxRetryTimer();
+    this.resetInboxRetryState();
     this.clearHeartbeatTimer();
     this.detachSocket(true);
     this.publish({ state: "paused", reconnectAttempt: this.reconnectAttempt, lastError: null });
@@ -340,7 +430,7 @@ export class NotificationTransport {
   }
 
   async reconcile(): Promise<void> {
-    if (!this.running || this.paused) return;
+    if (!this.running || this.paused || this.accessToken === null) return;
     await this.readInbox();
   }
 
@@ -384,61 +474,280 @@ export class NotificationTransport {
     this.markActivity(socket);
     const event = parseSafePushEvent(payload);
     if (event === null) return;
-    if (this.seenEvents.has(event.eventId)) return;
-    void this.readInbox().then((items) => this.deliverFromEvent(event, items));
+    if (this.seenEvents.has(event.eventId) || this.pendingEvents.has(event.eventId)) return;
+    if (this.pendingEvents.size >= MAX_PENDING_EVENTS) {
+      // The overflow hint itself is untrusted and is not claimed. Once every
+      // accepted post-hint read drains, force a fresh durable Inbox generation
+      // so a row committed after those reads cannot starve indefinitely.
+      this.overflowReconciliationPending = true;
+      return;
+    }
+    this.pendingEvents.add(event.eventId);
+    const minimumGeneration = this.inboxGeneration + 1;
+    void this.deliverFromEvent(event, minimumGeneration).finally(() => {
+      this.pendingEvents.delete(event.eventId);
+      if (this.pendingEvents.size === 0 && this.overflowReconciliationPending) {
+        this.overflowReconciliationPending = false;
+        this.scheduleInboxReconciliation(0);
+      }
+    });
   }
 
-  private deliverFromEvent(event: SafePushEvent, items: readonly DurableNotification[]): void {
+  private async deliverFromEvent(event: SafePushEvent, minimumGeneration: number): Promise<void> {
+    // A hint may arrive while socket-open reconciliation is still returning its
+    // pre-commit snapshot. Require a read started after this hint before deciding
+    // that its durable Inbox row is absent.
+    const { items, succeeded } = await this.readInboxAfter(minimumGeneration, event);
     if (!this.running || this.paused) return;
-    this.seenEvents.add(event.eventId);
+    if (!succeeded) return;
     const item = items.find((candidate) => candidate.id === event.notificationId);
     if (item === undefined) return;
-    this.deliver(item, event);
+    if (item.readAt !== null || this.seenNotifications.has(item.id)) {
+      this.seenEvents.add(event.eventId);
+      return;
+    }
+    // This post-hint generation already attempted the unread item with its
+    // matching event. The sink completion claims the event only on success.
   }
 
   private lastInbox: readonly DurableNotification[] = [];
 
-  private async readInbox(): Promise<readonly DurableNotification[]> {
+  private async readInboxAfter(
+    minimumGeneration: number,
+    event: SafePushEvent,
+  ): Promise<{
+    readonly generation: number;
+    readonly items: readonly DurableNotification[];
+    readonly succeeded: boolean;
+  }> {
+    for (;;) {
+      const result = await this.readInbox(event);
+      if (result.generation >= minimumGeneration || !this.running || this.paused) return result;
+    }
+  }
+
+  private async readInbox(event: SafePushEvent | null = null): Promise<{
+    readonly generation: number;
+    readonly items: readonly DurableNotification[];
+    readonly succeeded: boolean;
+  }> {
     if (this.inboxRead !== null) return this.inboxRead;
+    this.clearInboxRetryTimer();
+    const generation = ++this.inboxGeneration;
     this.inboxRead = (async () => {
       try {
         const items = await this.options.fetchInbox();
+        if (!this.running || this.paused) return { generation, items, succeeded: true };
         this.lastInbox = items;
-        for (const item of items) {
-          if (item.readAt === null) this.deliver(item, null);
-        }
-        return items;
-      } catch {
-        this.publish({
-          state: this.currentStatus.state,
-          reconnectAttempt: this.reconnectAttempt,
-          lastError: "INBOX_READ_FAILED",
+        const unreadNotificationIds = items
+          .filter((item) => item.readAt === null)
+          .map((item) => item.id);
+        const locallyAcknowledgedNotificationIds = unreadNotificationIds.filter((id) => {
+          if (!this.seenNotifications.has(id)) return false;
+          // Keep acknowledgements from the complete current snapshot ahead of
+          // stale entries when the bounded process-local set rolls over.
+          this.seenNotifications.add(id);
+          return true;
         });
-        return this.lastInbox;
+        const currentUnread = new Set(unreadNotificationIds);
+        for (const notificationId of this.attemptedNotifications) {
+          if (!currentUnread.has(notificationId) || this.seenNotifications.has(notificationId)) {
+            this.attemptedNotifications.delete(notificationId);
+          }
+        }
+        const newestItems = [...items].sort(newestNotificationFirst);
+        const matchingItem =
+          event === null
+            ? undefined
+            : newestItems.find((candidate) => candidate.id === event.notificationId);
+        const remainingItems =
+          matchingItem === undefined
+            ? newestItems
+            : newestItems.filter((candidate) => candidate !== matchingItem);
+        const deliveryItems = [
+          ...(matchingItem === undefined ? [] : [matchingItem]),
+          ...remainingItems.filter((candidate) => !this.attemptedNotifications.has(candidate.id)),
+          ...remainingItems.filter((candidate) => this.attemptedNotifications.has(candidate.id)),
+        ];
+        const pendingLimit = this.currentPendingNotificationLimit();
+        const availablePresentations = Math.max(0, pendingLimit - this.pendingNotifications.size);
+        const candidates: {
+          readonly item: DurableNotification;
+          readonly event: SafePushEvent | null;
+          readonly notification: DesktopNotification;
+        }[] = [];
+        for (const item of deliveryItems) {
+          if (candidates.length >= availablePresentations) break;
+          if (!this.canDeliver(item)) continue;
+          const matchingEvent = event?.notificationId === item.id ? event : null;
+          candidates.push({
+            item,
+            event: matchingEvent,
+            notification: desktopNotification(item, matchingEvent),
+          });
+        }
+        const prepared =
+          candidates.length === 0 || this.options.prepareNotifications === undefined
+            ? true
+            : await this.options.prepareNotifications(
+                candidates.map((candidate) => candidate.notification),
+              );
+        const presentationAttemptedNotificationIds: string[] = [];
+        if (prepared) {
+          this.reconciliationFailureAttempt = 0;
+          for (const candidate of candidates) {
+            if (this.deliver(candidate.item, candidate.event)) {
+              presentationAttemptedNotificationIds.push(candidate.item.id);
+            }
+          }
+        } else {
+          this.scheduleFailedInboxReconciliation("reconciliation");
+        }
+        try {
+          this.options.onReconcile?.({
+            generation,
+            notificationIds: items.map((item) => item.id),
+            unreadNotificationIds,
+            locallyAcknowledgedNotificationIds,
+            presentationAttemptedNotificationIds,
+          });
+        } catch {
+          // Observability must not turn a successful Inbox read into a retry.
+        }
+        return { generation, items, succeeded: true };
+      } catch {
+        if (this.running && !this.paused) {
+          this.publish({
+            state: this.currentStatus.state,
+            reconnectAttempt: this.reconnectAttempt,
+            lastError: "INBOX_READ_FAILED",
+          });
+          this.scheduleFailedInboxReconciliation("reconciliation");
+        }
+        return { generation, items: this.lastInbox, succeeded: false };
       } finally {
         this.inboxRead = null;
+        if (this.coalescedReconciliationPending) {
+          this.coalescedReconciliationPending = false;
+          this.scheduleInboxReconciliation(0);
+        }
       }
     })();
     return this.inboxRead;
   }
 
-  private deliver(item: DurableNotification, event: SafePushEvent | null): void {
-    if (item.readAt !== null || this.seenNotifications.has(item.id)) return;
-    this.seenNotifications.add(item.id);
+  private canDeliver(item: DurableNotification): boolean {
+    return (
+      this.running &&
+      !this.paused &&
+      item.readAt === null &&
+      !this.seenNotifications.has(item.id) &&
+      !this.pendingNotifications.has(item.id) &&
+      this.pendingNotifications.size < this.currentPendingNotificationLimit()
+    );
+  }
+
+  private currentPendingNotificationLimit(): number {
+    if (this.options.maxPendingNotifications === undefined) return MAX_PENDING_NOTIFICATIONS;
     try {
-      this.options.showNotification({
-        notificationId: item.id,
-        eventId: event?.eventId ?? null,
-        projectId: item.projectId,
-        userId: item.userId,
-        title: item.title,
-        body: item.body,
-        bugId: item.bugId ?? event?.bugId ?? null,
-      });
+      const value = this.options.maxPendingNotifications();
+      if (!Number.isSafeInteger(value) || value < 0) return 0;
+      return Math.min(value, MAX_PENDING_NOTIFICATIONS);
     } catch {
-      // A native notification failure must never tear down the authenticated
-      // transport or cause duplicate attempts on the next reconciliation.
+      return 0;
     }
+  }
+
+  private deliver(item: DurableNotification, event: SafePushEvent | null): boolean {
+    if (!this.canDeliver(item)) return false;
+    this.pendingNotifications.add(item.id);
+    const notification = desktopNotification(item, event);
+    let delivery: boolean | Promise<boolean>;
+    try {
+      delivery = this.options.showNotification(notification);
+    } catch {
+      this.pendingNotifications.delete(item.id);
+      this.attemptedNotifications.add(item.id);
+      this.scheduleFailedInboxReconciliation("presentation");
+      return false;
+    }
+    this.attemptedNotifications.add(item.id);
+    let acknowledged = false;
+    void Promise.resolve(delivery)
+      .then((result) => {
+        acknowledged = result;
+        if (result) {
+          this.seenNotifications.add(item.id);
+          if (event !== null) this.seenEvents.add(event.eventId);
+        }
+      })
+      .catch(() => {
+        // The unread item remains eligible for a later reconciliation.
+      })
+      .finally(() => {
+        this.pendingNotifications.delete(item.id);
+        if (!this.lastInboxHasRetryableNotification()) return;
+        if (acknowledged) {
+          this.presentationFailureAttempt = 0;
+          this.scheduleInboxReconciliation(0);
+        } else {
+          this.scheduleFailedInboxReconciliation("presentation");
+        }
+      });
+    return true;
+  }
+
+  private lastInboxHasRetryableNotification(): boolean {
+    return this.lastInbox.some(
+      (item) =>
+        item.readAt === null &&
+        !this.seenNotifications.has(item.id) &&
+        !this.pendingNotifications.has(item.id),
+    );
+  }
+
+  private scheduleFailedInboxReconciliation(kind: "reconciliation" | "presentation"): void {
+    const attempt =
+      kind === "reconciliation"
+        ? this.reconciliationFailureAttempt
+        : this.presentationFailureAttempt;
+    const delay = Math.min(
+      MAX_INBOX_RETRY_DELAY_MS,
+      INBOX_RETRY_BASE_DELAY_MS * 2 ** Math.min(attempt, 6),
+    );
+    if (!this.scheduleInboxReconciliation(delay)) return;
+    if (kind === "reconciliation") this.reconciliationFailureAttempt += 1;
+    else this.presentationFailureAttempt += 1;
+  }
+
+  private scheduleInboxReconciliation(delayMs: number): boolean {
+    if (!this.running || this.paused || this.accessToken === null) return false;
+    if (this.inboxRetryTimer !== null) {
+      if (this.inboxRetryDelayMs !== null && this.inboxRetryDelayMs <= delayMs) return false;
+      this.clearInboxRetryTimer();
+    }
+    this.inboxRetryDelayMs = delayMs;
+    this.inboxRetryTimer = this.setTimeoutFn(() => {
+      this.inboxRetryTimer = null;
+      this.inboxRetryDelayMs = null;
+      if (!this.running || this.paused || this.accessToken === null) return;
+      void this.readInbox();
+    }, delayMs);
+    return true;
+  }
+
+  private clearInboxRetryTimer(): void {
+    if (this.inboxRetryTimer === null) return;
+    this.clearTimeoutFn(this.inboxRetryTimer);
+    this.inboxRetryTimer = null;
+    this.inboxRetryDelayMs = null;
+  }
+
+  private resetInboxRetryState(): void {
+    this.reconciliationFailureAttempt = 0;
+    this.presentationFailureAttempt = 0;
+    this.overflowReconciliationPending = false;
+    this.coalescedReconciliationPending = false;
   }
 
   private markActivity(socket: NotificationSocket): void {
