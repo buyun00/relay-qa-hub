@@ -226,3 +226,130 @@ test("notification reads fail closed with the frozen authorization response", as
   assert.equal(response.statusCode, 403, response.body);
   assert.deepEqual(response.json(), { code: "FORBIDDEN" });
 });
+
+test("notification read route passes the authenticated actor, CAS body and idempotency key", async (t) => {
+  const calls = [];
+  const readAt = "2026-09-10T10:05:00.000Z";
+  const app = createApiApp({
+    logger: false,
+    debugActorId: actorId,
+    debugBearerToken: "read-token",
+    mobileNotificationStore: {
+      async listNotifications() {
+        throw new Error("not used");
+      },
+      async markRead(command) {
+        calls.push(command);
+        return {
+          id: itemId,
+          accountId,
+          projectId,
+          userId: actorId,
+          type: "bug.updated",
+          title: "Updated",
+          bugId,
+          createdAt: "2026-09-10T10:00:00.000Z",
+          readAt,
+          version: 2,
+        };
+      },
+    },
+  });
+  t.after(() => app.close());
+
+  const response = await app.inject({
+    method: "POST",
+    url: `/api/v1/notifications/${itemId}/read`,
+    headers: { ...authorization, "idempotency-key": "client-read-action" },
+    payload: { expectedVersion: 1 },
+  });
+  assert.equal(response.statusCode, 200, response.body);
+  assert.deepEqual(calls, [
+    {
+      actorId,
+      notificationId: itemId,
+      idempotencyKey: "client-read-action",
+      request: { expectedVersion: 1 },
+    },
+  ]);
+  assert.deepEqual(response.json(), {
+    id: itemId,
+    accountId,
+    projectId,
+    userId: actorId,
+    type: "bug.updated",
+    title: "Updated",
+    bugId,
+    createdAt: "2026-09-10T10:00:00.000Z",
+    readAt,
+    version: 2,
+  });
+});
+
+test("notification read route preserves frozen CAS and authorization error statuses", async (t) => {
+  let failure = "VERSION_CONFLICT";
+  const app = createApiApp({
+    logger: false,
+    debugActorId: actorId,
+    debugBearerToken: "read-token",
+    mobileNotificationStore: {
+      async listNotifications() {
+        throw new Error("not used");
+      },
+      async markRead() {
+        throw Object.assign(new Error(failure), { code: failure });
+      },
+    },
+  });
+  t.after(() => app.close());
+  const inject = () =>
+    app.inject({
+      method: "POST",
+      url: `/api/v1/notifications/${itemId}/read`,
+      headers: { ...authorization, "idempotency-key": "client-read-action" },
+      payload: { expectedVersion: 1 },
+    });
+
+  const stale = await inject();
+  assert.equal(stale.statusCode, 412, stale.body);
+  assert.deepEqual(stale.json(), { code: "VERSION_CONFLICT" });
+  failure = "IDEMPOTENCY_PAYLOAD_MISMATCH";
+  const mismatch = await inject();
+  assert.equal(mismatch.statusCode, 409, mismatch.body);
+  assert.deepEqual(mismatch.json(), { code: "IDEMPOTENCY_PAYLOAD_MISMATCH" });
+  failure = "FORBIDDEN";
+  const forbidden = await inject();
+  assert.equal(forbidden.statusCode, 403, forbidden.body);
+  assert.deepEqual(forbidden.json(), { code: "FORBIDDEN" });
+});
+
+test("notification read route rejects malformed CAS bodies and missing idempotency keys", async (t) => {
+  const app = createApiApp({
+    logger: false,
+    debugActorId: actorId,
+    debugBearerToken: "read-token",
+  });
+  t.after(() => app.close());
+  for (const request of [
+    {
+      headers: authorization,
+      payload: { expectedVersion: 1 },
+    },
+    {
+      headers: { ...authorization, "idempotency-key": "client-read-action" },
+      payload: { expectedVersion: 0 },
+    },
+    {
+      headers: { ...authorization, "idempotency-key": "client-read-action" },
+      payload: { expectedVersion: 1, extra: true },
+    },
+  ]) {
+    const response = await app.inject({
+      method: "POST",
+      url: `/api/v1/notifications/${itemId}/read`,
+      ...request,
+    });
+    assert.equal(response.statusCode, 400, response.body);
+    assert.deepEqual(response.json(), { code: "INVALID_REQUEST" });
+  }
+});

@@ -3,10 +3,13 @@ import { createHash } from "node:crypto";
 import type { MobileCaptureArtifactKind } from "@relay-qa-hub/storage";
 
 export const MOBILE_UPLOAD_INIT_PATH = "/api/v1/uploads/init" as const;
+export const MOBILE_UPLOAD_ITEM_PATH = "/api/v1/uploads/:sessionId" as const;
 export const MOBILE_UPLOAD_CHUNK_PATH = "/api/v1/uploads/:sessionId/chunks/:chunkNumber" as const;
 export const MOBILE_UPLOAD_FINALIZE_PATH = "/api/v1/uploads/:sessionId/finalize" as const;
 export const MOBILE_ATTACHMENT_BIND_PATH = "/api/v1/attachments/:attachmentId/bind" as const;
 export const MOBILE_ATTACHMENT_ITEM_PATH = "/api/v1/attachments/:attachmentId" as const;
+export const MOBILE_ATTACHMENT_METADATA_PATH =
+  "/api/v1/attachments/:attachmentId/metadata" as const;
 export const MOBILE_BUG_ATTACHMENTS_PATH = "/api/v1/bugs/:bugId/attachments" as const;
 export const MOBILE_CAPTURE_ARTIFACT_PATH =
   "/api/v1/bugs/:bugId/capture-bundles/:captureId/artifacts/:artifactKind" as const;
@@ -48,6 +51,27 @@ export interface MobileInitUploadResponse {
   readonly confirmedChunks: readonly number[];
   readonly version: number;
   readonly replayed: boolean;
+}
+
+export interface MobileUploadSessionSnapshot {
+  readonly sessionId: string;
+  readonly projectId: string;
+  readonly clientSubmissionId: string;
+  readonly clientAttachmentId: string;
+  readonly uploadAttempt: number;
+  readonly status: "open" | "finalizing" | "finalized" | "expired" | "rejected";
+  readonly filename: string;
+  readonly mediaType: string;
+  readonly captureId: string | null;
+  readonly expectedSize: number;
+  readonly chunkSize: number;
+  readonly sha256: string;
+  readonly expectedChunkCount: number;
+  readonly receivedBytes: number;
+  readonly confirmedChunks: readonly number[];
+  readonly attachmentId: string | null;
+  readonly expiresAt: string;
+  readonly version: number;
 }
 
 export interface MobileFinalizeUploadRequest {
@@ -121,6 +145,22 @@ export interface MobileAttachmentMetadata {
   readonly version: number;
 }
 
+export interface MobileAttachmentStateMetadata {
+  readonly attachmentId: string;
+  readonly projectId: string;
+  readonly clientSubmissionId: string;
+  readonly clientAttachmentId: string;
+  readonly captureId: string | null;
+  readonly filename: string;
+  readonly mediaType: string;
+  readonly size: number;
+  readonly sha256: string;
+  readonly scanStatus: "pending" | "clean" | "rejected" | "unavailable";
+  readonly readyToBind: boolean;
+  readonly bindingStatus: "unbound" | "reserved" | "claimed";
+  readonly version: number;
+}
+
 export interface MobileBugAttachmentListResponse {
   readonly bugId: string;
   readonly projectId: string;
@@ -184,6 +224,11 @@ export interface FinalizeMobileUploadCommand {
   readonly request: MobileFinalizeUploadRequest;
 }
 
+export interface GetMobileUploadSessionQuery {
+  readonly actorId: string;
+  readonly sessionId: string;
+}
+
 export interface BindMobileAttachmentCommand {
   readonly actorId: string;
   readonly idempotencyKey: string;
@@ -199,6 +244,11 @@ export interface ListMobileBugAttachmentsQuery {
 }
 
 export interface GetMobileAttachmentQuery {
+  readonly actorId: string;
+  readonly attachmentId: string;
+}
+
+export interface GetMobileAttachmentMetadataQuery {
   readonly actorId: string;
   readonly attachmentId: string;
 }
@@ -220,6 +270,9 @@ export interface MobileAttachmentStore {
   readonly finalizeUpload: (
     command: FinalizeMobileUploadCommand,
   ) => MobileFinalizeUploadResponse | Promise<MobileFinalizeUploadResponse>;
+  readonly getUploadSession: (
+    query: GetMobileUploadSessionQuery,
+  ) => MobileUploadSessionSnapshot | null | Promise<MobileUploadSessionSnapshot | null>;
   readonly bindAttachment: (
     command: BindMobileAttachmentCommand,
   ) => MobileAttachmentReservation | Promise<MobileAttachmentReservation>;
@@ -229,6 +282,9 @@ export interface MobileAttachmentStore {
   readonly getAttachment: (
     query: GetMobileAttachmentQuery,
   ) => MobileAttachmentDownload | null | Promise<MobileAttachmentDownload | null>;
+  readonly getAttachmentMetadata: (
+    query: GetMobileAttachmentMetadataQuery,
+  ) => MobileAttachmentStateMetadata | null | Promise<MobileAttachmentStateMetadata | null>;
   readonly getCaptureArtifact: (
     query: GetMobileCaptureArtifactQuery,
   ) => MobileCaptureArtifactDownload | null | Promise<MobileCaptureArtifactDownload | null>;

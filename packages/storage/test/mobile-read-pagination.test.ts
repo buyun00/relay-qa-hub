@@ -12,7 +12,10 @@ import {
   listMobileBugComments,
   listMobileBugEvents,
 } from "../src/mobile-comment-store.js";
-import { syncAndListMobileNotifications } from "../src/mobile-inbox-store.js";
+import {
+  markMobileNotificationRead,
+  syncAndListMobileNotifications,
+} from "../src/mobile-inbox-store.js";
 import {
   listMobileProjectMembers,
   listMobileVisibleProjects,
@@ -1554,6 +1557,234 @@ test("notification continuation keeps unread rows frozen across read mutation", 
     assert.equal(second.items[0]?.id, frozenSecondId);
     assert.equal(second.items[0]?.readAt, null);
     assert.equal(second.unreadCount, first.unreadCount);
+  } finally {
+    database.close();
+  }
+});
+
+function createUnreadNotification(database: DatabaseSync, now: string) {
+  const bug = transaction(database, () =>
+    createMobileBug(database, {
+      accountId,
+      projectId,
+      actorId,
+      clientSubmissionId: "81000000-0000-4000-8000-000000000070",
+      payloadDigest: "7".repeat(64),
+      title: "Notification read",
+      description: "Persist a read receipt",
+      expectedBehavior: "Unread count decreases",
+      severity: "S2",
+      priority: "P2",
+      ownerId: actorId,
+      verificationOwnerId: actorId,
+      occurrence: {
+        observedAt: createdAt,
+        platform: "android",
+        steps: ["Open Inbox"],
+        actualBehavior: "Notification is unread",
+      },
+      attachmentIds: [],
+      captureBundleId: null,
+      createdAt,
+    }),
+  );
+  const notifications = transaction(database, () =>
+    syncAndListMobileNotifications(
+      database,
+      {
+        accountId,
+        projectId,
+        actorId,
+        authorizationProjectId: projectId,
+        requestedProjectId: projectId,
+        limit: 50,
+        now,
+      },
+      key,
+    ),
+  );
+  const notification = notifications.items.find((item) => item.bugId === bug.bug.id);
+  assert.ok(notification);
+  assert.equal(notification.readAt, null);
+  assert.equal(notification.version, 1);
+  return notification;
+}
+
+test("notification read CAS persists one audit receipt, exact replay and unread counts", () => {
+  const database = databaseFixture();
+  try {
+    const readAt = new Date().toISOString();
+    const notification = createUnreadNotification(database, readAt);
+    const command = {
+      accountId,
+      projectId,
+      actorId,
+      notificationId: notification.id,
+      expectedVersion: 1,
+      idempotencyKey: "read-action-1",
+      requestDigest: "a".repeat(64),
+      readAt,
+    } as const;
+
+    const first = transaction(database, () => markMobileNotificationRead(database, command));
+    assert.deepEqual(first, {
+      id: notification.id,
+      accountId,
+      projectId,
+      userId: actorId,
+      type: notification.type,
+      title: notification.title,
+      bugId: notification.bugId,
+      createdAt: notification.createdAt,
+      readAt,
+      version: 2,
+    });
+    const replay = transaction(database, () => markMobileNotificationRead(database, command));
+    assert.deepEqual(replay, first);
+
+    const listed = transaction(database, () =>
+      syncAndListMobileNotifications(
+        database,
+        {
+          accountId,
+          projectId,
+          actorId,
+          authorizationProjectId: projectId,
+          requestedProjectId: projectId,
+          limit: 50,
+          now: new Date(Date.parse(readAt) + 1).toISOString(),
+        },
+        key,
+      ),
+    );
+    assert.equal(listed.unreadCount, 0);
+    assert.equal(listed.items.find((item) => item.id === notification.id)?.readAt, readAt);
+    assert.equal(listed.items.find((item) => item.id === notification.id)?.version, 2);
+    const unread = transaction(database, () =>
+      syncAndListMobileNotifications(
+        database,
+        {
+          accountId,
+          projectId,
+          actorId,
+          authorizationProjectId: projectId,
+          requestedProjectId: projectId,
+          unreadOnly: true,
+          limit: 50,
+          now: new Date(Date.parse(readAt) + 2).toISOString(),
+        },
+        key,
+      ),
+    );
+    assert.equal(unread.unreadCount, 0);
+    assert.equal(
+      unread.items.some((item) => item.id === notification.id),
+      false,
+    );
+    assert.equal(
+      database
+        .prepare(
+          "SELECT COUNT(*) AS count FROM idempotency_records WHERE operation_id = 'markNotificationRead'",
+        )
+        .get()!.count,
+      1,
+    );
+    assert.equal(
+      database
+        .prepare(
+          "SELECT COUNT(*) AS count FROM events WHERE type = 'notification.read' AND resource_id = ?",
+        )
+        .get(notification.id)!.count,
+      1,
+    );
+
+    assert.throws(
+      () =>
+        transaction(database, () =>
+          markMobileNotificationRead(database, {
+            ...command,
+            expectedVersion: 2,
+            requestDigest: "b".repeat(64),
+          }),
+        ),
+      hasStorageCode("IDEMPOTENCY_PAYLOAD_MISMATCH"),
+    );
+    assert.throws(
+      () =>
+        transaction(database, () =>
+          markMobileNotificationRead(database, {
+            ...command,
+            expectedVersion: 2,
+            idempotencyKey: "read-action-2",
+            requestDigest: "c".repeat(64),
+          }),
+        ),
+      hasStorageCode("VERSION_CONFLICT"),
+    );
+    assert.throws(
+      () =>
+        transaction(database, () =>
+          markMobileNotificationRead(database, {
+            ...command,
+            idempotencyKey: "read-action-stale",
+            requestDigest: "d".repeat(64),
+          }),
+        ),
+      hasStorageCode("VERSION_CONFLICT"),
+    );
+  } finally {
+    database.close();
+  }
+});
+
+test("notification read refuses another user and revoked project membership before mutation", () => {
+  const database = databaseFixture();
+  try {
+    const readAt = new Date().toISOString();
+    const notification = createUnreadNotification(database, readAt);
+    const base = {
+      accountId,
+      projectId,
+      notificationId: notification.id,
+      expectedVersion: 1,
+      idempotencyKey: "unauthorized-read",
+      requestDigest: "e".repeat(64),
+      readAt,
+    } as const;
+    assert.throws(
+      () =>
+        transaction(database, () =>
+          markMobileNotificationRead(database, {
+            ...base,
+            actorId: "81000000-0000-4000-8000-000000000010",
+          }),
+        ),
+      hasStorageCode("FORBIDDEN"),
+    );
+    database
+      .prepare(
+        `UPDATE memberships
+         SET status = 'revoked', updated_at = ?, version = version + 1
+         WHERE account_id = ? AND project_id = ? AND user_id = ?`,
+      )
+      .run(readAt, accountId, projectId, actorId);
+    assert.throws(
+      () => transaction(database, () => markMobileNotificationRead(database, { ...base, actorId })),
+      hasStorageCode("FORBIDDEN"),
+    );
+    const persisted = database
+      .prepare("SELECT read_at, version FROM notifications WHERE id = ?")
+      .get(notification.id) as { readonly read_at: string | null; readonly version: number };
+    assert.equal(persisted.read_at, null);
+    assert.equal(persisted.version, 1);
+    assert.equal(
+      database
+        .prepare(
+          "SELECT COUNT(*) AS count FROM idempotency_records WHERE operation_id = 'markNotificationRead'",
+        )
+        .get()!.count,
+      0,
+    );
   } finally {
     database.close();
   }

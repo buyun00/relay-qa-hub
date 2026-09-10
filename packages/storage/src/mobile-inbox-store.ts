@@ -42,6 +42,22 @@ export interface MobileNotificationList {
   readonly duplicate: number;
 }
 
+export type MobileNotificationReadRecord = Readonly<
+  Pick<
+    MobileNotificationRecord,
+    | "id"
+    | "accountId"
+    | "projectId"
+    | "userId"
+    | "type"
+    | "title"
+    | "bugId"
+    | "createdAt"
+    | "readAt"
+    | "version"
+  >
+>;
+
 export interface ListMobileNotificationsInput extends MobileRelayScope {
   readonly authorizationProjectId?: string;
   readonly requestedProjectId?: string;
@@ -49,6 +65,14 @@ export interface ListMobileNotificationsInput extends MobileRelayScope {
   readonly cursor?: string;
   readonly limit: number;
   readonly now: string;
+}
+
+export interface MarkMobileNotificationReadInput extends MobileRelayScope {
+  readonly notificationId: string;
+  readonly expectedVersion: number;
+  readonly idempotencyKey: string;
+  readonly requestDigest: string;
+  readonly readAt: string;
 }
 
 interface NotificationOutboxRow {
@@ -110,6 +134,12 @@ interface NotificationRow {
   readonly event_to_state: string | null;
   readonly event_aggregate_sequence: number;
   readonly event_payload_json: string;
+}
+
+interface NotificationReadReplayRow {
+  readonly request_digest: string;
+  readonly status: string;
+  readonly response_json: string | null;
 }
 
 function requireTransaction(database: DatabaseSync): void {
@@ -471,6 +501,237 @@ function toNotification(row: NotificationRow): MobileNotificationRecord {
     readAt: row.read_at,
     version: row.version,
   });
+}
+
+function toNotificationReadRecord(row: NotificationRow): MobileNotificationReadRecord {
+  const notification = toNotification(row);
+  return Object.freeze({
+    id: notification.id,
+    accountId: notification.accountId,
+    projectId: notification.projectId,
+    userId: notification.userId,
+    type: notification.type,
+    title: notification.title,
+    bugId: notification.bugId,
+    createdAt: notification.createdAt,
+    readAt: notification.readAt,
+    version: notification.version,
+  });
+}
+
+function readNotificationRow(
+  database: DatabaseSync,
+  accountId: string,
+  notificationId: string,
+): NotificationRow | null {
+  return (
+    (database
+      .prepare(
+        `SELECT notification.rowid AS row_id, notification.id, notification.account_id,
+                notification.project_id, notification.user_id, notification.type,
+                notification.title, notification.bug_id, notification.source_event_id,
+                notification.payload_json, notification.created_at, notification.read_at,
+                notification.version, event.type AS event_type,
+                event.to_state AS event_to_state,
+                event.aggregate_sequence AS event_aggregate_sequence,
+                event.payload_json AS event_payload_json
+         FROM notifications AS notification
+         JOIN events AS event ON event.account_id = notification.account_id
+           AND event.project_id = notification.project_id
+           AND event.id = notification.source_event_id
+         WHERE notification.account_id = ? AND notification.id = ?`,
+      )
+      .get(accountId, notificationId) as NotificationRow | undefined) ?? null
+  );
+}
+
+function notificationReadScope(
+  input: MarkMobileNotificationReadInput,
+  projectId: string,
+): { readonly json: string; readonly digest: string; readonly key: string } {
+  const json = JSON.stringify({
+    operationId: "markNotificationRead",
+    accountId: input.accountId,
+    projectId,
+    actorId: input.actorId,
+    notificationId: input.notificationId,
+  });
+  return Object.freeze({
+    json,
+    digest: createHash("sha256").update(json).digest("hex"),
+    key: `notification:${input.notificationId}:read:${input.idempotencyKey}`,
+  });
+}
+
+function readNotificationReplay(
+  database: DatabaseSync,
+  input: MarkMobileNotificationReadInput,
+  projectId: string,
+): MobileNotificationReadRecord | null {
+  const scope = notificationReadScope(input, projectId);
+  const row = database
+    .prepare(
+      `SELECT request_digest, status, response_json
+       FROM idempotency_records
+       WHERE account_id = ? AND project_id = ? AND actor_id = ?
+         AND operation_id = 'markNotificationRead'
+         AND scope_digest = ? AND idempotency_key = ?`,
+    )
+    .get(input.accountId, projectId, input.actorId, scope.digest, scope.key) as
+    NotificationReadReplayRow | undefined;
+  if (!row) return null;
+  if (row.request_digest !== input.requestDigest) {
+    throw new MobileRelayStorageError(
+      "IDEMPOTENCY_PAYLOAD_MISMATCH",
+      "Idempotency-Key was already used with another notification read request",
+    );
+  }
+  if (row.status !== "committed" || row.response_json === null) {
+    throw new MobileRelayStorageError("VERSION_CONFLICT", "notification read is not committed");
+  }
+  return Object.freeze(JSON.parse(row.response_json) as MobileNotificationReadRecord);
+}
+
+export function markMobileNotificationRead(
+  database: DatabaseSync,
+  input: MarkMobileNotificationReadInput,
+): MobileNotificationReadRecord {
+  requireTransaction(database);
+  requireUuid(input.accountId, "accountId");
+  requireUuid(input.projectId, "projectId");
+  requireUuid(input.actorId, "actorId");
+  requireUuid(input.notificationId, "notificationId");
+  if (!Number.isSafeInteger(input.expectedVersion) || input.expectedVersion < 1) {
+    throw new MobileRelayStorageError("INVALID_REQUEST", "expectedVersion is invalid");
+  }
+  if (input.idempotencyKey.length < 1 || input.idempotencyKey.length > 200) {
+    throw new MobileRelayStorageError("INVALID_REQUEST", "Idempotency-Key is invalid");
+  }
+  if (!/^[0-9a-f]{64}$/u.test(input.requestDigest)) {
+    throw new MobileRelayStorageError("INVALID_REQUEST", "requestDigest is invalid");
+  }
+  requireTimestamp(input.readAt);
+
+  const current = readNotificationRow(database, input.accountId, input.notificationId);
+  if (current === null) {
+    throw new MobileRelayStorageError("NOT_FOUND", "notification was not found");
+  }
+  if (current.user_id !== input.actorId) {
+    throw new MobileRelayStorageError("FORBIDDEN", "notification belongs to another user");
+  }
+  resolveMobileReadAuthorization(
+    database,
+    {
+      accountId: input.accountId,
+      actorId: input.actorId,
+      authorizationProjectId: input.projectId,
+    },
+    current.project_id,
+  );
+
+  const replay = readNotificationReplay(database, input, current.project_id);
+  if (replay !== null) return replay;
+  if (current.version !== input.expectedVersion) {
+    throw new MobileRelayStorageError("VERSION_CONFLICT", "notification version is stale");
+  }
+  if (current.read_at !== null) {
+    throw new MobileRelayStorageError("VERSION_CONFLICT", "notification is already read");
+  }
+  if (Date.parse(input.readAt) < Date.parse(current.created_at)) {
+    throw new MobileRelayStorageError("INVALID_REQUEST", "readAt precedes notification creation");
+  }
+
+  const scope = notificationReadScope(input, current.project_id);
+  const receiptId = randomUUID();
+  const eventId = randomUUID();
+  const nextVersion = current.version + 1;
+  const expiresAt = new Date(Date.parse(input.readAt) + 7 * 24 * 60 * 60 * 1_000).toISOString();
+  database
+    .prepare(
+      `INSERT INTO idempotency_records(
+         id, account_id, project_id, actor_id, operation_id, idempotency_key,
+         scope_digest, scope_json, request_digest, status, created_at, expires_at, version
+       ) VALUES (?, ?, ?, ?, 'markNotificationRead', ?, ?, ?, ?, 'reserved', ?, ?, 1)`,
+    )
+    .run(
+      receiptId,
+      input.accountId,
+      current.project_id,
+      input.actorId,
+      scope.key,
+      scope.digest,
+      scope.json,
+      input.requestDigest,
+      input.readAt,
+      expiresAt,
+    );
+  const updated = database
+    .prepare(
+      `UPDATE notifications
+       SET read_at = ?, version = version + 1
+       WHERE account_id = ? AND project_id = ? AND id = ? AND user_id = ?
+         AND version = ? AND read_at IS NULL`,
+    )
+    .run(
+      input.readAt,
+      input.accountId,
+      current.project_id,
+      input.notificationId,
+      input.actorId,
+      input.expectedVersion,
+    );
+  if (updated.changes !== 1) {
+    throw new MobileRelayStorageError("VERSION_CONFLICT", "notification read did not apply once");
+  }
+  database
+    .prepare(
+      `INSERT INTO events(
+         id, account_id, project_id, bug_id, type, source, actor_type,
+         actor_user_id, aggregate_type, aggregate_id, aggregate_sequence,
+         resource_type, resource_id, resource_version_after, request_digest,
+         correlation_id, payload_json, created_at
+       ) VALUES (?, ?, ?, ?, 'notification.read', 'qa_hub', 'user', ?,
+                 'notification', ?, ?, 'notification', ?, ?, ?, ?, ?, ?)`,
+    )
+    .run(
+      eventId,
+      input.accountId,
+      current.project_id,
+      current.bug_id,
+      input.actorId,
+      input.notificationId,
+      nextVersion,
+      input.notificationId,
+      nextVersion,
+      input.requestDigest,
+      randomUUID(),
+      JSON.stringify({
+        fromVersion: current.version,
+        toVersion: nextVersion,
+      }),
+      input.readAt,
+    );
+  const persisted = readNotificationRow(database, input.accountId, input.notificationId);
+  if (
+    persisted === null ||
+    persisted.version !== nextVersion ||
+    persisted.read_at !== input.readAt
+  ) {
+    throw new MobileRelayStorageError("VERSION_CONFLICT", "notification read was not persisted");
+  }
+  const response = toNotificationReadRecord(persisted);
+  const committed = database
+    .prepare(
+      `UPDATE idempotency_records
+       SET status = 'committed', http_status = 200, response_json = ?,
+           audit_event_id = ?, version = 2
+       WHERE id = ? AND status = 'reserved' AND version = 1`,
+    )
+    .run(JSON.stringify(response), eventId, receiptId);
+  if (committed.changes !== 1) {
+    throw new MobileRelayStorageError("VERSION_CONFLICT", "notification receipt did not commit");
+  }
+  return response;
 }
 
 export function syncAndListMobileNotifications(

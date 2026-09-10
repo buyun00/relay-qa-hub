@@ -20,11 +20,13 @@ import {
   MAX_MOBILE_CHUNK_SIZE_BYTES,
   MOBILE_ATTACHMENT_BIND_PATH,
   MOBILE_ATTACHMENT_ITEM_PATH,
+  MOBILE_ATTACHMENT_METADATA_PATH,
   MOBILE_BUG_ATTACHMENTS_PATH,
   MOBILE_CAPTURE_ARTIFACT_PATH,
   MOBILE_UPLOAD_CHUNK_PATH,
   MOBILE_UPLOAD_FINALIZE_PATH,
   MOBILE_UPLOAD_INIT_PATH,
+  MOBILE_UPLOAD_ITEM_PATH,
   type MobileAttachmentStore,
   parseMobileAttachmentBindingRequest,
   parseMobileAttachmentListLimit,
@@ -104,7 +106,11 @@ import {
 } from "./mobile-comments.js";
 import {
   MOBILE_NOTIFICATION_LIST_PATH,
+  MOBILE_NOTIFICATION_READ_PATH,
+  parseMobileMarkNotificationReadRequest,
   parseMobileNotificationListQuery,
+  requireMobileNotificationIdempotencyKey,
+  requireMobileNotificationUuid,
   type MobileNotificationStore,
 } from "./mobile-inbox.js";
 import {
@@ -377,6 +383,9 @@ const unconfiguredMobileAttachmentStore: MobileAttachmentStore = {
   finalizeUpload: () => {
     throw new Error("MobileAttachmentStore is not configured");
   },
+  getUploadSession: () => {
+    throw new Error("MobileAttachmentStore is not configured");
+  },
   bindAttachment: () => {
     throw new Error("MobileAttachmentStore is not configured");
   },
@@ -384,6 +393,9 @@ const unconfiguredMobileAttachmentStore: MobileAttachmentStore = {
     throw new Error("MobileAttachmentStore is not configured");
   },
   getAttachment: () => {
+    throw new Error("MobileAttachmentStore is not configured");
+  },
+  getAttachmentMetadata: () => {
     throw new Error("MobileAttachmentStore is not configured");
   },
   getCaptureArtifact: () => {
@@ -487,6 +499,9 @@ const unconfiguredMobileCommentStore: MobileCommentStore = {
 
 const unconfiguredMobileNotificationStore: MobileNotificationStore = {
   listNotifications: () => {
+    throw new Error("MobileNotificationStore is not configured");
+  },
+  markRead: () => {
     throw new Error("MobileNotificationStore is not configured");
   },
 };
@@ -2774,6 +2789,40 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
     }
   });
 
+  app.post<{ Params: { notificationId: string } }>(
+    MOBILE_NOTIFICATION_READ_PATH,
+    async (request, reply) => {
+      if (readHeader(request.headers.authorization) !== `Bearer ${debugBearerToken}`) {
+        return reply
+          .code(401)
+          .header("content-type", MOBILE_API_CONTENT_TYPE)
+          .send({ code: "UNAUTHENTICATED" });
+      }
+      try {
+        const notificationId = requireMobileNotificationUuid(
+          request.params.notificationId,
+          "notificationId",
+        );
+        const requestBody = parseMobileMarkNotificationReadRequest(request.body);
+        const result = await mobileNotificationStore.markRead({
+          actorId: authenticatedActorId(request, debugActorId),
+          notificationId,
+          idempotencyKey: requireMobileNotificationIdempotencyKey(
+            readHeader(request.headers["idempotency-key"]),
+          ),
+          request: requestBody,
+        });
+        return reply.header("content-type", MOBILE_API_CONTENT_TYPE).send(result);
+      } catch (error: unknown) {
+        const code = (error as { code?: unknown })?.code;
+        if (code === "VERSION_CONFLICT") {
+          return reply.code(412).header("content-type", MOBILE_API_CONTENT_TYPE).send({ code });
+        }
+        return relayErrorReply(error, reply);
+      }
+    },
+  );
+
   app.post(MOBILE_CAPTURE_COLLECTION_PATH, async (request, reply) => {
     if (readHeader(request.headers.authorization) !== `Bearer ${debugBearerToken}`) {
       return reply
@@ -2829,6 +2878,43 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
     });
     if (capture === null) return reply.code(404).send({ code: "NOT_FOUND" });
     return reply.header("content-type", MOBILE_API_CONTENT_TYPE).send(capture);
+  });
+
+  app.get<{ Params: { sessionId: string } }>(MOBILE_UPLOAD_ITEM_PATH, async (request, reply) => {
+    if (readHeader(request.headers.authorization) !== `Bearer ${debugBearerToken}`) {
+      return reply
+        .code(401)
+        .header("content-type", MOBILE_API_CONTENT_TYPE)
+        .send({ code: "UNAUTHENTICATED" });
+    }
+    try {
+      const result = await mobileAttachmentStore.getUploadSession({
+        actorId: authenticatedActorId(request, debugActorId),
+        sessionId: requireMobileUuid(request.params.sessionId, "sessionId"),
+      });
+      if (result === null) {
+        return reply
+          .code(404)
+          .header("content-type", MOBILE_API_CONTENT_TYPE)
+          .send({ code: "NOT_FOUND" });
+      }
+      return reply
+        .header("cache-control", "private, no-store")
+        .header("content-type", MOBILE_API_CONTENT_TYPE)
+        .send(result);
+    } catch (error: unknown) {
+      if ((error as { code?: string }).code === "FORBIDDEN") {
+        return reply
+          .code(403)
+          .header("content-type", MOBILE_API_CONTENT_TYPE)
+          .send({ code: "FORBIDDEN" });
+      }
+      if (!(error instanceof TypeError)) throw error;
+      return reply
+        .code(400)
+        .header("content-type", MOBILE_API_CONTENT_TYPE)
+        .send({ code: "INVALID_REQUEST" });
+    }
   });
 
   app.post(MOBILE_UPLOAD_INIT_PATH, async (request, reply) => {
@@ -2992,6 +3078,46 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
         });
         return reply.header("content-type", MOBILE_API_CONTENT_TYPE).send(response);
       } catch (error: unknown) {
+        if (!(error instanceof TypeError)) throw error;
+        return reply
+          .code(400)
+          .header("content-type", MOBILE_API_CONTENT_TYPE)
+          .send({ code: "INVALID_REQUEST" });
+      }
+    },
+  );
+
+  app.get<{ Params: { attachmentId: string } }>(
+    MOBILE_ATTACHMENT_METADATA_PATH,
+    async (request, reply) => {
+      if (readHeader(request.headers.authorization) !== `Bearer ${debugBearerToken}`) {
+        return reply
+          .code(401)
+          .header("content-type", MOBILE_API_CONTENT_TYPE)
+          .send({ code: "UNAUTHENTICATED" });
+      }
+      try {
+        const result = await mobileAttachmentStore.getAttachmentMetadata({
+          actorId: authenticatedActorId(request, debugActorId),
+          attachmentId: requireMobileUuid(request.params.attachmentId, "attachmentId"),
+        });
+        if (result === null) {
+          return reply
+            .code(404)
+            .header("content-type", MOBILE_API_CONTENT_TYPE)
+            .send({ code: "NOT_FOUND" });
+        }
+        return reply
+          .header("cache-control", "private, no-store")
+          .header("content-type", MOBILE_API_CONTENT_TYPE)
+          .send(result);
+      } catch (error: unknown) {
+        if ((error as { code?: string }).code === "FORBIDDEN") {
+          return reply
+            .code(403)
+            .header("content-type", MOBILE_API_CONTENT_TYPE)
+            .send({ code: "FORBIDDEN" });
+        }
         if (!(error instanceof TypeError)) throw error;
         return reply
           .code(400)

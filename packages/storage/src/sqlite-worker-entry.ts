@@ -18,15 +18,19 @@ import type { DatabaseSync } from "node:sqlite";
 import {
   bindMobileAttachment,
   finalizeMobileUpload,
+  getMobileAttachmentMetadata,
   getMobileAttachment,
   getMobileCaptureArtifact,
+  getMobileUploadSession,
   initMobileUpload,
   listMobileBugAttachments,
   putMobileUploadChunk,
   type BindMobileAttachmentInput,
   type FinalizeMobileUploadInput,
+  type GetMobileAttachmentMetadataInput,
   type GetMobileAttachmentInput,
   type GetMobileCaptureArtifactInput,
+  type GetMobileUploadSessionInput,
   type InitMobileUploadInput,
   type ListMobileBugAttachmentsInput,
   type MobileAttachmentRoots,
@@ -87,8 +91,10 @@ import {
   type MarkMobileBugDuplicateInput,
 } from "./mobile-duplicate-store.js";
 import {
+  markMobileNotificationRead,
   syncAndListMobileNotifications,
   type ListMobileNotificationsInput,
+  type MarkMobileNotificationReadInput,
 } from "./mobile-inbox-store.js";
 import {
   createBrowserSession,
@@ -244,6 +250,7 @@ interface WorkerRequest {
     | "startMobileVerification"
     | "recordMobileVerificationResult"
     | "syncAndListMobileNotifications"
+    | "markMobileNotificationRead"
     | "ensureMobileRelayRoles"
     | "transitionMobileBugReady"
     | "updateMobileBug"
@@ -269,9 +276,11 @@ interface WorkerRequest {
     | "initMobileUpload"
     | "putMobileUploadChunk"
     | "finalizeMobileUpload"
+    | "getMobileUploadSession"
     | "bindMobileAttachment"
     | "listMobileBugAttachments"
     | "getMobileAttachment"
+    | "getMobileAttachmentMetadata"
     | "getMobileCaptureArtifact"
     | "createOnlineBackup"
     | "testCreateBug"
@@ -669,6 +678,12 @@ async function execute(request: WorkerRequest): Promise<unknown> {
     );
   }
 
+  if (request.operation === "markMobileNotificationRead") {
+    return inWriteTransaction((current) =>
+      markMobileNotificationRead(current, request.payload as MarkMobileNotificationReadInput),
+    );
+  }
+
   if (request.operation === "ensureMobileRelayRoles") {
     return inWriteTransaction((current) => {
       ensureMobileRelayRoles(
@@ -872,6 +887,12 @@ async function execute(request: WorkerRequest): Promise<unknown> {
     );
   }
 
+  if (request.operation === "getMobileUploadSession") {
+    return inWriteTransaction((current) =>
+      getMobileUploadSession(current, request.payload as GetMobileUploadSessionInput),
+    );
+  }
+
   if (request.operation === "bindMobileAttachment") {
     return inWriteTransaction((current) =>
       bindMobileAttachment(current, request.payload as BindMobileAttachmentInput),
@@ -890,6 +911,13 @@ async function execute(request: WorkerRequest): Promise<unknown> {
       requireDatabase(),
       requireAttachmentRoots(),
       request.payload as GetMobileAttachmentInput,
+    );
+  }
+
+  if (request.operation === "getMobileAttachmentMetadata") {
+    return getMobileAttachmentMetadata(
+      requireDatabase(),
+      request.payload as GetMobileAttachmentMetadataInput,
     );
   }
 

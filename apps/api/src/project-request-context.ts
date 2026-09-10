@@ -93,7 +93,9 @@ export class ProjectRequestContext {
               ? 404
               : code === "PROJECT_NOT_ACCESSIBLE"
                 ? 403
-                : code === "PROJECT_REQUIRED" || code === "PROJECT_MISMATCH"
+                : code === "PROJECT_REQUIRED" ||
+                    code === "PROJECT_MISMATCH" ||
+                    code === "INVALID_REQUEST"
                   ? 400
                   : 500,
           )
@@ -132,6 +134,7 @@ export class ProjectRequestContext {
       ["repairAttemptId", "repair"],
       ["attemptId", "repair"],
       ["sessionId", "upload"],
+      ["notificationId", "notification"],
     ] as const;
     let actual: string | undefined;
     for (const [parameter, recordType] of identifiers) {

@@ -19,7 +19,7 @@
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "typecheck": "tsc --noEmit -p tsconfig.test.json",
-    "test": "npm run build && tsx --test test/storage.test.ts test/sqlite-migrations.test.ts test/sqlite-invariants.test.ts test/sqlite-backup.test.ts test/sqlite-restore.test.ts test/attachment-restore.test.ts test/sqlite-archive.test.ts test/qingyu-link-store.test.ts test/user-management-store.test.ts test/mobile-scope-branding.test.ts test/mobile-attachment-binding.test.ts test/mobile-read-cursor.test.ts test/mobile-read-pagination.test.ts test/project-management-store.test.ts test/verification-result-evidence.test.ts test/workflow-idempotency.test.ts test/workflow-projection.test.ts test/workflow-projection-worker.test.ts"
+    "test": "npm run build && tsx --test test/storage.test.ts test/sqlite-migrations.test.ts test/sqlite-invariants.test.ts test/sqlite-backup.test.ts test/sqlite-restore.test.ts test/attachment-restore.test.ts test/sqlite-archive.test.ts test/qingyu-link-store.test.ts test/user-management-store.test.ts test/mobile-scope-branding.test.ts test/mobile-attachment-binding.test.ts test/mobile-upload-reconciliation.test.ts test/mobile-read-cursor.test.ts test/mobile-read-pagination.test.ts test/project-management-store.test.ts test/verification-result-evidence.test.ts test/workflow-idempotency.test.ts test/workflow-projection.test.ts test/workflow-projection-worker.test.ts"
   },
   "engines": {
     "node": ">=24.19 <25"

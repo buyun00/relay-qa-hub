@@ -109,6 +109,13 @@ test("actual MCP HTTP and SQLite: attachment upload, resource read, project isol
     assert.equal(new Set(catalog.map((item) => item.name)).size, catalog.length);
     token = (await call("qa_login", { projectId, name: "附件测试员工" })).accessToken;
     const bToken = (await call("qa_login", { projectId: bId, name: "另一项目员工" })).accessToken;
+    const uploadRead = (path, bearer = token, selectedProjectId = projectId) =>
+      fetch(url + path, {
+        headers: {
+          ...(bearer ? { authorization: `Bearer ${bearer}` } : {}),
+          "x-qa-project-id": selectedProjectId,
+        },
+      });
     const bytes = Buffer.from(
       "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jRZkAAAAASUVORK5CYII=",
       "base64",
@@ -150,13 +157,93 @@ test("actual MCP HTTP and SQLite: attachment upload, resource read, project isol
     await call("qa_put_upload_chunk", { ...chunk, chunkSha256: "0".repeat(64) }, "INVALID_CHUNK");
     const uploaded = await call("qa_put_upload_chunk", chunk);
     assert.equal((await call("qa_put_upload_chunk", chunk)).version, uploaded.version);
+    const recoveredChunkReceipt = await uploadRead(`/api/v1/uploads/${init.sessionId}`);
+    assert.equal(recoveredChunkReceipt.status, 200);
+    assert.deepEqual(await recoveredChunkReceipt.json(), {
+      sessionId: init.sessionId,
+      projectId,
+      clientSubmissionId,
+      clientAttachmentId,
+      uploadAttempt: 1,
+      status: "finalizing",
+      filename: "mcp-test.png",
+      mediaType: "image/png",
+      captureId: null,
+      expectedSize: bytes.length,
+      chunkSize: init.chunkSize,
+      sha256,
+      expectedChunkCount: 1,
+      receivedBytes: bytes.length,
+      confirmedChunks: [0],
+      attachmentId: null,
+      expiresAt: init.expiresAt,
+      version: uploaded.version,
+    });
     const finalized = await call("qa_finalize_upload", {
       projectId,
       sessionId: init.sessionId,
       request: { ...common, expectedVersion: uploaded.version, expectedSize: bytes.length, sha256 },
       idempotencyKey: key("finalize"),
     });
-    await call("qa_bind_attachment", {
+    assert.equal(
+      (
+        await call("qa_finalize_upload", {
+          projectId,
+          sessionId: init.sessionId,
+          request: {
+            ...common,
+            expectedVersion: uploaded.version,
+            expectedSize: bytes.length,
+            sha256,
+          },
+          idempotencyKey: key("finalize"),
+        })
+      ).replayed,
+      true,
+    );
+    const recoveredFinalizeReceipt = await uploadRead(`/api/v1/uploads/${init.sessionId}`);
+    assert.equal(recoveredFinalizeReceipt.status, 200);
+    assert.deepEqual(await recoveredFinalizeReceipt.json(), {
+      sessionId: init.sessionId,
+      projectId,
+      clientSubmissionId,
+      clientAttachmentId,
+      uploadAttempt: 1,
+      status: "finalized",
+      filename: "mcp-test.png",
+      mediaType: "image/png",
+      captureId: null,
+      expectedSize: bytes.length,
+      chunkSize: init.chunkSize,
+      sha256,
+      expectedChunkCount: 1,
+      receivedBytes: bytes.length,
+      confirmedChunks: [0],
+      attachmentId: finalized.attachmentId,
+      expiresAt: init.expiresAt,
+      version: finalized.version,
+    });
+    const unboundMetadata = await uploadRead(
+      `/api/v1/attachments/${finalized.attachmentId}/metadata`,
+    );
+    assert.equal(unboundMetadata.status, 200);
+    const unboundMetadataBody = await unboundMetadata.json();
+    assert.deepEqual(unboundMetadataBody, {
+      attachmentId: finalized.attachmentId,
+      projectId,
+      clientSubmissionId,
+      clientAttachmentId,
+      captureId: null,
+      filename: "mcp-test.png",
+      mediaType: "image/png",
+      size: bytes.length,
+      sha256,
+      scanStatus: "clean",
+      readyToBind: true,
+      bindingStatus: "unbound",
+      version: finalized.version,
+    });
+    const bound = await call("qa_bind_attachment", {
       projectId,
       attachmentId: finalized.attachmentId,
       request: {
@@ -169,6 +256,15 @@ test("actual MCP HTTP and SQLite: attachment upload, resource read, project isol
         intent: "bug_create",
       },
       idempotencyKey: `submission:${clientSubmissionId}:attachment:${clientAttachmentId}:bind:1`,
+    });
+    const reservedMetadata = await uploadRead(
+      `/api/v1/attachments/${finalized.attachmentId}/metadata`,
+    );
+    assert.equal(reservedMetadata.status, 200);
+    assert.deepEqual(await reservedMetadata.json(), {
+      ...unboundMetadataBody,
+      bindingStatus: "reserved",
+      version: bound.version,
     });
     const created = await call("qa_create_bug", {
       projectId,
@@ -190,6 +286,15 @@ test("actual MCP HTTP and SQLite: attachment upload, resource read, project isol
       },
     });
     const identifiers = { projectId, bugId: created.bug.id, attachmentId: finalized.attachmentId };
+    const claimedMetadata = await uploadRead(
+      `/api/v1/attachments/${finalized.attachmentId}/metadata`,
+    );
+    assert.equal(claimedMetadata.status, 200);
+    assert.deepEqual(await claimedMetadata.json(), {
+      ...unboundMetadataBody,
+      bindingStatus: "claimed",
+      version: bound.version + 1,
+    });
     const materialized = await call("qa_materialize_attachment", identifiers);
     assert.match(materialized.resource.uri, /^qa-hub:\/\/attachment\//u);
     const resource = await rpc("resources/read", { uri: materialized.resource.uri });
@@ -199,6 +304,18 @@ test("actual MCP HTTP and SQLite: attachment upload, resource read, project isol
     });
     assert.equal(downloaded.status, 200);
     assert.deepEqual(Buffer.from(await downloaded.arrayBuffer()), bytes);
+    assert.equal((await uploadRead(`/api/v1/uploads/${init.sessionId}`, bToken, bId)).status, 404);
+    assert.equal(
+      (await uploadRead(`/api/v1/attachments/${finalized.attachmentId}/metadata`, bToken, bId))
+        .status,
+      404,
+    );
+    assert.equal(
+      (await uploadRead(`/api/v1/uploads/${init.sessionId}`, "", projectId)).status,
+      401,
+    );
+    const malformedUploadRead = await uploadRead("/api/v1/uploads/not-a-uuid");
+    assert.equal(malformedUploadRead.status, 400, await malformedUploadRead.text());
     await call("qa_read_attachment", { ...identifiers, projectId: bId }, "NOT_FOUND", bToken);
     assert.ok((await rpc("resources/read", { uri: materialized.resource.uri }, bToken)).error);
     assert.equal(

@@ -67,6 +67,8 @@ export interface MobileUploadSession {
   readonly replayed: boolean;
 }
 
+export type MobileUploadSessionSnapshot = Omit<MobileUploadSession, "replayed">;
+
 export interface PutMobileUploadChunkInput extends MobileAttachmentScope {
   readonly idempotencyKey: string;
   readonly sessionId: string;
@@ -148,6 +150,31 @@ export interface ListMobileBugAttachmentsInput extends MobileAttachmentScope {
 
 export interface GetMobileAttachmentInput extends MobileAttachmentScope {
   readonly attachmentId: string;
+}
+
+export interface GetMobileUploadSessionInput extends MobileAttachmentScope {
+  readonly sessionId: string;
+  readonly observedAt: string;
+}
+
+export interface GetMobileAttachmentMetadataInput extends MobileAttachmentScope {
+  readonly attachmentId: string;
+}
+
+export interface MobileAttachmentStateMetadata {
+  readonly attachmentId: string;
+  readonly projectId: string;
+  readonly clientSubmissionId: string;
+  readonly clientAttachmentId: string;
+  readonly captureId: string | null;
+  readonly filename: string;
+  readonly mediaType: string;
+  readonly size: number;
+  readonly sha256: string;
+  readonly scanStatus: "pending" | "clean" | "rejected" | "unavailable";
+  readonly readyToBind: boolean;
+  readonly bindingStatus: "unbound" | "reserved" | "claimed";
+  readonly version: number;
 }
 
 export interface GetMobileCaptureArtifactInput extends MobileAttachmentScope {
@@ -255,6 +282,12 @@ interface AttachmentRow {
   readonly version: number;
 }
 
+interface AttachmentStateRow extends AttachmentRow {
+  readonly upload_version: number;
+  readonly binding_state: string | null;
+  readonly lease_generation: number | null;
+}
+
 interface ClaimedAttachmentRow extends AttachmentRow {
   readonly storage_key: string;
 }
@@ -340,11 +373,7 @@ function confirmedChunks(database: DatabaseSync, upload: UploadRow): readonly nu
   );
 }
 
-function sessionRecord(
-  database: DatabaseSync,
-  upload: UploadRow,
-  replayed: boolean,
-): MobileUploadSession {
+function sessionSnapshot(database: DatabaseSync, upload: UploadRow): MobileUploadSessionSnapshot {
   return Object.freeze({
     sessionId: upload.id,
     projectId: upload.project_id,
@@ -364,8 +393,59 @@ function sessionRecord(
     attachmentId: upload.finalized_attachment_id,
     expiresAt: upload.expires_at,
     version: upload.version,
-    replayed,
   });
+}
+
+function sessionRecord(
+  database: DatabaseSync,
+  upload: UploadRow,
+  replayed: boolean,
+): MobileUploadSession {
+  return Object.freeze({ ...sessionSnapshot(database, upload), replayed });
+}
+
+export function getMobileUploadSession(
+  database: DatabaseSync,
+  input: GetMobileUploadSessionInput,
+): MobileUploadSessionSnapshot | null {
+  requireTransaction(database);
+  if (!hasActiveAttachmentReadMembership(database, input)) return null;
+  let upload = readUpload(database, input, input.sessionId);
+  if (upload === null) return null;
+  const observedAt = Date.parse(input.observedAt);
+  const expiresAt = Date.parse(upload.expires_at);
+  if (!Number.isFinite(observedAt) || !Number.isFinite(expiresAt)) {
+    throw new SqliteStorageError("SQLITE_UPLOAD_INVALID", "upload observation time is invalid");
+  }
+  // A fully received session stays finalizing so a lost finalize response can
+  // still be recovered. Only an incomplete, open lease becomes retryable.
+  if (upload.status === "open" && observedAt >= expiresAt) {
+    const updatedAt = nextTimestamp(upload.updated_at, input.observedAt);
+    const expired = database
+      .prepare(
+        `UPDATE upload_sessions
+         SET status = 'expired', updated_at = ?, version = version + 1
+         WHERE account_id = ? AND project_id = ? AND actor_id = ? AND id = ?
+           AND status = 'open' AND expires_at = ? AND version = ?`,
+      )
+      .run(
+        updatedAt,
+        input.accountId,
+        input.projectId,
+        input.actorId,
+        input.sessionId,
+        upload.expires_at,
+        upload.version,
+      );
+    if (expired.changes !== 1) {
+      throw new SqliteStorageError("SQLITE_UPLOAD_VERSION_CONFLICT", "upload expiry conflicted");
+    }
+    upload = readUpload(database, input, input.sessionId);
+    if (upload === null || upload.status !== "expired") {
+      throw new SqliteStorageError("SQLITE_EFFECT_MISSING", "expired upload is missing");
+    }
+  }
+  return sessionSnapshot(database, upload);
 }
 
 function exactUploadIdentity(upload: UploadRow, input: InitMobileUploadInput): boolean {
@@ -1096,6 +1176,90 @@ export function hasActiveAttachmentReadMembership(
       )
       .get(input.projectId, input.actorId, input.accountId) !== undefined
   );
+}
+
+export function getMobileAttachmentMetadata(
+  database: DatabaseSync,
+  input: GetMobileAttachmentMetadataInput,
+): MobileAttachmentStateMetadata | null {
+  if (!hasActiveAttachmentReadMembership(database, input)) return null;
+  const row =
+    (database
+      .prepare(
+        `SELECT attachment.id, attachment.account_id, attachment.project_id,
+                attachment.actor_id, attachment.client_submission_id,
+                attachment.client_attachment_id, attachment.capture_id,
+                attachment.file_name, attachment.media_type, attachment.size_bytes,
+                attachment.sha256, attachment.status, attachment.scan_state,
+                attachment.version, upload.version AS upload_version,
+                binding.state AS binding_state,
+                binding.lease_generation AS lease_generation
+         FROM attachments AS attachment
+         JOIN upload_sessions AS upload
+           ON upload.account_id = attachment.account_id
+          AND upload.project_id = attachment.project_id
+          AND upload.actor_id = attachment.actor_id
+          AND upload.id = attachment.upload_session_id
+          AND upload.client_submission_id = attachment.client_submission_id
+          AND upload.client_attachment_id = attachment.client_attachment_id
+          AND upload.capture_id IS attachment.capture_id
+          AND upload.status = 'finalized'
+          AND upload.finalized_attachment_id = attachment.id
+         LEFT JOIN attachment_bindings AS binding
+           ON binding.account_id = attachment.account_id
+          AND binding.project_id = attachment.project_id
+          AND binding.attachment_id = attachment.id
+          AND binding.id = (
+            SELECT latest.id
+            FROM attachment_bindings AS latest
+            WHERE latest.account_id = attachment.account_id
+              AND latest.project_id = attachment.project_id
+              AND latest.attachment_id = attachment.id
+            ORDER BY latest.lease_generation DESC
+            LIMIT 1
+          )
+         WHERE attachment.id = ? AND attachment.account_id = ?
+           AND attachment.project_id = ? AND attachment.actor_id = ?`,
+      )
+      .get(input.attachmentId, input.accountId, input.projectId, input.actorId) as
+      AttachmentStateRow | undefined) ?? null;
+  if (row === null) return null;
+  if (
+    !(["pending", "clean", "rejected", "unavailable"] as const).includes(
+      row.scan_state as "pending" | "clean" | "rejected" | "unavailable",
+    )
+  ) {
+    throw new SqliteStorageError("SQLITE_UPLOAD_INVALID", "attachment scan state is invalid");
+  }
+  const scanStatus = row.scan_state as MobileAttachmentStateMetadata["scanStatus"];
+  const bindingStatus: MobileAttachmentStateMetadata["bindingStatus"] =
+    row.binding_state === "reserved"
+      ? "reserved"
+      : row.binding_state === "claimed"
+        ? "claimed"
+        : "unbound";
+  const leaseGeneration = row.lease_generation ?? 0;
+  if (!Number.isSafeInteger(leaseGeneration) || leaseGeneration < 0) {
+    throw new SqliteStorageError("SQLITE_UPLOAD_INVALID", "attachment binding state is invalid");
+  }
+  return Object.freeze({
+    attachmentId: row.id,
+    projectId: row.project_id,
+    clientSubmissionId: row.client_submission_id,
+    clientAttachmentId: row.client_attachment_id,
+    captureId: row.capture_id,
+    filename: row.file_name,
+    mediaType: row.media_type,
+    size: row.size_bytes,
+    sha256: row.sha256,
+    scanStatus,
+    readyToBind: scanStatus === "clean",
+    bindingStatus,
+    version:
+      row.upload_version +
+      leaseGeneration +
+      (row.binding_state === "claimed" || row.binding_state === "released" ? 1 : 0),
+  });
 }
 
 function claimedAttachmentMetadata(row: ClaimedAttachmentRow): MobileAttachmentMetadata {

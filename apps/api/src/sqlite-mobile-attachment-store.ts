@@ -99,6 +99,14 @@ export function createSqliteMobileAttachmentStore(
       });
     },
 
+    async getUploadSession(query) {
+      return options.worker.getMobileUploadSession({
+        ...actorScope(query.actorId),
+        sessionId: query.sessionId,
+        observedAt: now().toISOString(),
+      });
+    },
+
     async bindAttachment(command) {
       requireProject(command.request.projectId, options.scope);
       if (
@@ -141,6 +149,13 @@ export function createSqliteMobileAttachmentStore(
         metadata: download.metadata,
         bytes: Buffer.from(download.bytes),
       };
+    },
+
+    async getAttachmentMetadata(query) {
+      return options.worker.getMobileAttachmentMetadata({
+        ...actorScope(query.actorId),
+        attachmentId: query.attachmentId,
+      });
     },
 
     async getCaptureArtifact(query) {

@@ -1,6 +1,11 @@
-import type { MobileNotificationList } from "@relay-qa-hub/storage";
+import type { MobileNotificationList, MobileNotificationReadRecord } from "@relay-qa-hub/storage";
 
 export const MOBILE_NOTIFICATION_LIST_PATH = "/api/v1/notifications" as const;
+export const MOBILE_NOTIFICATION_READ_PATH = "/api/v1/notifications/:notificationId/read" as const;
+
+export interface MobileMarkNotificationReadRequest {
+  readonly expectedVersion: number;
+}
 
 export interface MobileNotificationStore {
   readonly listNotifications: (query: {
@@ -11,6 +16,12 @@ export interface MobileNotificationStore {
     readonly limit: number;
     readonly now: string;
   }) => MobileNotificationList | Promise<MobileNotificationList>;
+  readonly markRead: (command: {
+    readonly actorId: string;
+    readonly notificationId: string;
+    readonly idempotencyKey: string;
+    readonly request: MobileMarkNotificationReadRequest;
+  }) => MobileNotificationReadRecord | Promise<MobileNotificationReadRecord>;
 }
 
 const UUID_PATTERN =
@@ -21,6 +32,34 @@ function record(value: unknown): Record<string, unknown> {
     throw new TypeError("notification list query must be an object");
   }
   return value as Record<string, unknown>;
+}
+
+export function requireMobileNotificationUuid(value: unknown, field: string): string {
+  if (typeof value !== "string" || !UUID_PATTERN.test(value)) {
+    throw new TypeError(`${field} must be a UUID`);
+  }
+  return value.toLowerCase();
+}
+
+export function requireMobileNotificationIdempotencyKey(value: unknown): string {
+  if (typeof value !== "string" || value.length < 1 || value.length > 200) {
+    throw new TypeError("Idempotency-Key must contain 1 to 200 characters");
+  }
+  return value;
+}
+
+export function parseMobileMarkNotificationReadRequest(
+  value: unknown,
+): MobileMarkNotificationReadRequest {
+  const body = record(value);
+  if (Object.keys(body).length !== 1 || !("expectedVersion" in body)) {
+    throw new TypeError("notification read body must contain only expectedVersion");
+  }
+  const expectedVersion = body["expectedVersion"];
+  if (!Number.isSafeInteger(expectedVersion) || Number(expectedVersion) < 1) {
+    throw new TypeError("expectedVersion must be a positive integer");
+  }
+  return Object.freeze({ expectedVersion: Number(expectedVersion) });
 }
 
 function queryString(value: Record<string, unknown>, key: string): string | undefined {

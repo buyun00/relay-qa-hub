@@ -1,7 +1,10 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { bindMobileAttachment } from "../src/mobile-attachment-store.ts";
+import {
+  bindMobileAttachment,
+  getMobileAttachmentMetadata,
+} from "../src/mobile-attachment-store.ts";
 import { evidenceFixture, fingerprint, tx } from "./verification-result-evidence-fixture.ts";
 
 test("attachment binding renews the same tuple exactly once after expiry", async (t) => {
@@ -68,6 +71,13 @@ test("attachment binding renews the same tuple exactly once after expiry", async
     assert.equal(renewed.version, initial.version + 1);
     assert.equal(renewed.expiresAt, new Date(clockMs + 15 * 60_000).toISOString());
     assert.equal(renewed.replayed, false);
+    assert.equal(
+      getMobileAttachmentMetadata(fixture.database, {
+        ...fixture.scope,
+        attachmentId: attachment.attachmentId,
+      })?.version,
+      renewed.version,
+    );
     assert.deepEqual(
       {
         ...fixture.database
@@ -115,6 +125,27 @@ test("attachment binding renews the same tuple exactly once after expiry", async
 
     clockMs = Date.now();
     fixture.submit(staged.input);
+    assert.deepEqual(
+      getMobileAttachmentMetadata(fixture.database, {
+        ...fixture.scope,
+        attachmentId: attachment.attachmentId,
+      }),
+      {
+        attachmentId: attachment.attachmentId,
+        projectId: attachment.projectId,
+        clientSubmissionId: attachment.clientSubmissionId,
+        clientAttachmentId: attachment.clientAttachmentId,
+        captureId: attachment.captureId,
+        filename: attachment.filename,
+        mediaType: attachment.mediaType,
+        size: attachment.size,
+        sha256: attachment.sha256,
+        scanStatus: attachment.scanStatus,
+        readyToBind: attachment.readyToBind,
+        bindingStatus: "claimed",
+        version: renewed.version + 1,
+      },
+    );
     clockMs = Date.parse(renewed.expiresAt) + 1_000;
     before = fingerprint(fixture.database);
     assert.throws(
@@ -135,6 +166,48 @@ test("attachment binding renews the same tuple exactly once after expiry", async
       { code: "SQLITE_IDEMPOTENCY_MISMATCH" },
     );
     assert.deepEqual(fingerprint(fixture.database), before);
+  } finally {
+    fixture.database.close();
+  }
+});
+
+test("released attachment metadata is unbound and advances the aggregate version", async (t) => {
+  const fixture = await evidenceFixture(t);
+  try {
+    const staged = fixture.stage(1);
+    const attachment = staged.attachments[0]!;
+    const reservation = staged.bindings[0]!;
+    tx(fixture.database, () => {
+      const released = fixture.database
+        .prepare(
+          `UPDATE attachment_bindings
+           SET state='released', expires_at=NULL, claimed_at=NULL, version=version+1
+           WHERE id=? AND state='reserved' AND version=?`,
+        )
+        .run(reservation.bindingId, 1);
+      assert.equal(released.changes, 1);
+    });
+    assert.deepEqual(
+      getMobileAttachmentMetadata(fixture.database, {
+        ...fixture.scope,
+        attachmentId: attachment.attachmentId,
+      }),
+      {
+        attachmentId: attachment.attachmentId,
+        projectId: attachment.projectId,
+        clientSubmissionId: attachment.clientSubmissionId,
+        clientAttachmentId: attachment.clientAttachmentId,
+        captureId: attachment.captureId,
+        filename: attachment.filename,
+        mediaType: attachment.mediaType,
+        size: attachment.size,
+        sha256: attachment.sha256,
+        scanStatus: attachment.scanStatus,
+        readyToBind: attachment.readyToBind,
+        bindingStatus: "unbound",
+        version: reservation.version + 1,
+      },
+    );
   } finally {
     fixture.database.close();
   }

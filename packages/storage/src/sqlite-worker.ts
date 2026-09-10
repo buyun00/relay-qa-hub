@@ -20,17 +20,21 @@ import type {
 import type {
   BindMobileAttachmentInput,
   FinalizeMobileUploadInput,
+  GetMobileAttachmentMetadataInput,
   GetMobileAttachmentInput,
   GetMobileCaptureArtifactInput,
+  GetMobileUploadSessionInput,
   InitMobileUploadInput,
   ListMobileBugAttachmentsInput,
   MobileAttachmentDownload,
+  MobileAttachmentStateMetadata,
   MobileCaptureArtifactDownload,
   MobileAttachmentReservation,
   MobileBugAttachmentList,
   MobileFinalizedAttachment,
   MobileUploadChunkReceipt,
   MobileUploadSession,
+  MobileUploadSessionSnapshot,
   PutMobileUploadChunkInput,
 } from "./mobile-attachment-store.js";
 import type {
@@ -120,7 +124,12 @@ import type {
   RecordMobileVerificationResultInput,
   StartMobileVerificationInput,
 } from "./mobile-verification-store.js";
-import type { ListMobileNotificationsInput, MobileNotificationList } from "./mobile-inbox-store.js";
+import type {
+  ListMobileNotificationsInput,
+  MarkMobileNotificationReadInput,
+  MobileNotificationList,
+  MobileNotificationReadRecord,
+} from "./mobile-inbox-store.js";
 import type {
   ActiveAccountUser,
   BrowserPrincipal,
@@ -393,6 +402,13 @@ export class SqliteStorageWorker {
     return this.request<MobileFinalizedAttachment>("finalizeMobileUpload", input);
   }
 
+  async getMobileUploadSession(
+    input: GetMobileUploadSessionInput,
+  ): Promise<MobileUploadSessionSnapshot | null> {
+    await this.initialization;
+    return this.request<MobileUploadSessionSnapshot | null>("getMobileUploadSession", input);
+  }
+
   async bindMobileAttachment(
     input: BindMobileAttachmentInput,
   ): Promise<MobileAttachmentReservation> {
@@ -412,6 +428,13 @@ export class SqliteStorageWorker {
   ): Promise<MobileAttachmentDownload | null> {
     await this.initialization;
     return this.request<MobileAttachmentDownload | null>("getMobileAttachment", input);
+  }
+
+  async getMobileAttachmentMetadata(
+    input: GetMobileAttachmentMetadataInput,
+  ): Promise<MobileAttachmentStateMetadata | null> {
+    await this.initialization;
+    return this.request<MobileAttachmentStateMetadata | null>("getMobileAttachmentMetadata", input);
   }
 
   async getMobileCaptureArtifact(
@@ -608,6 +631,13 @@ export class SqliteStorageWorker {
   ): Promise<MobileNotificationList> {
     await this.initialization;
     return this.request<MobileNotificationList>("syncAndListMobileNotifications", input);
+  }
+
+  async markMobileNotificationRead(
+    input: MarkMobileNotificationReadInput,
+  ): Promise<MobileNotificationReadRecord> {
+    await this.initialization;
+    return this.request<MobileNotificationReadRecord>("markMobileNotificationRead", input);
   }
 
   async ensureMobileRelayRoles(scope: MobileScopeBootstrap): Promise<void> {

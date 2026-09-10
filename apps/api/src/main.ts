@@ -55,6 +55,7 @@ import {
 } from "./people-config.js";
 import { parseRelayEndpoint, type MobileRelayOutboxPump } from "./mobile-relay-outbox.js";
 import { deriveMobileReadCursorSigningKey } from "./mobile-read-cursor-key.js";
+import { deriveMobileReplayDigestKey } from "./mobile-replay-digest.js";
 
 const MOBILE_SCOPE: MobileScopeBootstrap = Object.freeze({
   accountId: "10000000-0000-4000-8000-000000000020",
@@ -251,6 +252,7 @@ async function run(): Promise<void> {
   mkdirSync(storage.evidenceRoot, { recursive: true });
   mkdirSync(storage.quarantineRoot, { recursive: true });
   const debugBearerToken = requireMobileAccessToken();
+  const mobileReplayDigestKey = deriveMobileReplayDigestKey(debugBearerToken);
   const backupConfig = parseApiBackupEnvironment(process.env, {
     dataRoot: storage.dataRoot,
     databaseFile: storage.databaseFile,
@@ -487,7 +489,11 @@ async function run(): Promise<void> {
       }),
       mobileCommentStore: createSqliteMobileCommentStore({ worker, scope: requestScope }),
       mobileDuplicateStore: createSqliteMobileDuplicateStore({ worker, scope: requestScope }),
-      mobileNotificationStore: createSqliteMobileInboxStore({ worker, scope: requestScope }),
+      mobileNotificationStore: createSqliteMobileInboxStore({
+        worker,
+        scope: requestScope,
+        replayDigestKey: mobileReplayDigestKey,
+      }),
       notificationHintChannelEnabled: readNotificationHintChannelEnabled(),
       mobileProjectDirectoryStore: createSqliteMobileProjectDirectoryStore({
         worker,

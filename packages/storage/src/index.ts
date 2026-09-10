@@ -472,8 +472,10 @@ export type {
 export type {
   BindMobileAttachmentInput,
   FinalizeMobileUploadInput,
+  GetMobileAttachmentMetadataInput,
   GetMobileAttachmentInput,
   GetMobileCaptureArtifactInput,
+  GetMobileUploadSessionInput,
   InitMobileUploadInput,
   ListMobileBugAttachmentsInput,
   MobileAttachmentDownload,
@@ -481,15 +483,22 @@ export type {
   MobileCaptureArtifactMetadata,
   MobileAttachmentMetadata,
   MobileAttachmentReservation,
+  MobileAttachmentStateMetadata,
   MobileAttachmentRoots,
   MobileAttachmentScope,
   MobileBugAttachmentList,
   MobileFinalizedAttachment,
   MobileUploadChunkReceipt,
   MobileUploadSession,
+  MobileUploadSessionSnapshot,
   PutMobileUploadChunkInput,
 } from "./mobile-attachment-store.js";
-export { getMobileAttachment, listMobileBugAttachments } from "./mobile-attachment-store.js";
+export {
+  getMobileAttachment,
+  getMobileAttachmentMetadata,
+  getMobileUploadSession,
+  listMobileBugAttachments,
+} from "./mobile-attachment-store.js";
 export { getMobileCaptureArtifact } from "./mobile-attachment-store.js";
 export {
   MOBILE_CAPTURE_ALLOWED_METHODS,
@@ -539,10 +548,15 @@ export type {
   RecordMobileVerificationResultInput,
   StartMobileVerificationInput,
 } from "./mobile-verification-store.js";
-export { syncAndListMobileNotifications } from "./mobile-inbox-store.js";
+export {
+  markMobileNotificationRead,
+  syncAndListMobileNotifications,
+} from "./mobile-inbox-store.js";
 export type {
   ListMobileNotificationsInput,
+  MarkMobileNotificationReadInput,
   MobileNotificationList,
+  MobileNotificationReadRecord,
   MobileNotificationRecord,
 } from "./mobile-inbox-store.js";
 export type {

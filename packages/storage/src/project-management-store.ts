@@ -83,7 +83,14 @@ export interface ProjectManagementInput extends ProjectPrincipal {
   readonly config?: Readonly<Record<string, unknown>>;
   readonly includePrivateConfig?: boolean;
   readonly recordType?:
-    "bug" | "attachment" | "capture" | "build" | "verification" | "repair" | "upload";
+    | "bug"
+    | "attachment"
+    | "capture"
+    | "build"
+    | "verification"
+    | "repair"
+    | "upload"
+    | "notification";
   readonly recordId?: string;
   readonly bugId?: string;
   readonly limit?: number;
@@ -387,6 +394,7 @@ export function projectManagement(database: DatabaseSync, input: ProjectManageme
       verification: "verifications",
       repair: "repair_attempts",
       upload: "upload_sessions",
+      notification: "notifications",
     } as const;
     if (!input.recordType || !tables[input.recordType])
       fail("INVALID_REQUEST", "unsupported record type");

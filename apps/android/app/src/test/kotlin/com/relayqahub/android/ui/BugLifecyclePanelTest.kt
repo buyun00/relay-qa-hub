@@ -447,30 +447,6 @@ class BugLifecyclePanelTest {
     }
 
     @Test
-    fun `capture identity locks at the first durable upload session`() {
-        assertTrue(verificationCaptureCanChange(pending()))
-        val initialized = pending().copy(
-            attachments = listOf(
-                PendingVerificationAttachment(
-                    clientAttachmentId = "90000000-0000-4000-8000-000000000001",
-                    filename = "evidence.png",
-                    mediaType = "image/png",
-                    expectedSize = 3,
-                    sha256 = "a".repeat(64),
-                    uploadCheckpoint = AttachmentUploadCheckpoint(
-                        sessionId = "a0000000-0000-4000-8000-000000000001",
-                        chunkSize = 262_144,
-                        expectedChunkCount = 1,
-                        uploadVersion = 1,
-                        uploadExpiresAt = "2090-01-01T00:00:00Z",
-                    ),
-                ),
-            ),
-        )
-        assertFalse(verificationCaptureCanChange(initialized))
-    }
-
-    @Test
     fun `frozen result renews an expired reservation only after the first result attempt`() = runBlocking {
         val attachment = attachment(
             "90000000-0000-4000-8000-000000000001",

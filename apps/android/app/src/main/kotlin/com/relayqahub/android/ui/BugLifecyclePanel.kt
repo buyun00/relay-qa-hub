@@ -62,7 +62,6 @@ fun BugLifecyclePanel(
     var verificationImages by remember(bug.projectId, bug.id) {
         mutableStateOf<List<BugEditImageUpload>>(emptyList())
     }
-    var captureBundleIdInput by rememberSaveable(bug.projectId, bug.id) { mutableStateOf("") }
     var selectionError by remember(bug.projectId, bug.id) { mutableStateOf<String?>(null) }
     var busy by remember(bug.id) { mutableStateOf(false) }
     var error by remember(bug.id) { mutableStateOf<String?>(null) }
@@ -87,9 +86,6 @@ fun BugLifecyclePanel(
             projectScope,
             bug.id,
         )
-        pendingVerification?.captureBundleId?.let { persisted ->
-            if (captureBundleIdInput.isBlank()) captureBundleIdInput = persisted
-        }
         runCatching {
             val accessToken = checkNotNull(token)
             val enabled = container.projectOperationsClient.components(bug.projectId, accessToken)
@@ -184,19 +180,6 @@ fun BugLifecyclePanel(
                 check(verification.status == VerificationStatus.IN_PROGRESS) {
                     "当前验收已结束，不能生成另一份结果。"
                 }
-                val requestedCapture = captureBundleIdInput.trim().takeIf(String::isNotEmpty)
-                requestedCapture?.let {
-                    require(STRICT_PANEL_UUID.matches(it))
-                    UUID.fromString(it)
-                }
-                check(submission.captureBundleId == null || submission.captureBundleId == requestedCapture) {
-                    "本次验收已绑定另一份采集包，不能在重试时更换。"
-                }
-                check(
-                    verificationCaptureCanChange(submission) ||
-                        submission.captureBundleId == requestedCapture
-                ) { "附件开始上传后不能更换采集包。" }
-                submission = submission.copy(captureBundleId = requestedCapture)
                 container.bugDraftPreferences.saveVerification(verificationScopeKey, submission)
 
                 val knownAttachmentIds = submission.attachments.map { it.clientAttachmentId }.toSet()
@@ -361,7 +344,6 @@ fun BugLifecyclePanel(
             }
             pendingVerification = null
             verificationImages = emptyList()
-            captureBundleIdInput = ""
             selectionError = null
         }
     }
@@ -521,17 +503,6 @@ fun BugLifecyclePanel(
                 onClick = { imagePicker.launch("image/*") },
                 modifier = Modifier.fillMaxWidth().testTag("bug-verification-add-evidence"),
             ) { Text("添加验收图片") }
-            OutlinedTextField(
-                value = captureBundleIdInput,
-                onValueChange = { captureBundleIdInput = it.trim() },
-                enabled = mayEditVerification && !busy &&
-                    verificationCaptureCanChange(pendingVerification),
-                label = { Text("采集包编号（高级，可选）") },
-                supportingText = {
-                    Text("仅填写由当前待确认提交编号创建、且附件完全一致的未使用采集包 UUID。")
-                },
-                modifier = Modifier.fillMaxWidth().testTag("bug-verification-capture-bundle"),
-            )
             val frozenOutcome = pendingVerification?.frozenResult?.status
             val maySubmitVerification = mayEditVerification && !busy &&
                 (frozenOutcome != null || note.isNotBlank())
@@ -874,11 +845,6 @@ internal fun verificationSubmissionNote(
 internal fun canonicalVerificationAttachmentIds(
     attachments: List<PendingVerificationAttachment>,
 ): List<String> = attachments.map { checkNotNull(it.attachmentId) }.sorted()
-
-internal fun verificationCaptureCanChange(
-    pending: PendingVerificationSubmission?,
-): Boolean = pending?.frozenResult == null &&
-    pending?.attachments?.none { it.uploadCheckpoint.sessionId != null } != false
 
 internal data class VerificationActionSnapshot(
     val people: QaPeopleConfig,

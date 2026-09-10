@@ -31,11 +31,13 @@ export {
   MAX_MOBILE_CHUNK_SIZE_BYTES,
   MOBILE_ATTACHMENT_BIND_PATH,
   MOBILE_ATTACHMENT_ITEM_PATH,
+  MOBILE_ATTACHMENT_METADATA_PATH,
   MOBILE_BUG_ATTACHMENTS_PATH,
   MOBILE_CAPTURE_ARTIFACT_PATH,
   MOBILE_UPLOAD_CHUNK_PATH,
   MOBILE_UPLOAD_FINALIZE_PATH,
   MOBILE_UPLOAD_INIT_PATH,
+  MOBILE_UPLOAD_ITEM_PATH,
   parseMobileAttachmentBindingRequest,
   parseMobileAttachmentListLimit,
   parseMobileChunkNumber,
@@ -51,8 +53,10 @@ export {
 export type {
   BindMobileAttachmentCommand,
   FinalizeMobileUploadCommand,
+  GetMobileAttachmentMetadataQuery,
   GetMobileAttachmentQuery,
   GetMobileCaptureArtifactQuery,
+  GetMobileUploadSessionQuery,
   InitMobileUploadCommand,
   ListMobileBugAttachmentsQuery,
   MobileAttachmentBindingRequest,
@@ -62,12 +66,14 @@ export type {
   MobileAttachmentIntent,
   MobileAttachmentMetadata,
   MobileAttachmentReservation,
+  MobileAttachmentStateMetadata,
   MobileAttachmentStore,
   MobileBugAttachmentListResponse,
   MobileFinalizeUploadRequest,
   MobileFinalizeUploadResponse,
   MobileInitUploadRequest,
   MobileInitUploadResponse,
+  MobileUploadSessionSnapshot,
   PutMobileUploadChunkCommand,
   PutMobileUploadChunkResult,
 } from "./mobile-attachments.js";
@@ -177,8 +183,15 @@ export type {
   MobileMarkDuplicateRequest,
 } from "./mobile-duplicates.js";
 
-export { MOBILE_NOTIFICATION_LIST_PATH, parseMobileNotificationLimit } from "./mobile-inbox.js";
-export type { MobileNotificationStore } from "./mobile-inbox.js";
+export {
+  MOBILE_NOTIFICATION_LIST_PATH,
+  MOBILE_NOTIFICATION_READ_PATH,
+  parseMobileMarkNotificationReadRequest,
+  parseMobileNotificationLimit,
+  requireMobileNotificationIdempotencyKey,
+  requireMobileNotificationUuid,
+} from "./mobile-inbox.js";
+export type { MobileMarkNotificationReadRequest, MobileNotificationStore } from "./mobile-inbox.js";
 
 export {
   MOBILE_PROJECT_COLLECTION_PATH,
@@ -301,6 +314,10 @@ export { createApiServer } from "./server.js";
 export type { ApiListenOptions, ApiServer } from "./server.js";
 
 export { deriveMobileReadCursorSigningKey } from "./mobile-read-cursor-key.js";
+export {
+  createMobileNotificationReadRequestDigest,
+  deriveMobileReplayDigestKey,
+} from "./mobile-replay-digest.js";
 
 export {
   BROWSER_CSRF_HEADER,
