@@ -149,7 +149,8 @@ export function parseBuildLog(log: string): ParsedBuildLog {
         parsed.lockWait.end = elapsed;
       }
     }
-    const policy = /^\[JenkinsPlayerPolicy\].*\beffective=(App|Res|Script)\b/u.exec(line);
+    const policy =
+      /^\[(?:JenkinsPlayerPolicy|iOSPlayerPolicy)\].*\beffective=(App|Res|Script)\b/u.exec(line);
     if (policy) parsed.mode = policy[1] as ParsedBuildLog["mode"];
     const zip = /^\[init\] MAKE_PKG_ZIP_VAL=(true|false)$/u.exec(line);
     if (zip) parsed.zip = zip[1] === "true";
@@ -158,11 +159,16 @@ export function parseBuildLog(log: string): ParsedBuildLog {
       parsed.gradleMs =
         ((Number(gradle[1] ?? 0) * 60 + Number(gradle[2] ?? 0)) * 60 + Number(gradle[3])) * 1000;
     let stage: StageId | undefined;
-    if (/^\+ notify_stage ['"].*Unity 导出中/u.test(line)) stage = "unity";
-    else if (/^\+ notify_stage ['"].*(开始编译 APK|开始编译 IPA|Xcode 编译)/u.test(line))
+    if (/^(?:\+ notify_stage ['"]|\[build\] ).*Unity 导出中/u.test(line)) stage = "unity";
+    else if (
+      /^(?:\+ notify_stage ['"]|\[build\] ).*(开始编译 APK|开始编译 IPA|Xcode 编译)/u.test(line) ||
+      /^> (?:Configure project|Task) :(?:launcher|unityLibrary)\b/u.test(line) ||
+      /^\[buildIPA\] xcodebuild (?:archive|-exportArchive) 开始$/u.test(line)
+    )
       stage = "apk";
-    else if (/^\+ notify_stage ['"].*上传热更资源到 CDN/u.test(line)) stage = "publish";
-    else if (/^\+ notify_stage ['"].*开始打整包 ZIP/u.test(line)) stage = "zip";
+    else if (/^(?:\+ notify_stage ['"]|\[build\] ).*上传热更资源到 CDN/u.test(line))
+      stage = "publish";
+    else if (/^(?:\+ notify_stage ['"]|\[build\] ).*开始打整包 ZIP/u.test(line)) stage = "zip";
     else if (
       /^\[OZDQP-PUBLISH\] finalize\b/u.test(line) ||
       /^\+ record_player_base_revision\b/u.test(line)
@@ -207,6 +213,10 @@ export function describeBuild(
   const seen = BUILD_STAGES.filter((s) => s.id in parsed.markers);
   const current = seen.at(-1)!.id;
   const currentIndex = BUILD_STAGES.findIndex((s) => s.id === current);
+  // The iOS script reports its policy before export, but has no export-start marker.
+  // Keep this interval explicit instead of showing a five-minute preparation alarm.
+  const combinedIosExport =
+    buildPreset(build)?.startsWith("ios-") && parsed.mode !== null && !("unity" in parsed.markers);
   const lock = parsed.lockWait;
   const pendingLock = !!lock && !lock.acquired && current === "prepare";
   const waiting = pendingLock && build.building;
@@ -269,15 +279,20 @@ export function describeBuild(
     }
     return {
       id: definition.id,
-      label: definition.label,
-      work: definition.work,
+      label:
+        combinedIosExport && definition.id === "prepare" ? "准备并导出 iOS 工程" : definition.label,
+      work:
+        combinedIosExport && definition.id === "prepare"
+          ? "同步构建配置、编译脚本并导出 iOS 工程"
+          : definition.work,
       state,
       elapsedMs: duration,
       toolElapsedMs: definition.id === "apk" ? parsed.gradleMs : null,
       timing,
       expectedMs: null,
       sampleCount: 0,
-      alertAfterMs: definition.limit,
+      alertAfterMs:
+        combinedIosExport && definition.id === "prepare" ? BUILD_STAGES[1].limit : definition.limit,
       alertBasis: "initial",
       percent: state === "complete" ? 100 : null,
       alert: false,
