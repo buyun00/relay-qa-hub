@@ -1,0 +1,139 @@
+{
+  "schemaVersion": 1,
+  "capturedAt": "2026-09-10T10:40:41.3097572Z",
+  "instanceId": "qa-hub-preview-v21-e2e-fresh-0910",
+  "sourceCommit": "8b07042f94ccdf6d1ff900cbf7ea8a17da7b3025",
+  "upgrade": {
+    "from": "0.2.0-preview.13",
+    "to": "0.2.0-preview.14",
+    "releaseId": "20260910T102940665Z",
+    "installerBytes": 108356331,
+    "installerSha256": "b5926614efeb54029058d271270ce300b9df9e7b0f3051efdc3936945078e998"
+  },
+  "isolatedOldProcess": {
+    "pid": 19564,
+    "productVersion": "0.2.0-preview.13",
+    "sha256": "2bd7ee601175b06e433746babe6da4a826bf5eaa4ba15db807fff9b74b5d2e32",
+    "stoppedAfterExactIdentityCheck": true,
+    "port4642Released": true
+  },
+  "rememberedIdentity": {
+    "schemaVersion": 2,
+    "serviceOrigin": "http://127.0.0.1:4639",
+    "loginName": "Luna Worker 246",
+    "projectId": "305b4def-ae7e-4a2d-ae96-a05d616390bf",
+    "userId": "0ddff48b-536c-4c30-8b42-511741010610",
+    "identity": "employee"
+  },
+  "profileFingerprints": [
+    {
+      "relativePath": "IndexedDB/qa-hub-preview-v21-e2e-fresh-0910_app_0.indexeddb.blob/1/00/6",
+      "bytes": 123784,
+      "sha256": "99e40cfcf19b47a1d083bcdb774d32e6d2dd0ee3f53071aee31ac70f0de7977f"
+    },
+    {
+      "relativePath": "IndexedDB/qa-hub-preview-v21-e2e-fresh-0910_app_0.indexeddb.leveldb/000003.log",
+      "bytes": 70270,
+      "sha256": "c524439a8772f7c22406b782748e72454bdc7c875a97bc497eb0914cca5388e1"
+    },
+    {
+      "relativePath": "IndexedDB/qa-hub-preview-v21-e2e-fresh-0910_app_0.indexeddb.leveldb/CURRENT",
+      "bytes": 16,
+      "sha256": "0f1bad70c7bd1e0a69562853ec529355462fcd0423263a3d39d6d0d70b780443"
+    },
+    {
+      "relativePath": "IndexedDB/qa-hub-preview-v21-e2e-fresh-0910_app_0.indexeddb.leveldb/LOCK",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "relativePath": "IndexedDB/qa-hub-preview-v21-e2e-fresh-0910_app_0.indexeddb.leveldb/LOG",
+      "bytes": 480,
+      "sha256": "60e7f9c79c131e91df8fa6713876207b4d84e506f0f519edba6ceca7bdd9df44"
+    },
+    {
+      "relativePath": "IndexedDB/qa-hub-preview-v21-e2e-fresh-0910_app_0.indexeddb.leveldb/LOG.old",
+      "bytes": 480,
+      "sha256": "d5715bafe44aa5d3433723c571be1a1e24268c4d4ec87ce69e462aab353b44d1"
+    },
+    {
+      "relativePath": "IndexedDB/qa-hub-preview-v21-e2e-fresh-0910_app_0.indexeddb.leveldb/MANIFEST-000001",
+      "bytes": 23,
+      "sha256": "720a78803b84cbcc8eb204d5cf8ea6ee2f693be0ab2124ddf2b81455de02a3ed"
+    },
+    {
+      "relativePath": "Local Storage/leveldb/000003.log",
+      "bytes": 978,
+      "sha256": "7e136179f3fddb5eb209241d204caa1f93a369f5281abca731a8c87db4136edf"
+    },
+    {
+      "relativePath": "Local Storage/leveldb/CURRENT",
+      "bytes": 16,
+      "sha256": "0f1bad70c7bd1e0a69562853ec529355462fcd0423263a3d39d6d0d70b780443"
+    },
+    {
+      "relativePath": "Local Storage/leveldb/LOCK",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "relativePath": "Local Storage/leveldb/LOG",
+      "bytes": 388,
+      "sha256": "63f5905d555cd5f318e7e9f35a47480ced161c5af9ef542bb97ce5888133ad3b"
+    },
+    {
+      "relativePath": "Local Storage/leveldb/LOG.old",
+      "bytes": 388,
+      "sha256": "09366faff00c7769f51c1472d1ffdba8cd0adcae6a104a9aa8c1a9d6b53a56b8"
+    },
+    {
+      "relativePath": "Local Storage/leveldb/MANIFEST-000001",
+      "bytes": 41,
+      "sha256": "f9d31b278e215eb0d0e9cd709edfa037e828f36214ab7906f612160fead4b2b4"
+    },
+    {
+      "relativePath": "remembered-login-name.json",
+      "bytes": 211,
+      "sha256": "e004fe7fb4a8f9da43546be1cd53cc2894549eaacda5f578a00c304af20d98ff"
+    }
+  ],
+  "listenersAfterIsolatedStop": [
+    {
+      "port": 4319,
+      "pid": 9488,
+      "address": "0.0.0.0"
+    },
+    {
+      "port": 4174,
+      "pid": 7420,
+      "address": "0.0.0.0"
+    },
+    {
+      "port": 4320,
+      "pid": 17160,
+      "address": "127.0.0.1"
+    },
+    {
+      "port": 4639,
+      "pid": 1940,
+      "address": "127.0.0.1"
+    },
+    {
+      "port": 4640,
+      "pid": 20452,
+      "address": "127.0.0.1"
+    },
+    {
+      "port": 4641,
+      "pid": 19112,
+      "address": "127.0.0.1"
+    },
+    {
+      "port": 4642,
+      "pid": null,
+      "address": null
+    }
+  ],
+  "productionAction": "read_only_observation_only",
+  "productionTouched": false
+}

@@ -22,6 +22,10 @@ SetCompressor /SOLID lzma
 !ifndef DISPLAY_NAME
   !error "DISPLAY_NAME is required"
 !endif
+; The updater waits for the main PID, but a child can retain an image or directory
+; handle briefly. Keep the retry bounded: 40 total attempts and at most 9.75s asleep.
+!define INSTALL_RENAME_MAX_ATTEMPTS 40
+!define INSTALL_RENAME_RETRY_DELAY_MS 250
 Name "${DISPLAY_NAME}"
 OutFile "${OUTPUT_FILE}"
 InstallDir "$LOCALAPPDATA\Programs\${INSTALL_DIRECTORY_NAME}"
@@ -37,6 +41,7 @@ UninstPage instfiles
 Var BackupDirectory
 Var ExistingIdentity
 Var OperationSuffix
+Var RenameAttemptsRemaining
 
 Function .onInit
   SetShellVarContext current
@@ -82,9 +87,18 @@ next_backup:
   Goto choose_backup
 backup_ready:
   IfFileExists "$INSTDIR\*" 0 install_files
+  SetOutPath "$TEMP"
+  StrCpy $RenameAttemptsRemaining ${INSTALL_RENAME_MAX_ATTEMPTS}
+rename_install_directory:
   ClearErrors
   Rename "$INSTDIR" "$BackupDirectory"
-  IfErrors rename_failed
+  IfErrors rename_retry install_files
+rename_retry:
+  IntOp $RenameAttemptsRemaining $RenameAttemptsRemaining - 1
+  IntCmp $RenameAttemptsRemaining 0 rename_failed rename_failed rename_retry_wait
+rename_retry_wait:
+  Sleep ${INSTALL_RENAME_RETRY_DELAY_MS}
+  Goto rename_install_directory
 install_files:
   SetOutPath "$INSTDIR"
   ClearErrors

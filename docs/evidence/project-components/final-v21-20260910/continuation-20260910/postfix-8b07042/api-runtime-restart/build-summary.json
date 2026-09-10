@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "sourceCommit": "8b07042f94ccdf6d1ff900cbf7ea8a17da7b3025",
+  "sourceDirtyAtBuildAndPackageGate": false,
+  "summarizedAt": "2026-09-10T10:53:57.1331657Z",
+  "roots": [
+    {
+      "path": "apps/api/dist",
+      "fileCount": 280,
+      "totalBytes": 1843593,
+      "aggregateSha256": "63d767590032d9ed890a90eb8d046c80241288ae535403d7ad900d9881b30686"
+    },
+    {
+      "path": "apps/web/dist",
+      "fileCount": 8,
+      "totalBytes": 2544432,
+      "aggregateSha256": "7226e3b6df501acd19a737451b38443a38b3599523f6b3907421b5c8df490064"
+    },
+    {
+      "path": "apps/desktop/dist",
+      "fileCount": 88,
+      "totalBytes": 496224,
+      "aggregateSha256": "27932a821c5d02600c9707163734ed30d3d8fda3e89781ab152e01fc07e99076"
+    }
+  ],
+  "fileCount": 376,
+  "totalBytes": 4884249,
+  "aggregateSha256": "719455a48dc85b199d02decc984823575cfb293b33f94e1235127b4e8fcd0593",
+  "commands": [
+    "tsc -p apps/api/tsconfig.json",
+    "tsc -p apps/desktop/tsconfig.json",
+    "vite build from apps/web with isolated QA_HUB_API_BASE_URL"
+  ],
+  "packageReceipt": "runtime packages/20260910T102940665Z/receipt.json"
+}

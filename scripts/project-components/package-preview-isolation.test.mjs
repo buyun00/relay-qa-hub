@@ -79,6 +79,43 @@ test("package identity preserves only the explicit legacy identity and isolates 
   }
 });
 
+test("preview installer retries transient install-directory locks before returning 22", () => {
+  assert.match(installerSource, /!define INSTALL_RENAME_MAX_ATTEMPTS 40/u);
+  assert.match(installerSource, /!define INSTALL_RENAME_RETRY_DELAY_MS 250/u);
+
+  const retryBlock = installerSource.slice(
+    installerSource.indexOf("backup_ready:"),
+    installerSource.indexOf("install_files:"),
+  );
+  assert.match(retryBlock, /SetOutPath "\$TEMP"/u);
+  assert.match(retryBlock, /StrCpy \$RenameAttemptsRemaining \$\{INSTALL_RENAME_MAX_ATTEMPTS\}/u);
+  assert.match(
+    retryBlock,
+    /rename_install_directory:\s+ClearErrors\s+Rename "\$INSTDIR" "\$BackupDirectory"\s+IfErrors rename_retry install_files/u,
+  );
+  assert.match(
+    retryBlock,
+    /rename_retry:\s+IntOp \$RenameAttemptsRemaining \$RenameAttemptsRemaining - 1\s+IntCmp \$RenameAttemptsRemaining 0 rename_failed rename_failed rename_retry_wait/u,
+  );
+  assert.match(
+    retryBlock,
+    /rename_retry_wait:\s+Sleep \$\{INSTALL_RENAME_RETRY_DELAY_MS\}\s+Goto rename_install_directory/u,
+  );
+
+  const exhaustedFailure = installerSource.slice(installerSource.indexOf("rename_failed:"));
+  assert.match(exhaustedFailure, /^rename_failed:\s+SetErrorLevel 22\s+Goto finished/mu);
+  assert.equal(installerSource.match(/SetErrorLevel 22/gu)?.length, 1);
+
+  const payloadFailure = installerSource.slice(
+    installerSource.indexOf("install_failed:"),
+    installerSource.indexOf("rename_failed:"),
+  );
+  assert.match(
+    payloadFailure,
+    /SetOutPath "\$TEMP"\s+Rename "\$INSTDIR" "\$INSTDIR\.failed-\$\{RELEASE_ID\}"\s+Rename "\$BackupDirectory" "\$INSTDIR"\s+SetErrorLevel 21/u,
+  );
+});
+
 test("clean-source guard rejects dirty or moving HEAD before packaging", () => {
   const commit = "a".repeat(40);
   const execute = (_file, args) => {
