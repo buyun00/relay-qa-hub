@@ -2,6 +2,7 @@ import type { DatabaseSync } from "node:sqlite";
 
 import { digestMobileReadBinding } from "./mobile-read-cursor.js";
 import {
+  readMobileProjectSnapshotSequence,
   requireMobileReadLimit,
   resolveMobileReadAuthorization,
 } from "./mobile-read-authorization.js";
@@ -442,12 +443,22 @@ export function listMobileProjectMembers(
             left.displayName.toLowerCase().localeCompare(right.displayName.toLowerCase()) ||
             left.userId.localeCompare(right.userId),
         );
-      return Object.freeze({ items: Object.freeze(items), metadata: Object.freeze({}) });
+      return Object.freeze({
+        items: Object.freeze(items),
+        metadata: Object.freeze({
+          snapshotSequence: readMobileProjectSnapshotSequence(database, input.accountId, [
+            input.projectId,
+          ]),
+        }),
+      });
     },
   });
   return Object.freeze({
     projectId: input.projectId,
-    snapshotSequence: page.snapshotSequence,
+    // Member pages and Bug/workflow reads share the project event watermark. The
+    // snapshot table's own sequence identifies only this frozen directory page
+    // and cannot be compared with an events.event_position watermark.
+    snapshotSequence: page.metadata.snapshotSequence,
     items: page.items,
     nextCursor: page.nextCursor,
   });

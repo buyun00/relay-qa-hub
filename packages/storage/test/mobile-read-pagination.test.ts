@@ -17,6 +17,7 @@ import {
   listMobileProjectMembers,
   listMobileVisibleProjects,
 } from "../src/mobile-project-directory-store.js";
+import { readMobileProjectSnapshotSequence } from "../src/mobile-read-authorization.js";
 import { SQLITE_MIGRATIONS, SQLITE_SCHEMA_VERSION } from "../src/sqlite-migrations.js";
 import {
   currentSqliteSchemaVersion,
@@ -217,6 +218,10 @@ test("project and member pages use signed endpoint-bound cursors after canonical
       database,
       { accountId, actorId, authorizationProjectId: projectId, projectId, limit: 1 },
       key,
+    );
+    assert.equal(
+      members.snapshotSequence,
+      readMobileProjectSnapshotSequence(database, accountId, [projectId]),
     );
     assert.equal(Object.hasOwn(members.items[0]!, "identity"), false);
     assert.equal(Object.hasOwn(members.items[0]!, "linkedUserIds"), false);
