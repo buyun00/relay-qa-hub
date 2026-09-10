@@ -1,6 +1,6 @@
 # Windows 3.4.0 — unified quick builds
 
-Date: 2026-09-10. Product release verification is recorded below when complete.
+Date: 2026-09-10. Product release and installed-client verification are recorded below.
 
 ## Implementation
 
@@ -37,3 +37,23 @@ One real build-only probe was submitted, retaining its original request ID:
 Existing real iOS Release 2.4.37 artifact #46 metadata and ZIP HEAD were read: 740874401 bytes; SHA-256 recorded by build-info is `03aa41f40e812ae1dfa26f41d6859485d9516f0086b98b87d2a9effe4b9d9a90`. The probe did not upload or publish this existing version.
 
 **A successful real build-to-upload/publication is not verified.** The build-machine path error remains a dependency blocker; passing the EXE tests or publishing the compatibility release does not remove it.
+
+## Release and installed-client verification
+
+- Product source commit: `e68c0b2458aaa71a4afc1004d30c229294eec455`.
+- Version: **3.4.0**; release ID: **20260910T102920713Z**.
+- Installer: 150480687 bytes, SHA-256 `8a531c7f353d96016bd071d1e87820f9373909c01b8f71ee089db68763016ff1`.
+- Portable ZIP: 155457365 bytes, SHA-256 `db7595bac229cbcf5eab4caa2612e8ea7a800f0f2ffcd94c3fb52af9f240bd2b`.
+- Live signed update manifests and complete LAN downloads verified against hashes. The NSIS executables retain the existing Authenticode NotSigned status; update-manifest signature verification passed.
+- ASAR Web assets match deployed Web; installed main/preload/MCP/updater modules match compiled source. Runtime upload-contract files are included and byte-matched.
+- Production API was restarted only after checking no active/queued uploads or pending build handoffs. Readiness passed database/evidence/worker checks and live worker version is 0.5.0.
+- Real isolated EXE name login passed; all eight menus showed both operations enabled and the correct product/channel/tester. Actual iOS Release 2.4.37/#46 IPA and ZIP links point to the new directories. Installed MCP exposes 27 tools and all eight preset enums; readbacks match real catalogue and failed unified #2.
+- Isolated archived 3.3.8 upgraded through the live signed update channel to 3.4.0 and relaunched. Custom profile, runtime settings, legacy account/checkpoint/chain fixtures and rollback were retained. There is no local upload worker after upgrade.
+- Daily client PIDs 17160/10744/23944/3452 and startup entries were preserved; verification ports 4321/9333 released.
+- Previous published upload `46914a43-df35-431e-a292-1fbd18a514a7` remains `published=true`, status 100, publish time `2026-09-10 04:12:03`; no repeated platform write.
+
+Release evidence: `work/windows-3.4.0-release/` (`online-verification.json`, `package-source.json`, `api-deployment.json`, `live-web.json`, `portable-smoke.json`, `quick-build-packaged.json`, `quick-builds.png`, `self-update.json`, `previous-job-preserved.json`, `final-runtime.json`).
+
+Rollback: `apps/desktop/release/builds/prepublish-20260910T042456721Z-20260910T102737253Z/` contains the old 3.3.8 package, manifests/installers, Web and original source archive. API pre-change dist is retained at `work/quick-build-compat/api-dist-before`.
+
+The EXE compatibility release is verified. The real successful build/upload acceptance remains blocked by the build-machine error documented above; no real RuiXue publication was submitted during this compatibility validation.
