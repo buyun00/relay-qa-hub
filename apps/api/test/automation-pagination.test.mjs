@@ -376,12 +376,12 @@ test(
       await call(
         "qa_materialize_attachment",
         { ...specific, attachmentId: randomUUID() },
-        "NOT_FOUND",
+        "ATTACHMENT_NOT_BOUND_TO_BUG",
       );
       await call(
         "qa_materialize_attachment",
         { ...specific, projectId: otherProjectId, bugId: otherBugId },
-        "NOT_FOUND",
+        "ATTACHMENT_NOT_BOUND_TO_BUG",
         other.accessToken,
       );
 

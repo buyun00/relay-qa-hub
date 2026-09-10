@@ -368,7 +368,12 @@ test("MCP capture artifacts use real HTTP, SQLite bindings, content validation a
       "wrong Bug, project, membership, resource URI and nested capture project cannot expose evidence",
       async () => {
         for (const name of ["qa_read_attachment", "qa_materialize_attachment"]) {
-          await call(name, { ...identifiers, bugId: unrelated.bug.id }, "NOT_FOUND", readerToken);
+          await call(
+            name,
+            { ...identifiers, bugId: unrelated.bug.id },
+            name === "qa_materialize_attachment" ? "ATTACHMENT_NOT_BOUND_TO_BUG" : "NOT_FOUND",
+            readerToken,
+          );
           await call(name, { ...identifiers, projectId: otherProjectId }, "NOT_FOUND", otherToken);
         }
         await call(

@@ -1109,7 +1109,11 @@ export function registerAutomationRoutes(
             break;
           }
         }
-        if (!attachment) throw new AutomationError("NOT_FOUND", 404);
+        if (!attachment)
+          throw new AutomationError(
+            name === "qa_materialize_attachment" ? "ATTACHMENT_NOT_BOUND_TO_BUG" : "NOT_FOUND",
+            404,
+          );
         const uri = `qa-hub://attachment/${encoded(input, "projectId")}/${encoded(input, "bugId")}/${encoded(input, "attachmentId")}`;
         if (name === "qa_materialize_attachment")
           return {

@@ -1,0 +1,371 @@
+{
+  "schemaVersion": 1,
+  "instanceId": "qa-hub-preview-v21-e2e-fresh-0910",
+  "repositoryHeadCommit": "2295ccbba7ccaf35d11e3a562ad1dd1213183a44",
+  "runtimeProductSourceCommit": "88a6d0f9c31106f6cd3fc9edbadca0db6bf6397b",
+  "runtimeBuildAggregateSha256": "94133722ff285f123ea18a1ee19acadfbf9f6cf3045d29e7c0da73ca5876dd28",
+  "startedAt": "2026-09-10T09:42:01.419Z",
+  "finishedAt": "2026-09-10T09:42:01.681Z",
+  "scope": {
+    "projectId": "10000000-0000-4000-8000-000000000004",
+    "loginName": "Luna Worker 246",
+    "apiOrigin": "http://127.0.0.1:4639",
+    "serverMcp": "http://127.0.0.1:4641/mcp",
+    "localMcp": "http://127.0.0.1:4642/mcp",
+    "productionTouched": false,
+    "externalCalls": false
+  },
+  "passed": false,
+  "transportAndPersistencePassed": true,
+  "parityPassed": false,
+  "assertions": {
+    "httpUploadAndClaim": "passed",
+    "fiveMutatingOperationsReplayWithoutDuplicateRows": "passed",
+    "malformedIdempotencyKeyRejectedWithoutDurableMutation": "passed",
+    "httpServerLocalSameIdentityAndAttachment": "passed",
+    "httpAndLocalBytesEqualFixture": "passed",
+    "wrongBugMaterializationDeniedOnBothMcpSurfaces": "failed_error_code_mismatch",
+    "sqliteBugAttachmentBindingUploadAndReceiptsPersisted": "passed"
+  },
+  "record": {
+    "bugId": "3e161670-d343-4bf8-b228-fc8f3d681018",
+    "bugKey": "LOCAL-9",
+    "controlBugId": "122d805e-bcc0-4877-b6d6-8fcc46b04d54",
+    "attachmentId": "9da39cd0-1101-44ca-9efb-00661a13f080",
+    "uploadSessionId": "309078a2-6fc8-4765-af84-26efc9273ba7",
+    "fixture": {
+      "filename": "v21-http-mcp-parity-20260910094201.png",
+      "size": 68,
+      "sha256": "6b1048f8a6d40bac0b2954c18fefa40c4ea7a96120fc2e54b7317c0e43c2bbec"
+    }
+  },
+  "http": {
+    "checks": [
+      {
+        "label": "isolated API readiness",
+        "method": "GET",
+        "path": "/api/v1/health/ready",
+        "expectedStatus": 200,
+        "status": 200
+      },
+      {
+        "label": "HTTP same-name login",
+        "method": "POST",
+        "path": "/api/v1/auth/login",
+        "expectedStatus": 200,
+        "status": 200
+      },
+      {
+        "label": "wrong idempotency key rejected without durable mutation",
+        "method": "POST",
+        "path": "/api/v1/uploads/init",
+        "expectedStatus": 400,
+        "status": 400
+      },
+      {
+        "label": "upload init",
+        "method": "POST",
+        "path": "/api/v1/uploads/init",
+        "expectedStatus": 201,
+        "status": 201
+      },
+      {
+        "label": "upload init replay",
+        "method": "POST",
+        "path": "/api/v1/uploads/init",
+        "expectedStatus": 201,
+        "status": 201
+      },
+      {
+        "label": "upload chunk",
+        "method": "PUT",
+        "path": "/api/v1/uploads/:uuid/chunks/0",
+        "expectedStatus": 204,
+        "status": 204
+      },
+      {
+        "label": "upload chunk replay",
+        "method": "PUT",
+        "path": "/api/v1/uploads/:uuid/chunks/0",
+        "expectedStatus": 204,
+        "status": 204
+      },
+      {
+        "label": "upload finalize",
+        "method": "POST",
+        "path": "/api/v1/uploads/:uuid/finalize",
+        "expectedStatus": 200,
+        "status": 200
+      },
+      {
+        "label": "upload finalize replay",
+        "method": "POST",
+        "path": "/api/v1/uploads/:uuid/finalize",
+        "expectedStatus": 200,
+        "status": 200
+      },
+      {
+        "label": "attachment bind",
+        "method": "POST",
+        "path": "/api/v1/attachments/:uuid/bind",
+        "expectedStatus": 200,
+        "status": 200
+      },
+      {
+        "label": "attachment bind replay",
+        "method": "POST",
+        "path": "/api/v1/attachments/:uuid/bind",
+        "expectedStatus": 200,
+        "status": 200
+      },
+      {
+        "label": "create attachment Bug",
+        "method": "POST",
+        "path": "/api/v1/bugs",
+        "expectedStatus": 201,
+        "status": 201
+      },
+      {
+        "label": "create attachment Bug replay",
+        "method": "POST",
+        "path": "/api/v1/bugs",
+        "expectedStatus": 201,
+        "status": 201
+      },
+      {
+        "label": "create no-attachment control Bug",
+        "method": "POST",
+        "path": "/api/v1/bugs",
+        "expectedStatus": 201,
+        "status": 201
+      },
+      {
+        "label": "HTTP attachment readback",
+        "method": "GET",
+        "path": "/api/v1/bugs/:uuid/attachments?limit=50",
+        "expectedStatus": 200,
+        "status": 200
+      },
+      {
+        "label": "HTTP wrong Bug has no attachment",
+        "method": "GET",
+        "path": "/api/v1/bugs/:uuid/attachments?limit=50",
+        "expectedStatus": 200,
+        "status": 200
+      },
+      {
+        "label": "HTTP attachment bytes",
+        "method": "GET",
+        "path": "/api/v1/attachments/:uuid",
+        "expectedStatus": 200,
+        "status": 200
+      }
+    ],
+    "attachmentCount": 1,
+    "controlAttachmentCount": 0,
+    "downloadedBytes": 68,
+    "downloadedSha256": "6b1048f8a6d40bac0b2954c18fefa40c4ea7a96120fc2e54b7317c0e43c2bbec"
+  },
+  "mcp": {
+    "server": {
+      "endpoint": "http://127.0.0.1:4641/mcp",
+      "serverName": "qa-hub-project-preview",
+      "serverVersion": "2.1",
+      "toolCount": 96,
+      "sameUserIdAsHttp": true,
+      "listedItemCount": 1,
+      "attachmentId": "9da39cd0-1101-44ca-9efb-00661a13f080",
+      "size": 68,
+      "sha256": "6b1048f8a6d40bac0b2954c18fefa40c4ea7a96120fc2e54b7317c0e43c2bbec",
+      "errorBoundary": {
+        "code": "NOT_FOUND",
+        "isError": true
+      },
+      "calls": [
+        {
+          "method": "initialize",
+          "status": 200
+        },
+        {
+          "method": "tools/list",
+          "status": 200
+        },
+        {
+          "method": "tools/call",
+          "tool": "qa_login",
+          "status": 200
+        },
+        {
+          "method": "tools/call",
+          "tool": "qa_list_attachments",
+          "status": 200
+        },
+        {
+          "method": "tools/call",
+          "tool": "qa_materialize_attachment",
+          "status": 200
+        },
+        {
+          "method": "tools/call",
+          "tool": "qa_materialize_attachment",
+          "status": 200
+        },
+        {
+          "method": "tools/call",
+          "tool": "qa_materialize_attachment",
+          "status": 200
+        }
+      ],
+      "materialized": {
+        "downloadPath": "/api/v1/attachments/:attachmentId",
+        "resourceUriStableOnReplay": true
+      }
+    },
+    "local": {
+      "endpoint": "http://127.0.0.1:4642/mcp",
+      "serverName": "qa-hub-desktop-preview",
+      "serverVersion": "0.2.0-preview.13",
+      "toolCount": 96,
+      "sameUserIdAsHttp": true,
+      "listedItemCount": 1,
+      "attachmentId": "9da39cd0-1101-44ca-9efb-00661a13f080",
+      "size": 68,
+      "sha256": "6b1048f8a6d40bac0b2954c18fefa40c4ea7a96120fc2e54b7317c0e43c2bbec",
+      "errorBoundary": {
+        "code": "ATTACHMENT_NOT_BOUND_TO_BUG",
+        "isError": true
+      },
+      "calls": [
+        {
+          "method": "initialize",
+          "status": 200
+        },
+        {
+          "method": "tools/list",
+          "status": 200
+        },
+        {
+          "method": "tools/call",
+          "tool": "qa_login",
+          "status": 200
+        },
+        {
+          "method": "tools/call",
+          "tool": "qa_list_attachments",
+          "status": 200
+        },
+        {
+          "method": "tools/call",
+          "tool": "qa_materialize_attachment",
+          "status": 200
+        },
+        {
+          "method": "tools/call",
+          "tool": "qa_materialize_attachment",
+          "status": 200
+        },
+        {
+          "method": "tools/call",
+          "tool": "qa_materialize_attachment",
+          "status": 200
+        }
+      ],
+      "materialized": {
+        "runtimeRelativePath": "desktop/profile/mcp-attachments/435da0f754ff79351cf97b2b470f9e4ba0537dcecad9fd170591f26d15e4aa96/3e161670-d343-4bf8-b228-fc8f3d681018/9da39cd0-1101-44ca-9efb-00661a13f080-6b1048f8a6d4-v21-http-mcp-parity-20260910094201.png",
+        "bytes": 68,
+        "sha256": "6b1048f8a6d40bac0b2954c18fefa40c4ea7a96120fc2e54b7317c0e43c2bbec",
+        "replayUsedVerifiedCache": true
+      }
+    }
+  },
+  "database": {
+    "openedReadOnlyWithWalVisible": true,
+    "bug": {
+      "id": "3e161670-d343-4bf8-b228-fc8f3d681018",
+      "project_id": "10000000-0000-4000-8000-000000000004",
+      "key": "LOCAL-9",
+      "title": "V21_HTTP_SERVER_LOCAL_MCP_ATTACHMENT_PARITY_20260910094201",
+      "version": 1
+    },
+    "attachment": {
+      "id": "9da39cd0-1101-44ca-9efb-00661a13f080",
+      "project_id": "10000000-0000-4000-8000-000000000004",
+      "upload_session_id": "309078a2-6fc8-4765-af84-26efc9273ba7",
+      "file_name": "v21-http-mcp-parity-20260910094201.png",
+      "media_type": "image/png",
+      "size_bytes": 68,
+      "sha256": "6b1048f8a6d40bac0b2954c18fefa40c4ea7a96120fc2e54b7317c0e43c2bbec",
+      "status": "ready",
+      "scan_state": "clean",
+      "version": 2
+    },
+    "binding": {
+      "attachment_id": "9da39cd0-1101-44ca-9efb-00661a13f080",
+      "project_id": "10000000-0000-4000-8000-000000000004",
+      "target_bug_id": "3e161670-d343-4bf8-b228-fc8f3d681018",
+      "intent": "bug_create",
+      "state": "claimed",
+      "lease_generation": 1,
+      "version": 2
+    },
+    "relation": {
+      "project_id": "10000000-0000-4000-8000-000000000004",
+      "bug_id": "3e161670-d343-4bf8-b228-fc8f3d681018",
+      "attachment_id": "9da39cd0-1101-44ca-9efb-00661a13f080",
+      "binding_id": "108d37b5-1e4c-437a-b3f7-459079397af6"
+    },
+    "upload": {
+      "id": "309078a2-6fc8-4765-af84-26efc9273ba7",
+      "project_id": "10000000-0000-4000-8000-000000000004",
+      "finalized_attachment_id": "9da39cd0-1101-44ca-9efb-00661a13f080",
+      "status": "finalized",
+      "received_size_bytes": 68,
+      "expected_sha256": "6b1048f8a6d40bac0b2954c18fefa40c4ea7a96120fc2e54b7317c0e43c2bbec",
+      "version": 3
+    },
+    "submission": {
+      "project_id": "10000000-0000-4000-8000-000000000004",
+      "actor_id": "0ddff48b-536c-4c30-8b42-511741010610",
+      "client_submission_id": "0342894b-a164-429e-8ff7-3ed5137c5504",
+      "intent": "bug_create",
+      "bug_id": "3e161670-d343-4bf8-b228-fc8f3d681018",
+      "version": 1
+    },
+    "durableCountsAfterReplay": {
+      "uploadSessions": 1,
+      "uploadChunks": 1,
+      "attachments": 1,
+      "bindings": 1,
+      "bugAttachmentRelations": 1,
+      "submissions": 1
+    },
+    "malformedIdempotencyKeyRejectedWithoutDurableMutation": true,
+    "integrity": "ok",
+    "foreignKeyViolations": 0
+  },
+  "observedDefect": {
+    "code": "MCP_ERROR_CODE_MISMATCH",
+    "serverMcp": "NOT_FOUND",
+    "localMcp": "ATTACHMENT_NOT_BOUND_TO_BUG",
+    "httpStatusOnBothSurfaces": 404,
+    "sourceFixAppliedInWorktree": true,
+    "sourceFiles": [
+      "apps/api/src/automation.ts",
+      "apps/api/test/automation-protocol.test.mjs",
+      "apps/api/test/automation-pagination.test.mjs",
+      "apps/api/test/automation-capture.test.mjs"
+    ],
+    "sourceValidation": {
+      "apiTypeScriptBuild": "passed",
+      "automationTests": 33,
+      "automationTestsPassed": 33
+    },
+    "runningPreviewRebuiltOrRestartedAfterFix": false,
+    "livePostFixParityRevalidated": false
+  },
+  "limitations": [
+    "This proves the attachment metadata/materialization parity subset only; it does not imply parity for all 96 MCP tools.",
+    "It uses the isolated preview runtime and deterministic PNG bytes; no production, physical device, real packaging, upload publication, Relay, or third-party system was exercised.",
+    "The server MCP reports NOT_FOUND while local MCP reports ATTACHMENT_NOT_BOUND_TO_BUG for the same wrong-Bug boundary; both reject access with isError=true, but error-code wording is surface-specific."
+  ]
+}

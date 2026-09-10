@@ -317,6 +317,20 @@ test("actual MCP HTTP stops attachment materialization when an upstream page rep
   assert.equal(pages, 2);
 });
 
+test("actual MCP HTTP matches local MCP when an attachment is not bound to the requested Bug", async (t) => {
+  const f = await fixture(t, (app) => {
+    app.get("/api/v1/bugs/:bugId/attachments", async () => ({ items: [], nextCursor: null }));
+  });
+  const result = (
+    await f.rpc("tools/call", {
+      name: "qa_materialize_attachment",
+      arguments: { projectId: randomUUID(), bugId: randomUUID(), attachmentId: randomUUID() },
+    })
+  ).result;
+  assert.equal(result.isError, true);
+  assert.equal(JSON.parse(result.content[0].text).code, "ATTACHMENT_NOT_BOUND_TO_BUG");
+});
+
 test("actual MCP HTTP and SQLite GM login persists the selected project and rejects conflicting scopes", async () => {
   const root = await mkdtemp(join(tmpdir(), "qa-mcp-protocol-gm-"));
   const worker = new SqliteStorageWorker({
