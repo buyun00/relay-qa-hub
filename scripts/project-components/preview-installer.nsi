@@ -594,7 +594,7 @@ Function CreateIdentityShortcut
   System::Call 'OLE32::CoInitialize(p0)i.r9'
   IntCmp $9 0 shortcut_com_ready shortcut_finished shortcut_com_ready
 shortcut_com_ready:
-  !insertmacro ComHlpr_CreateInProcInstance ${CLSID_ShellLink} ${IID_IShellLink} r0 r2
+  !insertmacro ComHlpr_CreateInProcInstance ${CLSID_ShellLink} ${IID_IShellLink} r0 .r2
   StrCmp $0 0 shortcut_cleanup
   StrCmp $2 0 shortcut_set_path shortcut_cleanup
 shortcut_set_path:

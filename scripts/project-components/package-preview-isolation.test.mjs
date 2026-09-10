@@ -2803,6 +2803,16 @@ test("preview installer binds Electron's canonical Start Menu shortcut and COM a
   assert.match(shortcutFunction, /\$\{VT_CLSID\}/u);
   assert.match(shortcutFunction, /IPropertyStore::Commit/u);
   assert.match(shortcutFunction, /IPersistFile::Save/u);
+  assert.match(
+    shortcutFunction,
+    /!insertmacro ComHlpr_CreateInProcInstance \$\{CLSID_ShellLink\} \$\{IID_IShellLink\} r0 \.r2/u,
+    "CoCreateInstance must capture HRESULT in an output register",
+  );
+  assert.doesNotMatch(
+    shortcutFunction,
+    /!insertmacro ComHlpr_CreateInProcInstance \$\{CLSID_ShellLink\} \$\{IID_IShellLink\} r0 r2/u,
+    "an input-register HRESULT operand leaves the shell-link pointer unset",
+  );
 
   const installSection = installerSource.slice(
     installerSource.indexOf('Section "QA Hub Preview"'),
