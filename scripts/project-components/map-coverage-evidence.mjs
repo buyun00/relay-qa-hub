@@ -1239,24 +1239,39 @@ if (
   androidNormalization.removedCarriageReturns !== 1 ||
   androidNormalization.onlyCRLFToLF !== true ||
   androidNormalization.testsRerun !== false ||
-  !androidPending.sourceFiles.every(
-    (file) =>
-      file.path.startsWith("apps/android/app/src/") &&
-      createHash("sha256")
-        .update(fs.readFileSync(path.join(root, file.path)))
-        .digest("hex") === file.sha256,
-  )
+  !androidPending.sourceFiles.every((file) => file.path.startsWith("apps/android/app/src/"))
 )
-  throw new Error("Android pending submission proof/current source differs from reviewed hashes");
+  throw new Error("Android pending submission proof differs from reviewed content");
+const androidPendingSourceComparison = androidPending.sourceFiles.map((file) => {
+  const currentPath = path.join(root, file.path);
+  const exists = fs.existsSync(currentPath);
+  const currentSha256 = exists
+    ? createHash("sha256").update(fs.readFileSync(currentPath)).digest("hex")
+    : null;
+  return {
+    path: file.path,
+    reviewedSha256: file.sha256,
+    currentSha256,
+    exists,
+    matched: currentSha256 === file.sha256,
+  };
+});
+const androidPendingCurrentSourceMatched = androidPendingSourceComparison.every(
+  (file) => file.matched,
+);
 validationEvidence.push({
   file: androidPendingFile,
-  summary: "Android 115/115、lint 0 error；严格核对提交fb2eca7的10份当前源码SHA",
+  summary: "Android 115/115、lint 0 error；严格核对提交fb2eca7的10份冻结源码SHA",
   matched: true,
+  proofIntegrityMatched: true,
+  currentSourceMatched: androidPendingCurrentSourceMatched,
+  needsRevalidation: !androidPendingCurrentSourceMatched,
   sourceFiles: androidPending.sourceFiles,
+  sourceComparison: androidPendingSourceComparison,
   normalization: androidNormalization,
   preservedFailedVerification: androidPending.preservedFailedVerification,
   scope:
-    "BugDraftPreferences测试原始SHA与提交canonical SHA分别保留，仅1个CRLF→LF、未重跑测试。OkHttp回环/受控DAO及偏好存储夹具，不是已安装APK、Compose/物理设备故障注入；不提升任何客户端结果。",
+    "这是历史验证记录。BugDraftPreferences测试原始SHA与提交canonical SHA分别保留，仅1个CRLF→LF、未重跑测试。OkHttp回环/受控DAO及偏好存储夹具，不是已安装APK、Compose/物理设备故障注入；不提升任何客户端结果。",
 });
 const nativeGuards = optionalRead("runs/native-installer-guards.json");
 if (
@@ -1315,16 +1330,61 @@ for (const surface of ["http", "server_mcp"]) {
 }
 // Reviewed, proof-bound corrections survive reruns of older automatic mappings.
 // These are public evidence records, never authority to skip an untested feature.
+const unavailableReviewedEvidence = [];
+const ignoredAndroidBuildEvidenceRoot = path.resolve(
+  root,
+  "apps/android/app/build/evidence/project-components",
+);
+const isIgnoredAndroidBuildEvidence = (file) => {
+  const resolved = path.resolve(evidenceRoot, file);
+  return (
+    resolved === ignoredAndroidBuildEvidenceRoot ||
+    resolved.startsWith(ignoredAndroidBuildEvidenceRoot + path.sep)
+  );
+};
 for (const item of matrix.items) {
   const reviewed = item.manual.reviewedEvidence;
   if (!reviewed) continue;
   const hashes = Object.entries(reviewed.proofHashes ?? {});
   if (!hashes.length) throw new Error(`Reviewed evidence has no proof hashes: ${item.id}`);
+  const missingFiles = hashes
+    .map(([file]) => file)
+    .filter((file) => !fs.existsSync(path.resolve(evidenceRoot, file)));
+  const unexpectedMissingFiles = missingFiles.filter(
+    (file) => !isIgnoredAndroidBuildEvidence(file),
+  );
+  if (unexpectedMissingFiles.length)
+    throw new Error(
+      `Reviewed evidence missing; re-review required: ${item.id} / ${unexpectedMissingFiles[0]}`,
+    );
   for (const [file, expected] of hashes) {
+    if (missingFiles.includes(file)) continue;
     proofBytes(file);
     if (proofHashes[file] !== expected)
       throw new Error(`Reviewed evidence changed; re-review required: ${item.id} / ${file}`);
   }
+  if (missingFiles.length) {
+    item.needsRevalidation = true;
+    item.manual.needsRevalidation = true;
+    item.manual.reviewedEvidenceAvailability = {
+      currentProofsAvailable: false,
+      needsRevalidation: true,
+      resultReplaySkipped: true,
+      missingFiles,
+      scope:
+        "The reviewed result is retained as history, but unavailable Git-ignored Android build proof cannot replay or promote a current result.",
+    };
+    unavailableReviewedEvidence.push({
+      itemId: item.id,
+      missingFiles,
+      currentProofsAvailable: false,
+      needsRevalidation: true,
+      resultReplaySkipped: true,
+    });
+    continue;
+  }
+  if (item.manual.reviewedEvidenceAvailability?.currentProofsAvailable === false)
+    delete item.manual.reviewedEvidenceAvailability;
   for (const [surface, result] of Object.entries(reviewed.results ?? {})) {
     const prior = item.results[surface];
     if (prior?.status === "failed" && result.status !== "failed") continue;
@@ -2461,6 +2521,7 @@ matrix.evidenceMapping = {
   sourceReports: Object.keys(proofHashes),
   proofHashes,
   validationEvidence,
+  unavailableReviewedEvidence,
   review: "coverage-mapping-review.md",
 };
 const surfaces = Object.keys(matrix.surfaces);
@@ -2520,9 +2581,25 @@ const review = [
   "",
   "## 可重放与审计",
   "",
+  ...(unavailableReviewedEvidence.length
+    ? [
+        "以下历史 `reviewedEvidence` 指向的 Git-ignored Android build proof 当前缺失；对应行已标记 `needsRevalidation`，本次没有重放或提升这些结果。其它 tracked/public proof 缺失仍会在写入前拒绝：",
+        "",
+        ...unavailableReviewedEvidence.map(
+          (entry) => `- ${entry.itemId}：${entry.missingFiles.join("、")}`,
+        ),
+        "",
+      ]
+    : []),
   ...validationEvidence.map(
     (entry) =>
-      `- ${entry.summary}：${entry.matched ? "已有成功输出" : "输出需复核"}，见[${entry.file}](${entry.file})。${entry.scope}。`,
+      `- ${entry.summary}：${entry.matched ? "已有成功输出" : "输出需复核"}，见[${entry.file}](${entry.file})。${
+        entry.currentSourceMatched === undefined
+          ? ""
+          : entry.currentSourceMatched
+            ? "当前源码SHA仍匹配。"
+            : "当前源码SHA已漂移，needs revalidation；该记录只保留为历史验证，不映射为当前通过。"
+      }${entry.scope}。`,
   ),
   "",
   "## 近期指定版本的部分实测",

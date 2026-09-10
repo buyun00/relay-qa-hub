@@ -18,6 +18,26 @@ const before = Object.fromEntries(
 );
 const input = JSON.parse(fs.readFileSync(path.join(evidenceRoot, names[0])));
 const clone = structuredClone(input);
+const unavailableReviewedReplayControls = [];
+for (const item of clone.items) {
+  const reviewed = item.manual?.reviewedEvidence;
+  if (!reviewed) continue;
+  const hasUnavailableIgnoredBuildProof = Object.keys(reviewed.proofHashes ?? {}).some(
+    (file) =>
+      file.startsWith("../../../apps/android/app/build/evidence/project-components/") &&
+      !fs.existsSync(path.resolve(evidenceRoot, file)),
+  );
+  const reviewedLocal = reviewed.results?.local_mcp;
+  if (!hasUnavailableIgnoredBuildProof || reviewedLocal?.status !== "passed") continue;
+  item.results.local_mcp = {
+    ...item.results.local_mcp,
+    status: "not_run",
+    evidence: [],
+    actual: "synthetic unavailable reviewed proof control",
+    note: "missing ignored build proof must not replay this historical pass",
+  };
+  unavailableReviewedReplayControls.push(item.id);
+}
 const target = clone.items.find(
   (item) =>
     item.kind === "web_control" &&
@@ -88,7 +108,7 @@ manual.manual.surfaceProgress.exe = {
 };
 fs.writeFileSync(path.join(fixture, names[0]), JSON.stringify(clone));
 const sourceHashes = {};
-function execute(name) {
+function execute(name, { tamperProof = null, missingProof = null } = {}) {
   const sourcePath = path.join(root, "scripts/project-components", name);
   const bytes = fs.readFileSync(sourcePath);
   sourceHashes[name] = sha(bytes);
@@ -100,12 +120,19 @@ function execute(name) {
     path.dirname(path.resolve(file)) === evidenceRoot && names.includes(path.basename(file))
       ? path.join(fixture, path.basename(file))
       : file;
+  const writes = [];
+  const faultInjected = Boolean(tamperProof || missingProof);
   const virtualFs = {
     ...fs,
     readFileSync(file, ...args) {
-      return fs.readFileSync(redirect(file), ...args);
+      const body = fs.readFileSync(redirect(file), ...args);
+      if (tamperProof && path.resolve(file) === path.resolve(evidenceRoot, tamperProof))
+        return typeof body === "string" ? body + "\n" : Buffer.concat([body, Buffer.from("\n")]);
+      return body;
     },
     existsSync(file) {
+      if (missingProof && path.resolve(file) === path.resolve(evidenceRoot, missingProof))
+        return false;
       return fs.existsSync(redirect(file));
     },
     mkdirSync(file, ...args) {
@@ -114,29 +141,37 @@ function execute(name) {
     },
     writeFileSync(file, ...args) {
       if (redirect(file) === file) throw new Error("Unexpected write target");
-      return fs.writeFileSync(redirect(file), ...args);
+      writes.push(redirect(file));
+      if (!faultInjected) return fs.writeFileSync(redirect(file), ...args);
     },
   };
-  new Function(
-    "fs",
-    "path",
-    "fileURLToPath",
-    "createHash",
-    "execFileSync",
-    "ts",
-    "console",
-    "process",
-    source,
-  )(
-    virtualFs,
-    path,
-    fileURLToPath,
-    createHash,
-    execFileSync,
-    ts,
-    { log() {} },
-    { stdout: { write() {} } },
-  );
+  let error = null;
+  try {
+    new Function(
+      "fs",
+      "path",
+      "fileURLToPath",
+      "createHash",
+      "execFileSync",
+      "ts",
+      "console",
+      "process",
+      source,
+    )(
+      virtualFs,
+      path,
+      fileURLToPath,
+      createHash,
+      execFileSync,
+      ts,
+      { log() {} },
+      { stdout: { write() {} } },
+    );
+  } catch (cause) {
+    if (!faultInjected) throw cause;
+    error = cause instanceof Error ? cause.message : String(cause);
+  }
+  return { error, writes };
 }
 function chain() {
   for (const name of [
@@ -156,6 +191,15 @@ function normalized(value) {
 }
 const first = chain(),
   second = chain();
+const tamperedAndroidProof = execute("map-coverage-evidence.mjs", {
+  tamperProof: "android-offline-create-recovery.json",
+});
+const tamperedReviewedProof = execute("map-coverage-evidence.mjs", {
+  tamperProof: "runs/exe-preview6-logout-readback.json",
+});
+const missingTrackedReviewedProof = execute("map-coverage-evidence.mjs", {
+  missingProof: "runs/exe-preview6-logout-readback.json",
+});
 const firstIndex = new Map(first.items.map((item) => [item.id, item]));
 // Real discovery can retire stable IDs after a route declaration moves. Such
 // records must retain manual evidence in retiredItems; new discoveries must
@@ -175,6 +219,14 @@ const failedLosses = failed
 const newNode = firstIndex.get(target.id),
   changedNode = firstIndex.get(changed.id);
 const manualAfter = firstIndex.get(manual.id);
+const androidHistorical = first.evidenceMapping.validationEvidence.find(
+  (entry) => entry.file === "android-offline-create-recovery.json",
+);
+const androidProofMappedToResult = [...first.items, ...first.retiredItems].some((item) =>
+  Object.values(item.results).some((result) =>
+    result.evidence?.some((entry) => entry.includes("android-offline-create-recovery.json")),
+  ),
+);
 const originalNotes = clone.items.flatMap((item) =>
   (item.manual.retainedReviewNotes ?? []).map((note) => ({ id: item.id, note })),
 );
@@ -226,6 +278,42 @@ const checks = {
       note.note === "unique manual annotation before composite replay" &&
       note.progress?.remaining?.includes("manual remaining"),
   ),
+  androidHistoricalProofIntegrityRetained:
+    androidHistorical?.matched === true && androidHistorical.proofIntegrityMatched === true,
+  androidHistoricalProofRequiresCurrentSourceRevalidation:
+    androidHistorical?.currentSourceMatched === false &&
+    androidHistorical.needsRevalidation === true &&
+    androidHistorical.sourceComparison?.length === 10 &&
+    androidHistorical.sourceComparison.some((file) => file.matched === false) &&
+    !androidProofMappedToResult,
+  tamperedAndroidPinnedProofRejectedBeforeWrite:
+    tamperedAndroidProof.error?.includes(
+      "Android pending submission source verification proof changed; re-review required",
+    ) && tamperedAndroidProof.writes.length === 0,
+  unavailableIgnoredBuildProofsRetainedWithoutReplay:
+    unavailableReviewedReplayControls.length > 0 &&
+    first.evidenceMapping.unavailableReviewedEvidence?.length > 0 &&
+    first.evidenceMapping.unavailableReviewedEvidence.every((entry) => {
+      const item = retainedIndex.get(entry.itemId);
+      return (
+        item?.needsRevalidation === true &&
+        item.manual.needsRevalidation === true &&
+        item.manual.reviewedEvidence !== undefined &&
+        item.manual.reviewedEvidenceAvailability?.currentProofsAvailable === false &&
+        item.manual.reviewedEvidenceAvailability.needsRevalidation === true &&
+        item.manual.reviewedEvidenceAvailability.resultReplaySkipped === true &&
+        entry.resultReplaySkipped === true &&
+        (!unavailableReviewedReplayControls.includes(entry.itemId) ||
+          (item.results.local_mcp.status === "not_run" &&
+            item.results.local_mcp.actual === "synthetic unavailable reviewed proof control"))
+      );
+    }),
+  tamperedPresentReviewedProofRejectedBeforeWrite:
+    tamperedReviewedProof.error?.includes("Reviewed evidence changed; re-review required") &&
+    tamperedReviewedProof.writes.length === 0,
+  missingTrackedReviewedProofRejectedBeforeWrite:
+    missingTrackedReviewedProof.error?.includes("Reviewed evidence missing; re-review required") &&
+    missingTrackedReviewedProof.writes.length === 0,
   actualWorkspaceGeneratedFilesUnchanged: JSON.stringify(before) === JSON.stringify(after),
 };
 const report = {
@@ -243,6 +331,19 @@ const report = {
   failedLosses,
   notesMissing,
   flagLosses,
+  androidHistorical: {
+    currentSourceMatched: androidHistorical?.currentSourceMatched,
+    needsRevalidation: androidHistorical?.needsRevalidation,
+    mismatchedFiles:
+      androidHistorical?.sourceComparison
+        ?.filter((file) => !file.matched)
+        .map((file) => file.path) ?? [],
+    mappedToResult: androidProofMappedToResult,
+  },
+  tamperedAndroidProof,
+  tamperedReviewedProof,
+  missingTrackedReviewedProof,
+  unavailableReviewedEvidence: first.evidenceMapping.unavailableReviewedEvidence,
   semanticHashes: [first, second].map((value) => sha(normalized(value))),
   checks,
   workspaceBefore: before,
