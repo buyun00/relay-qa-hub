@@ -23,7 +23,7 @@ SetCompressor /SOLID lzma
   !error "DISPLAY_NAME is required"
 !endif
 ; The updater waits for the main PID, but a child can retain an image or directory
-; handle briefly. Keep the retry bounded: 40 total attempts and at most 9.75s asleep.
+; handle briefly. Each rename phase is bounded to 40 attempts and 9.75s asleep.
 !define INSTALL_RENAME_MAX_ATTEMPTS 40
 !define INSTALL_RENAME_RETRY_DELAY_MS 250
 Name "${DISPLAY_NAME}"
@@ -40,8 +40,15 @@ UninstPage instfiles
 
 Var BackupDirectory
 Var ExistingIdentity
+Var FailedDirectory
+Var HadExistingInstall
 Var OperationSuffix
 Var RenameAttemptsRemaining
+Var RenameDestination
+Var RenameSource
+Var RenameSucceeded
+Var VerificationDirectory
+Var VerificationSucceeded
 
 Function .onInit
   SetShellVarContext current
@@ -76,29 +83,61 @@ Function .onInit
 validated:
 FunctionEnd
 
+Function RetryRenameDirectory
+  StrCpy $RenameAttemptsRemaining ${INSTALL_RENAME_MAX_ATTEMPTS}
+  StrCpy $RenameSucceeded 0
+rename_directory_attempt:
+  ClearErrors
+  Rename "$RenameSource" "$RenameDestination"
+  IfErrors rename_directory_retry
+  StrCpy $RenameSucceeded 1
+  Return
+rename_directory_retry:
+  IntOp $RenameAttemptsRemaining $RenameAttemptsRemaining - 1
+  IntCmp $RenameAttemptsRemaining 0 rename_directory_exhausted rename_directory_exhausted rename_directory_wait
+rename_directory_wait:
+  Sleep ${INSTALL_RENAME_RETRY_DELAY_MS}
+  Goto rename_directory_attempt
+rename_directory_exhausted:
+FunctionEnd
+
+Function VerifyPreviewInstallDirectory
+  StrCpy $VerificationSucceeded 0
+  IfFileExists "$VerificationDirectory\.preview-instance-id" 0 verification_finished
+  IfFileExists "$VerificationDirectory\${EXECUTABLE_BASENAME}.exe" 0 verification_finished
+  ClearErrors
+  FileOpen $0 "$VerificationDirectory\.preview-instance-id" r
+  IfErrors verification_finished
+  FileRead $0 $ExistingIdentity
+  IfErrors verification_read_failed
+  FileClose $0
+  StrCmp $ExistingIdentity "${INSTANCE_ID}" 0 verification_finished
+  StrCpy $VerificationSucceeded 1
+  Return
+verification_read_failed:
+  FileClose $0
+verification_finished:
+FunctionEnd
+
 Section "QA Hub Preview"
+  StrCpy $HadExistingInstall 0
   StrCpy $BackupDirectory "$INSTDIR.backup-${RELEASE_ID}"
   StrCpy $OperationSuffix 0
 choose_backup:
-  IfFileExists "$BackupDirectory\*" next_backup backup_ready
+  IfFileExists "$BackupDirectory" next_backup
+  IfFileExists "$BackupDirectory\*.*" next_backup backup_ready
 next_backup:
   IntOp $OperationSuffix $OperationSuffix + 1
   StrCpy $BackupDirectory "$INSTDIR.backup-${RELEASE_ID}-$OperationSuffix"
   Goto choose_backup
 backup_ready:
-  IfFileExists "$INSTDIR\*" 0 install_files
+  IfFileExists "$INSTDIR\*.*" 0 install_files
+  StrCpy $HadExistingInstall 1
   SetOutPath "$TEMP"
-  StrCpy $RenameAttemptsRemaining ${INSTALL_RENAME_MAX_ATTEMPTS}
-rename_install_directory:
-  ClearErrors
-  Rename "$INSTDIR" "$BackupDirectory"
-  IfErrors rename_retry install_files
-rename_retry:
-  IntOp $RenameAttemptsRemaining $RenameAttemptsRemaining - 1
-  IntCmp $RenameAttemptsRemaining 0 rename_failed rename_failed rename_retry_wait
-rename_retry_wait:
-  Sleep ${INSTALL_RENAME_RETRY_DELAY_MS}
-  Goto rename_install_directory
+  StrCpy $RenameSource "$INSTDIR"
+  StrCpy $RenameDestination "$BackupDirectory"
+  Call RetryRenameDirectory
+  StrCmp $RenameSucceeded 1 install_files rename_failed
 install_files:
   SetOutPath "$INSTDIR"
   ClearErrors
@@ -127,11 +166,64 @@ write_registration:
   Goto finished
 install_failed:
   SetOutPath "$TEMP"
-  Rename "$INSTDIR" "$INSTDIR.failed-${RELEASE_ID}"
-  Rename "$BackupDirectory" "$INSTDIR"
+  IfFileExists "$INSTDIR\*.*" choose_failed_directory no_failed_payload_to_isolate
+choose_failed_directory:
+  StrCpy $FailedDirectory "$INSTDIR.failed-${RELEASE_ID}"
+  StrCpy $OperationSuffix 0
+find_unique_failed_directory:
+  IfFileExists "$FailedDirectory" next_failed_directory
+  IfFileExists "$FailedDirectory\*.*" next_failed_directory failed_directory_ready
+next_failed_directory:
+  IntOp $OperationSuffix $OperationSuffix + 1
+  StrCpy $FailedDirectory "$INSTDIR.failed-${RELEASE_ID}-$OperationSuffix"
+  Goto find_unique_failed_directory
+failed_directory_ready:
+  StrCpy $RenameSource "$INSTDIR"
+  StrCpy $RenameDestination "$FailedDirectory"
+  Call RetryRenameDirectory
+  StrCmp $RenameSucceeded 1 failed_payload_isolated quarantine_failed
+failed_payload_isolated:
+  IfFileExists "$FailedDirectory\*.*" failed_payload_ready quarantine_failed
+no_failed_payload_to_isolate:
+failed_payload_ready:
+  StrCmp $HadExistingInstall 1 restore_backup verify_fresh_failure
+verify_fresh_failure:
+  IfFileExists "$INSTDIR" quarantine_failed
+  IfFileExists "$INSTDIR\*.*" quarantine_failed fresh_failure_confirmed
+fresh_failure_confirmed:
+  ; A fresh install has no old backup; the failed payload is off the canonical path.
+  SetErrorLevel 25
+  Goto finished
+restore_backup:
+  StrCpy $VerificationDirectory "$BackupDirectory"
+  Call VerifyPreviewInstallDirectory
+  StrCmp $VerificationSucceeded 1 restore_verified_backup rollback_restore_failed
+restore_verified_backup:
+  StrCpy $RenameSource "$BackupDirectory"
+  StrCpy $RenameDestination "$INSTDIR"
+  Call RetryRenameDirectory
+  StrCmp $RenameSucceeded 1 verify_restored_backup rollback_restore_failed
+verify_restored_backup:
+  StrCpy $VerificationDirectory "$INSTDIR"
+  Call VerifyPreviewInstallDirectory
+  StrCmp $VerificationSucceeded 1 rollback_confirmed rollback_restore_failed
+rollback_confirmed:
+  ; Payload failed, but the verified old installation is canonical again.
   SetErrorLevel 21
   Goto finished
+quarantine_failed:
+  ; A partial payload might still occupy the canonical path.
+  SetErrorLevel 23
+  Goto finished
+rollback_restore_failed:
+  ; The old backup could not be restored and verified as canonical.
+  SetErrorLevel 24
+  Goto finished
 rename_failed:
+  StrCpy $VerificationDirectory "$INSTDIR"
+  Call VerifyPreviewInstallDirectory
+  StrCmp $VerificationSucceeded 1 rename_failed_safe rollback_restore_failed
+rename_failed_safe:
   SetErrorLevel 22
   Goto finished
 finished:

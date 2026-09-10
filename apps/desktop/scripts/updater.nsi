@@ -6,6 +6,10 @@ SetCompressor zlib
 
 !include "FileFunc.nsh"
 
+!ifndef FAIL_CLOSED_INSTALLER_FAILURES
+  !define FAIL_CLOSED_INSTALLER_FAILURES 0
+!endif
+
 Name "Relay QA Hub Updater"
 OutFile "${OUTPUT_FILE}"
 Icon "${ICON_FILE}"
@@ -25,6 +29,7 @@ Var Version
 Var LogPath
 Var InstallerExitCode
 Var FailureCode
+Var FailureRelaunchBlocked
 Var InstallRoot
 Var RelaunchMarker
 Var RelaunchParameters
@@ -57,6 +62,7 @@ write_result_done:
 FunctionEnd
 
 Section
+  StrCpy $FailureRelaunchBlocked 0
   StrCpy $LogPath "$EXEDIR\update.log"
   Push "native updater started"
   Call AppendLog
@@ -158,6 +164,11 @@ relaunch_failed:
 
 install_failed:
   StrCpy $FailureCode "UPDATE_INSTALLER_FAILED_$InstallerExitCode"
+!if ${FAIL_CLOSED_INSTALLER_FAILURES} != 0
+  StrCmp $InstallerExitCode "21" update_failed
+  StrCmp $InstallerExitCode "22" update_failed
+  StrCpy $FailureRelaunchBlocked 1
+!endif
   Goto update_failed
 
 invalid_config:
@@ -174,6 +185,7 @@ update_failed:
   Push "failed"
   Call WriteResult
 skip_failure_result:
+  StrCmp $FailureRelaunchBlocked 1 updater_exit_failed
   IfFileExists "$AppPath" relaunch_previous_app updater_exit_failed
 relaunch_previous_app:
   StrCmp $UserDataPath "" relaunch_previous_default_profile

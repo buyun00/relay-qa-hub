@@ -161,6 +161,7 @@ writeFileSync(
     "/DPRODUCT_VERSION=0.2.0",
     `/DICON_FILE=${icon}`,
     `/DOUTPUT_FILE=${join(packageDirectory, "RelayQaHubUpdater.exe")}`,
+    "/DFAIL_CLOSED_INSTALLER_FAILURES=1",
     updaterScript,
   ]),
 );

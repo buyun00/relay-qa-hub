@@ -13,6 +13,7 @@ const scriptRoot = dirname(fileURLToPath(import.meta.url));
 const sourceRoot = resolve(scriptRoot, "../..");
 const packageSource = readFileSync(resolve(scriptRoot, "package-preview.mjs"), "utf8");
 const installerSource = readFileSync(resolve(scriptRoot, "preview-installer.nsi"), "utf8");
+const updaterSource = readFileSync(resolve(sourceRoot, "apps/desktop/scripts/updater.nsi"), "utf8");
 
 test("preview packaging has a clean-source gate and no shared Windows install identity", () => {
   assert.match(packageSource, /preview-package-identity\.mjs/u);
@@ -79,40 +80,141 @@ test("package identity preserves only the explicit legacy identity and isolates 
   }
 });
 
-test("preview installer retries transient install-directory locks before returning 22", () => {
+test("preview installer bounds every update rename and verifies safe terminal states", () => {
   assert.match(installerSource, /!define INSTALL_RENAME_MAX_ATTEMPTS 40/u);
   assert.match(installerSource, /!define INSTALL_RENAME_RETRY_DELAY_MS 250/u);
 
-  const retryBlock = installerSource.slice(
-    installerSource.indexOf("backup_ready:"),
-    installerSource.indexOf("install_files:"),
-  );
-  assert.match(retryBlock, /SetOutPath "\$TEMP"/u);
-  assert.match(retryBlock, /StrCpy \$RenameAttemptsRemaining \$\{INSTALL_RENAME_MAX_ATTEMPTS\}/u);
-  assert.match(
-    retryBlock,
-    /rename_install_directory:\s+ClearErrors\s+Rename "\$INSTDIR" "\$BackupDirectory"\s+IfErrors rename_retry install_files/u,
+  const retryFunction = installerSource.slice(
+    installerSource.indexOf("Function RetryRenameDirectory"),
+    installerSource.indexOf("Function VerifyPreviewInstallDirectory"),
   );
   assert.match(
-    retryBlock,
-    /rename_retry:\s+IntOp \$RenameAttemptsRemaining \$RenameAttemptsRemaining - 1\s+IntCmp \$RenameAttemptsRemaining 0 rename_failed rename_failed rename_retry_wait/u,
+    retryFunction,
+    /StrCpy \$RenameAttemptsRemaining \$\{INSTALL_RENAME_MAX_ATTEMPTS\}/u,
   );
   assert.match(
-    retryBlock,
-    /rename_retry_wait:\s+Sleep \$\{INSTALL_RENAME_RETRY_DELAY_MS\}\s+Goto rename_install_directory/u,
+    retryFunction,
+    /rename_directory_attempt:\s+ClearErrors\s+Rename "\$RenameSource" "\$RenameDestination"\s+IfErrors rename_directory_retry/u,
   );
+  assert.match(
+    retryFunction,
+    /IntOp \$RenameAttemptsRemaining \$RenameAttemptsRemaining - 1\s+IntCmp \$RenameAttemptsRemaining 0 rename_directory_exhausted rename_directory_exhausted rename_directory_wait/u,
+  );
+  assert.match(
+    retryFunction,
+    /rename_directory_wait:\s+Sleep \$\{INSTALL_RENAME_RETRY_DELAY_MS\}\s+Goto rename_directory_attempt/u,
+  );
+  assert.equal(installerSource.match(/Call RetryRenameDirectory/gu)?.length, 3);
 
-  const exhaustedFailure = installerSource.slice(installerSource.indexOf("rename_failed:"));
-  assert.match(exhaustedFailure, /^rename_failed:\s+SetErrorLevel 22\s+Goto finished/mu);
-  assert.equal(installerSource.match(/SetErrorLevel 22/gu)?.length, 1);
+  const verificationFunction = installerSource.slice(
+    installerSource.indexOf("Function VerifyPreviewInstallDirectory"),
+    installerSource.indexOf('Section "QA Hub Preview"'),
+  );
+  assert.match(
+    verificationFunction,
+    /IfFileExists "\$VerificationDirectory\\\.preview-instance-id"/u,
+  );
+  assert.match(
+    verificationFunction,
+    /IfFileExists "\$VerificationDirectory\\\$\{EXECUTABLE_BASENAME\}\.exe"/u,
+  );
+  assert.match(
+    verificationFunction,
+    /StrCmp \$ExistingIdentity "\$\{INSTANCE_ID\}" 0 verification_finished/u,
+  );
 
   const payloadFailure = installerSource.slice(
     installerSource.indexOf("install_failed:"),
     installerSource.indexOf("rename_failed:"),
   );
+  assert.match(payloadFailure, /StrCpy \$FailedDirectory "\$INSTDIR\.failed-\$\{RELEASE_ID\}"/u);
   assert.match(
     payloadFailure,
-    /SetOutPath "\$TEMP"\s+Rename "\$INSTDIR" "\$INSTDIR\.failed-\$\{RELEASE_ID\}"\s+Rename "\$BackupDirectory" "\$INSTDIR"\s+SetErrorLevel 21/u,
+    /find_unique_failed_directory:\s+IfFileExists "\$FailedDirectory" next_failed_directory\s+IfFileExists "\$FailedDirectory\\\*\.\*" next_failed_directory failed_directory_ready/u,
+  );
+  assert.match(
+    payloadFailure,
+    /IfFileExists "\$INSTDIR\\\*\.\*" choose_failed_directory no_failed_payload_to_isolate/u,
+  );
+  assert.ok(
+    payloadFailure.indexOf('StrCpy $RenameDestination "$FailedDirectory"') <
+      payloadFailure.indexOf('StrCpy $VerificationDirectory "$BackupDirectory"'),
+    "the partial payload must be isolated before the old backup is read or restored",
+  );
+  assert.match(
+    payloadFailure,
+    /failed_payload_ready:\s+StrCmp \$HadExistingInstall 1 restore_backup verify_fresh_failure/u,
+  );
+  assert.match(
+    payloadFailure,
+    /rollback_confirmed:\s+;[^\r\n]*\r?\n\s*SetErrorLevel 21\s+Goto finished/u,
+  );
+  assert.match(
+    payloadFailure,
+    /verify_restored_backup:\s+StrCpy \$VerificationDirectory "\$INSTDIR"\s+Call VerifyPreviewInstallDirectory\s+StrCmp \$VerificationSucceeded 1 rollback_confirmed rollback_restore_failed/u,
+  );
+  assert.match(
+    payloadFailure,
+    /quarantine_failed:\s+;[^\r\n]*\r?\n\s*SetErrorLevel 23\s+Goto finished/u,
+  );
+  assert.match(
+    payloadFailure,
+    /rollback_restore_failed:\s+;[^\r\n]*\r?\n\s*SetErrorLevel 24\s+Goto finished/u,
+  );
+  assert.match(
+    payloadFailure,
+    /verify_fresh_failure:\s+IfFileExists "\$INSTDIR" quarantine_failed\s+IfFileExists "\$INSTDIR\\\*\.\*" quarantine_failed fresh_failure_confirmed\s+fresh_failure_confirmed:\s+;[^\r\n]*\r?\n\s*SetErrorLevel 25\s+Goto finished/u,
+  );
+  assert.equal(installerSource.match(/SetErrorLevel 21/gu)?.length, 1);
+  assert.equal(installerSource.match(/SetErrorLevel 22/gu)?.length, 1);
+  assert.equal(installerSource.match(/SetErrorLevel 23/gu)?.length, 1);
+  assert.equal(installerSource.match(/SetErrorLevel 24/gu)?.length, 1);
+  assert.equal(installerSource.match(/SetErrorLevel 25/gu)?.length, 1);
+
+  const initialRenameFailure = installerSource.slice(installerSource.indexOf("rename_failed:"));
+  assert.match(
+    initialRenameFailure,
+    /^rename_failed:\s+StrCpy \$VerificationDirectory "\$INSTDIR"\s+Call VerifyPreviewInstallDirectory\s+StrCmp \$VerificationSucceeded 1 rename_failed_safe rollback_restore_failed/mu,
+  );
+  assert.match(initialRenameFailure, /rename_failed_safe:\s+SetErrorLevel 22\s+Goto finished/u);
+});
+
+test("preview updater records every installer failure and relaunches only confirmed-safe 21 or 22", () => {
+  assert.match(updaterSource, /!define FAIL_CLOSED_INSTALLER_FAILURES 0/u);
+  assert.match(packageSource, /"\/DFAIL_CLOSED_INSTALLER_FAILURES=1"/u);
+  assert.match(updaterSource, /StrCpy \$FailureRelaunchBlocked 0/u);
+
+  const installerFailure = updaterSource.slice(
+    updaterSource.indexOf("install_failed:"),
+    updaterSource.indexOf("invalid_config:"),
+  );
+  assert.match(
+    installerFailure,
+    /StrCpy \$FailureCode "UPDATE_INSTALLER_FAILED_\$InstallerExitCode"/u,
+  );
+  assert.match(installerFailure, /StrCmp \$InstallerExitCode "21" update_failed/u);
+  assert.match(installerFailure, /StrCmp \$InstallerExitCode "22" update_failed/u);
+  assert.match(installerFailure, /StrCpy \$FailureRelaunchBlocked 1/u);
+  assert.deepEqual(
+    [...installerFailure.matchAll(/StrCmp \$InstallerExitCode "([0-9]+)" update_failed/gu)].map(
+      (match) => match[1],
+    ),
+    ["21", "22"],
+  );
+
+  const failureResult = updaterSource.slice(
+    updaterSource.indexOf("update_failed:"),
+    updaterSource.indexOf("relaunch_previous_app:"),
+  );
+  assert.ok(
+    failureResult.indexOf("Call WriteResult") <
+      failureResult.indexOf("StrCmp $FailureRelaunchBlocked 1 updater_exit_failed"),
+    "the updater must write the failed result before blocking relaunch",
+  );
+  assert.ok(
+    failureResult.indexOf("StrCmp $FailureRelaunchBlocked 1 updater_exit_failed") <
+      failureResult.indexOf('IfFileExists "$AppPath" relaunch_previous_app updater_exit_failed'),
+    "an unsafe residual AppPath must never authorize relaunch",
   );
 });
 
