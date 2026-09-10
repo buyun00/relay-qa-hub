@@ -157,6 +157,7 @@ public static class SelfTest
         });
         await AcquisitionTests.Run(root,Case,ct);
         await MultipartTransferTests.Run(root,Case,ct);
+        await RefreshingClientTests.Run(Case,ct);
         await SourceDownloadTests.Run(root,Case,ct);
         await Case("server_auth_cache_is_explicit_and_separate_from_desktop",()=>{
             var prior=Environment.GetEnvironmentVariable("OZDQP_AUTH_FILE");
@@ -174,7 +175,7 @@ public static class SelfTest
             } finally { Environment.SetEnvironmentVariable("OZDQP_AUTH_FILE",prior); }
             return Task.CompletedTask;
         });
-        var report=new{version="0.5.0",verification="local-loopback-and-handler-fixtures",passed=results.Count,failed=0,realPlatformTested=false,realAccountLoginTested=false,tencentSdkTransferTested=false,fixture=identity,tests=results,at=DateTimeOffset.UtcNow};
+        var report=new{version="0.5.1",verification="local-loopback-and-handler-fixtures",passed=results.Count,failed=0,realPlatformTested=false,realAccountLoginTested=false,tencentSdkTransferTested=false,fixture=identity,tests=results,at=DateTimeOffset.UtcNow};
         string reportPath=Path.Combine(root,"report.json");await File.WriteAllTextAsync(reportPath,JsonSerializer.Serialize(report,Json.Options),ct);
         Console.WriteLine(JsonSerializer.Serialize(new{type="selfTestResult",passed=results.Count,failed=0,reportPath,realPlatformTested=false}));
     }

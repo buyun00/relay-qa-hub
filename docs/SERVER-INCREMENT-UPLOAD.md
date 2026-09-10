@@ -65,13 +65,20 @@ identity and reads the original worker result instead of repeating launches. A
 machine restart leaves interrupted work recoverable with the original ZIP. Unknown
 writes are reconciled only on explicit recovery, never blindly replayed.
 
-Worker 0.5.0 reads explicit server-owned `OZDQP_AUTH_FILE` and `OZDQP_LOCK_ROOT`.
+Worker 0.5.1 reads explicit server-owned `OZDQP_AUTH_FILE` and `OZDQP_LOCK_ROOT`.
 The API does not accept client-selected paths, executables, origins or historical
 version IDs. Eight 5 MiB COS parts run concurrently, with serialized STS renewal and
 checkpoint writes; recovery sends only missing verified parts. The SDK's synchronous
 request deadline is 180 seconds (its `ConnectionTimeoutMs` also bounds transfer),
 with a 90-second read/write timeout. COS error diagnostics retain status codes and
 transport exception types, excluding messages, signed URLs and credentials.
+
+Every COS request acquires current STS credentials, including multipart completion,
+HEAD and recovery pagination. Long part transfers cannot leave completion using an
+expired cached signer. Concurrent failures share one refresh; a failed old client
+cannot invalidate an already renewed client. Refresh diagnostics contain timestamps
+only. An uncertain completion reports `REMOTE_RESULT_UNKNOWN`, retaining the
+original upload ID, parts and `COS_COMPLETE` checkpoint for explicit reconciliation.
 
 Atomic checkpoint writes tolerate temporary Windows access/sharing/lock violations
 with at most ten local retries over approximately 1.8 seconds. The last durable

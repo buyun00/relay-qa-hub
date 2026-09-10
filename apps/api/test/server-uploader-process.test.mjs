@@ -5,6 +5,7 @@ import path from "node:path";
 import os from "node:os";
 import { randomUUID } from "node:crypto";
 import { IncrementUploadService } from "../dist/increment-upload.js";
+import { catalogFetch } from "./quick-build-fixture.mjs";
 
 test("real server supervisor records the worker result after the API closes", async (t) => {
   const root = await mkdtemp(path.join(os.tmpdir(), "server-uploader-process-"));
@@ -28,6 +29,9 @@ test("real server supervisor records the worker result after the API closes", as
   );
   const options = {
     root,
+    // Artifact discovery is local fixture data; only the actual supervisor and
+    // worker processes run. The invalid cache stops before any platform request.
+    fetch: catalogFetch,
     jenkins: {
       trigger: () => {
         throw new Error("NO_BUSINESS_WRITES");
@@ -47,7 +51,7 @@ test("real server supervisor records the worker result after the API closes", as
     productId: "2002",
     channelId: "1002",
     belongName: "Local process fixture",
-    version: "fixture-only",
+    version: "2.4.37",
     testerId: 11562,
     mode: "prepare_publish",
   });
