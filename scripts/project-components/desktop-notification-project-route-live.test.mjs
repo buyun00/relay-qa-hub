@@ -15,6 +15,7 @@ import {
   assertExpectedRelease,
   assertReleaseAttestation,
   assertToastSessionMatch,
+  canonicalPackagedPreviewConfig,
   classifyBugDetailRequest,
   correlateWpnToastEvents,
   durableToastBody,
@@ -29,8 +30,10 @@ import {
   validatePublishedRelease,
 } from "./desktop-notification-project-route-live.mjs";
 import {
+  assertReleaseContentBinding,
   serializeReleaseAttestation,
   serializeUpdateManifestPayload,
+  snapshotReleaseDirectory,
 } from "./release-content-binding.mjs";
 import { pinnedPackageToolchainProvenance } from "./package-toolchain-provenance.mjs";
 import { resolveWindowsPowerShellExecutable } from "./windows-write-through.mjs";
@@ -49,6 +52,109 @@ const runnerSource = fs.readFileSync(
   ),
   "utf8",
 );
+
+function publishedReleaseFixture() {
+  const root = fs.mkdtempSync(path.join(tmpdir(), "qa-hub-notification-release-"));
+  const runtimeRoot = path.join(root, "runtime");
+  const downloadsRoot = path.join(runtimeRoot, "downloads");
+  const desktopRoot = path.join(runtimeRoot, "desktop");
+  const installedRoot = path.join(root, "RelayQaHubPreview-unit");
+  const extractedRoot = path.join(root, "extracted");
+  for (const directory of [runtimeRoot, downloadsRoot, desktopRoot, installedRoot, extractedRoot]) {
+    fs.mkdirSync(directory, { recursive: true });
+  }
+  const pair = generateKeyPairSync("ed25519");
+  const publicKeyPem = pair.publicKey.export({ type: "spki", format: "pem" });
+  const instance = {
+    instanceId: "qa-hub-preview-unit",
+    desktopRoot,
+    downloadsRoot,
+    apiHost: "127.0.0.1",
+    apiPort: 49196,
+    webHost: "127.0.0.1",
+    webPort: 49197,
+    desktopMcpPort: 49198,
+    cookieName: "qa-hub-preview-unit-session",
+  };
+  const canonicalConfig = canonicalPackagedPreviewConfig(instance, publicKeyPem);
+  const legacyConfig = { ...canonicalConfig };
+  delete legacyConfig.toastActivatorClsid;
+  const installedConfigBytes = Buffer.from(`${JSON.stringify(legacyConfig, null, 2)}\n`);
+  const canonicalConfigBytes = Buffer.from(`${JSON.stringify(canonicalConfig, null, 2)}\n`);
+  const previewConfigPath = path.join(installedRoot, "preview-instance.json");
+  fs.writeFileSync(previewConfigPath, installedConfigBytes);
+  fs.writeFileSync(path.join(installedRoot, ".preview-instance-id"), instance.instanceId);
+  fs.writeFileSync(path.join(installedRoot, "RelayQaHubPreview-unit.exe"), "installed-app");
+  fs.writeFileSync(path.join(extractedRoot, "preview-instance.json"), canonicalConfigBytes);
+  fs.writeFileSync(path.join(extractedRoot, ".preview-instance-id"), instance.instanceId);
+  fs.writeFileSync(path.join(extractedRoot, "RelayQaHubPreview-unit.exe"), "installed-app");
+
+  const installerBytes = Buffer.from("fixture-installer");
+  const installerName = `qa-hub-preview-unit-windows-${VERSION}-${RELEASE_ID}.exe`;
+  const manifestPayload = {
+    schemaVersion: 1,
+    releaseId: RELEASE_ID,
+    version: VERSION,
+    publishedAt: "2026-09-11T12:34:56.789Z",
+    archive: {
+      url: `/downloads/${installerName}`,
+      size: installerBytes.length,
+      sha256: createHash("sha256").update(installerBytes).digest("hex"),
+    },
+  };
+  const manifest = {
+    ...manifestPayload,
+    signature: sign(
+      null,
+      serializeUpdateManifestPayload(manifestPayload),
+      pair.privateKey,
+    ).toString("base64"),
+  };
+  const manifestBytes = Buffer.from(`${JSON.stringify(manifest)}\n`);
+  fs.writeFileSync(
+    path.join(downloadsRoot, "qa-hub-preview-unit-windows-latest.json"),
+    manifestBytes,
+  );
+  fs.writeFileSync(path.join(downloadsRoot, installerName), installerBytes);
+  const manifestUrl = new URL(
+    "http://127.0.0.1:49197/downloads/qa-hub-preview-unit-windows-latest.json",
+  );
+  const fetchImpl = async (url) => {
+    const bytes = new URL(url).pathname.endsWith("-latest.json") ? manifestBytes : installerBytes;
+    return new Response(bytes, {
+      status: 200,
+      headers: { "content-length": String(bytes.length) },
+    });
+  };
+  const installerPayloadVerifier = (_bytes, expected, _parent, label) =>
+    assertReleaseContentBinding(expected, snapshotReleaseDirectory(extractedRoot), label);
+  return {
+    root,
+    extractedRoot,
+    canonicalConfig,
+    installedConfigBytes,
+    canonicalConfigBytes,
+    fetchImpl,
+    installerPayloadVerifier,
+    scope: {
+      manifestUrl,
+      preview: canonicalConfig,
+      previewConfigPath,
+      previewConfigProvenance: {
+        bytes: installedConfigBytes.length,
+        sha256: createHash("sha256").update(installedConfigBytes).digest("hex"),
+      },
+      release: {
+        releaseId: RELEASE_ID,
+        version: VERSION,
+        sourceCommit: "b".repeat(40),
+      },
+      instance,
+      runtimeRoot,
+      installedRoot,
+    },
+  };
+}
 
 test("CLI is inert without --run and requires both explicit absolute inputs", () => {
   assert.deepEqual(parseArguments([]), { usageOnly: true, execute: false });
@@ -197,6 +303,124 @@ test("same-commit stale package cannot satisfy an explicitly selected newer rele
     ),
     /RUNNER_INSTALLED_RELEASE_ID_MISMATCH/u,
   );
+});
+
+test("published release accepts a byte-preserved legacy installed config with canonical installer config", async () => {
+  const fixture = publishedReleaseFixture();
+  try {
+    const result = await validatePublishedRelease(
+      fixture.scope,
+      RELEASE_ID,
+      VERSION,
+      fixture.fetchImpl,
+      fixture.installerPayloadVerifier,
+    );
+    assert.equal(result.previewConfig.policy, "preserve-existing-installation");
+    assert.equal(result.previewConfig.bytesEqual, false);
+    assert.equal(result.previewConfig.installedBytesMatchedStaticScope, true);
+    assert.equal(result.previewConfig.normalizedConfigMatchedCanonicalPackage, true);
+    assert.equal(
+      result.previewConfig.installed.sha256,
+      createHash("sha256").update(fixture.installedConfigBytes).digest("hex"),
+    );
+    assert.equal(
+      result.previewConfig.packaged.sha256,
+      createHash("sha256").update(fixture.canonicalConfigBytes).digest("hex"),
+    );
+  } finally {
+    fs.rmSync(fixture.root, { recursive: true, force: true });
+  }
+});
+
+test("published release rejects a semantic-equivalent installed config changed after static scope", async () => {
+  const fixture = publishedReleaseFixture();
+  try {
+    const changedBytes = Buffer.from(fixture.installedConfigBytes);
+    changedBytes[changedBytes.length - 1] = 0x20;
+    fs.writeFileSync(fixture.scope.previewConfigPath, changedBytes);
+    await assert.rejects(
+      validatePublishedRelease(
+        fixture.scope,
+        RELEASE_ID,
+        VERSION,
+        fixture.fetchImpl,
+        fixture.installerPayloadVerifier,
+      ),
+      /RUNNER_INSTALLED_PREVIEW_CONFIG_SHA256_CHANGED/u,
+    );
+  } finally {
+    fs.rmSync(fixture.root, { recursive: true, force: true });
+  }
+});
+
+test("published release rejects installed config semantics outside the canonical package", async () => {
+  const fixture = publishedReleaseFixture();
+  try {
+    const noncanonicalConfig = { ...fixture.canonicalConfig, unexpected: "refused" };
+    const noncanonicalBytes = Buffer.from(`${JSON.stringify(noncanonicalConfig, null, 2)}\n`);
+    fs.writeFileSync(fixture.scope.previewConfigPath, noncanonicalBytes);
+    fixture.scope.preview = noncanonicalConfig;
+    fixture.scope.previewConfigProvenance = {
+      bytes: noncanonicalBytes.length,
+      sha256: createHash("sha256").update(noncanonicalBytes).digest("hex"),
+    };
+    await assert.rejects(
+      validatePublishedRelease(
+        fixture.scope,
+        RELEASE_ID,
+        VERSION,
+        fixture.fetchImpl,
+        fixture.installerPayloadVerifier,
+      ),
+      /RUNNER_INSTALLED_PREVIEW_CONFIG_SEMANTIC_MISMATCH/u,
+    );
+  } finally {
+    fs.rmSync(fixture.root, { recursive: true, force: true });
+  }
+});
+
+test("published release rejects drift in every installed non-config payload file", async () => {
+  const fixture = publishedReleaseFixture();
+  try {
+    fs.writeFileSync(
+      path.join(fixture.extractedRoot, "RelayQaHubPreview-unit.exe"),
+      "different-app",
+    );
+    await assert.rejects(
+      validatePublishedRelease(
+        fixture.scope,
+        RELEASE_ID,
+        VERSION,
+        fixture.fetchImpl,
+        fixture.installerPayloadVerifier,
+      ),
+      /RUNNER_INSTALLER_INSTALLED_CONTENT_MISMATCH/u,
+    );
+  } finally {
+    fs.rmSync(fixture.root, { recursive: true, force: true });
+  }
+});
+
+test("published release rejects a packaged config that is not the exact canonical bytes", async () => {
+  const fixture = publishedReleaseFixture();
+  try {
+    fs.writeFileSync(
+      path.join(fixture.extractedRoot, "preview-instance.json"),
+      `${JSON.stringify(fixture.canonicalConfig)}\n`,
+    );
+    await assert.rejects(
+      validatePublishedRelease(
+        fixture.scope,
+        RELEASE_ID,
+        VERSION,
+        fixture.fetchImpl,
+        fixture.installerPayloadVerifier,
+      ),
+      /RUNNER_INSTALLER_INSTALLED_CONTENT_MISMATCH/u,
+    );
+  } finally {
+    fs.rmSync(fixture.root, { recursive: true, force: true });
+  }
 });
 
 test("live scope pins installed artifacts to a clean exact source commit", () => {

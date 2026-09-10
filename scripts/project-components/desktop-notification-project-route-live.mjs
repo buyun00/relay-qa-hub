@@ -213,6 +213,137 @@ export function normalizePreviewPackageConfigIdentity(preview, instanceId) {
   };
 }
 
+export function canonicalPackagedPreviewConfig(instance, updatePublicKeyPem) {
+  assert.ok(
+    instance && typeof instance === "object" && !Array.isArray(instance),
+    "INSTANCE_INVALID",
+  );
+  assert.ok(INSTANCE_ID.test(instance.instanceId), "PREVIEW_INSTANCE_ID_REQUIRED");
+  assert.ok(
+    typeof updatePublicKeyPem === "string" &&
+      updatePublicKeyPem.startsWith("-----BEGIN PUBLIC KEY-----"),
+    "PREVIEW_KEY_INVALID",
+  );
+  const packageIdentity = derivePreviewPackageIdentity(instance.instanceId);
+  return {
+    schemaVersion: 1,
+    instanceId: instance.instanceId,
+    profileDirectory: path.join(instance.desktopRoot, "profile"),
+    apiBaseUrl: `http://${instance.apiHost}:${instance.apiPort}`,
+    csrfOrigin: `http://${instance.webHost}:${instance.webPort}`,
+    cookieName: instance.cookieName,
+    appScheme: packageIdentity.protocolScheme,
+    appUserModelId: packageIdentity.appUserModelId,
+    toastActivatorClsid: packageIdentity.toastActivatorClsid,
+    mcpPort: instance.desktopMcpPort,
+    updateManifestUrl: `http://${instance.webHost}:${instance.webPort}/downloads/${instance.instanceId}-windows-latest.json`,
+    updatePublicKeyPem,
+  };
+}
+
+function snapshotWithCanonicalPreviewConfig(installedContent, canonicalConfigBytes) {
+  validateReleaseContentSnapshot(installedContent, "RUNNER_INSTALLED_CONTENT");
+  assert.ok(Buffer.isBuffer(canonicalConfigBytes), "RUNNER_PACKAGED_PREVIEW_CONFIG_INVALID");
+  const previewEntries = installedContent.files.filter(
+    (entry) => entry.path === "preview-instance.json",
+  );
+  assert.equal(previewEntries.length, 1, "RUNNER_INSTALLED_PREVIEW_CONFIG_COUNT_INVALID");
+  const files = installedContent.files
+    .map((entry) =>
+      entry.path === "preview-instance.json"
+        ? {
+            path: entry.path,
+            bytes: canonicalConfigBytes.length,
+            sha256: sha256(canonicalConfigBytes),
+          }
+        : { ...entry },
+    )
+    .sort((left, right) => {
+      if (left.path < right.path) return -1;
+      if (left.path > right.path) return 1;
+      return 0;
+    });
+  const snapshot = {
+    algorithm: "sha256",
+    digest: sha256(Buffer.from(JSON.stringify(files))),
+    files,
+  };
+  return validateReleaseContentSnapshot(snapshot, "RUNNER_EXPECTED_INSTALLER_CONTENT");
+}
+
+export function expectedPublishedInstallerContent(scope, installedContent) {
+  assert.ok(scope && typeof scope === "object" && !Array.isArray(scope), "RUNNER_SCOPE_INVALID");
+  assert.ok(
+    typeof scope.previewConfigPath === "string" && path.isAbsolute(scope.previewConfigPath),
+    "RUNNER_PREVIEW_CONFIG_PATH_INVALID",
+  );
+  const installedConfigBytes = fs.readFileSync(scope.previewConfigPath);
+  assert.equal(
+    installedConfigBytes.length,
+    scope.previewConfigProvenance?.bytes,
+    "RUNNER_INSTALLED_PREVIEW_CONFIG_SIZE_CHANGED",
+  );
+  assert.equal(
+    sha256(installedConfigBytes),
+    scope.previewConfigProvenance?.sha256,
+    "RUNNER_INSTALLED_PREVIEW_CONFIG_SHA256_CHANGED",
+  );
+  const installedConfig = JSON.parse(installedConfigBytes.toString("utf8").replace(/^\uFEFF/u, ""));
+  const { normalizedPreview } = normalizePreviewPackageConfigIdentity(
+    installedConfig,
+    scope.instance.instanceId,
+  );
+  assert.deepEqual(
+    normalizedPreview,
+    scope.preview,
+    "RUNNER_INSTALLED_PREVIEW_CONFIG_SCOPE_MISMATCH",
+  );
+  const canonicalConfig = canonicalPackagedPreviewConfig(
+    scope.instance,
+    scope.preview.updatePublicKeyPem,
+  );
+  assert.deepEqual(
+    normalizedPreview,
+    canonicalConfig,
+    "RUNNER_INSTALLED_PREVIEW_CONFIG_SEMANTIC_MISMATCH",
+  );
+  const canonicalConfigBytes = Buffer.from(`${JSON.stringify(canonicalConfig, null, 2)}\n`);
+  const installedPreviewEntry = installedContent.files.find(
+    (entry) => entry.path === "preview-instance.json",
+  );
+  assert.ok(installedPreviewEntry, "RUNNER_INSTALLED_PREVIEW_CONFIG_MISSING");
+  assert.equal(
+    installedPreviewEntry.bytes,
+    installedConfigBytes.length,
+    "RUNNER_INSTALLED_PREVIEW_CONFIG_SNAPSHOT_SIZE_MISMATCH",
+  );
+  assert.equal(
+    installedPreviewEntry.sha256,
+    sha256(installedConfigBytes),
+    "RUNNER_INSTALLED_PREVIEW_CONFIG_SNAPSHOT_SHA256_MISMATCH",
+  );
+  return {
+    expectedInstallerContent: snapshotWithCanonicalPreviewConfig(
+      installedContent,
+      canonicalConfigBytes,
+    ),
+    previewConfig: {
+      policy: "preserve-existing-installation",
+      installed: {
+        bytes: installedConfigBytes.length,
+        sha256: sha256(installedConfigBytes),
+      },
+      packaged: {
+        bytes: canonicalConfigBytes.length,
+        sha256: sha256(canonicalConfigBytes),
+      },
+      bytesEqual: installedConfigBytes.equals(canonicalConfigBytes),
+      installedBytesMatchedStaticScope: true,
+      normalizedConfigMatchedCanonicalPackage: true,
+    },
+  };
+}
+
 function assertExactFields(value, fields, label) {
   assert.ok(value && typeof value === "object" && !Array.isArray(value), `${label}_INVALID`);
   assert.deepEqual(Object.keys(value).sort(), [...fields].sort(), `${label}_FIELDS_INVALID`);
@@ -393,7 +524,8 @@ export function validateStaticScope(
     path.join(installedRoot, "preview-instance.json"),
     "PREVIEW_CONFIG",
   );
-  const preview = readJson(previewConfigPath);
+  const previewConfigBytes = fs.readFileSync(previewConfigPath);
+  const preview = JSON.parse(previewConfigBytes.toString("utf8").replace(/^\uFEFF/u, ""));
   assert.equal(preview.schemaVersion, 1, "PREVIEW_CONFIG_SCHEMA_REFUSED");
   assert.equal(preview.instanceId, instance.instanceId, "PREVIEW_INSTANCE_MISMATCH");
   assert.equal(preview.cookieName, instance.cookieName, "PREVIEW_COOKIE_MISMATCH");
@@ -532,6 +664,10 @@ export function validateStaticScope(
     installedRoot,
     asarPath,
     previewConfigPath,
+    previewConfigProvenance: {
+      bytes: previewConfigBytes.length,
+      sha256: sha256(previewConfigBytes),
+    },
     runtimePublicKeyPath,
     instance,
     preview: normalizedPreview,
@@ -551,6 +687,7 @@ export async function validatePublishedRelease(
   expectedReleaseId,
   expectedVersion,
   fetchImpl = globalThis.fetch,
+  installerPayloadVerifier = verifyPreviewInstallerPayload,
 ) {
   const manifestBytes = await fetchReleaseBytes(
     scope.manifestUrl,
@@ -615,9 +752,10 @@ export async function validatePublishedRelease(
   );
 
   const installedContent = snapshotInstalledPreviewDirectory(scope.installedRoot);
-  const extractedInstallerContent = verifyPreviewInstallerPayload(
+  const installerExpectation = expectedPublishedInstallerContent(scope, installedContent);
+  const extractedInstallerContent = installerPayloadVerifier(
     servedInstallerBytes,
-    installedContent,
+    installerExpectation.expectedInstallerContent,
     scope.runtimeRoot,
     "RUNNER_INSTALLER_INSTALLED_CONTENT",
   );
@@ -635,6 +773,7 @@ export async function validatePublishedRelease(
     installerSha256: sha256(servedInstallerBytes),
     installedContent,
     extractedInstallerContent,
+    previewConfig: installerExpectation.previewConfig,
   };
 }
 
