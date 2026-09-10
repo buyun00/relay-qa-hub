@@ -1,0 +1,384 @@
+{
+  "schemaVersion": 1,
+  "capturedAt": "2026-09-10T15:22:56.7913997Z",
+  "phase": "after-canonical-relaunch-inspection",
+  "sourceCommit": "c4e2eb7d9341a16d2430df9073a93f44f381dd2b",
+  "installed": {
+    "root": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview-v21-e2e-fresh-0910",
+    "exePath": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview-v21-e2e-fresh-0910\\RelayQaHubPreview-v21-e2e-fresh-0910.exe",
+    "version": "0.2.0-preview.17",
+    "fileVersion": "0.2.0.17",
+    "exeBytes": 235871744,
+    "exeSha256": "58c21fdc87e3b5007df9d30e59a27df67e24516f7c74c61d7fb545d8c54d4f0f",
+    "asarBytes": 3442810,
+    "asarSha256": "ff3b49304c7f98ec754bd42ef9732cd6b58718002b3f4be8ae0ae506e69b7474",
+    "previewConfigSha256": "dbde6a7d32476ed526bce22af042fd5eab0e7abf1cd4b871513688edc534a71c"
+  },
+  "rememberedIdentity": {
+    "value": {
+      "schemaVersion": 2,
+      "serviceOrigin": "http://127.0.0.1:4639",
+      "loginName": "Luna Worker 246",
+      "projectId": "305b4def-ae7e-4a2d-ae96-a05d616390bf",
+      "userId": "0ddff48b-536c-4c30-8b42-511741010610",
+      "identity": "employee"
+    },
+    "bytes": 211,
+    "sha256": "e004fe7fb4a8f9da43546be1cd53cc2894549eaacda5f578a00c304af20d98ff"
+  },
+  "latestManifest": {
+    "schemaVersion": 1,
+    "releaseId": "20260910T135324626Z",
+    "version": "0.2.0-preview.17",
+    "publishedAt": "2026-09-10T13:55:51.464Z",
+    "archive": {
+      "url": "/downloads/qa-hub-preview-v21-e2e-fresh-0910-windows-0.2.0-preview.17-20260910T135324626Z.exe",
+      "size": 108488136,
+      "sha256": "1c67b6555ffeeefff3ce885acfd09735dc6bc650570e3b53d109c8ad617d11d4"
+    },
+    "signature": "vVwK0L3+T/uWiltd8wVBvojkISE9phbv1Gt+QizK4HSYoQd37QuJNuRZif7ILIr7ZARUPAINp/HozZ6ATQy8DQ=="
+  },
+  "processes": [
+    {
+      "ProcessId": 16688,
+      "ParentProcessId": 21532,
+      "CreationDate": "2026-09-10T23:21:41.899105+08:00",
+      "ExecutablePath": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview-v21-e2e-fresh-0910\\RelayQaHubPreview-v21-e2e-fresh-0910.exe",
+      "CommandLine": "\"C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview-v21-e2e-fresh-0910\\RelayQaHubPreview-v21-e2e-fresh-0910.exe\" --hidden --remote-debugging-port=9433 --user-data-dir=C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-v21-e2e-fresh-0910\\desktop\\profile"
+    },
+    {
+      "ProcessId": 21748,
+      "ParentProcessId": 16688,
+      "CreationDate": "2026-09-10T23:21:42.025627+08:00",
+      "ExecutablePath": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview-v21-e2e-fresh-0910\\RelayQaHubPreview-v21-e2e-fresh-0910.exe",
+      "CommandLine": "\"C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview-v21-e2e-fresh-0910\\RelayQaHubPreview-v21-e2e-fresh-0910.exe\" --type=gpu-process --user-data-dir=\"C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-v21-e2e-fresh-0910\\desktop\\profile\" --gpu-preferences=UAAAAAAAAADgAAAEAAAAAAAAAAAAAGAAOAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAABgAAAAAAAAAGAAAAAAAAAAIAAAAAAAAAAgAAAAAAAAACAAAAAAAAAA= --field-trial-handle=1920,i,1670671642242106174,10398139681314826989,262144 --enable-features=PdfUseShowSaveFilePicker --disable-features=DropInputEventsWhilePaintHolding,LocalNetworkAccessChecks,NetworkServiceSandbox,ScreenAIOCREnabled,SpareRendererForSitePerProcess,TraceSiteInstanceGetProcessCreation --variations-seed-version --pseudonymization-salt-handle=1924,i,11400906814217886740,16416791646942661644,4 --trace-process-track-uuid=3190708988185955192 --mojo-platform-channel-handle=1916 /prefetch:2"
+    },
+    {
+      "ProcessId": 24796,
+      "ParentProcessId": 16688,
+      "CreationDate": "2026-09-10T23:21:42.048142+08:00",
+      "ExecutablePath": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview-v21-e2e-fresh-0910\\RelayQaHubPreview-v21-e2e-fresh-0910.exe",
+      "CommandLine": "\"C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview-v21-e2e-fresh-0910\\RelayQaHubPreview-v21-e2e-fresh-0910.exe\" --type=utility --utility-sub-type=network.mojom.NetworkService --lang=zh-CN --service-sandbox-type=none --user-data-dir=\"C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-v21-e2e-fresh-0910\\desktop\\profile\" --standard-schemes=qa-hub-preview-v21-e2e-fresh-0910 --secure-schemes=qa-hub-preview-v21-e2e-fresh-0910 --cors-schemes=qa-hub-preview-v21-e2e-fresh-0910 --fetch-schemes=qa-hub-preview-v21-e2e-fresh-0910 --streaming-schemes=qa-hub-preview-v21-e2e-fresh-0910 --field-trial-handle=1920,i,1670671642242106174,10398139681314826989,262144 --enable-features=PdfUseShowSaveFilePicker --disable-features=DropInputEventsWhilePaintHolding,LocalNetworkAccessChecks,NetworkServiceSandbox,ScreenAIOCREnabled,SpareRendererForSitePerProcess,TraceSiteInstanceGetProcessCreation --variations-seed-version --pseudonymization-salt-handle=1924,i,11400906814217886740,16416791646942661644,4 --trace-process-track-uuid=3190708989122997041 --mojo-platform-channel-handle=2208 /prefetch:11"
+    },
+    {
+      "ProcessId": 19072,
+      "ParentProcessId": 16688,
+      "CreationDate": "2026-09-10T23:21:42.139823+08:00",
+      "ExecutablePath": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview-v21-e2e-fresh-0910\\RelayQaHubPreview-v21-e2e-fresh-0910.exe",
+      "CommandLine": "\"C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview-v21-e2e-fresh-0910\\RelayQaHubPreview-v21-e2e-fresh-0910.exe\" --type=renderer --user-data-dir=\"C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-v21-e2e-fresh-0910\\desktop\\profile\" --standard-schemes=qa-hub-preview-v21-e2e-fresh-0910 --secure-schemes=qa-hub-preview-v21-e2e-fresh-0910 --cors-schemes=qa-hub-preview-v21-e2e-fresh-0910 --fetch-schemes=qa-hub-preview-v21-e2e-fresh-0910 --streaming-schemes=qa-hub-preview-v21-e2e-fresh-0910 --app-user-model-id=com.relayqahub.desktop.preview.v21.e2e.fresh.0910 --app-path=\"C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview-v21-e2e-fresh-0910\\resources\\app.asar\" --enable-sandbox --remote-debugging-port=9433 --video-capture-use-gpu-memory-buffer --lang=zh-CN --device-scale-factor=1.75 --num-raster-threads=4 --enable-main-frame-before-activation --renderer-client-id=4 --time-ticks-at-unix-epoch=-1788773729538061 --launch-time-ticks=279972595991 --field-trial-handle=1920,i,1670671642242106174,10398139681314826989,262144 --enable-features=PdfUseShowSaveFilePicker --disable-features=DropInputEventsWhilePaintHolding,LocalNetworkAccessChecks,NetworkServiceSandbox,ScreenAIOCREnabled,SpareRendererForSitePerProcess,TraceSiteInstanceGetProcessCreation --variations-seed-version --pseudonymization-salt-handle=1924,i,11400906814217886740,16416791646942661644,4 --trace-process-track-uuid=3190708990060038890 --mojo-platform-channel-handle=3404 /prefetch:1"
+    }
+  ],
+  "mainProcess": {
+    "ProcessId": 16688,
+    "ParentProcessId": 21532,
+    "CreationDate": "2026-09-10T23:21:41.899105+08:00",
+    "ExecutablePath": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview-v21-e2e-fresh-0910\\RelayQaHubPreview-v21-e2e-fresh-0910.exe",
+    "CommandLine": "\"C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview-v21-e2e-fresh-0910\\RelayQaHubPreview-v21-e2e-fresh-0910.exe\" --hidden --remote-debugging-port=9433 --user-data-dir=C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-v21-e2e-fresh-0910\\desktop\\profile"
+  },
+  "listeners": [
+    {
+      "address": "0.0.0.0",
+      "port": 4174,
+      "pid": 7420
+    },
+    {
+      "address": "0.0.0.0",
+      "port": 4319,
+      "pid": 14044
+    },
+    {
+      "address": "127.0.0.1",
+      "port": 4320,
+      "pid": 17160
+    },
+    {
+      "address": "127.0.0.1",
+      "port": 4639,
+      "pid": 19004
+    },
+    {
+      "address": "127.0.0.1",
+      "port": 4640,
+      "pid": 20452
+    },
+    {
+      "address": "127.0.0.1",
+      "port": 4641,
+      "pid": 19112
+    },
+    {
+      "address": "127.0.0.1",
+      "port": 4642,
+      "pid": 16688
+    },
+    {
+      "address": "127.0.0.1",
+      "port": 9333,
+      "pid": 26828
+    },
+    {
+      "address": "127.0.0.1",
+      "port": 9433,
+      "pid": 16688
+    }
+  ],
+  "backups": [
+    {
+      "name": "RelayQaHubPreview-v21-e2e-fresh-0910.backup-20260910T025617451Z",
+      "fullName": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview-v21-e2e-fresh-0910.backup-20260910T025617451Z",
+      "lastWriteTimeUtc": "2026-09-10T02:44:28.9452552Z"
+    },
+    {
+      "name": "RelayQaHubPreview-v21-e2e-fresh-0910.backup-20260910T033745832Z",
+      "fullName": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview-v21-e2e-fresh-0910.backup-20260910T033745832Z",
+      "lastWriteTimeUtc": "2026-09-10T03:00:16.3712284Z"
+    },
+    {
+      "name": "RelayQaHubPreview-v21-e2e-fresh-0910.backup-20260910T044149231Z",
+      "fullName": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview-v21-e2e-fresh-0910.backup-20260910T044149231Z",
+      "lastWriteTimeUtc": "2026-09-10T03:41:36.8117496Z"
+    },
+    {
+      "name": "RelayQaHubPreview-v21-e2e-fresh-0910.backup-20260910T044149231Z-1",
+      "fullName": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview-v21-e2e-fresh-0910.backup-20260910T044149231Z-1",
+      "lastWriteTimeUtc": "2026-09-10T11:34:49.3478165Z"
+    },
+    {
+      "name": "RelayQaHubPreview-v21-e2e-fresh-0910.backup-20260910T112450576Z",
+      "fullName": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview-v21-e2e-fresh-0910.backup-20260910T112450576Z",
+      "lastWriteTimeUtc": "2026-09-10T04:59:51.9055152Z"
+    },
+    {
+      "name": "RelayQaHubPreview-v21-e2e-fresh-0910.backup-20260910T122343731Z",
+      "fullName": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview-v21-e2e-fresh-0910.backup-20260910T122343731Z",
+      "lastWriteTimeUtc": "2026-09-10T12:38:46.9892578Z"
+    },
+    {
+      "name": "RelayQaHubPreview-v21-e2e-fresh-0910.backup-20260910T135324626Z",
+      "fullName": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview-v21-e2e-fresh-0910.backup-20260910T135324626Z",
+      "lastWriteTimeUtc": "2026-09-10T12:47:52.1902537Z"
+    }
+  ],
+  "updateEntries": [
+    {
+      "name": "20260910T025617451Z.exe",
+      "fullName": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-v21-e2e-fresh-0910\\desktop\\profile\\updates\\20260910T025617451Z.exe",
+      "isDirectory": false,
+      "length": 108446872,
+      "lastWriteTimeUtc": "2026-09-10T02:59:51.3399345Z"
+    },
+    {
+      "name": "20260910T033745832Z.exe",
+      "fullName": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-v21-e2e-fresh-0910\\desktop\\profile\\updates\\20260910T033745832Z.exe",
+      "isDirectory": false,
+      "length": 108326967,
+      "lastWriteTimeUtc": "2026-09-10T03:41:08.4815981Z"
+    },
+    {
+      "name": "20260910T044149231Z.exe",
+      "fullName": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-v21-e2e-fresh-0910\\desktop\\profile\\updates\\20260910T044149231Z.exe",
+      "isDirectory": false,
+      "length": 108296156,
+      "lastWriteTimeUtc": "2026-09-10T04:58:22.9564220Z"
+    },
+    {
+      "name": "20260910T044149231Z.exe.retained-d7aa2b55-e263-477b-af22-33ab5eba1327",
+      "fullName": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-v21-e2e-fresh-0910\\desktop\\profile\\updates\\20260910T044149231Z.exe.retained-d7aa2b55-e263-477b-af22-33ab5eba1327",
+      "isDirectory": false,
+      "length": 108296156,
+      "lastWriteTimeUtc": "2026-09-10T04:57:08.2587917Z"
+    },
+    {
+      "name": "20260910T102940665Z.exe",
+      "fullName": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-v21-e2e-fresh-0910\\desktop\\profile\\updates\\20260910T102940665Z.exe",
+      "isDirectory": false,
+      "length": 108356331,
+      "lastWriteTimeUtc": "2026-09-10T10:48:03.6131552Z"
+    },
+    {
+      "name": "20260910T102940665Z.exe.retained-583abf85-007d-49e4-ba3f-791ccab8ae85",
+      "fullName": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-v21-e2e-fresh-0910\\desktop\\profile\\updates\\20260910T102940665Z.exe.retained-583abf85-007d-49e4-ba3f-791ccab8ae85",
+      "isDirectory": false,
+      "length": 108356331,
+      "lastWriteTimeUtc": "2026-09-10T10:46:46.4158680Z"
+    },
+    {
+      "name": "20260910T112450576Z.exe",
+      "fullName": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-v21-e2e-fresh-0910\\desktop\\profile\\updates\\20260910T112450576Z.exe",
+      "isDirectory": false,
+      "length": 108335814,
+      "lastWriteTimeUtc": "2026-09-10T11:31:42.0851387Z"
+    },
+    {
+      "name": "20260910T122343731Z.exe",
+      "fullName": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-v21-e2e-fresh-0910\\desktop\\profile\\updates\\20260910T122343731Z.exe",
+      "isDirectory": false,
+      "length": 108471890,
+      "lastWriteTimeUtc": "2026-09-10T12:46:09.6612738Z"
+    },
+    {
+      "name": "20260910T122343731Z.exe.retained-39d2bed4-53d7-4434-8986-e1105423ea43",
+      "fullName": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-v21-e2e-fresh-0910\\desktop\\profile\\updates\\20260910T122343731Z.exe.retained-39d2bed4-53d7-4434-8986-e1105423ea43",
+      "isDirectory": false,
+      "length": 108471890,
+      "lastWriteTimeUtc": "2026-09-10T12:40:28.6670971Z"
+    },
+    {
+      "name": "20260910T135324626Z.exe",
+      "fullName": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-v21-e2e-fresh-0910\\desktop\\profile\\updates\\20260910T135324626Z.exe",
+      "isDirectory": false,
+      "length": 108488136,
+      "lastWriteTimeUtc": "2026-09-10T14:12:15.0450820Z"
+    },
+    {
+      "name": "last-update-result.json",
+      "fullName": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-v21-e2e-fresh-0910\\desktop\\profile\\updates\\last-update-result.json",
+      "isDirectory": false,
+      "length": 290,
+      "lastWriteTimeUtc": "2026-09-10T14:13:23.7622040Z"
+    },
+    {
+      "name": "retained-update-result-4cddb0c3-a209-4046-bfbf-4a38649b6c2a.json",
+      "fullName": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-v21-e2e-fresh-0910\\desktop\\profile\\updates\\retained-update-result-4cddb0c3-a209-4046-bfbf-4a38649b6c2a.json",
+      "isDirectory": false,
+      "length": 290,
+      "lastWriteTimeUtc": "2026-09-10T03:00:16.5694690Z"
+    },
+    {
+      "name": "retained-update-result-5966f383-a31b-4aaa-b9f8-848297b600e0.json",
+      "fullName": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-v21-e2e-fresh-0910\\desktop\\profile\\updates\\retained-update-result-5966f383-a31b-4aaa-b9f8-848297b600e0.json",
+      "isDirectory": false,
+      "length": 290,
+      "lastWriteTimeUtc": "2026-09-10T11:34:50.1114813Z"
+    },
+    {
+      "name": "retained-update-result-b26b0fa7-1055-4809-b92b-bab7601463bd.json",
+      "fullName": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-v21-e2e-fresh-0910\\desktop\\profile\\updates\\retained-update-result-b26b0fa7-1055-4809-b92b-bab7601463bd.json",
+      "isDirectory": false,
+      "length": 290,
+      "lastWriteTimeUtc": "2026-09-10T03:41:36.9613878Z"
+    },
+    {
+      "name": "retained-update-result-d1c64e53-751c-4d04-b3b4-890e105d262d.json",
+      "fullName": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-v21-e2e-fresh-0910\\desktop\\profile\\updates\\retained-update-result-d1c64e53-751c-4d04-b3b4-890e105d262d.json",
+      "isDirectory": false,
+      "length": 284,
+      "lastWriteTimeUtc": "2026-09-10T10:47:57.7877995Z"
+    },
+    {
+      "name": "retained-update-result-dab81b31-3917-44ed-90c7-1bb74dd6be5c.json",
+      "fullName": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-v21-e2e-fresh-0910\\desktop\\profile\\updates\\retained-update-result-dab81b31-3917-44ed-90c7-1bb74dd6be5c.json",
+      "isDirectory": false,
+      "length": 290,
+      "lastWriteTimeUtc": "2026-09-10T04:59:52.8594641Z"
+    },
+    {
+      "name": "retained-update-result-f7de9734-452d-4900-80b0-85014150afd0.json",
+      "fullName": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-v21-e2e-fresh-0910\\desktop\\profile\\updates\\retained-update-result-f7de9734-452d-4900-80b0-85014150afd0.json",
+      "isDirectory": false,
+      "length": 290,
+      "lastWriteTimeUtc": "2026-09-10T12:47:53.1847498Z"
+    },
+    {
+      "name": "updater-20260910T025617451Z-11304-d9cd3aad-338c-4b9b-b78f-963923e077e9",
+      "fullName": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-v21-e2e-fresh-0910\\desktop\\profile\\updates\\updater-20260910T025617451Z-11304-d9cd3aad-338c-4b9b-b78f-963923e077e9",
+      "isDirectory": true,
+      "length": null,
+      "lastWriteTimeUtc": "2026-09-10T03:00:03.6247559Z"
+    },
+    {
+      "name": "updater-20260910T033745832Z-27284-1f810ee5-757f-4bbf-b364-ea1e665d454c",
+      "fullName": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-v21-e2e-fresh-0910\\desktop\\profile\\updates\\updater-20260910T033745832Z-27284-1f810ee5-757f-4bbf-b364-ea1e665d454c",
+      "isDirectory": true,
+      "length": null,
+      "lastWriteTimeUtc": "2026-09-10T03:41:24.4270348Z"
+    },
+    {
+      "name": "updater-20260910T044149231Z-25508-e1211c76-e8c1-45f7-a3bc-d6a85a085e0d",
+      "fullName": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-v21-e2e-fresh-0910\\desktop\\profile\\updates\\updater-20260910T044149231Z-25508-e1211c76-e8c1-45f7-a3bc-d6a85a085e0d",
+      "isDirectory": true,
+      "length": null,
+      "lastWriteTimeUtc": "2026-09-10T04:59:52.6820392Z"
+    },
+    {
+      "name": "updater-20260910T102940665Z-26928-95c2444d-f87a-4e2c-a63b-c9cc4360cd56",
+      "fullName": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-v21-e2e-fresh-0910\\desktop\\profile\\updates\\updater-20260910T102940665Z-26928-95c2444d-f87a-4e2c-a63b-c9cc4360cd56",
+      "isDirectory": true,
+      "length": null,
+      "lastWriteTimeUtc": "2026-09-10T10:47:55.0170095Z"
+    },
+    {
+      "name": "updater-20260910T112450576Z-24124-6644c08a-1730-4954-a56f-f87144c62a3b",
+      "fullName": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-v21-e2e-fresh-0910\\desktop\\profile\\updates\\updater-20260910T112450576Z-24124-6644c08a-1730-4954-a56f-f87144c62a3b",
+      "isDirectory": true,
+      "length": null,
+      "lastWriteTimeUtc": "2026-09-10T11:34:49.9512620Z"
+    },
+    {
+      "name": "updater-20260910T122343731Z-10488-021e038b-9fa4-4ce7-bc88-cdd3c401a649",
+      "fullName": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-v21-e2e-fresh-0910\\desktop\\profile\\updates\\updater-20260910T122343731Z-10488-021e038b-9fa4-4ce7-bc88-cdd3c401a649",
+      "isDirectory": true,
+      "length": null,
+      "lastWriteTimeUtc": "2026-09-10T12:47:53.0159775Z"
+    },
+    {
+      "name": "updater-20260910T135324626Z-26836-ad81a690-ded7-47d1-bbc5-0f2643a3b36d",
+      "fullName": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-v21-e2e-fresh-0910\\desktop\\profile\\updates\\updater-20260910T135324626Z-26836-ad81a690-ded7-47d1-bbc5-0f2643a3b36d",
+      "isDirectory": true,
+      "length": null,
+      "lastWriteTimeUtc": "2026-09-10T14:13:23.6027411Z"
+    }
+  ],
+  "previewReady": {
+    "status": "ready",
+    "schemaVersion": "20",
+    "checks": [
+      {
+        "name": "database",
+        "status": "ok"
+      },
+      {
+        "name": "evidence",
+        "status": "ok"
+      },
+      {
+        "name": "worker",
+        "status": "ok"
+      }
+    ]
+  },
+  "desktopMcp": null,
+  "productionReady": {
+    "status": "ready",
+    "schemaVersion": "12",
+    "checks": [
+      {
+        "name": "database",
+        "status": "ok"
+      },
+      {
+        "name": "evidence",
+        "status": "ok"
+      },
+      {
+        "name": "worker",
+        "status": "ok"
+      }
+    ]
+  },
+  "productionObservation": {
+    "action": "read_only",
+    "touched": false
+  },
+  "checks": {
+    "installedVersionExact": true,
+    "installedFileVersionExact": true,
+    "installedExeHashExact": true,
+    "installedAsarHashExact": true,
+    "rememberedIdentityHashExact": true,
+    "previewReady": true,
+    "productionReadyObserved": true,
+    "productionObservationReadOnly": true
+  },
+  "passed": true
+}

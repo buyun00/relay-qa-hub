@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "capturedAt": "2026-09-10T15:16:15.2640101Z",
+  "logName": "Microsoft-Windows-PushNotification-Platform/Operational",
+  "provider": "Microsoft-Windows-PushNotifications-Platform",
+  "eventId": 3153,
+  "recordId": 72708,
+  "timeCreated": "2026-09-10T15:01:05.8112762+00:00",
+  "eventData": {
+    "TrackingId": "5638",
+    "SessionId": "1",
+    "MessageId": "{c28edcc4-f567-4e39-b053-03d26e9c3625}",
+    "AppUserModelId": "com.relayqahub.desktop.preview.v21.e2e.fresh.0910"
+  },
+  "message": "Toast with notification tracking id 5638 is delivered to com.relayqahub.desktop.preview.v21.e2e.fresh.0910 on session 1."
+}

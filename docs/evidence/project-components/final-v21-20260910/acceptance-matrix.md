@@ -1,10 +1,10 @@
 # QA Hub v2.1 试用发布验收矩阵
 
 记录日期：2026-09-10  
-最终 API/Android 源码：`88a6d0f9c31106f6cd3fc9edbadca0db6bf6397b`；保留的 Windows/Web 试用物仍来自 `867387fe69714ae0c3aafa6182946ffd80495768`  
-保留客户端源码等价：`apps/web`、`apps/desktop`、`packages/upload-contract` 在 artifact commit `867387fe69714ae0c3aafa6182946ffd80495768` 与最终产品源码 commit `88a6d0f9c31106f6cd3fc9edbadca0db6bf6397b` 的 Git tree ID 分别完全相同；这项证据只证明源码等价。见 [`continuation-20260910/artifact-source-equivalence.json`](continuation-20260910/artifact-source-equivalence.json)。  
+最终产品源码锚点：`c4e2eb7d9341a16d2430df9073a93f44f381dd2b`；Windows/Web build 17 来自该提交，Android 保留产物的 `apps/android` Git tree 与该提交一致。  
+来源说明：历史浏览器回读保留其原始提交 `88a6d0f9c31106f6cd3fc9edbadca0db6bf6397b`；当前源码代理复验状态单独记录，不能由源码等价推定。  
 隔离实例：API `4639`、Web `4640`、server MCP `4641`、local MCP `4642`  
-结论：**代理负责的开发、隔离发布与验收已经完成；整体仍为 NOT COMPLETE。** 六项真实外部/物理设备验收已按用户指令移交，代理未执行、未记作 PASS；等待用户自测结果，不再因自动展开的覆盖标记无限续转。
+结论：**代理复验仍未完成，整体为 NOT COMPLETE。** 当前仍有代理门禁失败、待测或未提供完整报告；六项用户自测也均已移交、代理未执行且保持 NOT_RUN。
 
 状态定义：`PASS` 表示真实入口执行并回读；`FAIL` 表示真实执行暴露故障；`UNRUN` 表示尚未覆盖；`用户自测／已移交，代理未执行` 表示由用户负责且代理没有代跑。监听、静态构建、dummy 配置或 mock 不单独算业务 E2E。
 
@@ -24,27 +24,27 @@
 | 第三方同步/青鱼真实订单闭环 | Web/EXE/APK + HTTP/MCP + 青鱼 | 用户自测／已移交，代理未执行 | 用户负责获准测试账号、项目和订单的导入及解决终态回读。见 [`user-self-test-handoff.md`](user-self-test-handoff.md)。 |
 | Web 最终资产与错误态 | Web | PASS | 实际加载 `/assets/index-BHhxArNW.js`，SHA-256 `296935b38f898f33f49f28a262cd7cff929ac5d5aae3353819d3744659dfb907`；组件依赖错误提示、输入保留与服务端零变更通过。见 [`web-final-867387f/`](web-final-867387f/)。 |
 | HTTP API | HTTP | PASS | 最终构建重启后仍为 schema `20`；真实链路完成上传丢回执恢复、附件元数据 `unbound→reserved→claimed`、通知读取 CAS/精确重放、跨项目/未认证/错误版本拒绝，并从 SQLite 回读唯一 committed 回执、唯一审计事件及匹配 HMAC-SHA-256。见 [`live-http-e2e.json`](live-http-e2e.json)、[`live-http-db-receipt.json`](live-http-db-receipt.json)。 |
-| server MCP | MCP `4641` | PASS | 重启后的 initialize、`tools/list=96`、`qa_list_projects`、`qa_list_bugs` 均真实通过；既有项目/Bug/评论/附件 materialize 与错误项目拒绝证据继续保留。见 [`post-restart-mcp-check.json`](post-restart-mcp-check.json) 与 [`web/core-e2e-report.md`](web/core-e2e-report.md)。 |
-| Windows EXE 与 local MCP | EXE + MCP `4642` | PASS | build12 从真实 UI 检查、下载并“安装并重启”至 build13；旧 PID 退出、新 PID 自动启动，helper/marker handshake 完整；同一 profile、项目、Bug、未提交草稿与 PNG 指纹保留；最终 API 重启后 local MCP `.13` 仍返回 96 工具并完成项目/Bug 实读。见 [`windows/acceptance-matrix.md`](windows/acceptance-matrix.md) 与 [`post-restart-mcp-check.json`](post-restart-mcp-check.json)。 |
-| Windows 候选完整性 | installer/feed | PASS | `0.2.0-preview.13`，release `20260910T044149231Z`，installer SHA-256 `7610c92fd39d4485d78e3d8ee7618d79d5e8ed9f3d6ce096c2922c72e5388ab0`；manifest Ed25519 通过，ASAR 中版本/源码和 Web/Desktop 文件与构建产物一致。见 [`builds/windows-build13-preinstall.json`](builds/windows-build13-preinstall.json)。 |
-| Windows Authenticode | installer | FACT / NOT SIGNED | `AuthenticodeStatus=NotSigned`；这与有效的 Ed25519 更新 manifest 是两项独立事实。见 [`builds/windows-build13-signatures.json`](builds/windows-build13-signatures.json)。 |
+| server MCP | MCP `4641` | PASS（目录与已执行子集） | server/local MCP 均观察到 96 项工具目录；真实执行范围仅为 initialize、目录、登录、项目列表、Bug 列表与已有附件一致性子集。该证据不声称 96 项工具全部通过业务 E2E。见 [`post-restart-mcp-check.json`](post-restart-mcp-check.json)。 |
+| Windows EXE 与 local MCP | EXE + MCP `4642` | PASS（升级链路） | 隔离签名更新器完成 `0.2.0-preview.16→0.2.0-preview.17`，精确重启已安装 EXE，保留回退备份、身份、项目、草稿与 local MCP，并消除 `INBOX_READ_FAILED`；最终试用实例也已从原 profile 恢复并通过只读回读。桌面通知路由仍由代理门禁单独复验。见 [`continuation-20260910/postfix-c4e2eb7/windows-build17-upgrade/auto-relaunch-verification.json`](continuation-20260910/postfix-c4e2eb7/windows-build17-upgrade/auto-relaunch-verification.json)、[`continuation-20260910/postfix-c4e2eb7/windows-build17-upgrade/post-upgrade-readonly.json`](continuation-20260910/postfix-c4e2eb7/windows-build17-upgrade/post-upgrade-readonly.json) 与 [`continuation-20260910/postfix-c4e2eb7/final-runtime/canonical-relaunch-20260910T152101642Z-82efc9c9-66e9-44e1-8160-7a3af37b4fa2/07-final-runtime-verification.json`](continuation-20260910/postfix-c4e2eb7/final-runtime/canonical-relaunch-20260910T152101642Z-82efc9c9-66e9-44e1-8160-7a3af37b4fa2/07-final-runtime-verification.json)。 |
+| Windows 候选完整性 | installer/feed | PASS | `0.2.0-preview.17`，release `20260910T135324626Z`，installer SHA-256 `1c67b6555ffeeefff3ce885acfd09735dc6bc650570e3b53d109c8ad617d11d4`；manifest Ed25519、HTTP 回读、ASAR 与 Desktop/Web 构建产物逐字节校验通过。见 [`continuation-20260910/postfix-c4e2eb7/windows-build17-package/package-verification.json`](continuation-20260910/postfix-c4e2eb7/windows-build17-package/package-verification.json)。 |
+| Windows Authenticode | installer | UNRUN（build 17） | build 17 的证据验证了 Ed25519 更新清单，未重新验证 Authenticode；旧 build 13 的 `NotSigned` 只作为历史事实保留，不能外推到 build 17。 |
 | Android APK 构建、签名、feed 与安装 | APK | PASS | 最终源码构建 code `28` / `0.2.0-preview.15`，35,913,773 bytes，SHA-256 `61a885f22b9a62383d923bf36ca0f9ade9f987c22bb30c7323bd8acbd7536e7a`，v2 签名；仅隔离 feed 原子发布并由 API/Web 的 GET、HEAD、Range 逐字节回读。见 [`android/acceptance/android-code28-self-update/artifact-verification.json`](android/acceptance/android-code28-self-update/artifact-verification.json) 与 [`android/acceptance/android-code28-self-update/feed-http-verification.json`](android/acceptance/android-code28-self-update/feed-http-verification.json)。 |
 | Android 应用内自更新 | APK/MuMu | PASS | 先后由应用内“检查更新”和 Android 系统安装器完成 code 26→27→28；没有用 `adb install`/`pm install` 代替。最终拉取已安装 APK 的 SHA-256 与候选完全一致，项目、姓名、关闭 Bug、截图草稿、反向端口和 daily 包均保留。见 [`android/acceptance/android-code28-self-update/luna-e2e/058-verdict.md`](android/acceptance/android-code28-self-update/luna-e2e/058-verdict.md)。 |
 | Android MediaProjection 截图与草稿 | APK/MuMu | PASS | 独立复验中完成一次悬浮球截图，应用 PID 保持、草稿可见、反向端口不变且无产品 fatal marker；随后两次应用内升级仍保留该草稿。见 [`android/acceptance/android-mediaprojection-revalidation/36-revalidation-verdict.md`](android/acceptance/android-mediaprojection-revalidation/36-revalidation-verdict.md)。 |
 | Android 物理设备 | APK | 用户自测／已移交，代理未执行 | 代理只执行了 MuMu；物理设备上的截图、更新、离线队列与收据复验由用户负责。见 [`user-self-test-handoff.md`](user-self-test-handoff.md)。 |
 | schema 迁移与回退 | HTTP + MCP + SQLite copy | PASS | 独立副本真实执行 `19 -> 20 -> 19`；MCP `94 -> 96 -> 94`；同一员工、项目、5 个 Bug、全部逻辑行和 5 个证据文件保持一致；自动 v19 备份与基线 DB 字节相同。见 [`migration/README.md`](migration/README.md) 和 [`migration/result.json`](migration/result.json)。 |
-| 生产、旧 preview 与失败现场并存 | read-only observation | PASS | 最终重启后再次只读核对：生产 `4319/4174/4320`、旧 preview `4419/4274/4420`、保留现场 `4539/4541` 及 v2.1 `4639/4640/4641/4642` 共 12 个监听均在；所有 API ready、所有 Web HTTP 200，v2.1 四端口保持 loopback。见 [`coexistence-post-restart.json`](coexistence-post-restart.json)。 |
+| 生产、旧 preview 与失败现场并存 | read-only observation | PASS | 最终 build 17 试用实例使用原始隔离 profile 运行，主进程只拥有 local MCP `4642` 和 CDP `9433`；启动前后生产 `4174/4319/4320`、隔离 API/Web/server MCP `4639/4640/4641` 及既有 CDP `9333` 的监听地址、端口和 PID 完全一致。见 [`continuation-20260910/postfix-c4e2eb7/final-runtime/canonical-relaunch-20260910T152101642Z-82efc9c9-66e9-44e1-8160-7a3af37b4fa2/07-final-runtime-verification.json`](continuation-20260910/postfix-c4e2eb7/final-runtime/canonical-relaunch-20260910T152101642Z-82efc9c9-66e9-44e1-8160-7a3af37b4fa2/07-final-runtime-verification.json)；更早的并存快照继续保留。 |
 | 最终 API 运行时重启与持久回读 | HTTP + server/local MCP + SQLite | PASS | 只重启隔离 API：PID `16000→26088`，Web/MCP PID 未变；receipt、完整命令行、loopback 监听、ready 200、schema 20、DB integrity/FK 均通过，随后真实 HTTP 与两种 MCP 回读通过。见 [`api-runtime-restart/restart-verification.json`](api-runtime-restart/restart-verification.json)。 |
-| 最终源码门禁 | source | PASS | `88a6d0f` 上 TypeScript 构建与 5 项冻结/增量合同检查通过；storage 166 PASS/1 SKIP，API JS 274/274、TS 47/47；Android clean unit+lint+assemble 59 tasks 与更新 UI 定向 32 tasks 均通过。并行首次失败日志原样保留，隔离完整复跑通过。见 [`source-verification-88a6d0f/summary.json`](source-verification-88a6d0f/summary.json)。 |
+| 最终源码门禁 | source | PARTIAL | 产品源码锚定 `c4e2eb7d9341a16d2430df9073a93f44f381dd2b`，但代理复验仍有失败、待测或未报告门禁，不能记作完成。 |
 
 ## 试用发布物
 
 - Android：隔离 feed 中的 `Relay-QA-Hub-Android-28-0.2.0-preview.15.apk`，SHA-256 `61a885f22b9a62383d923bf36ca0f9ade9f987c22bb30c7323bd8acbd7536e7a`。
-- Windows：隔离 feed 中的 `qa-hub-preview-v21-e2e-fresh-0910-windows-0.2.0-preview.13-20260910T044149231Z.exe`，SHA-256 `7610c92fd39d4485d78e3d8ee7618d79d5e8ed9f3d6ce096c2922c72e5388ab0`。
-- Web/API/server MCP：隔离实例 `4640/4639/4641`；Windows build13 提供 local MCP `4642`。
+- Windows：隔离 feed 中的 `qa-hub-preview-v21-e2e-fresh-0910-windows-0.2.0-preview.17-20260910T135324626Z.exe`，SHA-256 `1c67b6555ffeeefff3ce885acfd09735dc6bc650570e3b53d109c8ad617d11d4`。
+- Web/API/server MCP：隔离实例 `4640/4639/4641`；Windows 0.2.0-preview.17 提供 local MCP `4642`。
 
 ## 尚未完成
 
 代理侧的细粒度覆盖矩阵已按最终源码重新生成：1,030 项、47 个退休项、637 项带源码复验标记，详见 [`../coverage-matrix.md`](../coverage-matrix.md)。这些行继续保留且未被改成 PASS；该单一计数包含自动展开节点和历史源码漂移，不等于 637 个独立用户功能失败，也不替代上表的真实功能验收结论。
 
-用户侧六项均为 `用户自测／已移交，代理未执行`：物理 Android 真机、真实打包、单次打包上传、真实增量上传发布、Relay AI 制作交付、第三方同步和轻语闭环。操作与回填要求见 [`user-self-test-handoff.md`](user-self-test-handoff.md)。
+用户侧六项均为 `用户自测／已移交，代理未执行`：物理 Android 真机、真实打包、单次打包上传、真实增量上传发布、Relay AI 制作交付、第三方同步/青鱼真实订单闭环。操作与回填要求见 [`user-self-test-handoff.md`](user-self-test-handoff.md)。

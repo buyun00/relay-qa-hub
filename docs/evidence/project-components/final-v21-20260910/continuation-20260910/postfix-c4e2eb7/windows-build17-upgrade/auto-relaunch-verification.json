@@ -1,0 +1,158 @@
+{
+  "schemaVersion": 1,
+  "capturedAt": "2026-09-10T14:18:04.7538121Z",
+  "transition": {
+    "fromVersion": "0.2.0-preview.16",
+    "toVersion": "0.2.0-preview.17",
+    "releaseId": "20260910T135324626Z",
+    "sourceCommit": "c4e2eb7d9341a16d2430df9073a93f44f381dd2b"
+  },
+  "updaterDirectory": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-v21-e2e-fresh-0910\\desktop\\profile\\updates\\updater-20260910T135324626Z-26836-ad81a690-ded7-47d1-bbc5-0f2643a3b36d",
+  "ini": {
+    "PackagePath": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-v21-e2e-fresh-0910\\desktop\\profile\\updates\\20260910T135324626Z.exe",
+    "AppPath": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview-v21-e2e-fresh-0910\\RelayQaHubPreview-v21-e2e-fresh-0910.exe",
+    "UserDataPath": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-v21-e2e-fresh-0910\\desktop\\profile",
+    "ParentPid": "26836",
+    "ResultPath": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-v21-e2e-fresh-0910\\desktop\\profile\\updates\\last-update-result.json",
+    "ReleaseId": "20260910T135324626Z",
+    "Version": "0.2.0-preview.17"
+  },
+  "updateLogLines": [
+    "native updater started",
+    "handoff validated",
+    "main process exited; starting installer",
+    "update installed; relaunching application",
+    "application relaunch acknowledged"
+  ],
+  "readyFlag": "ready:20260910T135324626Z",
+  "installResult": {
+    "schemaVersion": 1,
+    "status": "installed",
+    "releaseId": "20260910T135324626Z",
+    "version": "0.2.0-preview.17",
+    "recordedAt": "2026-09-10T14:13:23Z"
+  },
+  "relaunchMarker": {
+    "schemaVersion": 1,
+    "status": "ready",
+    "version": "0.2.0-preview.17",
+    "pid": 12764,
+    "recordedAt": "2026-09-10T14:13:23.602Z"
+  },
+  "mainProcess": {
+    "ProcessId": 12764,
+    "ParentProcessId": 11360,
+    "CreationDate": "2026-09-10T22:13:23.249524+08:00",
+    "ExecutablePath": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview-v21-e2e-fresh-0910\\RelayQaHubPreview-v21-e2e-fresh-0910.exe",
+    "CommandLine": "\"C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview-v21-e2e-fresh-0910\\RelayQaHubPreview-v21-e2e-fresh-0910.exe\" --updated --user-data-dir=\"C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-v21-e2e-fresh-0910\\desktop\\profile\" --update-relaunch-marker=\"C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-v21-e2e-fresh-0910\\desktop\\profile\\updates\\updater-20260910T135324626Z-26836-ad81a690-ded7-47d1-bbc5-0f2643a3b36d\\relaunched.flag\""
+  },
+  "installed": {
+    "exeSha256": "58c21fdc87e3b5007df9d30e59a27df67e24516f7c74c61d7fb545d8c54d4f0f",
+    "asarSha256": "ff3b49304c7f98ec754bd42ef9732cd6b58718002b3f4be8ae0ae506e69b7474",
+    "version": "0.2.0-preview.17"
+  },
+  "rollbackBackup": {
+    "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview-v21-e2e-fresh-0910.backup-20260910T135324626Z",
+    "version": "0.2.0-preview.16",
+    "exeSha256": "15974f3d818980bc0b1a341ecbe2636b9018c3ad4958a60ba2367648a64511c5",
+    "asarSha256": "4d47c054aa4aa62fb23c99a5c437213663228003277ea0a58276252df0c75203"
+  },
+  "mcpInitialize": {
+    "jsonrpc": "2.0",
+    "id": 1,
+    "result": {
+      "protocolVersion": "2025-06-18",
+      "capabilities": {
+        "tools": {
+          "listChanged": false
+        },
+        "resources": {
+          "subscribe": false,
+          "listChanged": false
+        }
+      },
+      "serverInfo": {
+        "name": "qa-hub-desktop-preview",
+        "version": "0.2.0-preview.17"
+      },
+      "instructions": "先用项目姓名登录，再列出自己的项目。每个工具必须使用明确项目；本地 MCP 与独立服务端 MCP 共用 HTTP 业务。Bug 人工完成、验收通过、退回和关闭独立于五项可选组件。代码交付和第三方同步不代表验收关闭。附件 materialize 在本地校验后返回作用域隔离的文件。不要报告未执行的验证。"
+    }
+  },
+  "listeners": [
+    {
+      "address": "0.0.0.0",
+      "port": 4174,
+      "pid": 7420
+    },
+    {
+      "address": "0.0.0.0",
+      "port": 4319,
+      "pid": 14044
+    },
+    {
+      "address": "127.0.0.1",
+      "port": 4320,
+      "pid": 17160
+    },
+    {
+      "address": "127.0.0.1",
+      "port": 4639,
+      "pid": 19004
+    },
+    {
+      "address": "127.0.0.1",
+      "port": 4640,
+      "pid": 20452
+    },
+    {
+      "address": "127.0.0.1",
+      "port": 4641,
+      "pid": 19112
+    },
+    {
+      "address": "127.0.0.1",
+      "port": 4642,
+      "pid": 12764
+    },
+    {
+      "address": "127.0.0.1",
+      "port": 9333,
+      "pid": 26828
+    }
+  ],
+  "checks": {
+    "exactUpdaterDirectory": true,
+    "iniPackageExact": true,
+    "iniAppExact": true,
+    "iniProfileExact": true,
+    "iniParentExact": true,
+    "iniResultExact": true,
+    "iniReleaseExact": true,
+    "iniVersionExact": true,
+    "updatePackageBytesExact": true,
+    "updatePackageHashExact": true,
+    "updaterBinaryExact": true,
+    "readyFlagExact": true,
+    "logSequenceExact": true,
+    "installResultExact": true,
+    "oneAutoRelaunchMain": true,
+    "autoRelaunchCommandExact": true,
+    "relaunchMarkerExact": true,
+    "installedVersionExact": true,
+    "installedExeHashExact": true,
+    "installedAsarHashExact": true,
+    "rollbackBackupVersion16": true,
+    "rollbackBackupExeHashExact": true,
+    "rollbackBackupAsarHashExact": true,
+    "desktopMcpOwnedByRelaunch": true,
+    "cdpAbsentOnAutoRelaunch": true,
+    "desktopMcpVersion17": true,
+    "productionAndPreviewServiceOwnersPreserved": true,
+    "productionObservationReadOnly": true
+  },
+  "productionObservation": {
+    "action": "read_only",
+    "touched": false
+  },
+  "passed": true
+}

@@ -1,0 +1,48 @@
+{
+  "schemaVersion": 1,
+  "capturedAt": "2026-09-10T14:19:58.5166591Z",
+  "requestedPid": 14216,
+  "process": {
+    "ProcessId": 14216,
+    "ParentProcessId": 4896,
+    "CreationDate": "2026-09-10T22:19:57.663912+08:00",
+    "ExecutablePath": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview-v21-e2e-fresh-0910\\RelayQaHubPreview-v21-e2e-fresh-0910.exe",
+    "CommandLine": "\"C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview-v21-e2e-fresh-0910\\RelayQaHubPreview-v21-e2e-fresh-0910.exe\" --hidden --remote-debugging-port=9433 --user-data-dir=C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-v21-e2e-fresh-0910\\desktop\\profile"
+  },
+  "listeners": [
+    {
+      "port": 4642,
+      "pid": 14216,
+      "address": "127.0.0.1"
+    },
+    {
+      "port": 9433,
+      "pid": 14216,
+      "address": "127.0.0.1"
+    }
+  ],
+  "cdpPageCount": 1,
+  "cdpPageUrls": [
+    "qa-hub-preview-v21-e2e-fresh-0910://app/index.html"
+  ],
+  "mcp": {
+    "status": "ready",
+    "service": "relay-qa-hub-desktop-mcp",
+    "endpoint": "/mcp",
+    "transport": "streamable-http"
+  },
+  "checks": {
+    "processExact": true,
+    "profileExact": true,
+    "cdpArgumentExact": true,
+    "cdpOwnedByMain": true,
+    "mcpOwnedByMain": true,
+    "exactPreviewPage": true,
+    "mcpReady": true
+  },
+  "productionObservation": {
+    "action": "read_only",
+    "touched": false
+  },
+  "passed": true
+}

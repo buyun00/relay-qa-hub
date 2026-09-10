@@ -1,0 +1,60 @@
+{
+  "schemaVersion": 1,
+  "capturedAt": "2026-09-10T15:21:01.6756367Z",
+  "passed": true,
+  "evidenceDirectory": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\docs\\evidence\\project-components\\final-v21-20260910\\continuation-20260910\\postfix-c4e2eb7\\final-runtime\\canonical-relaunch-20260910T152101642Z-82efc9c9-66e9-44e1-8160-7a3af37b4fa2",
+  "canonicalExe": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview-v21-e2e-fresh-0910\\RelayQaHubPreview-v21-e2e-fresh-0910.exe",
+  "profile": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-v21-e2e-fresh-0910\\desktop\\profile",
+  "versions": {
+    "product": "0.2.0-preview.17",
+    "file": "0.2.0.17"
+  },
+  "hashes": {
+    "exe": "58c21fdc87e3b5007df9d30e59a27df67e24516f7c74c61d7fb545d8c54d4f0f",
+    "asar": "ff3b49304c7f98ec754bd42ef9732cd6b58718002b3f4be8ae0ae506e69b7474",
+    "launcher": "843253611e5e8b8e7a19f799b9dfa13b6325939bb6fdd1f17400580ca614ffa7"
+  },
+  "canonicalProcessCount": 0,
+  "profileReferenceCount": 0,
+  "requiredFreePorts": [
+    4642,
+    9433
+  ],
+  "protectedListeners": [
+    {
+      "address": "0.0.0.0",
+      "port": 4174,
+      "pid": 7420
+    },
+    {
+      "address": "0.0.0.0",
+      "port": 4319,
+      "pid": 14044
+    },
+    {
+      "address": "127.0.0.1",
+      "port": 4320,
+      "pid": 17160
+    },
+    {
+      "address": "127.0.0.1",
+      "port": 4639,
+      "pid": 19004
+    },
+    {
+      "address": "127.0.0.1",
+      "port": 4640,
+      "pid": 20452
+    },
+    {
+      "address": "127.0.0.1",
+      "port": 4641,
+      "pid": 19112
+    },
+    {
+      "address": "127.0.0.1",
+      "port": 9333,
+      "pid": 26828
+    }
+  ]
+}

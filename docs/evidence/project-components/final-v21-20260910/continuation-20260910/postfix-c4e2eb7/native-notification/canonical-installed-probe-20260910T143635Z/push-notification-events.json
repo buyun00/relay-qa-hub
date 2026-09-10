@@ -1,0 +1,86 @@
+[
+  {
+    "TimeCreated": "2026-09-10T22:37:26.3990478+08:00",
+    "Id": 2416,
+    "LevelDisplayName": "信息",
+    "ProviderName": "Microsoft-Windows-PushNotifications-Platform",
+    "Message": "已通过应用程序终结点从 com.relayqahub.desktop.preview.v21.e2e.fresh.0910 具有 0 [NotificationId] 的 [AppUserModelId] 收到本地通知。"
+  },
+  {
+    "TimeCreated": "2026-09-10T22:37:26.4015236+08:00",
+    "Id": 2418,
+    "LevelDisplayName": "信息",
+    "ProviderName": "Microsoft-Windows-PushNotifications-Platform",
+    "Message": "本地通知已提交到线程池: com.relayqahub.desktop.preview.v21.e2e.fresh.0910 [AppUserModelId] toast [NotificationType] 5635 [NotificationTrackingId] Local [NotificationSource]。"
+  },
+  {
+    "TimeCreated": "2026-09-10T22:37:26.4028792+08:00",
+    "Id": 3052,
+    "LevelDisplayName": "信息",
+    "ProviderName": "Microsoft-Windows-PushNotifications-Platform",
+    "Message": "已将具有通知跟踪 ID 5635 的 Toast 传送到会话 1 上的 com.relayqahub.desktop.preview.v21.e2e.fresh.0910。"
+  },
+  {
+    "TimeCreated": "2026-09-10T22:37:26.4032069+08:00",
+    "Id": 3153,
+    "LevelDisplayName": "信息",
+    "ProviderName": "Microsoft-Windows-PushNotifications-Platform",
+    "Message": "Toast with notification tracking id 5635 is delivered to com.relayqahub.desktop.preview.v21.e2e.fresh.0910 on session 1."
+  },
+  {
+    "TimeCreated": "2026-09-10T22:42:59.9076752+08:00",
+    "Id": 2416,
+    "LevelDisplayName": "信息",
+    "ProviderName": "Microsoft-Windows-PushNotifications-Platform",
+    "Message": "已通过应用程序终结点从 com.relayqahub.desktop.preview.v21.e2e.fresh.0910 具有 0 [NotificationId] 的 [AppUserModelId] 收到本地通知。"
+  },
+  {
+    "TimeCreated": "2026-09-10T22:42:59.9093044+08:00",
+    "Id": 2418,
+    "LevelDisplayName": "信息",
+    "ProviderName": "Microsoft-Windows-PushNotifications-Platform",
+    "Message": "本地通知已提交到线程池: com.relayqahub.desktop.preview.v21.e2e.fresh.0910 [AppUserModelId] toast [NotificationType] 5636 [NotificationTrackingId] Local [NotificationSource]。"
+  },
+  {
+    "TimeCreated": "2026-09-10T22:42:59.9105565+08:00",
+    "Id": 3052,
+    "LevelDisplayName": "信息",
+    "ProviderName": "Microsoft-Windows-PushNotifications-Platform",
+    "Message": "已将具有通知跟踪 ID 5636 的 Toast 传送到会话 1 上的 com.relayqahub.desktop.preview.v21.e2e.fresh.0910。"
+  },
+  {
+    "TimeCreated": "2026-09-10T22:42:59.9107704+08:00",
+    "Id": 3153,
+    "LevelDisplayName": "信息",
+    "ProviderName": "Microsoft-Windows-PushNotifications-Platform",
+    "Message": "Toast with notification tracking id 5636 is delivered to com.relayqahub.desktop.preview.v21.e2e.fresh.0910 on session 1."
+  },
+  {
+    "TimeCreated": "2026-09-10T22:49:22.5962081+08:00",
+    "Id": 2416,
+    "LevelDisplayName": "信息",
+    "ProviderName": "Microsoft-Windows-PushNotifications-Platform",
+    "Message": "已通过应用程序终结点从 com.relayqahub.desktop.preview.v21.e2e.fresh.0910 具有 0 [NotificationId] 的 [AppUserModelId] 收到本地通知。"
+  },
+  {
+    "TimeCreated": "2026-09-10T22:49:22.5982399+08:00",
+    "Id": 2418,
+    "LevelDisplayName": "信息",
+    "ProviderName": "Microsoft-Windows-PushNotifications-Platform",
+    "Message": "本地通知已提交到线程池: com.relayqahub.desktop.preview.v21.e2e.fresh.0910 [AppUserModelId] toast [NotificationType] 5637 [NotificationTrackingId] Local [NotificationSource]。"
+  },
+  {
+    "TimeCreated": "2026-09-10T22:49:22.5994408+08:00",
+    "Id": 3052,
+    "LevelDisplayName": "信息",
+    "ProviderName": "Microsoft-Windows-PushNotifications-Platform",
+    "Message": "已将具有通知跟踪 ID 5637 的 Toast 传送到会话 1 上的 com.relayqahub.desktop.preview.v21.e2e.fresh.0910。"
+  },
+  {
+    "TimeCreated": "2026-09-10T22:49:22.5996457+08:00",
+    "Id": 3153,
+    "LevelDisplayName": "信息",
+    "ProviderName": "Microsoft-Windows-PushNotifications-Platform",
+    "Message": "Toast with notification tracking id 5637 is delivered to com.relayqahub.desktop.preview.v21.e2e.fresh.0910 on session 1."
+  }
+]

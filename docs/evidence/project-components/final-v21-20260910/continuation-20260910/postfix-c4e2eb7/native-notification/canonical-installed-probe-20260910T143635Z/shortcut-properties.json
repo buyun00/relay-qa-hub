@@ -1,0 +1,16 @@
+[
+  {
+    "path": "C:\\Users\\lin0\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\QA Hub Project Preview (v21-e2e-fresh-0910).lnk",
+    "targetPath": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview-v21-e2e-fresh-0910\\RelayQaHubPreview-v21-e2e-fresh-0910.exe",
+    "modifiedAt": "2026-09-10T14:37:26.5013390Z",
+    "appUserModelId": "com.relayqahub.desktop.preview.v21.e2e.fresh.0910",
+    "toastActivatorClsid": "{AA24A0E7-B4DA-4E0F-B4E2-668C88EB5B8A}"
+  },
+  {
+    "path": "C:\\Users\\lin0\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\QA Hub Project Preview - v21-e2e-fresh-0910\\QA Hub Project Preview - v21-e2e-fresh-0910.lnk",
+    "targetPath": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview-v21-e2e-fresh-0910\\RelayQaHubPreview-v21-e2e-fresh-0910.exe",
+    "modifiedAt": "2026-09-10T14:13:23.1090798Z",
+    "appUserModelId": null,
+    "toastActivatorClsid": null
+  }
+]

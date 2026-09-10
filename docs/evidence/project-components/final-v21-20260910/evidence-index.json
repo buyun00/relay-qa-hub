@@ -1,26 +1,31 @@
 {
-  "schemaVersion": 1,
-  "recordedAt": "2026-09-10T09:25:31.984Z",
+  "schemaVersion": 2,
+  "recordedAt": "2026-09-10T16:24:39.366Z",
   "root": "docs/evidence/project-components/final-v21-20260910",
-  "sourceCommit": "88a6d0f9c31106f6cd3fc9edbadca0db6bf6397b",
-  "files": 258,
-  "totalBytes": 46089633,
-  "aggregateSha256": "f81b338f0af64cbd2a917717f7550700af19d547626c62867b01328cd65b9c11",
+  "sourceCommit": "c4e2eb7d9341a16d2430df9073a93f44f381dd2b",
+  "productSourceCommit": "c4e2eb7d9341a16d2430df9073a93f44f381dd2b",
+  "selection": {
+    "method": "git ls-files",
+    "trackedOnly": true,
+    "excludedPaths": [
+      "evidence-index.json",
+      "final-validation.json"
+    ],
+    "completeTrackedSetVerified": true
+  },
+  "files": 355,
+  "totalBytes": 46862696,
+  "aggregateSha256": "d564eebbcca6f9e697417f563b58b2258c99222ecd0b36c2e668d9cf44e61612",
   "entries": [
     {
       "path": "acceptance-matrix.json",
-      "bytes": 18559,
-      "sha256": "8148deb1d9c8286b05f12248f2576088826b0c1a64ef88c8199a8e89eac6088c"
+      "bytes": 24700,
+      "sha256": "7a33be067ed83507520d4daf5dac99e9ef9be44b9ab229137dfb70c2682edbbd"
     },
     {
       "path": "acceptance-matrix.md",
-      "bytes": 12326,
-      "sha256": "82e2b5e8d2173c9624a0f10859cf02025c907c994434d0b6f8a15ae03deef1f3"
-    },
-    {
-      "path": "android/acceptance/android-code27-self-update/aapt-code27-corrected.log",
-      "bytes": 6159,
-      "sha256": "8407bd7221e8d0aaac957eb545b38f1e6caf63eb1b8a91703d1206b876ed15e6"
+      "bytes": 12853,
+      "sha256": "c80fd45b634530102d6cf9a189daaf605006e29b308d196358c98b38971bdc31"
     },
     {
       "path": "android/acceptance/android-code27-self-update/android-code27-feed-http.json",
@@ -33,19 +38,9 @@
       "sha256": "99b9cbbddf3358cfe49d3be08c51f2327fdccd40793de0b8b128267fea1132d9"
     },
     {
-      "path": "android/acceptance/android-code27-self-update/apksigner-code27-corrected.log",
-      "bytes": 1425,
-      "sha256": "65475181e170a815a2393c2643d025af715f2f5ed50ac20a6996a2ba29298abf"
-    },
-    {
       "path": "android/acceptance/android-code27-self-update/artifact-verification.json",
       "bytes": 2380,
       "sha256": "e23d6d7975b5cc18e93b965bac19249e5ab20624ead3b37d4420146089d5c07b"
-    },
-    {
-      "path": "android/acceptance/android-code27-self-update/assemble-code27-corrected2.log",
-      "bytes": 2749,
-      "sha256": "5aa26a12c9bac47d0e89a6474efc72b1d4959384b64bb306e1150f81b2ee1a32"
     },
     {
       "path": "android/acceptance/android-code27-self-update/lint-results-debug.txt",
@@ -346,16 +341,6 @@
       "path": "android/acceptance/android-code28-self-update/feed-http-verification.json",
       "bytes": 2785,
       "sha256": "837ee7faec114c75a3d8c1f2d8255095e0a7b2530d4f071e264db0ac4b74325c"
-    },
-    {
-      "path": "android/acceptance/android-code28-self-update/gradle-clean-test-lint-assemble.log",
-      "bytes": 4256,
-      "sha256": "e7c67dd0bb89f3037553610cea8632e0d3380a6321dc4c366fe3b989c327920f"
-    },
-    {
-      "path": "android/acceptance/android-code28-self-update/gradle-targeted-update-ui-tests.log",
-      "bytes": 2870,
-      "sha256": "8d3dd4821b3f1a566d52c185d7d058ed81675ff84033e59d3c027e3dcc431a25"
     },
     {
       "path": "android/acceptance/android-code28-self-update/luna-e2e/000-host-timestamp.txt",
@@ -958,19 +943,9 @@
       "sha256": "8ce3b9986b99167107c02c3ba22fa49149ce79e79cb76587c83e19f06daba0dc"
     },
     {
-      "path": "api-runtime-restart/build.log",
-      "bytes": 181,
-      "sha256": "a76dce0f927af26429f554354bdc8ac2ec0e10abcf1fd979a74766cd28ab30d3"
-    },
-    {
       "path": "api-runtime-restart/database-post-restart.json",
       "bytes": 215,
       "sha256": "b8b609e22e632cfed032fefe58cfc12a944ba33103f9e57ce3de6c8385bbd802"
-    },
-    {
-      "path": "api-runtime-restart/manager-start.log",
-      "bytes": 31,
-      "sha256": "5bd89b589c5b443bde696e4f768ef674a9dd8a9c814751557a961d8b8e2bf118"
     },
     {
       "path": "api-runtime-restart/pre-restart-identity.json",
@@ -1028,6 +1003,541 @@
       "sha256": "498313b382f7f0b6a7639d86fcc49182a73405a0a9dcfaa05cd88c2dffc8e234"
     },
     {
+      "path": "continuation-20260910/http-server-local-mcp-attachment-parity.json",
+      "bytes": 11822,
+      "sha256": "2aaf499fdfe3dd04630f94a345a342dd533e1c3196bc1a3940cf90965233bdfb"
+    },
+    {
+      "path": "continuation-20260910/http-server-local-mcp-attachment-parity.mjs",
+      "bytes": 22384,
+      "sha256": "ca24bde76dcf84b2b26402cdf2a2b443fc74304a5d47c44f494b218d4e448256"
+    },
+    {
+      "path": "continuation-20260910/postfix-3634254/windows-build15-package/package-verification.json",
+      "bytes": 1442,
+      "sha256": "24245cf1b43b173ca738f283ea27e2a6f5ffdd8ba7aa73c6120c0daa499b8bed"
+    },
+    {
+      "path": "continuation-20260910/postfix-3634254/windows-build15-upgrade/auto-relaunch.json",
+      "bytes": 6889,
+      "sha256": "50a9c8f16f389cbcc1671223c4be6c206a6ef6b3e46b9d410f4a29865238b6ee"
+    },
+    {
+      "path": "continuation-20260910/postfix-3634254/windows-build15-upgrade/build15-packaged-preload-failure.json",
+      "bytes": 2018,
+      "sha256": "4d2deda838712ebcf38dc0901518251c6908adbeaac41e2aa939b83b7f3b62b7"
+    },
+    {
+      "path": "continuation-20260910/postfix-3634254/windows-build15-upgrade/draft-before.json",
+      "bytes": 415,
+      "sha256": "43cddb1d53101e36ec64951e8fde97f3928f819501339aa8e9992eb9578bb55b"
+    },
+    {
+      "path": "continuation-20260910/postfix-3634254/windows-build15-upgrade/draft-persistence-control.json",
+      "bytes": 1422,
+      "sha256": "82041f749f5b1e601691515121981998b380f9e3038e7f9a8791720c7e9298af"
+    },
+    {
+      "path": "continuation-20260910/postfix-3634254/windows-build15-upgrade/install-request.json",
+      "bytes": 45,
+      "sha256": "4e11fa6450938e00a9d78695e70831671ff0c5085f8c0b45264ec54ada8c5eb3"
+    },
+    {
+      "path": "continuation-20260910/postfix-3634254/windows-build15-upgrade/post-upgrade-ui.json",
+      "bytes": 1540,
+      "sha256": "ca040be8ea8019898909263797f0708a2e29d36557eea033b1c7b7be44f4e69a"
+    },
+    {
+      "path": "continuation-20260910/postfix-3634254/windows-build15-upgrade/pre-upgrade.json",
+      "bytes": 7010,
+      "sha256": "febdd8c093b3c5c8c41ea0299f83cc9770ddb4c0e2350c3a78d0706ece6aa1ac"
+    },
+    {
+      "path": "continuation-20260910/postfix-3634254/windows-build15-upgrade/preload-diagnostic.json",
+      "bytes": 2339,
+      "sha256": "7588e0afecdf29e507a3d325c813223827c62cd7c4292db47d9f62093dcd5d6a"
+    },
+    {
+      "path": "continuation-20260910/postfix-3634254/windows-build15-upgrade/update-ready.json",
+      "bytes": 1736,
+      "sha256": "9a6b25bc5333f7cbf0e692d67436af7b62cc627082a0f4ee1dd130d88667e0c9"
+    },
+    {
+      "path": "continuation-20260910/postfix-8b07042/api-runtime-restart/build-summary.json",
+      "bytes": 1171,
+      "sha256": "6444f48790b8d41f9192b06a76d8e460d323965e9cd3d5e1e72003037d7ab556"
+    },
+    {
+      "path": "continuation-20260910/postfix-8b07042/api-runtime-restart/restart-verification.json",
+      "bytes": 4911,
+      "sha256": "308adc3e244753ea5736f8b7654335a4414ae75543f664104ab8000d8e357baf"
+    },
+    {
+      "path": "continuation-20260910/postfix-bb035c4/api-runtime-restart/build-summary.json",
+      "bytes": 889,
+      "sha256": "537c7de8f4e1b8c810db63ef92d3b3b30a6528544c6e2968705849ef3134247b"
+    },
+    {
+      "path": "continuation-20260910/postfix-bb035c4/api-runtime-restart/generate-build-summary.mjs",
+      "bytes": 3394,
+      "sha256": "bfed27a09e69ef98179dade93b41ed4ef9b5647c4f0a3107c009033e3d4779bb"
+    },
+    {
+      "path": "continuation-20260910/postfix-bb035c4/evidence-manifest.json",
+      "bytes": 7077,
+      "sha256": "38c8cf8352c045d261cd3b32b82e8ba6ca5baa3cc5a477a1f518d5adbad6fcc0"
+    },
+    {
+      "path": "continuation-20260910/postfix-bb035c4/native-notification-prep/canonical-stop.json",
+      "bytes": 1391,
+      "sha256": "32fb3c275d9c02f93f21402c4b77d957dfa6ae55a388639ea064608cf7880a55"
+    },
+    {
+      "path": "continuation-20260910/postfix-bb035c4/notification-content-negotiation/api-restart/96e7fde8-4f71-446e-be40-4bfa5f808be4/after.json",
+      "bytes": 16216,
+      "sha256": "8b9001e1c1ca1399da805b4c9310cabacc561728d766052df422811dc902dd1a"
+    },
+    {
+      "path": "continuation-20260910/postfix-bb035c4/notification-content-negotiation/api-restart/96e7fde8-4f71-446e-be40-4bfa5f808be4/before.json",
+      "bytes": 15855,
+      "sha256": "01e8b70bab9d496f8429800c571a42ce8e6899c240f1f2a017f6591c5a244d6b"
+    },
+    {
+      "path": "continuation-20260910/postfix-bb035c4/notification-content-negotiation/api-restart/capture-api-restart.mjs",
+      "bytes": 9614,
+      "sha256": "e82d0d37c0e87d4fa7127b173e30d576c043133e6c9e7bcddaf22a87e51df387"
+    },
+    {
+      "path": "continuation-20260910/postfix-bb035c4/run/http-server-local-mcp-attachment-parity-postfix.json",
+      "bytes": 11061,
+      "sha256": "9766169aa8e75c0aa3a95f75cfd4d0211f900eb6510f07886c406c3ca3d2faca"
+    },
+    {
+      "path": "continuation-20260910/postfix-bb035c4/windows-build16-package/package-verification.json",
+      "bytes": 3930,
+      "sha256": "61f2498d0f41103d27cd274d11c058697acb21e531b6d263f5fecaf309e3b891"
+    },
+    {
+      "path": "continuation-20260910/postfix-bb035c4/windows-build16-package/prepackage.json",
+      "bytes": 408,
+      "sha256": "67eab8cd73637dd0da2a5ba02b28e80c79615094a2b1a9be586d38fdfcac2ef4"
+    },
+    {
+      "path": "continuation-20260910/postfix-bb035c4/windows-build16-package/previous-windows-latest.json",
+      "bytes": 480,
+      "sha256": "ae6027e51f973669fe652a2733a5f2b46691dd30daf0f86771ca3a8d8739c124"
+    },
+    {
+      "path": "continuation-20260910/postfix-bb035c4/windows-build16-portable-smoke/bridge-mcp.json",
+      "bytes": 2387,
+      "sha256": "d217980372226b8e2ffa4a2d1453816c6106e7f1d20eb48770ca182e90909fba"
+    },
+    {
+      "path": "continuation-20260910/postfix-bb035c4/windows-build16-portable-smoke/prelaunch.json",
+      "bytes": 1442,
+      "sha256": "7819340075266c94cef4b6b0f43bc5d7fe0075ecd2f9384b3fa5b16ace7d2f14"
+    },
+    {
+      "path": "continuation-20260910/postfix-bb035c4/windows-build16-portable-smoke/preload-diagnostic.json",
+      "bytes": 697,
+      "sha256": "17971f30f95a44bb37b1d779b236355ba10e2e07fec3ce3be517199092010169"
+    },
+    {
+      "path": "continuation-20260910/postfix-bb035c4/windows-build16-portable-smoke/preview-instance.package.json",
+      "bytes": 742,
+      "sha256": "dbde6a7d32476ed526bce22af042fd5eab0e7abf1cd4b871513688edc534a71c"
+    },
+    {
+      "path": "continuation-20260910/postfix-bb035c4/windows-build16-portable-smoke/result.json",
+      "bytes": 7328,
+      "sha256": "7d8b2908b7c4a9639715cbe5b44bf9ba8265d4c26d0d312290167a2f5a4aac1a"
+    },
+    {
+      "path": "continuation-20260910/postfix-bb035c4/windows-build16-portable-smoke/snapshot.json",
+      "bytes": 1630,
+      "sha256": "7bf9a22d9761fb168c5e90a6bfcf2fb055f56ea8624ceb8f0a1b73ca679df359"
+    },
+    {
+      "path": "continuation-20260910/postfix-bb035c4/windows-build16-portable-smoke/stopped.json",
+      "bytes": 152,
+      "sha256": "6f65b8679da95147b48ac9926b10695b9f23642a8b58fecc2a304003c24e977b"
+    },
+    {
+      "path": "continuation-20260910/postfix-bb035c4/windows-build16-upgrade/auto-relaunch-initial-owner-sample.json",
+      "bytes": 6128,
+      "sha256": "15cb8427cc2c96843b3f6abbbd8e70b5e473470b8d229bbdd759317a596443dc"
+    },
+    {
+      "path": "continuation-20260910/postfix-bb035c4/windows-build16-upgrade/auto-relaunch-stop.json",
+      "bytes": 1833,
+      "sha256": "0fa6486ef69d7583f6749fc6bc3dad154cc1f72420bbddc26070d547e6dbb8e0"
+    },
+    {
+      "path": "continuation-20260910/postfix-bb035c4/windows-build16-upgrade/auto-relaunch.json",
+      "bytes": 6579,
+      "sha256": "a38c148a56458450b6dc7b3c0478008057e334a7c43832680e7c279c1f6e7128"
+    },
+    {
+      "path": "continuation-20260910/postfix-bb035c4/windows-build16-upgrade/build13-after-restart.json",
+      "bytes": 3736,
+      "sha256": "dbc34fbfa502ba647a789253cba42f7e423d5257e1748d4bc4933a922ae32055"
+    },
+    {
+      "path": "continuation-20260910/postfix-bb035c4/windows-build16-upgrade/build13-before-restart-draft.json",
+      "bytes": 526,
+      "sha256": "989ac9ae936f96125d5231192398d9d4de52736c114e4c249005f936c8f58352"
+    },
+    {
+      "path": "continuation-20260910/postfix-bb035c4/windows-build16-upgrade/build13-before-restart-snapshot.json",
+      "bytes": 2227,
+      "sha256": "7219972e5274d14bca3340ba08b86480113376dbf1ba37337d914c98c705f990"
+    },
+    {
+      "path": "continuation-20260910/postfix-bb035c4/windows-build16-upgrade/build13-restart-stop.json",
+      "bytes": 793,
+      "sha256": "9f5b92c2bef6024f9ef1104f7302b80c82a9da9519cfcf71aab790258efbfd0b"
+    },
+    {
+      "path": "continuation-20260910/postfix-bb035c4/windows-build16-upgrade/build16-before-page-reload-draft.json",
+      "bytes": 413,
+      "sha256": "bef880f02e631be874628ebea63e9bc1601732a3815e3ba138149e02d8f21527"
+    },
+    {
+      "path": "continuation-20260910/postfix-bb035c4/windows-build16-upgrade/build16-before-page-reload-snapshot.json",
+      "bytes": 1696,
+      "sha256": "b961f2c9054e3b35a591f08571b3172f17da0aa07e9fd198b6f792862e9fd966"
+    },
+    {
+      "path": "continuation-20260910/postfix-bb035c4/windows-build16-upgrade/build16-postupgrade-readonly.json",
+      "bytes": 6327,
+      "sha256": "ca4fa9fa695b174b3c69bcb775efc7ab44b2eb373e519e9bf7f431fc10c84e9f"
+    },
+    {
+      "path": "continuation-20260910/postfix-bb035c4/windows-build16-upgrade/build16-postupgrade-readonly.mjs",
+      "bytes": 9293,
+      "sha256": "09f5908e21c8d6064e73e3fbb4a134565d61ef4d2b7a7f9de2d723f76fd73d76"
+    },
+    {
+      "path": "continuation-20260910/postfix-bb035c4/windows-build16-upgrade/cold-profile-after-downgrade.json",
+      "bytes": 20948,
+      "sha256": "2d654187df909ab27e840b7e2e6bbe8ece61cf19612c0a1b998f2b584b87e32f"
+    },
+    {
+      "path": "continuation-20260910/postfix-bb035c4/windows-build16-upgrade/cold-profile-before-downgrade.json",
+      "bytes": 21446,
+      "sha256": "20f5916a9d00d8949a1c93ff7294367a376db016024ad18e4e163813eeb61931"
+    },
+    {
+      "path": "continuation-20260910/postfix-bb035c4/windows-build16-upgrade/controlled-relaunch.json",
+      "bytes": 5533,
+      "sha256": "b4c732b23f472d21df232650dcdf2d8834543471b97db0b8858611c340f51f28"
+    },
+    {
+      "path": "continuation-20260910/postfix-bb035c4/windows-build16-upgrade/downgrade-installer-process.json",
+      "bytes": 324,
+      "sha256": "2986780a217170b70de2c9ce2bc14a6df93f1804102d78ea05358aa4659c910a"
+    },
+    {
+      "path": "continuation-20260910/postfix-bb035c4/windows-build16-upgrade/downgrade-to-13.json",
+      "bytes": 2301,
+      "sha256": "9fd0f8d311213d1ee2dac02b779cb2723c0e0090f424bde554a7b063611fb0a6"
+    },
+    {
+      "path": "continuation-20260910/postfix-bb035c4/windows-build16-upgrade/draft-records-build13.json",
+      "bytes": 5867,
+      "sha256": "faf9d2dcc59f64dd13da0445848b4e99329132e02ac156bdd6bd79936c369c99"
+    },
+    {
+      "path": "continuation-20260910/postfix-bb035c4/windows-build16-upgrade/install-request.json",
+      "bytes": 45,
+      "sha256": "4e11fa6450938e00a9d78695e70831671ff0c5085f8c0b45264ec54ada8c5eb3"
+    },
+    {
+      "path": "continuation-20260910/postfix-bb035c4/windows-build16-upgrade/pre-downgrade-draft.json",
+      "bytes": 270,
+      "sha256": "5d4a625af91e9b49e324807efe8886f7c8247afe7bff895948df53181f8495d8"
+    },
+    {
+      "path": "continuation-20260910/postfix-bb035c4/windows-build16-upgrade/pre-downgrade.json",
+      "bytes": 9178,
+      "sha256": "1b23d9857c7eaba30eeb5e97fcffab9cb143637ee9cf81fbb47352d821c8e0e1"
+    },
+    {
+      "path": "continuation-20260910/postfix-bb035c4/windows-build16-upgrade/update-ready.json",
+      "bytes": 2236,
+      "sha256": "85bdc6ad9a73f41841f18afa0970492e66330dabf14fc805a74e168ae0fc2b48"
+    },
+    {
+      "path": "continuation-20260910/postfix-bb035c4/windows-build16-upgrade/updater-directories-before.json",
+      "bytes": 390,
+      "sha256": "a80247ca4883d18136eee2111966f837cebae5364f98fd14e63810e3c05afdc8"
+    },
+    {
+      "path": "continuation-20260910/postfix-c4e2eb7/final-runtime/canonical-relaunch-20260910T152101642Z-82efc9c9-66e9-44e1-8160-7a3af37b4fa2/00-preflight.json",
+      "bytes": 1723,
+      "sha256": "985be2ee968b92d6ce99cec14a56eebd1662ebc0ab1026321e0f8db19759a392"
+    },
+    {
+      "path": "continuation-20260910/postfix-c4e2eb7/final-runtime/canonical-relaunch-20260910T152101642Z-82efc9c9-66e9-44e1-8160-7a3af37b4fa2/01-before.json",
+      "bytes": 14700,
+      "sha256": "418bd351168319a8f17fa5356e09139f2c47f941199c3a266031c43bc8646bd0"
+    },
+    {
+      "path": "continuation-20260910/postfix-c4e2eb7/final-runtime/canonical-relaunch-20260910T152101642Z-82efc9c9-66e9-44e1-8160-7a3af37b4fa2/02-launch.json",
+      "bytes": 1456,
+      "sha256": "2023b42d66e298655338156ce78fa16240af5a4ed4a94cf3252e732493ecc758"
+    },
+    {
+      "path": "continuation-20260910/postfix-c4e2eb7/final-runtime/canonical-relaunch-20260910T152101642Z-82efc9c9-66e9-44e1-8160-7a3af37b4fa2/03-cdp-snapshot.json",
+      "bytes": 1683,
+      "sha256": "049de9b0a83a22c7c15c39193f3ce41ca89c4cbf80431410bd108cbce383ea70"
+    },
+    {
+      "path": "continuation-20260910/postfix-c4e2eb7/final-runtime/canonical-relaunch-20260910T152101642Z-82efc9c9-66e9-44e1-8160-7a3af37b4fa2/04-inspect-installed-readonly.json",
+      "bytes": 6571,
+      "sha256": "84ff0864ccb320e51ffdd16224830c934db559c66152fcd0dec37d6d1b1e36eb"
+    },
+    {
+      "path": "continuation-20260910/postfix-c4e2eb7/final-runtime/canonical-relaunch-20260910T152101642Z-82efc9c9-66e9-44e1-8160-7a3af37b4fa2/05-mcp-initialize.json",
+      "bytes": 1321,
+      "sha256": "a35fe86806ed72d39608bffc74e2f2448fb0dfbea0dd7fdb2f9a1eac84396151"
+    },
+    {
+      "path": "continuation-20260910/postfix-c4e2eb7/final-runtime/canonical-relaunch-20260910T152101642Z-82efc9c9-66e9-44e1-8160-7a3af37b4fa2/06-after.json",
+      "bytes": 20488,
+      "sha256": "7284f885f3eb252565f69b116f76d14666c51d0dcb0f655261f210da273b0447"
+    },
+    {
+      "path": "continuation-20260910/postfix-c4e2eb7/final-runtime/canonical-relaunch-20260910T152101642Z-82efc9c9-66e9-44e1-8160-7a3af37b4fa2/07-final-runtime-verification.json",
+      "bytes": 2924,
+      "sha256": "59355443e74c281386fc20ba20692679db8b9cf6a76eee86a8c4836a24dabab0"
+    },
+    {
+      "path": "continuation-20260910/postfix-c4e2eb7/final-runtime/canonical-relaunch-20260910T152101642Z-82efc9c9-66e9-44e1-8160-7a3af37b4fa2/launch-installed.ps1",
+      "bytes": 3341,
+      "sha256": "843253611e5e8b8e7a19f799b9dfa13b6325939bb6fdd1f17400580ca614ffa7"
+    },
+    {
+      "path": "continuation-20260910/postfix-c4e2eb7/native-notification/canonical-installed-probe-20260910T143635Z/capture-diagnostic.ps1",
+      "bytes": 5722,
+      "sha256": "8179446d54551bf2bd3efbbe4d89d1b9d6693a123ba303d21fdc5827db967be5"
+    },
+    {
+      "path": "continuation-20260910/postfix-c4e2eb7/native-notification/canonical-installed-probe-20260910T143635Z/diagnostic-summary.json",
+      "bytes": 1760,
+      "sha256": "693499bdfe7a2d3164f0ef89e6a6d18c309a120a2af11905379c99ebdb8cb9ba"
+    },
+    {
+      "path": "continuation-20260910/postfix-c4e2eb7/native-notification/canonical-installed-probe-20260910T143635Z/fuzzy-observation-2.json",
+      "bytes": 190,
+      "sha256": "259919c35d53f6cfc342aae178741de163028af56689449b9d1d0179937f652f"
+    },
+    {
+      "path": "continuation-20260910/postfix-c4e2eb7/native-notification/canonical-installed-probe-20260910T143635Z/fuzzy-observation.json",
+      "bytes": 76470,
+      "sha256": "14dc9a63cba4fa313a3c363509ed4bfb95b30cf15d2683cde520e98c004f8884"
+    },
+    {
+      "path": "continuation-20260910/postfix-c4e2eb7/native-notification/canonical-installed-probe-20260910T143635Z/fuzzy-stdout-2.json",
+      "bytes": 190,
+      "sha256": "259919c35d53f6cfc342aae178741de163028af56689449b9d1d0179937f652f"
+    },
+    {
+      "path": "continuation-20260910/postfix-c4e2eb7/native-notification/canonical-installed-probe-20260910T143635Z/fuzzy-stdout.json",
+      "bytes": 76470,
+      "sha256": "14dc9a63cba4fa313a3c363509ed4bfb95b30cf15d2683cde520e98c004f8884"
+    },
+    {
+      "path": "continuation-20260910/postfix-c4e2eb7/native-notification/canonical-installed-probe-20260910T143635Z/inspect-notification-settings.ps1",
+      "bytes": 2919,
+      "sha256": "2940b130623b3fdcd8ab2caec112fe6b9d5aa1a1a93f6043f64de9b45480cef1"
+    },
+    {
+      "path": "continuation-20260910/postfix-c4e2eb7/native-notification/canonical-installed-probe-20260910T143635Z/notification-registry.json",
+      "bytes": 498,
+      "sha256": "eb1e4551b03f943b6f7f41a92869c3cbc4ebcb7894029132055454393c8556c1"
+    },
+    {
+      "path": "continuation-20260910/postfix-c4e2eb7/native-notification/canonical-installed-probe-20260910T143635Z/notification-settings-uia.json",
+      "bytes": 11981,
+      "sha256": "539b284702f15abf41129f0945c84959eae3cd5478be7dbe076be236e6f91c1b"
+    },
+    {
+      "path": "continuation-20260910/postfix-c4e2eb7/native-notification/canonical-installed-probe-20260910T143635Z/push-notification-events.json",
+      "bytes": 4235,
+      "sha256": "8dda4cfcd4a4d1fd859debb04105efc528a263b5391b6e24b13cfc96d8607b4a"
+    },
+    {
+      "path": "continuation-20260910/postfix-c4e2eb7/native-notification/canonical-installed-probe-20260910T143635Z/shortcut-properties.json",
+      "bytes": 951,
+      "sha256": "94cd5467a369762324223db130ecaa93a419eb4a0a13fa806ed305847ff72f21"
+    },
+    {
+      "path": "continuation-20260910/postfix-c4e2eb7/native-notification/canonical-installed-probe-20260910T143635Z/toast-fuzzy-uia.ps1",
+      "bytes": 2629,
+      "sha256": "b329354692fd5cb43eaa4600a633e2c6ca075b67db82cb25223b3a065b8d233b"
+    },
+    {
+      "path": "continuation-20260910/postfix-c4e2eb7/native-notification/canonical-installed-probe-20260910T143635Z/toast-input-3.json",
+      "bytes": 701,
+      "sha256": "6ca2190bffa8308d46174ad71d19a2948d919367f2e27129d837bedd13f55c58"
+    },
+    {
+      "path": "continuation-20260910/postfix-c4e2eb7/native-notification/canonical-installed-probe-20260910T143635Z/toast-input.json",
+      "bytes": 697,
+      "sha256": "ec7b50e660f9fe68549d12c6ae21eb557f670c5e41d0dff67d4c6347674bd841"
+    },
+    {
+      "path": "continuation-20260910/postfix-c4e2eb7/native-notification/canonical-installed-probe-20260910T143635Z/toast-uia.ps1",
+      "bytes": 3228,
+      "sha256": "5f13eebc0ff8755baaa5a7cdc27d1c48ca003f34b32b0dce17b2e3d9e48b561c"
+    },
+    {
+      "path": "continuation-20260910/postfix-c4e2eb7/native-notification/canonical-installed-probe-20260910T143635Z/windows-session.json",
+      "bytes": 5786,
+      "sha256": "3fbc498e187d27a52285d91da951be679c64934ae201a4d82f61b2b58ce6ae61"
+    },
+    {
+      "path": "continuation-20260910/postfix-c4e2eb7/native-notification/failed-run-1f89-notification-center.json",
+      "bytes": 436,
+      "sha256": "127eeddd5143f8e900a79834972e2bc4aa325e0dddfe45e34ce478d95ee0405b"
+    },
+    {
+      "path": "continuation-20260910/postfix-c4e2eb7/native-notification/inspect-notification-center.ps1",
+      "bytes": 2243,
+      "sha256": "ed65099a6f1e61ca56ff1bc201e83885f8fca2cc80a99c5a4fb465ce0ba7ba61"
+    },
+    {
+      "path": "continuation-20260910/postfix-c4e2eb7/native-notification/session-routing-analysis.json",
+      "bytes": 1119,
+      "sha256": "bacdf61df148d2f064eb65cc723f10d7ad6a8b24a08832bfb807b737d7c46d5c"
+    },
+    {
+      "path": "continuation-20260910/postfix-c4e2eb7/native-notification/session-routing-event-5638.json",
+      "bytes": 657,
+      "sha256": "a00d17b6580726bf5190ee4ef78f7b4af91466fb5347db37d5b7a535f2aa8f63"
+    },
+    {
+      "path": "continuation-20260910/postfix-c4e2eb7/windows-build17-package/package-verification.json",
+      "bytes": 36399,
+      "sha256": "6863d47e2d07a5532268882a6d3fd91293b588dc6e3e5ad4c78b17ebac1b3aa1"
+    },
+    {
+      "path": "continuation-20260910/postfix-c4e2eb7/windows-build17-package/prepackage.json",
+      "bytes": 1221,
+      "sha256": "5ce8718bd033583320a5f11453f8792641b846a4dea00568f3b1d3575a478e8c"
+    },
+    {
+      "path": "continuation-20260910/postfix-c4e2eb7/windows-build17-package/previous-windows-latest.json",
+      "bytes": 480,
+      "sha256": "8260e453a04f832d33321af3eeb642894436bef4d2bd7b161fb1fad0159f83a1"
+    },
+    {
+      "path": "continuation-20260910/postfix-c4e2eb7/windows-build17-package/verify-package.mjs",
+      "bytes": 8450,
+      "sha256": "2eaa0c53e9dafb1bd897b3f5a501d864151e359f4cf0c0fd3902fb7fd268d023"
+    },
+    {
+      "path": "continuation-20260910/postfix-c4e2eb7/windows-build17-upgrade/after-auto-relaunch.json",
+      "bytes": 20750,
+      "sha256": "f1db9828b7be07f7f9b2c0565d213d6be60a343045c8c536247071eb4f911c09"
+    },
+    {
+      "path": "continuation-20260910/postfix-c4e2eb7/windows-build17-upgrade/after-controlled-relaunch.json",
+      "bytes": 20471,
+      "sha256": "0b95c325848eb1c091c04ba1e21cccc90c1f2b4c08c00f639897a9af99e6528f"
+    },
+    {
+      "path": "continuation-20260910/postfix-c4e2eb7/windows-build17-upgrade/auto-relaunch-stop.json",
+      "bytes": 8015,
+      "sha256": "ef3449c8900710446eb5438d0bb64e20e76fc52d1a9016ea7ea3de1b766737b0"
+    },
+    {
+      "path": "continuation-20260910/postfix-c4e2eb7/windows-build17-upgrade/auto-relaunch-verification.json",
+      "bytes": 5881,
+      "sha256": "36550e32a7d064966beb65a70f32a403dc703e54a11bb084037bbf85307aedd4"
+    },
+    {
+      "path": "continuation-20260910/postfix-c4e2eb7/windows-build17-upgrade/before-launch.json",
+      "bytes": 13268,
+      "sha256": "174a595a5895716dbaa110622b92a674fa29cdfa80f074fd37419324775e4cda"
+    },
+    {
+      "path": "continuation-20260910/postfix-c4e2eb7/windows-build17-upgrade/capture-upgrade-state.ps1",
+      "bytes": 5489,
+      "sha256": "d129d0d6f3d682c0fd2f08f444dbe60035ad5ce338fab7a58903f03b47d54813"
+    },
+    {
+      "path": "continuation-20260910/postfix-c4e2eb7/windows-build17-upgrade/controlled-relaunch-17.json",
+      "bytes": 1455,
+      "sha256": "6e304bb8d721c0744008d1d1cf54b7aba0417a75b62d1347b9b7dfae8bdd5641"
+    },
+    {
+      "path": "continuation-20260910/postfix-c4e2eb7/windows-build17-upgrade/controlled-relaunch-stop-before-native-runner.json",
+      "bytes": 7730,
+      "sha256": "c310363f61f8ad29dfc33a146483821698e3e877b50672115132123a6c868537"
+    },
+    {
+      "path": "continuation-20260910/postfix-c4e2eb7/windows-build17-upgrade/desktop-cdp-smoke-preview-9433.mjs",
+      "bytes": 31354,
+      "sha256": "6b9b86a75703b2baa6f2ab0c64112e4d0900f133fe320328c5deb0f2699bc11a"
+    },
+    {
+      "path": "continuation-20260910/postfix-c4e2eb7/windows-build17-upgrade/inspect-installed-readonly.mjs",
+      "bytes": 10466,
+      "sha256": "4a9c4f278110e3133afea87a21199fa5a663a3785fc68e19c72f6c378a62d579"
+    },
+    {
+      "path": "continuation-20260910/postfix-c4e2eb7/windows-build17-upgrade/install-request.json",
+      "bytes": 45,
+      "sha256": "4e11fa6450938e00a9d78695e70831671ff0c5085f8c0b45264ec54ada8c5eb3"
+    },
+    {
+      "path": "continuation-20260910/postfix-c4e2eb7/windows-build17-upgrade/launch-16.json",
+      "bytes": 1456,
+      "sha256": "f1ac70583b7f9517da1880baa78baff6abc8aeadfe6d43b5e72d8e4dc666850b"
+    },
+    {
+      "path": "continuation-20260910/postfix-c4e2eb7/windows-build17-upgrade/launch-installed.ps1",
+      "bytes": 3341,
+      "sha256": "843253611e5e8b8e7a19f799b9dfa13b6325939bb6fdd1f17400580ca614ffa7"
+    },
+    {
+      "path": "continuation-20260910/postfix-c4e2eb7/windows-build17-upgrade/native-probe-launch.json",
+      "bytes": 1456,
+      "sha256": "e954027a5d6a45f85d7ff348450b0c85c12c1a57e2372162a0453ae49a009aba"
+    },
+    {
+      "path": "continuation-20260910/postfix-c4e2eb7/windows-build17-upgrade/native-probe-stop.json",
+      "bytes": 7731,
+      "sha256": "ba0e3fb1fca748c2b35a33c67272073de96b87e2cae6424eebdf5015eaeda683"
+    },
+    {
+      "path": "continuation-20260910/postfix-c4e2eb7/windows-build17-upgrade/post-upgrade-readonly.json",
+      "bytes": 6571,
+      "sha256": "42a3490be767a20df77d03009f8d5b446d69347787ade76f8b7bcd0c7a839f3e"
+    },
+    {
+      "path": "continuation-20260910/postfix-c4e2eb7/windows-build17-upgrade/pre-upgrade-readonly.json",
+      "bytes": 6687,
+      "sha256": "1679251265994dba6724f5be258700704ff5fa90bac36d86a8e965fe3fda9100"
+    },
+    {
+      "path": "continuation-20260910/postfix-c4e2eb7/windows-build17-upgrade/stop-exact-preview.ps1",
+      "bytes": 4087,
+      "sha256": "224c23876890b901fc776b9c3a841563b1db33334eb1f0e1df196418dc075b68"
+    },
+    {
+      "path": "continuation-20260910/postfix-c4e2eb7/windows-build17-upgrade/update-ready.json",
+      "bytes": 1736,
+      "sha256": "5c8ca523052aeb5d38d69c9128905d9d346913af1404c08893aa2bab06ceff43"
+    },
+    {
+      "path": "continuation-20260910/postfix-c4e2eb7/windows-build17-upgrade/verify-auto-relaunch.ps1",
+      "bytes": 7972,
+      "sha256": "6abff27ecff8b8d1c5ad94f055b2e956ef56cbf84e6669fa9388b04d10b79c89"
+    },
+    {
       "path": "continuation-20260910/verify-artifact-source-equivalence.mjs",
       "bytes": 2441,
       "sha256": "4c80f5e9c6181a360518fad5a255fb2115cd290d20eeceac75bf5b88b900deb0"
@@ -1043,6 +1553,16 @@
       "sha256": "efb9bd4cbaaa3a8ad2b2029451a9a46a039113e4223190be29764e79f26a586a"
     },
     {
+      "path": "continuation-20260910/windows-build14-upgrade/build14-failed-upgrade.json",
+      "bytes": 2260,
+      "sha256": "e0bcfa4ac8132bf93df6a15af5e6311a27a463811a7b5873f51252be0252065c"
+    },
+    {
+      "path": "continuation-20260910/windows-build14-upgrade/pre-upgrade.json",
+      "bytes": 4516,
+      "sha256": "ad83e700279fbb5f7a57fc1acace3975b40d38a1295c55bfd157f5c784b0b24e"
+    },
+    {
       "path": "external/audit.json",
       "bytes": 2333,
       "sha256": "02a90bbc9e4feba11c5b8457a583c368054c3f6b014924286263292b8a40b346"
@@ -1053,14 +1573,9 @@
       "sha256": "b5780833682bc955db00265d8150fb6309d4a7ad348833a4009872556c5f8a4e"
     },
     {
-      "path": "final-validation.json",
-      "bytes": 659,
-      "sha256": "afdad419e6faa4f43993e8b5270f872efa25f5cf1706c0b174761697b7654465"
-    },
-    {
       "path": "generate-evidence-index.mjs",
-      "bytes": 2262,
-      "sha256": "9e5508d70dd7410761e2c5acee36577b1fa9d5d7a0de771172545ed5910bf9a9"
+      "bytes": 4849,
+      "sha256": "7a9317f0c054a992f4f7a81035e48355780c38b1bc4cfda1ae441709babda203"
     },
     {
       "path": "live-http-db-receipt.json",
@@ -1099,23 +1614,18 @@
     },
     {
       "path": "scan-evidence-secrets.mjs",
-      "bytes": 3045,
-      "sha256": "7ab64a17d09e0ad060f9272b865b3b2d030e03af213234461ec5f5e093062000"
+      "bytes": 11285,
+      "sha256": "7e4625b2470853f05e249e4d8b8b8bbb61eeff199e6da52b90ac1e1242adb8f6"
     },
     {
       "path": "secret-scan.json",
-      "bytes": 404,
-      "sha256": "a7475e861c250533520021fb95f2546c97e74e189d973daa88e9cd9eb227f2a5"
+      "bytes": 1273,
+      "sha256": "672b9284fcc3f33f6212907328792d9299e606a7f92ef515a064e81056a47fff"
     },
     {
       "path": "source-gate/02-project-components-tests.result.json",
       "bytes": 1994,
       "sha256": "42c469c37874d321efc5e2421d67037eadbfbd86306cb7ac02897b739d14de99"
-    },
-    {
-      "path": "source-gate/02-project-components-tests.stdout.log",
-      "bytes": 15440,
-      "sha256": "f182f9040c22f2a8ae5572c268c2563b7b6671f367089d0dc774522b5799b23c"
     },
     {
       "path": "source-gate/corr-30-test-api-mjs.result.json",
@@ -1128,11 +1638,6 @@
       "sha256": "410ed2841b1cb5dd2339dc3c1b7e64c5500d4cc4f9ffc1540b793366d530b9b4"
     },
     {
-      "path": "source-gate/corr-32b-test-web-isolated-env.stdout.log",
-      "bytes": 249,
-      "sha256": "5f43bf36523c18f1aa9a578dfab138bec476b454c6aeb70a29bc8cf4bb119ffa"
-    },
-    {
       "path": "source-gate/corr-38-git-diff-check.result.json",
       "bytes": 372,
       "sha256": "4a1497f0d16d0f022965c615317cbcdce1224fe38106d4e787c4ed33d89e9d9a"
@@ -1141,16 +1646,6 @@
       "path": "source-gate/corr2-37-android-final.result.json",
       "bytes": 445,
       "sha256": "5e2ca1f8934503d8352b6e322b2f74f481cddccae54a919df39342ccda45109d"
-    },
-    {
-      "path": "source-gate/corr2-37-android-final.stderr.log",
-      "bytes": 251,
-      "sha256": "7947f20a02b8249ee4ac57e08b051987df95393d087248b86ba68192263b665b"
-    },
-    {
-      "path": "source-gate/corr2-37-android-final.stdout.log",
-      "bytes": 3589,
-      "sha256": "96d72c0431b65a8e20500527ec6b81e560bd92e339a9cec1a885877f3d0d66f3"
     },
     {
       "path": "source-gate/final-summary.json",
@@ -1194,8 +1689,8 @@
     },
     {
       "path": "update-acceptance-matrix.mjs",
-      "bytes": 16455,
-      "sha256": "625981ab99d463e9c5550775ffce3374513e14d74813d0aeabb529b2da094f1b"
+      "bytes": 44527,
+      "sha256": "f2d7998d0e847c6f2832dbc945eabe5f01ab1eed8fa780ce23c8cb26ef94644e"
     },
     {
       "path": "user-self-test-handoff.md",
@@ -1204,8 +1699,8 @@
     },
     {
       "path": "validate-final-evidence.mjs",
-      "bytes": 5396,
-      "sha256": "e93cf4c9c48e9871ea287acb0056686bc2c283a08eaa04179fd82e15c9f52cb6"
+      "bytes": 39580,
+      "sha256": "ce2bcff2a05d1b5ffe95c722c8163d6a89ccf4ad23adf855118632126b5d0e28"
     },
     {
       "path": "verify-live-http-db-receipt.mjs",

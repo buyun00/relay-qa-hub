@@ -245,6 +245,13 @@ export function notificationProjectKey(compactRunId, suffix) {
   return `N${compactRunId.slice(0, 10).toUpperCase()}${suffix}`;
 }
 
+export function liveRequestAccept(pathname) {
+  const parsed = new URL(pathname, "http://local.invalid");
+  return parsed.pathname === "/api/v1/notifications"
+    ? "application/json"
+    : "application/vnd.relay-qa-hub.v1.1+json";
+}
+
 function writeExclusive(file, value) {
   fs.mkdirSync(path.dirname(file), { recursive: true });
   fs.writeFileSync(
@@ -254,19 +261,6 @@ function writeExclusive(file, value) {
       flag: "wx",
     },
   );
-}
-
-function copyTreeExclusive(from, to) {
-  const stat = fs.lstatSync(from);
-  assert.ok(!stat.isSymbolicLink(), "PACKAGE_LINK_REFUSED");
-  if (stat.isDirectory()) {
-    fs.mkdirSync(to);
-    for (const name of fs.readdirSync(from))
-      copyTreeExclusive(path.join(from, name), path.join(to, name));
-    return;
-  }
-  assert.ok(stat.isFile(), "PACKAGE_SPECIAL_FILE_REFUSED");
-  fs.copyFileSync(from, to, fs.constants.COPYFILE_EXCL);
 }
 
 async function freePort(forbidden) {
@@ -389,9 +383,8 @@ function sanitizeHostSnapshot(value, secrets) {
   };
 }
 
-function foreignFingerprint(snapshot, ownedRoot) {
+export function relayProcessFingerprint(snapshot) {
   return snapshot.processes
-    .filter((item) => !item.path || !containedBy(ownedRoot, item.path))
     .map(({ pid, parentPid, name, path: exe, startedAt, commandLineSha256 }) => ({
       pid,
       parentPid,
@@ -658,6 +651,8 @@ async function runLive(scope) {
       foreignProcessesAreNeverSignaled: true,
       noForceKillFallback: true,
       fixturesAreRetained: true,
+      installedCanonicalRunsDirectly: true,
+      isolatedProfileAndPreviewConfig: true,
     },
   };
   const check = (label, actual, expected = true) => {
@@ -676,17 +671,11 @@ async function runLive(scope) {
   };
   const ports = await allocatePorts(scope.instance);
   proof.ports = ports;
-  const packageCopy = path.join(experiment, "installed-copy");
-  const copiedExe = path.join(packageCopy, path.basename(scope.executablePath));
+  const criticalBefore = criticalFiles(scope);
+  proof.inputFingerprints = criticalBefore;
   writeExclusive(path.join(experiment, "host-snapshot.ps1"), HOST_SNAPSHOT_PS);
   writeExclusive(path.join(experiment, "toast-uia.ps1"), TOAST_UIA_PS);
-  copyTreeExclusive(scope.installedRoot, packageCopy);
-  check("copied EXE hash", fileSha256(copiedExe), fileSha256(scope.executablePath));
-  check(
-    "copied ASAR hash",
-    fileSha256(path.join(packageCopy, "resources", "app.asar")),
-    fileSha256(scope.asarPath),
-  );
+  check("canonical inputs unchanged before preparation", criticalFiles(scope), criticalBefore);
   const configFor = (name) => {
     const profileDirectory = path.join(experiment, "profiles", scope.instance.instanceId, name);
     return {
@@ -737,13 +726,18 @@ async function runLive(scope) {
     writeExclusive(path.join(evidence, "raw", `host-${phase}.json`), value);
     return value;
   };
-  const criticalBefore = criticalFiles(scope);
   let hostBefore;
   let child = null;
   let mainInspector = null;
   let renderer = null;
   let processEvents = [];
+  let activeLaunch = null;
   const launch = async (phase, config) => {
+    check(
+      `${phase} canonical inputs unchanged before launch`,
+      criticalFiles(scope),
+      criticalBefore,
+    );
     const stdoutFile = path.join(experiment, `${phase}-stdout.ndjson`);
     const stderrFile = path.join(experiment, `${phase}-stderr.txt`);
     const stdout = fs.createWriteStream(stdoutFile, { flags: "wx" });
@@ -757,7 +751,7 @@ async function runLive(scope) {
     );
     env.QA_HUB_PREVIEW_DESKTOP_CONFIG = config.file;
     child = spawn(
-      copiedExe,
+      scope.executablePath,
       [
         `--inspect=${ports.inspector}`,
         "--remote-debugging-address=127.0.0.1",
@@ -765,8 +759,9 @@ async function runLive(scope) {
         `--user-data-dir=${config.profileDirectory}`,
         "--hidden",
       ],
-      { cwd: packageCopy, env, windowsHide: true, stdio: ["ignore", "pipe", "pipe"] },
+      { cwd: scope.installedRoot, env, windowsHide: true, stdio: ["ignore", "pipe", "pipe"] },
     );
+    activeLaunch = { phase, config, pid: child.pid };
     child.stdout.on("data", (chunk) => {
       const safe = redactEvidence(String(chunk), knownSecrets);
       stdout.write(safe);
@@ -789,7 +784,7 @@ async function runLive(scope) {
     proof.processes.push({
       phase: `${phase}_launch`,
       pid: child.pid,
-      executable: copiedExe,
+      executable: scope.executablePath,
       profile: config.profileDirectory,
       at: new Date().toISOString(),
     });
@@ -819,7 +814,11 @@ async function runLive(scope) {
       `(()=>{const app=${electron}.app;setTimeout(()=>app.quit(),600000).unref();return {pid:process.pid,exe:process.execPath,profile:app.getPath('userData'),ready:app.isReady(),version:app.getVersion()}})()`,
     );
     check(`${phase} exact PID`, metadata.pid, child.pid);
-    check(`${phase} exact copied EXE`, path.resolve(metadata.exe), path.resolve(copiedExe));
+    check(
+      `${phase} exact installed canonical EXE`,
+      path.resolve(metadata.exe),
+      path.resolve(scope.executablePath),
+    );
     check(
       `${phase} exact isolated profile`,
       path.resolve(metadata.profile),
@@ -876,28 +875,88 @@ async function runLive(scope) {
     });
     return metadata;
   };
+  const reconnectMainInspectorForCleanup = async () => {
+    assert.ok(child && activeLaunch, "CLEANUP_CHILD_METADATA_UNAVAILABLE");
+    let target;
+    for (let attempt = 0; attempt < 40; attempt += 1) {
+      if (child.exitCode !== null) return null;
+      try {
+        const response = await fetch(`http://127.0.0.1:${ports.inspector}/json/list`, {
+          signal: AbortSignal.timeout(500),
+        });
+        if (response.ok) {
+          const items = await response.json();
+          target = items[0];
+          if (target?.webSocketDebuggerUrl) break;
+        }
+      } catch {
+        /* bounded safe cleanup reconnect */
+      }
+      await delay(100);
+    }
+    if (!target?.webSocketDebuggerUrl) return null;
+    let candidate;
+    try {
+      candidate = await CdpClient.connect(target.webSocketDebuggerUrl, ports.inspector);
+      await candidate.call("Runtime.enable");
+      const electron =
+        "process.getBuiltinModule('module').createRequire(process.execPath)('electron')";
+      const metadata = await candidate.evaluate(
+        `(()=>{const app=${electron}.app;return {pid:process.pid,exe:process.execPath,profile:app.getPath('userData')}})()`,
+      );
+      assert.equal(metadata.pid, child.pid, "CLEANUP_PID_MISMATCH");
+      assert.equal(
+        path.resolve(metadata.exe),
+        path.resolve(scope.executablePath),
+        "CLEANUP_EXE_MISMATCH",
+      );
+      assert.equal(
+        path.resolve(metadata.profile),
+        path.resolve(activeLaunch.config.profileDirectory),
+        "CLEANUP_PROFILE_MISMATCH",
+      );
+      proof.processes.push({
+        phase: `${activeLaunch.phase}_cleanup_reconnect`,
+        pid: metadata.pid,
+        executable: metadata.exe,
+        profile: metadata.profile,
+        at: new Date().toISOString(),
+      });
+      return candidate;
+    } catch (error) {
+      candidate?.close();
+      throw error;
+    }
+  };
   const stopOwn = async (phase) => {
     assert.ok(child && mainInspector, `${phase}_NO_GRACEFUL_CHANNEL`);
+    const stoppingChild = child;
+    const stoppingInspector = mainInspector;
     const electron =
       "process.getBuiltinModule('module').createRequire(process.execPath)('electron')";
-    const ack = await mainInspector.evaluate(
+    const ack = await stoppingInspector.evaluate(
       `(()=>{const app=${electron}.app;setTimeout(()=>app.quit(),50);return 'OWN_APP_QUIT_SCHEDULED'})()`,
     );
     check(`${phase} graceful quit acknowledged`, ack, "OWN_APP_QUIT_SCHEDULED");
     renderer?.close();
     renderer = null;
-    mainInspector.close();
-    mainInspector = null;
-    for (let attempt = 0; attempt < 150 && child.exitCode === null; attempt += 1) await delay(100);
-    check(`${phase} exact child exited`, child.exitCode !== null, true);
-    check(`${phase} exit code`, child.exitCode, 0);
+    // Node's inspector intentionally keeps the Electron main process alive until
+    // every debugger detaches. Disconnect after the verified app.quit request;
+    // the bounded cleanup path can reconnect to the same exact PID if exit stalls.
+    stoppingInspector.close();
+    if (mainInspector === stoppingInspector) mainInspector = null;
+    for (let attempt = 0; attempt < 150 && stoppingChild.exitCode === null; attempt += 1)
+      await delay(100);
+    check(`${phase} exact child exited`, stoppingChild.exitCode !== null, true);
+    check(`${phase} exit code`, stoppingChild.exitCode, 0);
     proof.processes.push({
       phase: `${phase}_quit`,
-      pid: child.pid,
-      exitCode: child.exitCode,
+      pid: stoppingChild.pid,
+      exitCode: stoppingChild.exitCode,
       at: new Date().toISOString(),
     });
-    child = null;
+    if (child === stoppingChild) child = null;
+    activeLaunch = null;
   };
   const eventFor = async (predicate, label, timeoutMs = TIMEOUT) => {
     const deadline = Date.now() + timeoutMs;
@@ -957,7 +1016,7 @@ async function runLive(scope) {
       redirect: "error",
       signal: AbortSignal.timeout(TIMEOUT),
       headers: {
-        accept: "application/vnd.relay-qa-hub.v1.1+json",
+        accept: liveRequestAccept(pathname),
         ...(options.token ? { authorization: `Bearer ${options.token}` } : {}),
         ...(options.projectId ? { "x-qa-project-id": options.projectId } : {}),
         ...(options.body ? { "content-type": "application/json" } : {}),
@@ -1101,10 +1160,18 @@ async function runLive(scope) {
     await stopOwn("quit-probe");
     const afterProbe = await snapshotHost("after-quit-probe");
     check(
-      "foreign processes unchanged by quit probe",
-      foreignFingerprint(afterProbe, packageCopy),
-      foreignFingerprint(hostBefore, packageCopy),
+      "all Relay QA Hub processes unchanged by quit probe",
+      relayProcessFingerprint(afterProbe),
+      relayProcessFingerprint(hostBefore),
     );
+    check(
+      "installed canonical EXE absent after quit probe",
+      afterProbe.processes.filter(
+        (item) => path.resolve(item.path || "C:\\missing") === path.resolve(scope.executablePath),
+      ).length,
+      0,
+    );
+    check("canonical inputs unchanged after quit probe", criticalFiles(scope), criticalBefore);
     for (const port of [ports.mcp, ports.cdp, ports.inspector])
       check(
         `probe port ${port} released`,
@@ -1112,7 +1179,8 @@ async function runLive(scope) {
         0,
       );
 
-    // Business writes start only after the copied EXE has proved its exact PID, profile and graceful exit.
+    // Business writes start only after the installed canonical EXE has proved its exact PID,
+    // isolated profile and graceful exit.
     const secrets = readJson(scope.instance.secretsFile);
     knownSecrets.add(secrets.gmPassword);
     const gm = await api("GM login", "POST", "/api/v1/auth/gm/login", {
@@ -1349,20 +1417,40 @@ async function runLive(scope) {
     };
     throw error;
   } finally {
-    if (child && mainInspector) {
+    if (child) {
       try {
-        await stopOwn("final-cleanup");
+        if (child.exitCode !== null) {
+          const exitedChild = child;
+          renderer?.close();
+          renderer = null;
+          mainInspector?.close();
+          mainInspector = null;
+          child = null;
+          activeLaunch = null;
+          proof.processes.push({
+            phase: "final-cleanup_already_exited",
+            pid: exitedChild.pid,
+            exitCode: exitedChild.exitCode,
+            at: new Date().toISOString(),
+          });
+          check("final-cleanup already-exited code", exitedChild.exitCode, 0);
+        } else {
+          if (!mainInspector) mainInspector = await reconnectMainInspectorForCleanup();
+          assert.ok(mainInspector, "FINAL_CLEANUP_NO_VERIFIED_GRACEFUL_CHANNEL");
+          await stopOwn("final-cleanup");
+        }
       } catch (error) {
         proof.cleanupError = redactEvidence(error?.message ?? String(error), knownSecrets);
+        proof.passed = false;
       }
     }
     try {
       const hostAfter = await snapshotHost("after");
       if (hostBefore) {
         check(
-          "daily and foreign QA Hub processes unchanged",
-          foreignFingerprint(hostAfter, packageCopy),
-          foreignFingerprint(hostBefore, packageCopy),
+          "all pre-existing QA Hub processes unchanged",
+          relayProcessFingerprint(hostAfter),
+          relayProcessFingerprint(hostBefore),
         );
         check(
           "configured and production listeners unchanged",
@@ -1375,6 +1463,14 @@ async function runLive(scope) {
             hostAfter.listeners.filter((item) => item.port === port && item.listening).length,
             0,
           );
+        check(
+          "installed canonical EXE absent after final cleanup",
+          hostAfter.processes.filter(
+            (item) =>
+              path.resolve(item.path || "C:\\missing") === path.resolve(scope.executablePath),
+          ).length,
+          0,
+        );
       }
       check(
         "instance and installed preview inputs unchanged",

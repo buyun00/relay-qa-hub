@@ -1,0 +1,50 @@
+{
+  "schemaVersion": 1,
+  "capturedAt": "2026-09-10T13:52:48.8727395Z",
+  "head": "c4e2eb7d9341a16d2430df9073a93f44f381dd2b",
+  "sourceClean": true,
+  "buildNumber": 17,
+  "previousManifest": "8260e453a04f832d33321af3eeb642894436bef4d2bd7b161fb1fad0159f83a1",
+  "desktopMain": "05b539668473e62bf792338a83dbacb4e34dc0241b373d952bb7ed75b6bb4f00",
+  "desktopNetwork": "6bc86d77a4fbc1a88190adff58088f21dcc18edaa0a1549a00252ef1c6263cda",
+  "webIndex": "f8746ac51d3d95b5ca0353742523c25dae52f5d3387d553c729bba619250652e",
+  "listeners": [
+    {
+      "address": "0.0.0.0",
+      "port": 4174,
+      "pid": 7420
+    },
+    {
+      "address": "0.0.0.0",
+      "port": 4319,
+      "pid": 14044
+    },
+    {
+      "address": "127.0.0.1",
+      "port": 4320,
+      "pid": 17160
+    },
+    {
+      "address": "127.0.0.1",
+      "port": 4639,
+      "pid": 19004
+    },
+    {
+      "address": "127.0.0.1",
+      "port": 4640,
+      "pid": 20452
+    },
+    {
+      "address": "127.0.0.1",
+      "port": 4641,
+      "pid": 19112
+    },
+    {
+      "address": "127.0.0.1",
+      "port": 9333,
+      "pid": 26828
+    }
+  ],
+  "productionAction": "read_only",
+  "productionTouched": false
+}

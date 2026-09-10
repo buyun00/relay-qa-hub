@@ -1,10 +1,10 @@
 {
   "schemaVersion": 1,
-  "recordedAt": "2026-09-10T09:25:09.911Z",
+  "recordedAt": "2026-09-10T16:24:28.894Z",
   "designVersion": "2.1",
   "overallStatus": "not_complete",
   "completionAllowed": false,
-  "productSourceCommit": "88a6d0f9c31106f6cd3fc9edbadca0db6bf6397b",
+  "productSourceCommit": "c4e2eb7d9341a16d2430df9073a93f44f381dd2b",
   "coverageFixCommit": "04f22a5075fb6e534ab1303c8ff4e886296168ed",
   "isolatedRuntime": {
     "api": "http://127.0.0.1:4639",
@@ -31,12 +31,13 @@
       "sourceCommit": "88a6d0f9c31106f6cd3fc9edbadca0db6bf6397b"
     },
     "windows": {
-      "releaseId": "20260910T044149231Z",
-      "version": "0.2.0-preview.13",
-      "bytes": 108296156,
-      "sha256": "7610c92fd39d4485d78e3d8ee7618d79d5e8ed9f3d6ce096c2922c72e5388ab0",
+      "releaseId": "20260910T135324626Z",
+      "version": "0.2.0-preview.17",
+      "bytes": 108488136,
+      "sha256": "1c67b6555ffeeefff3ce885acfd09735dc6bc650570e3b53d109c8ad617d11d4",
       "manifestEd25519": true,
-      "authenticode": "NotSigned"
+      "authenticode": "not_revalidated_for_build17",
+      "sourceCommit": "c4e2eb7d9341a16d2430df9073a93f44f381dd2b"
     },
     "web": {
       "asset": "/assets/index-BHhxArNW.js",
@@ -152,9 +153,10 @@
         "user-self-test-handoff.md"
       ],
       "owner": "user",
-      "handoffStatus": "delegated_to_user",
+      "handoffStatus": "delegated_pending",
       "agentExecuted": false,
-      "resultLabel": "用户自测／已移交，代理未执行"
+      "resultLabel": "用户自测／已移交，代理未执行",
+      "completionImpact": "blocks_final_acceptance"
     },
     {
       "id": "external-single-build-upload-terminal",
@@ -172,9 +174,10 @@
         "user-self-test-handoff.md"
       ],
       "owner": "user",
-      "handoffStatus": "delegated_to_user",
+      "handoffStatus": "delegated_pending",
       "agentExecuted": false,
-      "resultLabel": "用户自测／已移交，代理未执行"
+      "resultLabel": "用户自测／已移交，代理未执行",
+      "completionImpact": "blocks_final_acceptance"
     },
     {
       "id": "external-incremental-publication-terminal",
@@ -192,9 +195,10 @@
         "user-self-test-handoff.md"
       ],
       "owner": "user",
-      "handoffStatus": "delegated_to_user",
+      "handoffStatus": "delegated_pending",
       "agentExecuted": false,
-      "resultLabel": "用户自测／已移交，代理未执行"
+      "resultLabel": "用户自测／已移交，代理未执行",
+      "completionImpact": "blocks_final_acceptance"
     },
     {
       "id": "external-relay-delivery-terminal",
@@ -212,9 +216,10 @@
         "user-self-test-handoff.md"
       ],
       "owner": "user",
-      "handoffStatus": "delegated_to_user",
+      "handoffStatus": "delegated_pending",
       "agentExecuted": false,
-      "resultLabel": "用户自测／已移交，代理未执行"
+      "resultLabel": "用户自测／已移交，代理未执行",
+      "completionImpact": "blocks_final_acceptance"
     },
     {
       "id": "external-qingyu-order-terminal",
@@ -232,9 +237,10 @@
         "user-self-test-handoff.md"
       ],
       "owner": "user",
-      "handoffStatus": "delegated_to_user",
+      "handoffStatus": "delegated_pending",
       "agentExecuted": false,
-      "resultLabel": "用户自测／已移交，代理未执行"
+      "resultLabel": "用户自测／已移交，代理未执行",
+      "completionImpact": "blocks_final_acceptance"
     },
     {
       "id": "web-final-asset-and-dependency-error",
@@ -264,7 +270,7 @@
       "detail": "The restarted commit-88a6d0f API completed upload lost-ack reconciliation, metadata unbound/reserved/claimed transitions, exact notification replay, authorization/CAS negatives, and retained the read receipt in SQLite."
     },
     {
-      "id": "server-mcp-96-tools-business",
+      "id": "server-mcp-catalog-and-business-subset",
       "surfaces": [
         "server_mcp"
       ],
@@ -273,7 +279,16 @@
         "web/core-e2e-report.md",
         "post-restart-mcp-check.json",
         "../runs/server-mcp-core-2026-09-10T08-40-47-204Z.json"
-      ]
+      ],
+      "legacyId": "server-mcp-96-tools-business",
+      "claimScope": "catalog_and_executed_business_subset",
+      "catalogToolCountObserved": 96,
+      "executedBusinessSubset": [
+        "qa_login",
+        "qa_list_projects",
+        "qa_list_bugs"
+      ],
+      "detail": "The server and local MCP catalogs each exposed 96 entries. The executed business scope is limited to initialize, catalog, login, project-list, Bug-list, and the retained attachment parity subset; catalog size does not establish per-tool business E2E."
     },
     {
       "id": "windows-built-in-update-and-local-mcp",
@@ -286,8 +301,13 @@
         "windows/acceptance-matrix.md",
         "windows/post-upgrade-process-mcp.json",
         "post-restart-mcp-check.json",
-        "../runs/desktop-mcp-core-2026-09-10T08-41-32-807Z.json"
-      ]
+        "../runs/desktop-mcp-core-2026-09-10T08-41-32-807Z.json",
+        "continuation-20260910/postfix-c4e2eb7/windows-build17-package/package-verification.json",
+        "continuation-20260910/postfix-c4e2eb7/windows-build17-upgrade/auto-relaunch-verification.json",
+        "continuation-20260910/postfix-c4e2eb7/windows-build17-upgrade/post-upgrade-readonly.json",
+        "continuation-20260910/postfix-c4e2eb7/final-runtime/canonical-relaunch-20260910T152101642Z-82efc9c9-66e9-44e1-8160-7a3af37b4fa2/07-final-runtime-verification.json"
+      ],
+      "detail": "The isolated signed updater completed 0.2.0-preview.16 to 0.2.0-preview.17, relaunched the exact installed executable, preserved its rollback backup, identity, project, drafts, and local MCP, and reconnected without INBOX_READ_FAILED. Desktop notification routing remains a separate agent revalidation gate."
     },
     {
       "id": "android-build-feed-install",
@@ -337,9 +357,10 @@
         "user-self-test-handoff.md"
       ],
       "owner": "user",
-      "handoffStatus": "delegated_to_user",
+      "handoffStatus": "delegated_pending",
       "agentExecuted": false,
-      "resultLabel": "用户自测／已移交，代理未执行"
+      "resultLabel": "用户自测／已移交，代理未执行",
+      "completionImpact": "blocks_final_acceptance"
     },
     {
       "id": "schema19-20-19-migration-rollback",
@@ -364,19 +385,28 @@
       "status": "pass",
       "evidence": [
         "coexistence-final.json",
-        "coexistence-post-restart.json"
-      ]
+        "coexistence-post-restart.json",
+        "continuation-20260910/postfix-c4e2eb7/final-runtime/canonical-relaunch-20260910T152101642Z-82efc9c9-66e9-44e1-8160-7a3af37b4fa2/07-final-runtime-verification.json"
+      ],
+      "detail": "The canonical build 17 trial runtime is running on the original isolated profile, owns only local MCP 4642 and CDP 9433, and retained the exact identity and drafts. Protected production and preview service listener tuples were byte-for-byte unchanged before and after read-only inspection. Native toast visibility remains a separate failed agent gate."
     },
     {
       "id": "final-source-gate",
       "surfaces": [
         "source"
       ],
-      "status": "pass",
+      "status": "partial",
       "evidence": [
         "source-gate/final-summary.json",
-        "source-verification-88a6d0f/summary.json"
-      ]
+        "source-verification-88a6d0f/summary.json",
+        "continuation-20260910/postfix-c4e2eb7/windows-build17-package/package-verification.json",
+        "../desktop-notification-project-route-live/d77ea52e-f6c4-4e69-8259-06f2ce9e359d/proof.json",
+        "../desktop-notification-project-route-live/1f89daba-cf96-4138-b8d4-62b8377e38d7/proof.json",
+        "../desktop-notification-project-route-live/9ca4df2d-11a7-4d1c-8707-c66884afb2a6/proof.json",
+        "continuation-20260910/postfix-c4e2eb7/native-notification/session-routing-analysis.json",
+        "continuation-20260910/postfix-c4e2eb7/native-notification/session-routing-event-5638.json"
+      ],
+      "detail": "Product source is anchored at c4e2eb7d9341a16d2430df9073a93f44f381dd2b, but one or more required agent gates remain failed, pending, or unreported."
     },
     {
       "id": "final-api-runtime-restart-and-durable-readback",
@@ -402,211 +432,238 @@
   ],
   "blocking": [
     {
+      "id": "desktop-notification-project-route-live",
+      "status": "fail",
+      "owner": "agent",
+      "completionImpact": "blocks_agent_scope_completion",
+      "evidence": [
+        "../desktop-notification-project-route-live/d77ea52e-f6c4-4e69-8259-06f2ce9e359d/proof.json",
+        "../desktop-notification-project-route-live/1f89daba-cf96-4138-b8d4-62b8377e38d7/proof.json",
+        "../desktop-notification-project-route-live/9ca4df2d-11a7-4d1c-8707-c66884afb2a6/proof.json",
+        "continuation-20260910/postfix-c4e2eb7/native-notification/session-routing-analysis.json",
+        "continuation-20260910/postfix-c4e2eb7/native-notification/session-routing-event-5638.json"
+      ]
+    },
+    {
       "id": "android-physical-device",
       "status": "not_run",
       "owner": "user",
-      "handoffStatus": "delegated_to_user",
+      "handoffStatus": "delegated_pending",
       "agentExecuted": false,
+      "completionImpact": "blocks_final_acceptance",
       "resultLabel": "用户自测／已移交，代理未执行"
     },
     {
       "id": "external-build-terminal",
       "status": "not_run",
       "owner": "user",
-      "handoffStatus": "delegated_to_user",
+      "handoffStatus": "delegated_pending",
       "agentExecuted": false,
+      "completionImpact": "blocks_final_acceptance",
       "resultLabel": "用户自测／已移交，代理未执行"
     },
     {
       "id": "external-single-build-upload-terminal",
       "status": "not_run",
       "owner": "user",
-      "handoffStatus": "delegated_to_user",
+      "handoffStatus": "delegated_pending",
       "agentExecuted": false,
+      "completionImpact": "blocks_final_acceptance",
       "resultLabel": "用户自测／已移交，代理未执行"
     },
     {
       "id": "external-incremental-publication-terminal",
       "status": "not_run",
       "owner": "user",
-      "handoffStatus": "delegated_to_user",
+      "handoffStatus": "delegated_pending",
       "agentExecuted": false,
+      "completionImpact": "blocks_final_acceptance",
       "resultLabel": "用户自测／已移交，代理未执行"
     },
     {
       "id": "external-relay-delivery-terminal",
       "status": "not_run",
       "owner": "user",
-      "handoffStatus": "delegated_to_user",
+      "handoffStatus": "delegated_pending",
       "agentExecuted": false,
+      "completionImpact": "blocks_final_acceptance",
       "resultLabel": "用户自测／已移交，代理未执行"
     },
     {
       "id": "external-qingyu-order-terminal",
       "status": "not_run",
       "owner": "user",
-      "handoffStatus": "delegated_to_user",
+      "handoffStatus": "delegated_pending",
       "agentExecuted": false,
+      "completionImpact": "blocks_final_acceptance",
       "resultLabel": "用户自测／已移交，代理未执行"
     }
   ],
   "sourceGate": {
-    "previousGate": {
-      "commit": "04f22a5075fb6e534ab1303c8ff4e886296168ed",
-      "effectiveStages": {
-        "total": 37,
-        "passed": 37,
-        "failed": 0
-      },
-      "tests": {
-        "total": 1122,
-        "passed": 1121,
-        "failed": 0,
-        "skipped": 1
-      },
-      "androidLint": {
-        "errors": 0,
-        "warnings": 40
-      },
-      "evidence": "source-gate/final-summary.json"
-    },
-    "currentCommit": {
-      "commit": "88a6d0f9c31106f6cd3fc9edbadca0db6bf6397b",
-      "typescriptBuilds": "passed",
-      "storage": {
-        "tests": 167,
-        "passed": 166,
-        "failed": 0,
-        "skipped": 1
-      },
-      "apiJavaScript": {
-        "tests": 274,
-        "passed": 274,
-        "failed": 0,
-        "skipped": 0
-      },
-      "apiTypeScript": {
-        "tests": 47,
-        "passed": 47,
-        "failed": 0,
-        "skipped": 0
-      },
-      "contracts": {
-        "status": "passed",
-        "checks": 5
-      },
-      "androidCleanUnitLintAssemble": {
-        "status": "passed",
-        "tasks": 59
-      },
-      "androidTargetedUpdateUi": {
-        "status": "passed",
-        "tasks": 32
-      },
-      "evidence": "source-verification-88a6d0f/summary.json"
-    },
-    "retainedTransientFailure": {
-      "status": "retained",
-      "isolatedRerunPassed": true,
-      "evidence": "source-verification-88a6d0f/api-js-tests.concurrent-first-failure.tap.txt"
-    }
+    "productSourceCommit": "c4e2eb7d9341a16d2430df9073a93f44f381dd2b",
+    "status": "incomplete_agent_revalidation_pending",
+    "agentGateReport": null,
+    "allRequiredAgentGatesPassed": false,
+    "evidence": [
+      "continuation-20260910/postfix-c4e2eb7/windows-build17-package/package-verification.json",
+      "../desktop-notification-project-route-live/d77ea52e-f6c4-4e69-8259-06f2ce9e359d/proof.json",
+      "../desktop-notification-project-route-live/1f89daba-cf96-4138-b8d4-62b8377e38d7/proof.json",
+      "../desktop-notification-project-route-live/9ca4df2d-11a7-4d1c-8707-c66884afb2a6/proof.json",
+      "continuation-20260910/postfix-c4e2eb7/native-notification/session-routing-analysis.json",
+      "continuation-20260910/postfix-c4e2eb7/native-notification/session-routing-event-5638.json"
+    ]
   },
   "fineGrainedCoverage": {
     "items": 1030,
     "retiredItems": 47,
     "needsRevalidation": 637,
     "unavailableReviewedEvidence": 1,
-    "note": "Fine-grained not_run and needsRevalidation rows remain retained and are not counted as PASS. The scalar revalidation count includes generated and historical source-drift inventory; it is not treated as a list of distinct failed user features."
+    "note": "Fine-grained not_run and needsRevalidation rows remain retained and are not counted as PASS. They do not replace the explicit agent and user acceptance gates."
   },
-  "agentScopeStatus": "complete_user_acceptance_pending",
+  "agentScopeStatus": "incomplete_agent_revalidation_pending",
   "userAcceptanceStatus": "delegated_pending",
   "sourceProvenance": {
-    "api": "88a6d0f9c31106f6cd3fc9edbadca0db6bf6397b",
-    "android": "88a6d0f9c31106f6cd3fc9edbadca0db6bf6397b",
-    "windows": "867387fe69714ae0c3aafa6182946ffd80495768",
-    "web": "867387fe69714ae0c3aafa6182946ffd80495768",
-    "equivalentGitTrees": [
-      {
-        "path": "apps/web",
-        "artifactTree": "c112b977ed277bcb94d28e4da4f740cb9eb455e2",
-        "productTree": "c112b977ed277bcb94d28e4da4f740cb9eb455e2",
-        "treeEqual": true
-      },
-      {
-        "path": "apps/desktop",
-        "artifactTree": "c5521bcc2409e754f7317f222352fe106a512ad4",
-        "productTree": "c5521bcc2409e754f7317f222352fe106a512ad4",
-        "treeEqual": true
-      },
-      {
-        "path": "packages/upload-contract",
-        "artifactTree": "8795d80c367cda7ebed365dee78fe1de193049c0",
-        "productTree": "8795d80c367cda7ebed365dee78fe1de193049c0",
-        "treeEqual": true
-      }
-    ],
-    "note": "Windows and Web trial artifacts retain artifact commit 867387fe69714ae0c3aafa6182946ffd80495768; the apps/web, apps/desktop, and packages/upload-contract Git trees are exactly equal at final product source commit 88a6d0f9c31106f6cd3fc9edbadca0db6bf6397b. This proves source equivalence only and does not replace install, signature, browser, update, or user-delegated real packaging acceptance.",
-    "evidence": [
-      "continuation-20260910/artifact-source-equivalence.json"
-    ]
+    "productSourceAnchor": "c4e2eb7d9341a16d2430df9073a93f44f381dd2b",
+    "windowsTrialArtifact": {
+      "sourceCommit": "c4e2eb7d9341a16d2430df9073a93f44f381dd2b",
+      "evidence": [
+        "continuation-20260910/postfix-c4e2eb7/windows-build17-package/package-verification.json",
+        "continuation-20260910/postfix-c4e2eb7/windows-build17-upgrade/auto-relaunch-verification.json"
+      ]
+    },
+    "webInWindowsTrialArtifact": {
+      "sourceCommit": "c4e2eb7d9341a16d2430df9073a93f44f381dd2b",
+      "packagedByteExact": true,
+      "evidence": [
+        "continuation-20260910/postfix-c4e2eb7/windows-build17-package/package-verification.json"
+      ]
+    },
+    "windowsTrialRuntime": {
+      "sourceCommit": "c4e2eb7d9341a16d2430df9073a93f44f381dd2b",
+      "status": "trial_runtime_ready",
+      "evidence": [
+        "continuation-20260910/postfix-c4e2eb7/final-runtime/canonical-relaunch-20260910T152101642Z-82efc9c9-66e9-44e1-8160-7a3af37b4fa2/07-final-runtime-verification.json"
+      ]
+    },
+    "retainedAndroidTrialArtifact": {
+      "sourceCommit": "88a6d0f9c31106f6cd3fc9edbadca0db6bf6397b",
+      "artifactTree": "699ee7e13d6cf04d23e234bb52b347af50cd790e",
+      "productTree": "699ee7e13d6cf04d23e234bb52b347af50cd790e",
+      "treeEqual": true,
+      "evidence": [
+        "android/acceptance/android-code28-self-update/artifact-verification.json"
+      ]
+    },
+    "historicalWebBrowserReadback": {
+      "sourceCommit": "88a6d0f9c31106f6cd3fc9edbadca0db6bf6397b",
+      "evidence": [
+        "continuation-20260910/web-cua-readback.json"
+      ]
+    },
+    "note": "The product source anchor and Windows/Web build 17 package are c4e2eb7. The retained Android artifact predates that commit but its apps/android Git tree is identical. Historical browser evidence keeps its recorded source; current-source agent revalidation is tracked separately and cannot be inferred from source equivalence."
   },
-  "agentBlocking": [],
+  "agentBlocking": [
+    {
+      "id": "desktop-notification-project-route-live",
+      "status": "fail",
+      "owner": "agent",
+      "completionImpact": "blocks_agent_scope_completion",
+      "evidence": [
+        "../desktop-notification-project-route-live/d77ea52e-f6c4-4e69-8259-06f2ce9e359d/proof.json",
+        "../desktop-notification-project-route-live/1f89daba-cf96-4138-b8d4-62b8377e38d7/proof.json",
+        "../desktop-notification-project-route-live/9ca4df2d-11a7-4d1c-8707-c66884afb2a6/proof.json",
+        "continuation-20260910/postfix-c4e2eb7/native-notification/session-routing-analysis.json",
+        "continuation-20260910/postfix-c4e2eb7/native-notification/session-routing-event-5638.json"
+      ]
+    }
+  ],
   "userAcceptancePending": [
     {
       "id": "android-physical-device",
       "status": "not_run",
       "owner": "user",
-      "handoffStatus": "delegated_to_user",
+      "handoffStatus": "delegated_pending",
       "agentExecuted": false,
+      "completionImpact": "blocks_final_acceptance",
       "resultLabel": "用户自测／已移交，代理未执行"
     },
     {
       "id": "external-build-terminal",
       "status": "not_run",
       "owner": "user",
-      "handoffStatus": "delegated_to_user",
+      "handoffStatus": "delegated_pending",
       "agentExecuted": false,
+      "completionImpact": "blocks_final_acceptance",
       "resultLabel": "用户自测／已移交，代理未执行"
     },
     {
       "id": "external-single-build-upload-terminal",
       "status": "not_run",
       "owner": "user",
-      "handoffStatus": "delegated_to_user",
+      "handoffStatus": "delegated_pending",
       "agentExecuted": false,
+      "completionImpact": "blocks_final_acceptance",
       "resultLabel": "用户自测／已移交，代理未执行"
     },
     {
       "id": "external-incremental-publication-terminal",
       "status": "not_run",
       "owner": "user",
-      "handoffStatus": "delegated_to_user",
+      "handoffStatus": "delegated_pending",
       "agentExecuted": false,
+      "completionImpact": "blocks_final_acceptance",
       "resultLabel": "用户自测／已移交，代理未执行"
     },
     {
       "id": "external-relay-delivery-terminal",
       "status": "not_run",
       "owner": "user",
-      "handoffStatus": "delegated_to_user",
+      "handoffStatus": "delegated_pending",
       "agentExecuted": false,
+      "completionImpact": "blocks_final_acceptance",
       "resultLabel": "用户自测／已移交，代理未执行"
     },
     {
       "id": "external-qingyu-order-terminal",
       "status": "not_run",
       "owner": "user",
-      "handoffStatus": "delegated_to_user",
+      "handoffStatus": "delegated_pending",
       "agentExecuted": false,
+      "completionImpact": "blocks_final_acceptance",
       "resultLabel": "用户自测／已移交，代理未执行"
     }
   ],
   "coverageAudit": {
     "status": "retained_open_inventory",
-    "detail": "The generated 1,030-item audit inventory retains 637 source-revalidation flags. They are not rewritten as PASS and do not by themselves represent 637 distinct user-feature failures. A concrete applicable failure remains blocking when found.",
+    "detail": "The generated 1,030-item inventory retains 637 source-revalidation flags. These are retained as inventory and are never rewritten as PASS by this updater.",
     "evidence": [
       "../coverage-matrix.json",
       "../coverage-matrix.md"
     ]
+  },
+  "productAcceptancePassed": false,
+  "agentRevalidation": {
+    "schemaVersion": 1,
+    "sourceCommit": "c4e2eb7d9341a16d2430df9073a93f44f381dd2b",
+    "report": null,
+    "reportSupplied": false,
+    "requiredGateIds": [
+      "desktop-notification-project-route-live"
+    ],
+    "gates": [
+      {
+        "id": "desktop-notification-project-route-live",
+        "status": "fail",
+        "detail": "Durable notification content reached Windows, but WPN routed it to SessionId 1 while the active RDP observer was in SessionId 2. The required visible toast plus InvokePattern route was not observed, so a passing rerun is still required; delivery logs are not UI proof.",
+        "evidence": [
+          "../desktop-notification-project-route-live/d77ea52e-f6c4-4e69-8259-06f2ce9e359d/proof.json",
+          "../desktop-notification-project-route-live/1f89daba-cf96-4138-b8d4-62b8377e38d7/proof.json",
+          "../desktop-notification-project-route-live/9ca4df2d-11a7-4d1c-8707-c66884afb2a6/proof.json",
+          "continuation-20260910/postfix-c4e2eb7/native-notification/session-routing-analysis.json",
+          "continuation-20260910/postfix-c4e2eb7/native-notification/session-routing-event-5638.json"
+        ]
+      }
+    ],
+    "allRequiredGatesPassed": false
   }
 }

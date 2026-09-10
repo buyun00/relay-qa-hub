@@ -1,0 +1,2401 @@
+{
+  "schemaVersion": 1,
+  "capturedAt": "2026-09-10T14:42:16.4014734Z",
+  "sessionId": 2,
+  "sampleCount": 31,
+  "samples": [
+    {
+      "observedAt": "2026-09-10T14:42:15.8118928Z",
+      "name": "QA Hub Project Preview - 1 个运行窗口",
+      "ancestors": [
+        {
+          "name": "QA Hub Project Preview - 1 个运行窗口",
+          "automationId": "Appid: com.relayqahub.desktop.preview",
+          "className": "Taskbar.TaskListButtonAutomationPeer",
+          "controlType": "ControlType.Button",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "",
+          "automationId": "TaskbarFrame",
+          "className": "Taskbar.TaskbarFrameAutomationPeer",
+          "controlType": "ControlType.Pane",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "",
+          "automationId": "",
+          "className": "Windows.UI.Input.InputSite.WindowClass",
+          "controlType": "ControlType.Pane",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 66218
+        },
+        {
+          "name": "",
+          "automationId": "",
+          "className": "Shell_TrayWnd",
+          "controlType": "ControlType.Pane",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 65932
+        },
+        {
+          "name": "",
+          "automationId": "",
+          "className": "#32769",
+          "controlType": "ControlType.Pane",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 65548
+        }
+      ]
+    },
+    {
+      "observedAt": "2026-09-10T14:42:15.8200633Z",
+      "name": " Relay QA Hub",
+      "ancestors": [
+        {
+          "name": " Relay QA Hub",
+          "automationId": "NotifyItemIcon",
+          "className": "SystemTray.NormalButton",
+          "controlType": "ControlType.Button",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "",
+          "automationId": "",
+          "className": "Windows.UI.Input.InputSite.WindowClass",
+          "controlType": "ControlType.Pane",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 66218
+        },
+        {
+          "name": "",
+          "automationId": "",
+          "className": "Shell_TrayWnd",
+          "controlType": "ControlType.Pane",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 65932
+        },
+        {
+          "name": "",
+          "automationId": "",
+          "className": "#32769",
+          "controlType": "ControlType.Pane",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 65548
+        }
+      ]
+    },
+    {
+      "observedAt": "2026-09-10T14:42:15.8572648Z",
+      "name": "ozdqp-build-tool验证并修复主分支打包加速 OZDQP 增量打包并实测验收澄清 EXE 分支构建规则兼容游戏初始化结构改动检查 Hyper-V 磁盘占用展开显示",
+      "ancestors": [
+        {
+          "name": "ozdqp-build-tool验证并修复主分支打包加速 OZDQP 增量打包并实测验收澄清 EXE 分支构建规则兼容游戏初始化结构改动检查 Hyper-V 磁盘占用展开显示",
+          "automationId": "",
+          "className": "after:block after:h-px after:content-[''] last:after:hidden touch-none",
+          "controlType": "ControlType.ListItem",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "",
+          "automationId": "",
+          "className": "flex flex-col",
+          "controlType": "ControlType.List",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "",
+          "automationId": "",
+          "className": "",
+          "controlType": "ControlType.Group",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "已安排任务文件夹",
+          "automationId": "",
+          "className": "_Navigation_1ej6d_2",
+          "controlType": "ControlType.Group",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "",
+          "automationId": "",
+          "className": "app-shell-left-panel pointer-events-auto relative flex overflow-visible browser:bg-surface",
+          "controlType": "ControlType.Group",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "",
+          "automationId": "root",
+          "className": "",
+          "controlType": "ControlType.Group",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "",
+          "automationId": "",
+          "className": "",
+          "controlType": "ControlType.Group",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "ChatGPT",
+          "automationId": "RootWebArea",
+          "className": "",
+          "controlType": "ControlType.Document",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "",
+          "automationId": "",
+          "className": "Chrome_WidgetWin_1",
+          "controlType": "ControlType.Pane",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "",
+          "automationId": "",
+          "className": "View",
+          "controlType": "ControlType.Pane",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        }
+      ]
+    },
+    {
+      "observedAt": "2026-09-10T14:42:15.8719507Z",
+      "name": "加速 OZDQP 增量打包并实测验收",
+      "ancestors": [
+        {
+          "name": "加速 OZDQP 增量打包并实测验收",
+          "automationId": "",
+          "className": "after:block after:h-px after:content-[''] last:after:hidden",
+          "controlType": "ControlType.ListItem",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "ozdqp-build-tool中的已安排任务",
+          "automationId": "",
+          "className": "flex flex-col",
+          "controlType": "ControlType.List",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "ozdqp-build-tool",
+          "automationId": "",
+          "className": "group/cwd relative flex flex-col",
+          "controlType": "ControlType.Group",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "ozdqp-build-tool验证并修复主分支打包加速 OZDQP 增量打包并实测验收澄清 EXE 分支构建规则兼容游戏初始化结构改动检查 Hyper-V 磁盘占用展开显示",
+          "automationId": "",
+          "className": "after:block after:h-px after:content-[''] last:after:hidden touch-none",
+          "controlType": "ControlType.ListItem",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "",
+          "automationId": "",
+          "className": "flex flex-col",
+          "controlType": "ControlType.List",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "",
+          "automationId": "",
+          "className": "",
+          "controlType": "ControlType.Group",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "已安排任务文件夹",
+          "automationId": "",
+          "className": "_Navigation_1ej6d_2",
+          "controlType": "ControlType.Group",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "",
+          "automationId": "",
+          "className": "app-shell-left-panel pointer-events-auto relative flex overflow-visible browser:bg-surface",
+          "controlType": "ControlType.Group",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "",
+          "automationId": "root",
+          "className": "",
+          "controlType": "ControlType.Group",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "",
+          "automationId": "",
+          "className": "",
+          "controlType": "ControlType.Group",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        }
+      ]
+    },
+    {
+      "observedAt": "2026-09-10T14:42:15.8831683Z",
+      "name": "加速 OZDQP 增量打包并实测验收",
+      "ancestors": [
+        {
+          "name": "加速 OZDQP 增量打包并实测验收",
+          "automationId": "",
+          "className": "group relative cursor-interaction text-sm hover:bg-primary-ghost-hover h-[var(--height-token-row)] sidebar-item focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-0 focus-visible:outline-ring has-[[aria-haspopup=menu][aria-expanded=true]]:bg-primary-ghost-hover data-[app-action-sidebar-thread-selected=true]:bg-primary-ghost-hover data-[file-drop-active=true]:bg-primary-ghost-hover py-row-y pe-row-y ps-[var(--padding-row-cell-x,var(--padding-row-x))]",
+          "controlType": "ControlType.Button",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "",
+          "automationId": "",
+          "className": "cursor-grab active:cursor-grabbing",
+          "controlType": "ControlType.Group",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "加速 OZDQP 增量打包并实测验收",
+          "automationId": "",
+          "className": "after:block after:h-px after:content-[''] last:after:hidden",
+          "controlType": "ControlType.ListItem",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "ozdqp-build-tool中的已安排任务",
+          "automationId": "",
+          "className": "flex flex-col",
+          "controlType": "ControlType.List",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "ozdqp-build-tool",
+          "automationId": "",
+          "className": "group/cwd relative flex flex-col",
+          "controlType": "ControlType.Group",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "ozdqp-build-tool验证并修复主分支打包加速 OZDQP 增量打包并实测验收澄清 EXE 分支构建规则兼容游戏初始化结构改动检查 Hyper-V 磁盘占用展开显示",
+          "automationId": "",
+          "className": "after:block after:h-px after:content-[''] last:after:hidden touch-none",
+          "controlType": "ControlType.ListItem",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "",
+          "automationId": "",
+          "className": "flex flex-col",
+          "controlType": "ControlType.List",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "",
+          "automationId": "",
+          "className": "",
+          "controlType": "ControlType.Group",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "已安排任务文件夹",
+          "automationId": "",
+          "className": "_Navigation_1ej6d_2",
+          "controlType": "ControlType.Group",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "",
+          "automationId": "",
+          "className": "app-shell-left-panel pointer-events-auto relative flex overflow-visible browser:bg-surface",
+          "controlType": "ControlType.Group",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        }
+      ]
+    },
+    {
+      "observedAt": "2026-09-10T14:42:15.9025560Z",
+      "name": "Relay-Unity-Orchestrator查找 Relay 名称来源分析 AI 管线准备耗时连接 QA Hub MCP停止并完成四个单子定位未完成备份的虚拟机快照展开显示",
+      "ancestors": [
+        {
+          "name": "Relay-Unity-Orchestrator查找 Relay 名称来源分析 AI 管线准备耗时连接 QA Hub MCP停止并完成四个单子定位未完成备份的虚拟机快照展开显示",
+          "automationId": "",
+          "className": "after:block after:h-px after:content-[''] last:after:hidden after:!hidden touch-none",
+          "controlType": "ControlType.ListItem",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "",
+          "automationId": "",
+          "className": "flex flex-col",
+          "controlType": "ControlType.List",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "",
+          "automationId": "",
+          "className": "",
+          "controlType": "ControlType.Group",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "已安排任务文件夹",
+          "automationId": "",
+          "className": "_Navigation_1ej6d_2",
+          "controlType": "ControlType.Group",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "",
+          "automationId": "",
+          "className": "app-shell-left-panel pointer-events-auto relative flex overflow-visible browser:bg-surface",
+          "controlType": "ControlType.Group",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "",
+          "automationId": "root",
+          "className": "",
+          "controlType": "ControlType.Group",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "",
+          "automationId": "",
+          "className": "",
+          "controlType": "ControlType.Group",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "ChatGPT",
+          "automationId": "RootWebArea",
+          "className": "",
+          "controlType": "ControlType.Document",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "",
+          "automationId": "",
+          "className": "Chrome_WidgetWin_1",
+          "controlType": "ControlType.Pane",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "",
+          "automationId": "",
+          "className": "View",
+          "controlType": "ControlType.Pane",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        }
+      ]
+    },
+    {
+      "observedAt": "2026-09-10T14:42:15.9199684Z",
+      "name": "连接 QA Hub MCP",
+      "ancestors": [
+        {
+          "name": "连接 QA Hub MCP",
+          "automationId": "",
+          "className": "after:block after:h-px after:content-[''] last:after:hidden",
+          "controlType": "ControlType.ListItem",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "Relay-Unity-Orchestrator中的已安排任务",
+          "automationId": "",
+          "className": "flex flex-col",
+          "controlType": "ControlType.List",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "Relay-Unity-Orchestrator",
+          "automationId": "",
+          "className": "group/cwd relative flex flex-col",
+          "controlType": "ControlType.Group",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "Relay-Unity-Orchestrator查找 Relay 名称来源分析 AI 管线准备耗时连接 QA Hub MCP停止并完成四个单子定位未完成备份的虚拟机快照展开显示",
+          "automationId": "",
+          "className": "after:block after:h-px after:content-[''] last:after:hidden after:!hidden touch-none",
+          "controlType": "ControlType.ListItem",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "",
+          "automationId": "",
+          "className": "flex flex-col",
+          "controlType": "ControlType.List",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "",
+          "automationId": "",
+          "className": "",
+          "controlType": "ControlType.Group",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "已安排任务文件夹",
+          "automationId": "",
+          "className": "_Navigation_1ej6d_2",
+          "controlType": "ControlType.Group",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "",
+          "automationId": "",
+          "className": "app-shell-left-panel pointer-events-auto relative flex overflow-visible browser:bg-surface",
+          "controlType": "ControlType.Group",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "",
+          "automationId": "root",
+          "className": "",
+          "controlType": "ControlType.Group",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "",
+          "automationId": "",
+          "className": "",
+          "controlType": "ControlType.Group",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        }
+      ]
+    },
+    {
+      "observedAt": "2026-09-10T14:42:15.9319986Z",
+      "name": "连接 QA Hub MCP",
+      "ancestors": [
+        {
+          "name": "连接 QA Hub MCP",
+          "automationId": "",
+          "className": "group relative cursor-interaction text-sm hover:bg-primary-ghost-hover h-[var(--height-token-row)] sidebar-item focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-0 focus-visible:outline-ring has-[[aria-haspopup=menu][aria-expanded=true]]:bg-primary-ghost-hover data-[app-action-sidebar-thread-selected=true]:bg-primary-ghost-hover data-[file-drop-active=true]:bg-primary-ghost-hover py-row-y pe-row-y ps-[var(--padding-row-cell-x,var(--padding-row-x))]",
+          "controlType": "ControlType.Button",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "",
+          "automationId": "",
+          "className": "cursor-grab active:cursor-grabbing",
+          "controlType": "ControlType.Group",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "连接 QA Hub MCP",
+          "automationId": "",
+          "className": "after:block after:h-px after:content-[''] last:after:hidden",
+          "controlType": "ControlType.ListItem",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "Relay-Unity-Orchestrator中的已安排任务",
+          "automationId": "",
+          "className": "flex flex-col",
+          "controlType": "ControlType.List",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "Relay-Unity-Orchestrator",
+          "automationId": "",
+          "className": "group/cwd relative flex flex-col",
+          "controlType": "ControlType.Group",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "Relay-Unity-Orchestrator查找 Relay 名称来源分析 AI 管线准备耗时连接 QA Hub MCP停止并完成四个单子定位未完成备份的虚拟机快照展开显示",
+          "automationId": "",
+          "className": "after:block after:h-px after:content-[''] last:after:hidden after:!hidden touch-none",
+          "controlType": "ControlType.ListItem",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "",
+          "automationId": "",
+          "className": "flex flex-col",
+          "controlType": "ControlType.List",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "",
+          "automationId": "",
+          "className": "",
+          "controlType": "ControlType.Group",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "已安排任务文件夹",
+          "automationId": "",
+          "className": "_Navigation_1ej6d_2",
+          "controlType": "ControlType.Group",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "",
+          "automationId": "",
+          "className": "app-shell-left-panel pointer-events-auto relative flex overflow-visible browser:bg-surface",
+          "controlType": "ControlType.Group",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        }
+      ]
+    },
+    {
+      "observedAt": "2026-09-10T14:42:15.9701283Z",
+      "name": "QA Hub v2.1 Web E2E Luna",
+      "ancestors": [
+        {
+          "name": "QA Hub v2.1 Web E2E Luna",
+          "automationId": "",
+          "className": "after:block after:h-px after:content-[''] last:after:hidden",
+          "controlType": "ControlType.ListItem",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "",
+          "automationId": "",
+          "className": "flex flex-col",
+          "controlType": "ControlType.List",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "",
+          "automationId": "",
+          "className": "",
+          "controlType": "ControlType.Group",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "已安排任务文件夹",
+          "automationId": "",
+          "className": "_Navigation_1ej6d_2",
+          "controlType": "ControlType.Group",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "",
+          "automationId": "",
+          "className": "app-shell-left-panel pointer-events-auto relative flex overflow-visible browser:bg-surface",
+          "controlType": "ControlType.Group",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "",
+          "automationId": "root",
+          "className": "",
+          "controlType": "ControlType.Group",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "",
+          "automationId": "",
+          "className": "",
+          "controlType": "ControlType.Group",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "ChatGPT",
+          "automationId": "RootWebArea",
+          "className": "",
+          "controlType": "ControlType.Document",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "",
+          "automationId": "",
+          "className": "Chrome_WidgetWin_1",
+          "controlType": "ControlType.Pane",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "",
+          "automationId": "",
+          "className": "View",
+          "controlType": "ControlType.Pane",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        }
+      ]
+    },
+    {
+      "observedAt": "2026-09-10T14:42:15.9833822Z",
+      "name": "QA Hub v2.1 Web E2E Luna",
+      "ancestors": [
+        {
+          "name": "QA Hub v2.1 Web E2E Luna",
+          "automationId": "",
+          "className": "group relative cursor-interaction text-sm hover:bg-primary-ghost-hover h-[var(--height-token-row)] sidebar-item focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-0 focus-visible:outline-ring has-[[aria-haspopup=menu][aria-expanded=true]]:bg-primary-ghost-hover data-[app-action-sidebar-thread-selected=true]:bg-primary-ghost-hover data-[file-drop-active=true]:bg-primary-ghost-hover py-row-y pe-row-y ps-[var(--padding-row-cell-x,var(--padding-row-x))]",
+          "controlType": "ControlType.Button",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "",
+          "automationId": "",
+          "className": "cursor-grab active:cursor-grabbing",
+          "controlType": "ControlType.Group",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "QA Hub v2.1 Web E2E Luna",
+          "automationId": "",
+          "className": "after:block after:h-px after:content-[''] last:after:hidden",
+          "controlType": "ControlType.ListItem",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "",
+          "automationId": "",
+          "className": "flex flex-col",
+          "controlType": "ControlType.List",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "",
+          "automationId": "",
+          "className": "",
+          "controlType": "ControlType.Group",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "已安排任务文件夹",
+          "automationId": "",
+          "className": "_Navigation_1ej6d_2",
+          "controlType": "ControlType.Group",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "",
+          "automationId": "",
+          "className": "app-shell-left-panel pointer-events-auto relative flex overflow-visible browser:bg-surface",
+          "controlType": "ControlType.Group",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "",
+          "automationId": "root",
+          "className": "",
+          "controlType": "ControlType.Group",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "",
+          "automationId": "",
+          "className": "",
+          "controlType": "ControlType.Group",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "ChatGPT",
+          "automationId": "RootWebArea",
+          "className": "",
+          "controlType": "ControlType.Document",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        }
+      ]
+    },
+    {
+      "observedAt": "2026-09-10T14:42:16.0301323Z",
+      "name": "10.100.5.129:8080/job/00-【OZDQP】【快捷打包】/build?delay=0sec  现在我的打包机进行了一次大的更改，所有打包入口都集中到了这一个构建上。你看一下，在我们的 exe 中做一下兼容。我们的 exe 现在可以选择一共这 8 项的打包，一键打包。每一个都可以有两个选项，分别是只构建，以及构建完自动上传增量，其中，安卓的 debug 包上传增量的是 2001 的 1002，安卓的 Release 是 2002 的 1002；iOS 的 debug 包是 2001 的 2004，iOS 的 Release 是 2002 的 2004。这四个渠道要在瑞雪上传的时候对应一下。这个瑞雪上传的版本号要和我构建的版本号完全一致。我修改了打包之后 APK、IPA 以及上传增量包的地方，重构了它们的地址。你可以看一下打包参数，确认包和增量具体会放到哪里，上传的时候别传错了 ，现在 iOS 和安卓的 APK 安装包增量都放在了这下面10.100.5.129:8000/ozdqp",
+      "ancestors": [
+        {
+          "name": "10.100.5.129:8080/job/00-【OZDQP】【快捷打包】/build?delay=0sec  现在我的打包机进行了一次大的更改，所有打包入口都集中到了这一个构建上。你看一下，在我们的 exe 中做一下兼容。我们的 exe 现在可以选择一共这 8 项的打包，一键打包。每一个都可以有两个选项，分别是只构建，以及构建完自动上传增量，其中，安卓的 debug 包上传增量的是 2001 的 1002，安卓的 Release 是 2002 的 1002；iOS 的 debug 包是 2001 的 2004，iOS 的 Release 是 2002 的 2004。这四个渠道要在瑞雪上传的时候对应一下。这个瑞雪上传的版本号要和我构建的版本号完全一致。我修改了打包之后 APK、IPA 以及上传增量包的地方，重构了它们的地址。你可以看一下打包参数，确认包和增量具体会放到哪里，上传的时候别传错了 ，现在 iOS 和安卓的 APK 安装包增量都放在了这下面10.100.5.129:8000/ozdqp",
+          "automationId": "",
+          "className": "",
+          "controlType": "ControlType.Text",
+          "offscreen": true,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "",
+          "automationId": "",
+          "className": "relative h-full flex-1 [content-visibility:auto]",
+          "controlType": "ControlType.Group",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "",
+          "automationId": "",
+          "className": "_MainContentSurface_ihb90_2 border-l-hairline border-default",
+          "controlType": "ControlType.Group",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "",
+          "automationId": "root",
+          "className": "",
+          "controlType": "ControlType.Group",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "",
+          "automationId": "",
+          "className": "",
+          "controlType": "ControlType.Group",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "ChatGPT",
+          "automationId": "RootWebArea",
+          "className": "",
+          "controlType": "ControlType.Document",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "",
+          "automationId": "",
+          "className": "Chrome_WidgetWin_1",
+          "controlType": "ControlType.Pane",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "",
+          "automationId": "",
+          "className": "View",
+          "controlType": "ControlType.Pane",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "",
+          "automationId": "",
+          "className": "ChromeNodeClientView",
+          "controlType": "ControlType.Pane",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "",
+          "automationId": "",
+          "className": "ChromeNodeFrameView",
+          "controlType": "ControlType.Pane",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        }
+      ]
+    },
+    {
+      "observedAt": "2026-09-10T14:42:16.0811118Z",
+      "name": "前四种“安装包＋增量”已真实构建、上传并完成提测，版本均为 ",
+      "ancestors": [
+        {
+          "name": "前四种“安装包＋增量”已真实构建、上传并完成提测，版本均为 ",
+          "automationId": "",
+          "className": "",
+          "controlType": "ControlType.Text",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "",
+          "automationId": "",
+          "className": "relative h-full flex-1 [content-visibility:auto]",
+          "controlType": "ControlType.Group",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "",
+          "automationId": "",
+          "className": "_MainContentSurface_ihb90_2 border-l-hairline border-default",
+          "controlType": "ControlType.Group",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "",
+          "automationId": "root",
+          "className": "",
+          "controlType": "ControlType.Group",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "",
+          "automationId": "",
+          "className": "",
+          "controlType": "ControlType.Group",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "ChatGPT",
+          "automationId": "RootWebArea",
+          "className": "",
+          "controlType": "ControlType.Document",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "",
+          "automationId": "",
+          "className": "Chrome_WidgetWin_1",
+          "controlType": "ControlType.Pane",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "",
+          "automationId": "",
+          "className": "View",
+          "controlType": "ControlType.Pane",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "",
+          "automationId": "",
+          "className": "ChromeNodeClientView",
+          "controlType": "ControlType.Pane",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "",
+          "automationId": "",
+          "className": "ChromeNodeFrameView",
+          "controlType": "ControlType.Pane",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        }
+      ]
+    },
+    {
+      "observedAt": "2026-09-10T14:42:16.1403294Z",
+      "name": " 新统一构建日志缺少旧 shell tracing 标记，页面停在准备环境。QA Hub ",
+      "ancestors": [
+        {
+          "name": " 新统一构建日志缺少旧 shell tracing 标记，页面停在准备环境。QA Hub ",
+          "automationId": "",
+          "className": "",
+          "controlType": "ControlType.Text",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "使用 Markdown 编写…",
+          "automationId": "",
+          "className": "cm-content cm-lineWrapping",
+          "controlType": "ControlType.Edit",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "",
+          "automationId": "",
+          "className": "cm-scroller",
+          "controlType": "ControlType.Group",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "",
+          "automationId": "",
+          "className": "absolute inset-0 overflow-hidden",
+          "controlType": "ControlType.Group",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "eight-build-acceptance-20260910.md",
+          "automationId": "",
+          "className": "relative min-h-0 flex-1 outline-none",
+          "controlType": "ControlType.Pane",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "",
+          "automationId": "",
+          "className": "relative z-[41] h-full min-h-0 min-w-0 shrink-0 overflow-visible ltr:ms-auto rtl:me-auto",
+          "controlType": "ControlType.Group",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "",
+          "automationId": "",
+          "className": "_MainContentSurface_ihb90_2 border-l-hairline border-default",
+          "controlType": "ControlType.Group",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "",
+          "automationId": "root",
+          "className": "",
+          "controlType": "ControlType.Group",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "",
+          "automationId": "",
+          "className": "",
+          "controlType": "ControlType.Group",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "ChatGPT",
+          "automationId": "RootWebArea",
+          "className": "",
+          "controlType": "ControlType.Document",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        }
+      ]
+    },
+    {
+      "observedAt": "2026-09-10T14:42:16.1617668Z",
+      "name": "取得授权后，先确认四个 2.5.1 实际发布至瑞雪状态 100，再使用打包机已有 ConfirmOzdqpUploadedBaseline.py 登记基线；这一步当前是操作员脚本，并非 QA Hub 自动回写。接着固定同源码 2.5.2 批次，执行四项 Res，核对实际 incremental、基线 2.5.1、对应 Player、目标渠道与瑞雪版本。",
+      "ancestors": [
+        {
+          "name": "取得授权后，先确认四个 2.5.1 实际发布至瑞雪状态 100，再使用打包机已有 ConfirmOzdqpUploadedBaseline.py 登记基线；这一步当前是操作员脚本，并非 QA Hub 自动回写。接着固定同源码 2.5.2 批次，执行四项 Res，核对实际 incremental、基线 2.5.1、对应 Player、目标渠道与瑞雪版本。",
+          "automationId": "",
+          "className": "",
+          "controlType": "ControlType.Text",
+          "offscreen": true,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "使用 Markdown 编写…",
+          "automationId": "",
+          "className": "cm-content cm-lineWrapping",
+          "controlType": "ControlType.Edit",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "",
+          "automationId": "",
+          "className": "cm-scroller",
+          "controlType": "ControlType.Group",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "",
+          "automationId": "",
+          "className": "absolute inset-0 overflow-hidden",
+          "controlType": "ControlType.Group",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "eight-build-acceptance-20260910.md",
+          "automationId": "",
+          "className": "relative min-h-0 flex-1 outline-none",
+          "controlType": "ControlType.Pane",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "",
+          "automationId": "",
+          "className": "relative z-[41] h-full min-h-0 min-w-0 shrink-0 overflow-visible ltr:ms-auto rtl:me-auto",
+          "controlType": "ControlType.Group",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "",
+          "automationId": "",
+          "className": "_MainContentSurface_ihb90_2 border-l-hairline border-default",
+          "controlType": "ControlType.Group",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "",
+          "automationId": "root",
+          "className": "",
+          "controlType": "ControlType.Group",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "",
+          "automationId": "",
+          "className": "",
+          "controlType": "ControlType.Group",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "ChatGPT",
+          "automationId": "RootWebArea",
+          "className": "",
+          "controlType": "ControlType.Document",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        }
+      ]
+    },
+    {
+      "observedAt": "2026-09-10T14:42:16.1981890Z",
+      "name": "Relay QA Hub",
+      "ancestors": [
+        {
+          "name": "Relay QA Hub",
+          "automationId": "",
+          "className": "Chrome_WidgetWin_1",
+          "controlType": "ControlType.Window",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 3409188
+        },
+        {
+          "name": "",
+          "automationId": "",
+          "className": "#32769",
+          "controlType": "ControlType.Pane",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 65548
+        }
+      ]
+    },
+    {
+      "observedAt": "2026-09-10T14:42:16.2012393Z",
+      "name": "Relay QA Hub",
+      "ancestors": [
+        {
+          "name": "Relay QA Hub",
+          "automationId": "",
+          "className": "RootView",
+          "controlType": "ControlType.Pane",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "Relay QA Hub",
+          "automationId": "",
+          "className": "Chrome_WidgetWin_1",
+          "controlType": "ControlType.Window",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 3409188
+        },
+        {
+          "name": "",
+          "automationId": "",
+          "className": "#32769",
+          "controlType": "ControlType.Pane",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 65548
+        }
+      ]
+    },
+    {
+      "observedAt": "2026-09-10T14:42:16.2251291Z",
+      "name": "Relay QA Hub",
+      "ancestors": [
+        {
+          "name": "Relay QA Hub",
+          "automationId": "RootWebArea",
+          "className": "",
+          "controlType": "ControlType.Document",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "",
+          "automationId": "",
+          "className": "View",
+          "controlType": "ControlType.Pane",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "",
+          "automationId": "",
+          "className": "View",
+          "controlType": "ControlType.Pane",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "",
+          "automationId": "",
+          "className": "View",
+          "controlType": "ControlType.Pane",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "",
+          "automationId": "",
+          "className": "ClientView",
+          "controlType": "ControlType.Pane",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "",
+          "automationId": "",
+          "className": "WinFrameView",
+          "controlType": "ControlType.Pane",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "",
+          "automationId": "",
+          "className": "NonClientView",
+          "controlType": "ControlType.Pane",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "Relay QA Hub",
+          "automationId": "",
+          "className": "RootView",
+          "controlType": "ControlType.Pane",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "Relay QA Hub",
+          "automationId": "",
+          "className": "Chrome_WidgetWin_1",
+          "controlType": "ControlType.Window",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 3409188
+        },
+        {
+          "name": "",
+          "automationId": "",
+          "className": "#32769",
+          "controlType": "ControlType.Pane",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 65548
+        }
+      ]
+    },
+    {
+      "observedAt": "2026-09-10T14:42:16.2378512Z",
+      "name": "QA Hub 窗口栏",
+      "ancestors": [
+        {
+          "name": "QA Hub 窗口栏",
+          "automationId": "",
+          "className": "topbar",
+          "controlType": "ControlType.Group",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "",
+          "automationId": "root",
+          "className": "",
+          "controlType": "ControlType.Group",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "Relay QA Hub",
+          "automationId": "RootWebArea",
+          "className": "",
+          "controlType": "ControlType.Document",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "",
+          "automationId": "",
+          "className": "View",
+          "controlType": "ControlType.Pane",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "",
+          "automationId": "",
+          "className": "View",
+          "controlType": "ControlType.Pane",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "",
+          "automationId": "",
+          "className": "View",
+          "controlType": "ControlType.Pane",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "",
+          "automationId": "",
+          "className": "ClientView",
+          "controlType": "ControlType.Pane",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "",
+          "automationId": "",
+          "className": "WinFrameView",
+          "controlType": "ControlType.Pane",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "",
+          "automationId": "",
+          "className": "NonClientView",
+          "controlType": "ControlType.Pane",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "Relay QA Hub",
+          "automationId": "",
+          "className": "RootView",
+          "controlType": "ControlType.Pane",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        }
+      ]
+    },
+    {
+      "observedAt": "2026-09-10T14:42:16.2503862Z",
+      "name": "QA Hub 已连接",
+      "ancestors": [
+        {
+          "name": "QA Hub 已连接",
+          "automationId": "",
+          "className": "connection-light is-connected",
+          "controlType": "ControlType.Image",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "QA Hub 窗口栏",
+          "automationId": "",
+          "className": "topbar",
+          "controlType": "ControlType.Group",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "",
+          "automationId": "root",
+          "className": "",
+          "controlType": "ControlType.Group",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "Relay QA Hub",
+          "automationId": "RootWebArea",
+          "className": "",
+          "controlType": "ControlType.Document",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "",
+          "automationId": "",
+          "className": "View",
+          "controlType": "ControlType.Pane",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "",
+          "automationId": "",
+          "className": "View",
+          "controlType": "ControlType.Pane",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "",
+          "automationId": "",
+          "className": "View",
+          "controlType": "ControlType.Pane",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "",
+          "automationId": "",
+          "className": "ClientView",
+          "controlType": "ControlType.Pane",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "",
+          "automationId": "",
+          "className": "WinFrameView",
+          "controlType": "ControlType.Pane",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "",
+          "automationId": "",
+          "className": "NonClientView",
+          "controlType": "ControlType.Pane",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        }
+      ]
+    },
+    {
+      "observedAt": "2026-09-10T14:42:16.2627507Z",
+      "name": "QA Hub",
+      "ancestors": [
+        {
+          "name": "QA Hub",
+          "automationId": "",
+          "className": "",
+          "controlType": "ControlType.Text",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "QA Hub 窗口栏",
+          "automationId": "",
+          "className": "topbar",
+          "controlType": "ControlType.Group",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "",
+          "automationId": "root",
+          "className": "",
+          "controlType": "ControlType.Group",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "Relay QA Hub",
+          "automationId": "RootWebArea",
+          "className": "",
+          "controlType": "ControlType.Document",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "",
+          "automationId": "",
+          "className": "View",
+          "controlType": "ControlType.Pane",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "",
+          "automationId": "",
+          "className": "View",
+          "controlType": "ControlType.Pane",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "",
+          "automationId": "",
+          "className": "View",
+          "controlType": "ControlType.Pane",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "",
+          "automationId": "",
+          "className": "ClientView",
+          "controlType": "ControlType.Pane",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "",
+          "automationId": "",
+          "className": "WinFrameView",
+          "controlType": "ControlType.Pane",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "",
+          "automationId": "",
+          "className": "NonClientView",
+          "controlType": "ControlType.Pane",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        }
+      ]
+    },
+    {
+      "observedAt": "2026-09-10T14:42:16.2852765Z",
+      "name": "Relay QA Hub",
+      "ancestors": [
+        {
+          "name": "Relay QA Hub",
+          "automationId": "",
+          "className": "Chrome_WidgetWin_1",
+          "controlType": "ControlType.Window",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 197696
+        },
+        {
+          "name": "",
+          "automationId": "",
+          "className": "#32769",
+          "controlType": "ControlType.Pane",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 65548
+        }
+      ]
+    },
+    {
+      "observedAt": "2026-09-10T14:42:16.2883512Z",
+      "name": "Relay QA Hub",
+      "ancestors": [
+        {
+          "name": "Relay QA Hub",
+          "automationId": "",
+          "className": "RootView",
+          "controlType": "ControlType.Pane",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "Relay QA Hub",
+          "automationId": "",
+          "className": "Chrome_WidgetWin_1",
+          "controlType": "ControlType.Window",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 197696
+        },
+        {
+          "name": "",
+          "automationId": "",
+          "className": "#32769",
+          "controlType": "ControlType.Pane",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 65548
+        }
+      ]
+    },
+    {
+      "observedAt": "2026-09-10T14:42:16.3006640Z",
+      "name": "Relay QA Hub",
+      "ancestors": [
+        {
+          "name": "Relay QA Hub",
+          "automationId": "RootWebArea",
+          "className": "",
+          "controlType": "ControlType.Document",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "",
+          "automationId": "",
+          "className": "View",
+          "controlType": "ControlType.Pane",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "",
+          "automationId": "",
+          "className": "View",
+          "controlType": "ControlType.Pane",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "",
+          "automationId": "",
+          "className": "View",
+          "controlType": "ControlType.Pane",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "",
+          "automationId": "",
+          "className": "ClientView",
+          "controlType": "ControlType.Pane",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "",
+          "automationId": "",
+          "className": "WinFrameView",
+          "controlType": "ControlType.Pane",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "",
+          "automationId": "",
+          "className": "NonClientView",
+          "controlType": "ControlType.Pane",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "Relay QA Hub",
+          "automationId": "",
+          "className": "RootView",
+          "controlType": "ControlType.Pane",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "Relay QA Hub",
+          "automationId": "",
+          "className": "Chrome_WidgetWin_1",
+          "controlType": "ControlType.Window",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 197696
+        },
+        {
+          "name": "",
+          "automationId": "",
+          "className": "#32769",
+          "controlType": "ControlType.Pane",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 65548
+        }
+      ]
+    },
+    {
+      "observedAt": "2026-09-10T14:42:16.3127511Z",
+      "name": "QA Hub ",
+      "ancestors": [
+        {
+          "name": "QA Hub ",
+          "automationId": "",
+          "className": "",
+          "controlType": "ControlType.Text",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "",
+          "automationId": "",
+          "className": "desktop-update-notice is-ready",
+          "controlType": "ControlType.StatusBar",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "",
+          "automationId": "root",
+          "className": "",
+          "controlType": "ControlType.Group",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "Relay QA Hub",
+          "automationId": "RootWebArea",
+          "className": "",
+          "controlType": "ControlType.Document",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "",
+          "automationId": "",
+          "className": "View",
+          "controlType": "ControlType.Pane",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "",
+          "automationId": "",
+          "className": "View",
+          "controlType": "ControlType.Pane",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "",
+          "automationId": "",
+          "className": "View",
+          "controlType": "ControlType.Pane",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "",
+          "automationId": "",
+          "className": "ClientView",
+          "controlType": "ControlType.Pane",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "",
+          "automationId": "",
+          "className": "WinFrameView",
+          "controlType": "ControlType.Pane",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "",
+          "automationId": "",
+          "className": "NonClientView",
+          "controlType": "ControlType.Pane",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        }
+      ]
+    },
+    {
+      "observedAt": "2026-09-10T14:42:16.3259965Z",
+      "name": "QA Hub 窗口栏",
+      "ancestors": [
+        {
+          "name": "QA Hub 窗口栏",
+          "automationId": "",
+          "className": "topbar",
+          "controlType": "ControlType.Group",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "",
+          "automationId": "root",
+          "className": "",
+          "controlType": "ControlType.Group",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "Relay QA Hub",
+          "automationId": "RootWebArea",
+          "className": "",
+          "controlType": "ControlType.Document",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "",
+          "automationId": "",
+          "className": "View",
+          "controlType": "ControlType.Pane",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "",
+          "automationId": "",
+          "className": "View",
+          "controlType": "ControlType.Pane",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "",
+          "automationId": "",
+          "className": "View",
+          "controlType": "ControlType.Pane",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "",
+          "automationId": "",
+          "className": "ClientView",
+          "controlType": "ControlType.Pane",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "",
+          "automationId": "",
+          "className": "WinFrameView",
+          "controlType": "ControlType.Pane",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "",
+          "automationId": "",
+          "className": "NonClientView",
+          "controlType": "ControlType.Pane",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "Relay QA Hub",
+          "automationId": "",
+          "className": "RootView",
+          "controlType": "ControlType.Pane",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        }
+      ]
+    },
+    {
+      "observedAt": "2026-09-10T14:42:16.3391478Z",
+      "name": "QA Hub 已连接",
+      "ancestors": [
+        {
+          "name": "QA Hub 已连接",
+          "automationId": "",
+          "className": "connection-light is-connected",
+          "controlType": "ControlType.Image",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "QA Hub 窗口栏",
+          "automationId": "",
+          "className": "topbar",
+          "controlType": "ControlType.Group",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "",
+          "automationId": "root",
+          "className": "",
+          "controlType": "ControlType.Group",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "Relay QA Hub",
+          "automationId": "RootWebArea",
+          "className": "",
+          "controlType": "ControlType.Document",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "",
+          "automationId": "",
+          "className": "View",
+          "controlType": "ControlType.Pane",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "",
+          "automationId": "",
+          "className": "View",
+          "controlType": "ControlType.Pane",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "",
+          "automationId": "",
+          "className": "View",
+          "controlType": "ControlType.Pane",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "",
+          "automationId": "",
+          "className": "ClientView",
+          "controlType": "ControlType.Pane",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "",
+          "automationId": "",
+          "className": "WinFrameView",
+          "controlType": "ControlType.Pane",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "",
+          "automationId": "",
+          "className": "NonClientView",
+          "controlType": "ControlType.Pane",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        }
+      ]
+    },
+    {
+      "observedAt": "2026-09-10T14:42:16.3519620Z",
+      "name": "QA Hub",
+      "ancestors": [
+        {
+          "name": "QA Hub",
+          "automationId": "",
+          "className": "",
+          "controlType": "ControlType.Text",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "QA Hub 窗口栏",
+          "automationId": "",
+          "className": "topbar",
+          "controlType": "ControlType.Group",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "",
+          "automationId": "root",
+          "className": "",
+          "controlType": "ControlType.Group",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "Relay QA Hub",
+          "automationId": "RootWebArea",
+          "className": "",
+          "controlType": "ControlType.Document",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "",
+          "automationId": "",
+          "className": "View",
+          "controlType": "ControlType.Pane",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "",
+          "automationId": "",
+          "className": "View",
+          "controlType": "ControlType.Pane",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "",
+          "automationId": "",
+          "className": "View",
+          "controlType": "ControlType.Pane",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "",
+          "automationId": "",
+          "className": "ClientView",
+          "controlType": "ControlType.Pane",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "",
+          "automationId": "",
+          "className": "WinFrameView",
+          "controlType": "ControlType.Pane",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "",
+          "automationId": "",
+          "className": "NonClientView",
+          "controlType": "ControlType.Pane",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        }
+      ]
+    },
+    {
+      "observedAt": "2026-09-10T14:42:16.3923474Z",
+      "name": "QA Hub Project Preview - final-sol-0909",
+      "ancestors": [
+        {
+          "name": "QA Hub Project Preview - final-sol-0909",
+          "automationId": "",
+          "className": "",
+          "controlType": "ControlType.ListItem",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "桌面",
+          "automationId": "1",
+          "className": "SysListView32",
+          "controlType": "ControlType.List",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 65982
+        },
+        {
+          "name": "Program Manager",
+          "automationId": "",
+          "className": "Progman",
+          "controlType": "ControlType.Pane",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 65976
+        },
+        {
+          "name": "",
+          "automationId": "",
+          "className": "#32769",
+          "controlType": "ControlType.Pane",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 65548
+        }
+      ]
+    },
+    {
+      "observedAt": "2026-09-10T14:42:16.3948608Z",
+      "name": "QA Hub Project Preview - v21-e2e-fresh-0910",
+      "ancestors": [
+        {
+          "name": "QA Hub Project Preview - v21-e2e-fresh-0910",
+          "automationId": "",
+          "className": "",
+          "controlType": "ControlType.ListItem",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "桌面",
+          "automationId": "1",
+          "className": "SysListView32",
+          "controlType": "ControlType.List",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 65982
+        },
+        {
+          "name": "Program Manager",
+          "automationId": "",
+          "className": "Progman",
+          "controlType": "ControlType.Pane",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 65976
+        },
+        {
+          "name": "",
+          "automationId": "",
+          "className": "#32769",
+          "controlType": "ControlType.Pane",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 65548
+        }
+      ]
+    },
+    {
+      "observedAt": "2026-09-10T14:42:16.3973920Z",
+      "name": "QA Hub Project Preview",
+      "ancestors": [
+        {
+          "name": "QA Hub Project Preview",
+          "automationId": "",
+          "className": "",
+          "controlType": "ControlType.ListItem",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "桌面",
+          "automationId": "1",
+          "className": "SysListView32",
+          "controlType": "ControlType.List",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 65982
+        },
+        {
+          "name": "Program Manager",
+          "automationId": "",
+          "className": "Progman",
+          "controlType": "ControlType.Pane",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 65976
+        },
+        {
+          "name": "",
+          "automationId": "",
+          "className": "#32769",
+          "controlType": "ControlType.Pane",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 65548
+        }
+      ]
+    },
+    {
+      "observedAt": "2026-09-10T14:42:16.3999722Z",
+      "name": "Relay QA Hub",
+      "ancestors": [
+        {
+          "name": "Relay QA Hub",
+          "automationId": "",
+          "className": "",
+          "controlType": "ControlType.ListItem",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 0
+        },
+        {
+          "name": "桌面",
+          "automationId": "1",
+          "className": "SysListView32",
+          "controlType": "ControlType.List",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 65982
+        },
+        {
+          "name": "Program Manager",
+          "automationId": "",
+          "className": "Progman",
+          "controlType": "ControlType.Pane",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 65976
+        },
+        {
+          "name": "",
+          "automationId": "",
+          "className": "#32769",
+          "controlType": "ControlType.Pane",
+          "offscreen": false,
+          "enabled": true,
+          "nativeWindowHandle": 65548
+        }
+      ]
+    }
+  ],
+  "exactTitleSeen": false,
+  "exactBodySeen": false
+}

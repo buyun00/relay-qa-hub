@@ -1,0 +1,1921 @@
+{
+  "schemaVersion": 1,
+  "runId": "1f89daba-cf96-4138-b8d4-62b8377e38d7",
+  "startedAt": "2026-09-10T14:24:56.150Z",
+  "instanceId": "qa-hub-preview-v21-e2e-fresh-0910",
+  "passed": false,
+  "checks": [
+    {
+      "label": "copied EXE hash",
+      "passed": true,
+      "actual": "58c21fdc87e3b5007df9d30e59a27df67e24516f7c74c61d7fb545d8c54d4f0f",
+      "expected": "58c21fdc87e3b5007df9d30e59a27df67e24516f7c74c61d7fb545d8c54d4f0f",
+      "at": "2026-09-10T14:24:56.767Z"
+    },
+    {
+      "label": "copied ASAR hash",
+      "passed": true,
+      "actual": "ff3b49304c7f98ec754bd42ef9732cd6b58718002b3f4be8ae0ae506e69b7474",
+      "expected": "ff3b49304c7f98ec754bd42ef9732cd6b58718002b3f4be8ae0ae506e69b7474",
+      "at": "2026-09-10T14:24:56.778Z"
+    },
+    {
+      "label": "interactive desktop session",
+      "passed": true,
+      "actual": true,
+      "expected": true,
+      "at": "2026-09-10T14:25:02.169Z"
+    },
+    {
+      "label": "input preview has no running process",
+      "passed": true,
+      "actual": 0,
+      "expected": 0,
+      "at": "2026-09-10T14:25:02.169Z"
+    },
+    {
+      "label": "same instance has no running process",
+      "passed": true,
+      "actual": 0,
+      "expected": 0,
+      "at": "2026-09-10T14:25:02.169Z"
+    },
+    {
+      "label": "new port 63374 vacant",
+      "passed": true,
+      "actual": 0,
+      "expected": 0,
+      "at": "2026-09-10T14:25:02.169Z"
+    },
+    {
+      "label": "new port 63375 vacant",
+      "passed": true,
+      "actual": 0,
+      "expected": 0,
+      "at": "2026-09-10T14:25:02.169Z"
+    },
+    {
+      "label": "new port 63376 vacant",
+      "passed": true,
+      "actual": 0,
+      "expected": 0,
+      "at": "2026-09-10T14:25:02.169Z"
+    },
+    {
+      "label": "read-only readiness before any business write status",
+      "passed": true,
+      "actual": 200,
+      "expected": 200,
+      "at": "2026-09-10T14:25:02.215Z"
+    },
+    {
+      "label": "isolated API ready",
+      "passed": true,
+      "actual": "ready",
+      "expected": "ready",
+      "at": "2026-09-10T14:25:02.216Z"
+    },
+    {
+      "label": "quit-probe exact PID",
+      "passed": true,
+      "actual": 25004,
+      "expected": 25004,
+      "at": "2026-09-10T14:25:02.696Z"
+    },
+    {
+      "label": "quit-probe exact copied EXE",
+      "passed": true,
+      "actual": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-v21-e2e-fresh-0910\\acceptance\\desktop-notification-project-route-live\\1f89daba-cf96-4138-b8d4-62b8377e38d7\\installed-copy\\RelayQaHubPreview-v21-e2e-fresh-0910.exe",
+      "expected": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-v21-e2e-fresh-0910\\acceptance\\desktop-notification-project-route-live\\1f89daba-cf96-4138-b8d4-62b8377e38d7\\installed-copy\\RelayQaHubPreview-v21-e2e-fresh-0910.exe",
+      "at": "2026-09-10T14:25:02.696Z"
+    },
+    {
+      "label": "quit-probe exact isolated profile",
+      "passed": true,
+      "actual": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-v21-e2e-fresh-0910\\acceptance\\desktop-notification-project-route-live\\1f89daba-cf96-4138-b8d4-62b8377e38d7\\profiles\\qa-hub-preview-v21-e2e-fresh-0910\\quit-probe",
+      "expected": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-v21-e2e-fresh-0910\\acceptance\\desktop-notification-project-route-live\\1f89daba-cf96-4138-b8d4-62b8377e38d7\\profiles\\qa-hub-preview-v21-e2e-fresh-0910\\quit-probe",
+      "at": "2026-09-10T14:25:02.696Z"
+    },
+    {
+      "label": "quit-probe graceful quit acknowledged",
+      "passed": true,
+      "actual": "OWN_APP_QUIT_SCHEDULED",
+      "expected": "OWN_APP_QUIT_SCHEDULED",
+      "at": "2026-09-10T14:25:02.951Z"
+    },
+    {
+      "label": "quit-probe exact child exited",
+      "passed": true,
+      "actual": true,
+      "expected": true,
+      "at": "2026-09-10T14:25:03.154Z"
+    },
+    {
+      "label": "quit-probe exit code",
+      "passed": true,
+      "actual": 0,
+      "expected": 0,
+      "at": "2026-09-10T14:25:03.154Z"
+    },
+    {
+      "label": "foreign processes unchanged by quit probe",
+      "passed": true,
+      "actual": [
+        {
+          "pid": 164,
+          "parentPid": 13564,
+          "name": "RelayQaHubPreview.exe",
+          "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview\\RelayQaHubPreview.exe",
+          "startedAt": "2026-09-09T01:44:08.6454770Z",
+          "commandLineSha256": "57b7c73ac644856fa52c597b0ae3a1cdbb6def14950fa6845de3e80102886da2"
+        },
+        {
+          "pid": 3452,
+          "parentPid": 17160,
+          "name": "RelayQaHub.exe",
+          "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHub\\RelayQaHub.exe",
+          "startedAt": "2026-09-08T10:24:12.7633970Z",
+          "commandLineSha256": "f18fb4fa9486f1e9e4b0de71a49ba0c15cd9d686f5a69872fa123342d582adb9"
+        },
+        {
+          "pid": 8632,
+          "parentPid": 13564,
+          "name": "RelayQaHubPreview.exe",
+          "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview\\RelayQaHubPreview.exe",
+          "startedAt": "2026-09-09T01:44:08.8187730Z",
+          "commandLineSha256": "1a58dc2a01b4e2cc7e586856e1f6f3cdfb30eb54c9b3c39238a4fb738a528aef"
+        },
+        {
+          "pid": 10744,
+          "parentPid": 17160,
+          "name": "RelayQaHub.exe",
+          "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHub\\RelayQaHub.exe",
+          "startedAt": "2026-09-08T10:24:12.6574810Z",
+          "commandLineSha256": "ef640b5d223baafb1b55652982938f69285aaaf8d37daab258238ff681f63549"
+        },
+        {
+          "pid": 13564,
+          "parentPid": 9232,
+          "name": "RelayQaHubPreview.exe",
+          "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview\\RelayQaHubPreview.exe",
+          "startedAt": "2026-09-09T01:44:08.4163170Z",
+          "commandLineSha256": "893a817c34861eedfa3a3a0a968755ae0746e6cbe6a400c55df28550c877eb59"
+        },
+        {
+          "pid": 17160,
+          "parentPid": 24088,
+          "name": "RelayQaHub.exe",
+          "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHub\\RelayQaHub.exe",
+          "startedAt": "2026-09-08T10:24:12.5269520Z",
+          "commandLineSha256": "0877b43443e2a4cfbe1a0e676912b9dfcfc812ceeb1ad371fd9ef0a516221a77"
+        },
+        {
+          "pid": 20984,
+          "parentPid": 13564,
+          "name": "RelayQaHubPreview.exe",
+          "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview\\RelayQaHubPreview.exe",
+          "startedAt": "2026-09-09T01:44:08.6727490Z",
+          "commandLineSha256": "a23cf06b5604dbe8e8c40e1c2f0b94ffdb26c37f59df36401fca0a0d3b7a3637"
+        },
+        {
+          "pid": 23112,
+          "parentPid": 26828,
+          "name": "RelayQaHub.exe",
+          "path": "D:\\Relay-QA-Hub\\apps\\desktop\\release\\RelayQaHub-win32-x64\\RelayQaHub.exe",
+          "startedAt": "2026-09-10T10:48:47.4786740Z",
+          "commandLineSha256": "d4be73d72d5d2b6268634ec9c55de800a9afdd8bec2f594031ac217cdd728374"
+        },
+        {
+          "pid": 23528,
+          "parentPid": 26828,
+          "name": "RelayQaHub.exe",
+          "path": "D:\\Relay-QA-Hub\\apps\\desktop\\release\\RelayQaHub-win32-x64\\RelayQaHub.exe",
+          "startedAt": "2026-09-10T10:48:47.5454310Z",
+          "commandLineSha256": "5527caeb78b30015a746e441c1162e7fb72302c669a8a04a9262a6ea92aba450"
+        },
+        {
+          "pid": 23944,
+          "parentPid": 17160,
+          "name": "RelayQaHub.exe",
+          "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHub\\RelayQaHub.exe",
+          "startedAt": "2026-09-08T10:24:12.6985200Z",
+          "commandLineSha256": "31089bf64ff57bae2d8a04a0d4764c67d65e9fe3dc103454afc41dbffa1502f0"
+        },
+        {
+          "pid": 26660,
+          "parentPid": 26828,
+          "name": "RelayQaHub.exe",
+          "path": "D:\\Relay-QA-Hub\\apps\\desktop\\release\\RelayQaHub-win32-x64\\RelayQaHub.exe",
+          "startedAt": "2026-09-10T10:48:47.4690790Z",
+          "commandLineSha256": "fa4cbc206d6a98847d7e60470bfd9fb0fcea17531e11c1adc21247ef20201c32"
+        },
+        {
+          "pid": 26828,
+          "parentPid": 19820,
+          "name": "RelayQaHub.exe",
+          "path": "D:\\Relay-QA-Hub\\apps\\desktop\\release\\RelayQaHub-win32-x64\\RelayQaHub.exe",
+          "startedAt": "2026-09-10T10:48:47.3434440Z",
+          "commandLineSha256": "2caedf0420c6bfbf2a720702a5a12356aee3cbb941872c0b76c0692e187dedf9"
+        }
+      ],
+      "expected": [
+        {
+          "pid": 164,
+          "parentPid": 13564,
+          "name": "RelayQaHubPreview.exe",
+          "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview\\RelayQaHubPreview.exe",
+          "startedAt": "2026-09-09T01:44:08.6454770Z",
+          "commandLineSha256": "57b7c73ac644856fa52c597b0ae3a1cdbb6def14950fa6845de3e80102886da2"
+        },
+        {
+          "pid": 3452,
+          "parentPid": 17160,
+          "name": "RelayQaHub.exe",
+          "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHub\\RelayQaHub.exe",
+          "startedAt": "2026-09-08T10:24:12.7633970Z",
+          "commandLineSha256": "f18fb4fa9486f1e9e4b0de71a49ba0c15cd9d686f5a69872fa123342d582adb9"
+        },
+        {
+          "pid": 8632,
+          "parentPid": 13564,
+          "name": "RelayQaHubPreview.exe",
+          "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview\\RelayQaHubPreview.exe",
+          "startedAt": "2026-09-09T01:44:08.8187730Z",
+          "commandLineSha256": "1a58dc2a01b4e2cc7e586856e1f6f3cdfb30eb54c9b3c39238a4fb738a528aef"
+        },
+        {
+          "pid": 10744,
+          "parentPid": 17160,
+          "name": "RelayQaHub.exe",
+          "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHub\\RelayQaHub.exe",
+          "startedAt": "2026-09-08T10:24:12.6574810Z",
+          "commandLineSha256": "ef640b5d223baafb1b55652982938f69285aaaf8d37daab258238ff681f63549"
+        },
+        {
+          "pid": 13564,
+          "parentPid": 9232,
+          "name": "RelayQaHubPreview.exe",
+          "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview\\RelayQaHubPreview.exe",
+          "startedAt": "2026-09-09T01:44:08.4163170Z",
+          "commandLineSha256": "893a817c34861eedfa3a3a0a968755ae0746e6cbe6a400c55df28550c877eb59"
+        },
+        {
+          "pid": 17160,
+          "parentPid": 24088,
+          "name": "RelayQaHub.exe",
+          "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHub\\RelayQaHub.exe",
+          "startedAt": "2026-09-08T10:24:12.5269520Z",
+          "commandLineSha256": "0877b43443e2a4cfbe1a0e676912b9dfcfc812ceeb1ad371fd9ef0a516221a77"
+        },
+        {
+          "pid": 20984,
+          "parentPid": 13564,
+          "name": "RelayQaHubPreview.exe",
+          "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview\\RelayQaHubPreview.exe",
+          "startedAt": "2026-09-09T01:44:08.6727490Z",
+          "commandLineSha256": "a23cf06b5604dbe8e8c40e1c2f0b94ffdb26c37f59df36401fca0a0d3b7a3637"
+        },
+        {
+          "pid": 23112,
+          "parentPid": 26828,
+          "name": "RelayQaHub.exe",
+          "path": "D:\\Relay-QA-Hub\\apps\\desktop\\release\\RelayQaHub-win32-x64\\RelayQaHub.exe",
+          "startedAt": "2026-09-10T10:48:47.4786740Z",
+          "commandLineSha256": "d4be73d72d5d2b6268634ec9c55de800a9afdd8bec2f594031ac217cdd728374"
+        },
+        {
+          "pid": 23528,
+          "parentPid": 26828,
+          "name": "RelayQaHub.exe",
+          "path": "D:\\Relay-QA-Hub\\apps\\desktop\\release\\RelayQaHub-win32-x64\\RelayQaHub.exe",
+          "startedAt": "2026-09-10T10:48:47.5454310Z",
+          "commandLineSha256": "5527caeb78b30015a746e441c1162e7fb72302c669a8a04a9262a6ea92aba450"
+        },
+        {
+          "pid": 23944,
+          "parentPid": 17160,
+          "name": "RelayQaHub.exe",
+          "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHub\\RelayQaHub.exe",
+          "startedAt": "2026-09-08T10:24:12.6985200Z",
+          "commandLineSha256": "31089bf64ff57bae2d8a04a0d4764c67d65e9fe3dc103454afc41dbffa1502f0"
+        },
+        {
+          "pid": 26660,
+          "parentPid": 26828,
+          "name": "RelayQaHub.exe",
+          "path": "D:\\Relay-QA-Hub\\apps\\desktop\\release\\RelayQaHub-win32-x64\\RelayQaHub.exe",
+          "startedAt": "2026-09-10T10:48:47.4690790Z",
+          "commandLineSha256": "fa4cbc206d6a98847d7e60470bfd9fb0fcea17531e11c1adc21247ef20201c32"
+        },
+        {
+          "pid": 26828,
+          "parentPid": 19820,
+          "name": "RelayQaHub.exe",
+          "path": "D:\\Relay-QA-Hub\\apps\\desktop\\release\\RelayQaHub-win32-x64\\RelayQaHub.exe",
+          "startedAt": "2026-09-10T10:48:47.3434440Z",
+          "commandLineSha256": "2caedf0420c6bfbf2a720702a5a12356aee3cbb941872c0b76c0692e187dedf9"
+        }
+      ],
+      "at": "2026-09-10T14:25:08.631Z"
+    },
+    {
+      "label": "probe port 63374 released",
+      "passed": true,
+      "actual": 0,
+      "expected": 0,
+      "at": "2026-09-10T14:25:08.631Z"
+    },
+    {
+      "label": "probe port 63375 released",
+      "passed": true,
+      "actual": 0,
+      "expected": 0,
+      "at": "2026-09-10T14:25:08.631Z"
+    },
+    {
+      "label": "probe port 63376 released",
+      "passed": true,
+      "actual": 0,
+      "expected": 0,
+      "at": "2026-09-10T14:25:08.631Z"
+    },
+    {
+      "label": "GM login status",
+      "passed": true,
+      "actual": 200,
+      "expected": 200,
+      "at": "2026-09-10T14:25:08.637Z"
+    },
+    {
+      "label": "GM identity",
+      "passed": true,
+      "actual": true,
+      "expected": true,
+      "at": "2026-09-10T14:25:08.637Z"
+    },
+    {
+      "label": "create project A status",
+      "passed": true,
+      "actual": 200,
+      "expected": 200,
+      "at": "2026-09-10T14:25:08.641Z"
+    },
+    {
+      "label": "create project B status",
+      "passed": true,
+      "actual": 200,
+      "expected": 200,
+      "at": "2026-09-10T14:25:08.647Z"
+    },
+    {
+      "label": "target joins A status",
+      "passed": true,
+      "actual": 200,
+      "expected": 200,
+      "at": "2026-09-10T14:25:08.657Z"
+    },
+    {
+      "label": "same target joins B status",
+      "passed": true,
+      "actual": 200,
+      "expected": 200,
+      "at": "2026-09-10T14:25:08.664Z"
+    },
+    {
+      "label": "separate actor joins A status",
+      "passed": true,
+      "actual": 200,
+      "expected": 200,
+      "at": "2026-09-10T14:25:08.669Z"
+    },
+    {
+      "label": "same separate actor joins B status",
+      "passed": true,
+      "actual": 200,
+      "expected": 200,
+      "at": "2026-09-10T14:25:08.675Z"
+    },
+    {
+      "label": "same target identity A B",
+      "passed": true,
+      "actual": "4276d9e1-c0a0-4235-8c8d-f3d746dbc17c",
+      "expected": "4276d9e1-c0a0-4235-8c8d-f3d746dbc17c",
+      "at": "2026-09-10T14:25:08.675Z"
+    },
+    {
+      "label": "same actor identity A B",
+      "passed": true,
+      "actual": "bb551639-6e7c-43b8-86cc-436f26623a7c",
+      "expected": "bb551639-6e7c-43b8-86cc-436f26623a7c",
+      "at": "2026-09-10T14:25:08.675Z"
+    },
+    {
+      "label": "actor distinct",
+      "passed": true,
+      "actual": true,
+      "expected": true,
+      "at": "2026-09-10T14:25:08.675Z"
+    },
+    {
+      "label": "route-1 exact PID",
+      "passed": true,
+      "actual": 2240,
+      "expected": 2240,
+      "at": "2026-09-10T14:25:08.825Z"
+    },
+    {
+      "label": "route-1 exact copied EXE",
+      "passed": true,
+      "actual": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-v21-e2e-fresh-0910\\acceptance\\desktop-notification-project-route-live\\1f89daba-cf96-4138-b8d4-62b8377e38d7\\installed-copy\\RelayQaHubPreview-v21-e2e-fresh-0910.exe",
+      "expected": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-v21-e2e-fresh-0910\\acceptance\\desktop-notification-project-route-live\\1f89daba-cf96-4138-b8d4-62b8377e38d7\\installed-copy\\RelayQaHubPreview-v21-e2e-fresh-0910.exe",
+      "at": "2026-09-10T14:25:08.825Z"
+    },
+    {
+      "label": "route-1 exact isolated profile",
+      "passed": true,
+      "actual": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-v21-e2e-fresh-0910\\acceptance\\desktop-notification-project-route-live\\1f89daba-cf96-4138-b8d4-62b8377e38d7\\profiles\\qa-hub-preview-v21-e2e-fresh-0910\\route",
+      "expected": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-v21-e2e-fresh-0910\\acceptance\\desktop-notification-project-route-live\\1f89daba-cf96-4138-b8d4-62b8377e38d7\\profiles\\qa-hub-preview-v21-e2e-fresh-0910\\route",
+      "at": "2026-09-10T14:25:08.825Z"
+    },
+    {
+      "label": "actor creates assigned A1 Bug status",
+      "passed": true,
+      "actual": 201,
+      "expected": 201,
+      "at": "2026-09-10T14:25:09.211Z"
+    },
+    {
+      "label": "target reads durable A1 notification status",
+      "passed": true,
+      "actual": 200,
+      "expected": 200,
+      "at": "2026-09-10T14:25:09.218Z"
+    },
+    {
+      "label": "durable A1 notification exists",
+      "passed": true,
+      "actual": true,
+      "expected": true,
+      "at": "2026-09-10T14:25:09.219Z"
+    },
+    {
+      "label": "durable A1 notification body",
+      "passed": true,
+      "actual": "N1F89DABACFA-1 · 通知路由A1-1f89dabacf964138b8d462b8377e38d7",
+      "expected": "N1F89DABACFA-1 · 通知路由A1-1f89dabacf964138b8d462b8377e38d7",
+      "at": "2026-09-10T14:25:09.219Z"
+    },
+    {
+      "label": "final-cleanup graceful quit acknowledged",
+      "passed": true,
+      "actual": "OWN_APP_QUIT_SCHEDULED",
+      "expected": "OWN_APP_QUIT_SCHEDULED",
+      "at": "2026-09-10T14:25:39.397Z"
+    },
+    {
+      "label": "final-cleanup exact child exited",
+      "passed": true,
+      "actual": true,
+      "expected": true,
+      "at": "2026-09-10T14:25:39.601Z"
+    },
+    {
+      "label": "final-cleanup exit code",
+      "passed": true,
+      "actual": 0,
+      "expected": 0,
+      "at": "2026-09-10T14:25:39.601Z"
+    },
+    {
+      "label": "daily and foreign QA Hub processes unchanged",
+      "passed": true,
+      "actual": [
+        {
+          "pid": 164,
+          "parentPid": 13564,
+          "name": "RelayQaHubPreview.exe",
+          "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview\\RelayQaHubPreview.exe",
+          "startedAt": "2026-09-09T01:44:08.6454770Z",
+          "commandLineSha256": "57b7c73ac644856fa52c597b0ae3a1cdbb6def14950fa6845de3e80102886da2"
+        },
+        {
+          "pid": 3452,
+          "parentPid": 17160,
+          "name": "RelayQaHub.exe",
+          "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHub\\RelayQaHub.exe",
+          "startedAt": "2026-09-08T10:24:12.7633970Z",
+          "commandLineSha256": "f18fb4fa9486f1e9e4b0de71a49ba0c15cd9d686f5a69872fa123342d582adb9"
+        },
+        {
+          "pid": 8632,
+          "parentPid": 13564,
+          "name": "RelayQaHubPreview.exe",
+          "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview\\RelayQaHubPreview.exe",
+          "startedAt": "2026-09-09T01:44:08.8187730Z",
+          "commandLineSha256": "1a58dc2a01b4e2cc7e586856e1f6f3cdfb30eb54c9b3c39238a4fb738a528aef"
+        },
+        {
+          "pid": 10744,
+          "parentPid": 17160,
+          "name": "RelayQaHub.exe",
+          "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHub\\RelayQaHub.exe",
+          "startedAt": "2026-09-08T10:24:12.6574810Z",
+          "commandLineSha256": "ef640b5d223baafb1b55652982938f69285aaaf8d37daab258238ff681f63549"
+        },
+        {
+          "pid": 13564,
+          "parentPid": 9232,
+          "name": "RelayQaHubPreview.exe",
+          "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview\\RelayQaHubPreview.exe",
+          "startedAt": "2026-09-09T01:44:08.4163170Z",
+          "commandLineSha256": "893a817c34861eedfa3a3a0a968755ae0746e6cbe6a400c55df28550c877eb59"
+        },
+        {
+          "pid": 17160,
+          "parentPid": 24088,
+          "name": "RelayQaHub.exe",
+          "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHub\\RelayQaHub.exe",
+          "startedAt": "2026-09-08T10:24:12.5269520Z",
+          "commandLineSha256": "0877b43443e2a4cfbe1a0e676912b9dfcfc812ceeb1ad371fd9ef0a516221a77"
+        },
+        {
+          "pid": 20984,
+          "parentPid": 13564,
+          "name": "RelayQaHubPreview.exe",
+          "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview\\RelayQaHubPreview.exe",
+          "startedAt": "2026-09-09T01:44:08.6727490Z",
+          "commandLineSha256": "a23cf06b5604dbe8e8c40e1c2f0b94ffdb26c37f59df36401fca0a0d3b7a3637"
+        },
+        {
+          "pid": 23112,
+          "parentPid": 26828,
+          "name": "RelayQaHub.exe",
+          "path": "D:\\Relay-QA-Hub\\apps\\desktop\\release\\RelayQaHub-win32-x64\\RelayQaHub.exe",
+          "startedAt": "2026-09-10T10:48:47.4786740Z",
+          "commandLineSha256": "d4be73d72d5d2b6268634ec9c55de800a9afdd8bec2f594031ac217cdd728374"
+        },
+        {
+          "pid": 23528,
+          "parentPid": 26828,
+          "name": "RelayQaHub.exe",
+          "path": "D:\\Relay-QA-Hub\\apps\\desktop\\release\\RelayQaHub-win32-x64\\RelayQaHub.exe",
+          "startedAt": "2026-09-10T10:48:47.5454310Z",
+          "commandLineSha256": "5527caeb78b30015a746e441c1162e7fb72302c669a8a04a9262a6ea92aba450"
+        },
+        {
+          "pid": 23944,
+          "parentPid": 17160,
+          "name": "RelayQaHub.exe",
+          "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHub\\RelayQaHub.exe",
+          "startedAt": "2026-09-08T10:24:12.6985200Z",
+          "commandLineSha256": "31089bf64ff57bae2d8a04a0d4764c67d65e9fe3dc103454afc41dbffa1502f0"
+        },
+        {
+          "pid": 26660,
+          "parentPid": 26828,
+          "name": "RelayQaHub.exe",
+          "path": "D:\\Relay-QA-Hub\\apps\\desktop\\release\\RelayQaHub-win32-x64\\RelayQaHub.exe",
+          "startedAt": "2026-09-10T10:48:47.4690790Z",
+          "commandLineSha256": "fa4cbc206d6a98847d7e60470bfd9fb0fcea17531e11c1adc21247ef20201c32"
+        },
+        {
+          "pid": 26828,
+          "parentPid": 19820,
+          "name": "RelayQaHub.exe",
+          "path": "D:\\Relay-QA-Hub\\apps\\desktop\\release\\RelayQaHub-win32-x64\\RelayQaHub.exe",
+          "startedAt": "2026-09-10T10:48:47.3434440Z",
+          "commandLineSha256": "2caedf0420c6bfbf2a720702a5a12356aee3cbb941872c0b76c0692e187dedf9"
+        }
+      ],
+      "expected": [
+        {
+          "pid": 164,
+          "parentPid": 13564,
+          "name": "RelayQaHubPreview.exe",
+          "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview\\RelayQaHubPreview.exe",
+          "startedAt": "2026-09-09T01:44:08.6454770Z",
+          "commandLineSha256": "57b7c73ac644856fa52c597b0ae3a1cdbb6def14950fa6845de3e80102886da2"
+        },
+        {
+          "pid": 3452,
+          "parentPid": 17160,
+          "name": "RelayQaHub.exe",
+          "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHub\\RelayQaHub.exe",
+          "startedAt": "2026-09-08T10:24:12.7633970Z",
+          "commandLineSha256": "f18fb4fa9486f1e9e4b0de71a49ba0c15cd9d686f5a69872fa123342d582adb9"
+        },
+        {
+          "pid": 8632,
+          "parentPid": 13564,
+          "name": "RelayQaHubPreview.exe",
+          "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview\\RelayQaHubPreview.exe",
+          "startedAt": "2026-09-09T01:44:08.8187730Z",
+          "commandLineSha256": "1a58dc2a01b4e2cc7e586856e1f6f3cdfb30eb54c9b3c39238a4fb738a528aef"
+        },
+        {
+          "pid": 10744,
+          "parentPid": 17160,
+          "name": "RelayQaHub.exe",
+          "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHub\\RelayQaHub.exe",
+          "startedAt": "2026-09-08T10:24:12.6574810Z",
+          "commandLineSha256": "ef640b5d223baafb1b55652982938f69285aaaf8d37daab258238ff681f63549"
+        },
+        {
+          "pid": 13564,
+          "parentPid": 9232,
+          "name": "RelayQaHubPreview.exe",
+          "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview\\RelayQaHubPreview.exe",
+          "startedAt": "2026-09-09T01:44:08.4163170Z",
+          "commandLineSha256": "893a817c34861eedfa3a3a0a968755ae0746e6cbe6a400c55df28550c877eb59"
+        },
+        {
+          "pid": 17160,
+          "parentPid": 24088,
+          "name": "RelayQaHub.exe",
+          "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHub\\RelayQaHub.exe",
+          "startedAt": "2026-09-08T10:24:12.5269520Z",
+          "commandLineSha256": "0877b43443e2a4cfbe1a0e676912b9dfcfc812ceeb1ad371fd9ef0a516221a77"
+        },
+        {
+          "pid": 20984,
+          "parentPid": 13564,
+          "name": "RelayQaHubPreview.exe",
+          "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview\\RelayQaHubPreview.exe",
+          "startedAt": "2026-09-09T01:44:08.6727490Z",
+          "commandLineSha256": "a23cf06b5604dbe8e8c40e1c2f0b94ffdb26c37f59df36401fca0a0d3b7a3637"
+        },
+        {
+          "pid": 23112,
+          "parentPid": 26828,
+          "name": "RelayQaHub.exe",
+          "path": "D:\\Relay-QA-Hub\\apps\\desktop\\release\\RelayQaHub-win32-x64\\RelayQaHub.exe",
+          "startedAt": "2026-09-10T10:48:47.4786740Z",
+          "commandLineSha256": "d4be73d72d5d2b6268634ec9c55de800a9afdd8bec2f594031ac217cdd728374"
+        },
+        {
+          "pid": 23528,
+          "parentPid": 26828,
+          "name": "RelayQaHub.exe",
+          "path": "D:\\Relay-QA-Hub\\apps\\desktop\\release\\RelayQaHub-win32-x64\\RelayQaHub.exe",
+          "startedAt": "2026-09-10T10:48:47.5454310Z",
+          "commandLineSha256": "5527caeb78b30015a746e441c1162e7fb72302c669a8a04a9262a6ea92aba450"
+        },
+        {
+          "pid": 23944,
+          "parentPid": 17160,
+          "name": "RelayQaHub.exe",
+          "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHub\\RelayQaHub.exe",
+          "startedAt": "2026-09-08T10:24:12.6985200Z",
+          "commandLineSha256": "31089bf64ff57bae2d8a04a0d4764c67d65e9fe3dc103454afc41dbffa1502f0"
+        },
+        {
+          "pid": 26660,
+          "parentPid": 26828,
+          "name": "RelayQaHub.exe",
+          "path": "D:\\Relay-QA-Hub\\apps\\desktop\\release\\RelayQaHub-win32-x64\\RelayQaHub.exe",
+          "startedAt": "2026-09-10T10:48:47.4690790Z",
+          "commandLineSha256": "fa4cbc206d6a98847d7e60470bfd9fb0fcea17531e11c1adc21247ef20201c32"
+        },
+        {
+          "pid": 26828,
+          "parentPid": 19820,
+          "name": "RelayQaHub.exe",
+          "path": "D:\\Relay-QA-Hub\\apps\\desktop\\release\\RelayQaHub-win32-x64\\RelayQaHub.exe",
+          "startedAt": "2026-09-10T10:48:47.3434440Z",
+          "commandLineSha256": "2caedf0420c6bfbf2a720702a5a12356aee3cbb941872c0b76c0692e187dedf9"
+        }
+      ],
+      "at": "2026-09-10T14:25:44.841Z"
+    },
+    {
+      "label": "configured and production listeners unchanged",
+      "passed": true,
+      "actual": [
+        {
+          "port": 4174,
+          "listening": true,
+          "address": "0.0.0.0",
+          "pid": 7420
+        },
+        {
+          "port": 4319,
+          "listening": true,
+          "address": "0.0.0.0",
+          "pid": 14044
+        },
+        {
+          "port": 4320,
+          "listening": true,
+          "address": "127.0.0.1",
+          "pid": 17160
+        },
+        {
+          "port": 4639,
+          "listening": true,
+          "address": "127.0.0.1",
+          "pid": 19004
+        },
+        {
+          "port": 4640,
+          "listening": true,
+          "address": "127.0.0.1",
+          "pid": 20452
+        },
+        {
+          "port": 4641,
+          "listening": true,
+          "address": "127.0.0.1",
+          "pid": 19112
+        },
+        {
+          "port": 4642,
+          "listening": false,
+          "address": null,
+          "pid": null
+        }
+      ],
+      "expected": [
+        {
+          "port": 4174,
+          "listening": true,
+          "address": "0.0.0.0",
+          "pid": 7420
+        },
+        {
+          "port": 4319,
+          "listening": true,
+          "address": "0.0.0.0",
+          "pid": 14044
+        },
+        {
+          "port": 4320,
+          "listening": true,
+          "address": "127.0.0.1",
+          "pid": 17160
+        },
+        {
+          "port": 4639,
+          "listening": true,
+          "address": "127.0.0.1",
+          "pid": 19004
+        },
+        {
+          "port": 4640,
+          "listening": true,
+          "address": "127.0.0.1",
+          "pid": 20452
+        },
+        {
+          "port": 4641,
+          "listening": true,
+          "address": "127.0.0.1",
+          "pid": 19112
+        },
+        {
+          "port": 4642,
+          "listening": false,
+          "address": null,
+          "pid": null
+        }
+      ],
+      "at": "2026-09-10T14:25:44.841Z"
+    },
+    {
+      "label": "final own port 63374 released",
+      "passed": true,
+      "actual": 0,
+      "expected": 0,
+      "at": "2026-09-10T14:25:44.841Z"
+    },
+    {
+      "label": "final own port 63375 released",
+      "passed": true,
+      "actual": 0,
+      "expected": 0,
+      "at": "2026-09-10T14:25:44.841Z"
+    },
+    {
+      "label": "final own port 63376 released",
+      "passed": true,
+      "actual": 0,
+      "expected": 0,
+      "at": "2026-09-10T14:25:44.841Z"
+    },
+    {
+      "label": "instance and installed preview inputs unchanged",
+      "passed": true,
+      "actual": [
+        {
+          "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-v21-e2e-fresh-0910\\instance.json",
+          "bytes": 1327,
+          "sha256": "cf92bad26060bbcddcfc37d620320e8bac15e09104088944e456a3b9205257db"
+        },
+        {
+          "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview-v21-e2e-fresh-0910\\RelayQaHubPreview-v21-e2e-fresh-0910.exe",
+          "bytes": 235871744,
+          "sha256": "58c21fdc87e3b5007df9d30e59a27df67e24516f7c74c61d7fb545d8c54d4f0f"
+        },
+        {
+          "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview-v21-e2e-fresh-0910\\resources\\app.asar",
+          "bytes": 3442810,
+          "sha256": "ff3b49304c7f98ec754bd42ef9732cd6b58718002b3f4be8ae0ae506e69b7474"
+        },
+        {
+          "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview-v21-e2e-fresh-0910\\preview-instance.json",
+          "bytes": 742,
+          "sha256": "dbde6a7d32476ed526bce22af042fd5eab0e7abf1cd4b871513688edc534a71c"
+        },
+        {
+          "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-v21-e2e-fresh-0910\\secrets.json",
+          "bytes": 242,
+          "sha256": "fcf0173d2eaac6c6a7d6fa56a990870796a80fac34bee3de696a7fdd094c4468"
+        }
+      ],
+      "expected": [
+        {
+          "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-v21-e2e-fresh-0910\\instance.json",
+          "bytes": 1327,
+          "sha256": "cf92bad26060bbcddcfc37d620320e8bac15e09104088944e456a3b9205257db"
+        },
+        {
+          "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview-v21-e2e-fresh-0910\\RelayQaHubPreview-v21-e2e-fresh-0910.exe",
+          "bytes": 235871744,
+          "sha256": "58c21fdc87e3b5007df9d30e59a27df67e24516f7c74c61d7fb545d8c54d4f0f"
+        },
+        {
+          "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview-v21-e2e-fresh-0910\\resources\\app.asar",
+          "bytes": 3442810,
+          "sha256": "ff3b49304c7f98ec754bd42ef9732cd6b58718002b3f4be8ae0ae506e69b7474"
+        },
+        {
+          "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview-v21-e2e-fresh-0910\\preview-instance.json",
+          "bytes": 742,
+          "sha256": "dbde6a7d32476ed526bce22af042fd5eab0e7abf1cd4b871513688edc534a71c"
+        },
+        {
+          "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-v21-e2e-fresh-0910\\secrets.json",
+          "bytes": 242,
+          "sha256": "fcf0173d2eaac6c6a7d6fa56a990870796a80fac34bee3de696a7fdd094c4468"
+        }
+      ],
+      "at": "2026-09-10T14:25:45.045Z"
+    }
+  ],
+  "fixtures": {
+    "projectA": {
+      "id": "9aef7510-658f-4ed6-93e0-eb587a2b6a1d",
+      "key": "N1F89DABACFA",
+      "name": "通知路由A-1f89daba",
+      "active": true,
+      "version": 1
+    },
+    "projectB": {
+      "id": "e22e9cf4-2d34-4227-8fa9-05db1591ef60",
+      "key": "N1F89DABACFB",
+      "name": "通知路由B-1f89daba",
+      "active": true,
+      "version": 1
+    },
+    "target": {
+      "userId": "4276d9e1-c0a0-4235-8c8d-f3d746dbc17c",
+      "name": "NotifyTarget1f89dabacf96"
+    },
+    "actorA": {
+      "userId": "bb551639-6e7c-43b8-86cc-436f26623a7c",
+      "name": "NotifyActor1f89dabacf96"
+    }
+  },
+  "requests": [
+    {
+      "label": "read-only readiness before any business write",
+      "method": "GET",
+      "path": "/api/v1/health/ready",
+      "projectId": null,
+      "request": null,
+      "at": "2026-09-10T14:25:02.170Z",
+      "status": 200,
+      "responseSha256": "eef9b88c73d906a5ee60e088d5ac06472b255a8962c86e47b6b77d6c2787262f",
+      "response": {
+        "status": "ready",
+        "schemaVersion": "20",
+        "checks": [
+          {
+            "name": "database",
+            "status": "ok"
+          },
+          {
+            "name": "evidence",
+            "status": "ok"
+          },
+          {
+            "name": "worker",
+            "status": "ok"
+          }
+        ]
+      }
+    },
+    {
+      "label": "GM login",
+      "method": "POST",
+      "path": "/api/v1/auth/gm/login",
+      "projectId": null,
+      "request": {
+        "password": "[REDACTED]",
+        "client": "android"
+      },
+      "at": "2026-09-10T14:25:08.631Z",
+      "status": 200,
+      "responseSha256": "1c3583e40753e256292fa7060cb921e96a3e8714194d78048d71450b93817ab8",
+      "response": {
+        "accountId": "10000000-0000-4000-8000-000000000020",
+        "userId": "eb15d62a-f9d2-4015-a5f3-c95f1a729e23",
+        "email": "qa-b92dcb64da744e5245c8ad99ceeca75c6d719402fc65e323ea07fff842e5d657@local.invalid",
+        "displayName": "Preview GM",
+        "csrfToken": "[REDACTED]",
+        "isGm": true,
+        "accessToken": "[REDACTED]",
+        "expiresAt": "2094-09-28T17:39:15.635Z"
+      }
+    },
+    {
+      "label": "create project A",
+      "method": "POST",
+      "path": "/api/v1/gm/projects",
+      "projectId": null,
+      "request": {
+        "id": "9aef7510-658f-4ed6-93e0-eb587a2b6a1d",
+        "key": "N1F89DABACFA",
+        "name": "通知路由A-1f89daba"
+      },
+      "at": "2026-09-10T14:25:08.637Z",
+      "status": 200,
+      "responseSha256": "5c926b58c9739b1877608147e63d478e3e9ac35ba54f7eec4e6ec894e8985003",
+      "response": {
+        "id": "9aef7510-658f-4ed6-93e0-eb587a2b6a1d",
+        "key": "N1F89DABACFA",
+        "name": "通知路由A-1f89daba",
+        "active": true,
+        "version": 1
+      }
+    },
+    {
+      "label": "create project B",
+      "method": "POST",
+      "path": "/api/v1/gm/projects",
+      "projectId": null,
+      "request": {
+        "id": "e22e9cf4-2d34-4227-8fa9-05db1591ef60",
+        "key": "N1F89DABACFB",
+        "name": "通知路由B-1f89daba"
+      },
+      "at": "2026-09-10T14:25:08.642Z",
+      "status": 200,
+      "responseSha256": "80076b04ef6f1f6b87c77ca220a2d368f628ca2d4bbc53418ea72ae90ed10ef9",
+      "response": {
+        "id": "e22e9cf4-2d34-4227-8fa9-05db1591ef60",
+        "key": "N1F89DABACFB",
+        "name": "通知路由B-1f89daba",
+        "active": true,
+        "version": 1
+      }
+    },
+    {
+      "label": "target joins A",
+      "method": "POST",
+      "path": "/api/v1/auth/login",
+      "projectId": null,
+      "request": {
+        "name": "NotifyTarget1f89dabacf96",
+        "projectId": "9aef7510-658f-4ed6-93e0-eb587a2b6a1d",
+        "client": "android"
+      },
+      "at": "2026-09-10T14:25:08.649Z",
+      "status": 200,
+      "responseSha256": "0f926bd30168dee702c30e952f519a09cff2b01d5208fc3784486c58f3b5480d",
+      "response": {
+        "accountId": "10000000-0000-4000-8000-000000000020",
+        "userId": "4276d9e1-c0a0-4235-8c8d-f3d746dbc17c",
+        "email": "qa-8f02e35c8e37868ff24d0de092bab96b00a3bdc6200858e3aabf8f9f1893b48c@local.invalid",
+        "displayName": "NotifyTarget1f89dabacf96",
+        "csrfToken": "[REDACTED]",
+        "projectId": "9aef7510-658f-4ed6-93e0-eb587a2b6a1d",
+        "isGm": false,
+        "accessToken": "[REDACTED]",
+        "expiresAt": "2094-09-28T17:39:15.652Z"
+      }
+    },
+    {
+      "label": "same target joins B",
+      "method": "POST",
+      "path": "/api/v1/auth/login",
+      "projectId": null,
+      "request": {
+        "name": "NotifyTarget1f89dabacf96",
+        "projectId": "e22e9cf4-2d34-4227-8fa9-05db1591ef60",
+        "client": "android"
+      },
+      "at": "2026-09-10T14:25:08.657Z",
+      "status": 200,
+      "responseSha256": "ad3ca1e1612766dca4eb9c7fa5ade96ab67d23c16751f37e4d844a150b574038",
+      "response": {
+        "accountId": "10000000-0000-4000-8000-000000000020",
+        "userId": "4276d9e1-c0a0-4235-8c8d-f3d746dbc17c",
+        "email": "qa-8f02e35c8e37868ff24d0de092bab96b00a3bdc6200858e3aabf8f9f1893b48c@local.invalid",
+        "displayName": "NotifyTarget1f89dabacf96",
+        "csrfToken": "[REDACTED]",
+        "projectId": "e22e9cf4-2d34-4227-8fa9-05db1591ef60",
+        "isGm": false,
+        "accessToken": "[REDACTED]",
+        "expiresAt": "2094-09-28T17:39:15.659Z"
+      }
+    },
+    {
+      "label": "separate actor joins A",
+      "method": "POST",
+      "path": "/api/v1/auth/login",
+      "projectId": null,
+      "request": {
+        "name": "NotifyActor1f89dabacf96",
+        "projectId": "9aef7510-658f-4ed6-93e0-eb587a2b6a1d",
+        "client": "android"
+      },
+      "at": "2026-09-10T14:25:08.664Z",
+      "status": 200,
+      "responseSha256": "16421c37a745d089114507952f604994a02d81725b429a79902dbcab30e47ffa",
+      "response": {
+        "accountId": "10000000-0000-4000-8000-000000000020",
+        "userId": "bb551639-6e7c-43b8-86cc-436f26623a7c",
+        "email": "qa-ce4ce6cfc6a7953655917614b870d291d2a459144532276ba198f4e5b50d0b24@local.invalid",
+        "displayName": "NotifyActor1f89dabacf96",
+        "csrfToken": "[REDACTED]",
+        "projectId": "9aef7510-658f-4ed6-93e0-eb587a2b6a1d",
+        "isGm": false,
+        "accessToken": "[REDACTED]",
+        "expiresAt": "2094-09-28T17:39:15.665Z"
+      }
+    },
+    {
+      "label": "same separate actor joins B",
+      "method": "POST",
+      "path": "/api/v1/auth/login",
+      "projectId": null,
+      "request": {
+        "name": "NotifyActor1f89dabacf96",
+        "projectId": "e22e9cf4-2d34-4227-8fa9-05db1591ef60",
+        "client": "android"
+      },
+      "at": "2026-09-10T14:25:08.669Z",
+      "status": 200,
+      "responseSha256": "3269c99897c3a7bece0f8370779113776c16353354e1ec85736d6ffa01a5eb67",
+      "response": {
+        "accountId": "10000000-0000-4000-8000-000000000020",
+        "userId": "bb551639-6e7c-43b8-86cc-436f26623a7c",
+        "email": "qa-ce4ce6cfc6a7953655917614b870d291d2a459144532276ba198f4e5b50d0b24@local.invalid",
+        "displayName": "NotifyActor1f89dabacf96",
+        "csrfToken": "[REDACTED]",
+        "projectId": "e22e9cf4-2d34-4227-8fa9-05db1591ef60",
+        "isGm": false,
+        "accessToken": "[REDACTED]",
+        "expiresAt": "2094-09-28T17:39:15.671Z"
+      }
+    },
+    {
+      "label": "actor creates assigned A1 Bug",
+      "method": "POST",
+      "path": "/api/v1/bugs",
+      "projectId": "9aef7510-658f-4ed6-93e0-eb587a2b6a1d",
+      "request": {
+        "submissionContractVersion": "1.1.0",
+        "projectId": "9aef7510-658f-4ed6-93e0-eb587a2b6a1d",
+        "clientSubmissionId": "2f490977-a3b3-4a1c-85bb-96dadaadbfd3",
+        "title": "通知路由A1-1f89dabacf964138b8d462b8377e38d7",
+        "description": "通知路由A1-1f89dabacf964138b8d462b8377e38d7",
+        "expectedBehavior": "点击通知后进入正确项目与精确 Bug 详情",
+        "severity": "S2",
+        "priority": "P2",
+        "ownerId": "4276d9e1-c0a0-4235-8c8d-f3d746dbc17c",
+        "verificationOwnerId": "4276d9e1-c0a0-4235-8c8d-f3d746dbc17c",
+        "occurrence": {
+          "observedAt": "2026-09-10T14:25:09.201Z",
+          "platform": "windows",
+          "steps": [
+            "由独立 actor 创建并分配给目标员工"
+          ],
+          "actualBehavior": "通知路由A1-1f89dabacf964138b8d462b8377e38d7"
+        },
+        "attachmentIds": []
+      },
+      "at": "2026-09-10T14:25:09.202Z",
+      "status": 201,
+      "responseSha256": "f6222634ccbd0569ac2d4f867cb2659aa88ac378ede9c0a33c847733fcb969de",
+      "response": {
+        "clientSubmissionId": "2f490977-a3b3-4a1c-85bb-96dadaadbfd3",
+        "qaItem": {
+          "type": "bug",
+          "id": "e69928da-9b12-4c48-851b-4f3a3bbf9cf4",
+          "key": "N1F89DABACFA-1"
+        },
+        "disposition": "created",
+        "bug": {
+          "id": "e69928da-9b12-4c48-851b-4f3a3bbf9cf4",
+          "projectId": "9aef7510-658f-4ed6-93e0-eb587a2b6a1d",
+          "number": 1,
+          "key": "N1F89DABACFA-1",
+          "title": "通知路由A1-1f89dabacf964138b8d462b8377e38d7",
+          "description": "通知路由A1-1f89dabacf964138b8d462b8377e38d7",
+          "expectedBehavior": "点击通知后进入正确项目与精确 Bug 详情",
+          "moduleId": null,
+          "state": "reported",
+          "severity": "S2",
+          "priority": "P2",
+          "reporterId": "bb551639-6e7c-43b8-86cc-436f26623a7c",
+          "ownerId": "4276d9e1-c0a0-4235-8c8d-f3d746dbc17c",
+          "verificationOwnerId": "4276d9e1-c0a0-4235-8c8d-f3d746dbc17c",
+          "duplicateOfBugId": null,
+          "occurrenceCount": 1,
+          "reopenCount": 0,
+          "version": 1,
+          "createdAt": "2026-09-10T14:25:09.205Z",
+          "updatedAt": "2026-09-10T14:25:09.205Z",
+          "closedAt": null
+        },
+        "occurrenceId": "1c1d7585-3d82-4d76-b120-cae3c66a60cd",
+        "attachmentIds": [],
+        "captureBundleId": null,
+        "eventId": "a89ba327-f88e-4e6b-9cdd-135b5fc23a29",
+        "replayed": false
+      }
+    },
+    {
+      "label": "target reads durable A1 notification",
+      "method": "GET",
+      "path": "/api/v1/notifications?projectId=9aef7510-658f-4ed6-93e0-eb587a2b6a1d&unreadOnly=true&limit=100",
+      "projectId": "9aef7510-658f-4ed6-93e0-eb587a2b6a1d",
+      "request": null,
+      "at": "2026-09-10T14:25:09.212Z",
+      "status": 200,
+      "responseSha256": "d1bdf04f393605388970de6400e3e4f492a5b5b545acfa90d3046dac7f42d967",
+      "response": {
+        "items": [
+          {
+            "id": "b4b7cbfe-c52e-4c12-8824-0d5b85aa2a43",
+            "projectId": "9aef7510-658f-4ed6-93e0-eb587a2b6a1d",
+            "userId": "4276d9e1-c0a0-4235-8c8d-f3d746dbc17c",
+            "type": "occurrence.appended",
+            "title": "这个单子已创建",
+            "body": "N1F89DABACFA-1 · 通知路由A1-1f89dabacf964138b8d462b8377e38d7",
+            "bugId": "e69928da-9b12-4c48-851b-4f3a3bbf9cf4",
+            "createdAt": "2026-09-10T14:25:09.205Z",
+            "readAt": null,
+            "version": 1
+          }
+        ],
+        "nextCursor": null,
+        "unreadCount": 1
+      }
+    }
+  ],
+  "processes": [
+    {
+      "phase": "quit-probe_launch",
+      "pid": 25004,
+      "executable": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-v21-e2e-fresh-0910\\acceptance\\desktop-notification-project-route-live\\1f89daba-cf96-4138-b8d4-62b8377e38d7\\installed-copy\\RelayQaHubPreview-v21-e2e-fresh-0910.exe",
+      "profile": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-v21-e2e-fresh-0910\\acceptance\\desktop-notification-project-route-live\\1f89daba-cf96-4138-b8d4-62b8377e38d7\\profiles\\qa-hub-preview-v21-e2e-fresh-0910\\quit-probe",
+      "at": "2026-09-10T14:25:02.577Z"
+    },
+    {
+      "phase": "quit-probe_quit",
+      "pid": 25004,
+      "exitCode": 0,
+      "at": "2026-09-10T14:25:03.154Z"
+    },
+    {
+      "phase": "route-1_launch",
+      "pid": 2240,
+      "executable": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-v21-e2e-fresh-0910\\acceptance\\desktop-notification-project-route-live\\1f89daba-cf96-4138-b8d4-62b8377e38d7\\installed-copy\\RelayQaHubPreview-v21-e2e-fresh-0910.exe",
+      "profile": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-v21-e2e-fresh-0910\\acceptance\\desktop-notification-project-route-live\\1f89daba-cf96-4138-b8d4-62b8377e38d7\\profiles\\qa-hub-preview-v21-e2e-fresh-0910\\route",
+      "at": "2026-09-10T14:25:08.686Z"
+    },
+    {
+      "phase": "final-cleanup_quit",
+      "pid": 2240,
+      "exitCode": 0,
+      "at": "2026-09-10T14:25:39.601Z"
+    }
+  ],
+  "network": [
+    {
+      "phase": "route-1",
+      "requestId": "7972.6",
+      "method": "GET",
+      "url": "qa-hub-preview-v21-e2e-fresh-0910://app/api/v1/auth/me",
+      "headers": {
+        "accept": "application/vnd.relay-qa-hub.v1.1+json"
+      },
+      "timestamp": 276579.48359,
+      "wallTime": 1789050309.022202
+    },
+    {
+      "phase": "route-1",
+      "requestId": "7972.7",
+      "method": "GET",
+      "url": "qa-hub-preview-v21-e2e-fresh-0910://app/api/v1/project-entry/9aef7510-658f-4ed6-93e0-eb587a2b6a1d",
+      "headers": {
+        "accept": "application/vnd.relay-qa-hub.v1.1+json"
+      },
+      "timestamp": 276579.552114,
+      "wallTime": 1789050309.090222
+    },
+    {
+      "phase": "route-1",
+      "requestId": "7972.8",
+      "method": "POST",
+      "url": "qa-hub-preview-v21-e2e-fresh-0910://app/api/v1/auth/login",
+      "headers": {
+        "x-qa-project-id": "9aef7510-658f-4ed6-93e0-eb587a2b6a1d",
+        "accept": "application/vnd.relay-qa-hub.v1.1+json",
+        "content-type": "application/json"
+      },
+      "timestamp": 276579.556696,
+      "wallTime": 1789050309.094801
+    },
+    {
+      "phase": "route-1",
+      "requestId": "7972.9",
+      "method": "GET",
+      "url": "qa-hub-preview-v21-e2e-fresh-0910://app/api/v1/projects/9aef7510-658f-4ed6-93e0-eb587a2b6a1d/components",
+      "headers": {
+        "x-qa-project-id": "9aef7510-658f-4ed6-93e0-eb587a2b6a1d",
+        "accept": "application/vnd.relay-qa-hub.v1.1+json"
+      },
+      "timestamp": 276579.63857,
+      "wallTime": 1789050309.176693
+    },
+    {
+      "phase": "route-1",
+      "requestId": "7972.10",
+      "method": "GET",
+      "url": "qa-hub-preview-v21-e2e-fresh-0910://app/api/v1/projects?limit=100",
+      "headers": {
+        "x-qa-project-id": "9aef7510-658f-4ed6-93e0-eb587a2b6a1d",
+        "accept": "application/vnd.relay-qa-hub.v1.1+json"
+      },
+      "timestamp": 276579.639092,
+      "wallTime": 1789050309.177193
+    },
+    {
+      "phase": "route-1",
+      "requestId": "7972.11",
+      "method": "GET",
+      "url": "qa-hub-preview-v21-e2e-fresh-0910://app/api/v1/projects/9aef7510-658f-4ed6-93e0-eb587a2b6a1d/members?limit=100",
+      "headers": {
+        "x-qa-project-id": "9aef7510-658f-4ed6-93e0-eb587a2b6a1d",
+        "accept": "application/vnd.relay-qa-hub.v1.1+json"
+      },
+      "timestamp": 276579.639589,
+      "wallTime": 1789050309.177693
+    },
+    {
+      "phase": "route-1",
+      "requestId": "7972.12",
+      "method": "GET",
+      "url": "qa-hub-preview-v21-e2e-fresh-0910://app/api/v1/bugs?projectId=9aef7510-658f-4ed6-93e0-eb587a2b6a1d&limit=500&ownerId=4276d9e1-c0a0-4235-8c8d-f3d746dbc17c",
+      "headers": {
+        "x-qa-project-id": "9aef7510-658f-4ed6-93e0-eb587a2b6a1d",
+        "accept": "application/vnd.relay-qa-hub.v1.1+json"
+      },
+      "timestamp": 276579.640034,
+      "wallTime": 1789050309.17813
+    },
+    {
+      "phase": "route-1",
+      "requestId": "7972.13",
+      "method": "GET",
+      "url": "qa-hub-preview-v21-e2e-fresh-0910://app/api/v1/bugs?projectId=9aef7510-658f-4ed6-93e0-eb587a2b6a1d&limit=500&verificationOwnerId=4276d9e1-c0a0-4235-8c8d-f3d746dbc17c",
+      "headers": {
+        "x-qa-project-id": "9aef7510-658f-4ed6-93e0-eb587a2b6a1d",
+        "accept": "application/vnd.relay-qa-hub.v1.1+json"
+      },
+      "timestamp": 276579.640272,
+      "wallTime": 1789050309.178371
+    },
+    {
+      "phase": "route-1",
+      "requestId": "7972.14",
+      "method": "GET",
+      "url": "qa-hub-preview-v21-e2e-fresh-0910://app/api/v1/bugs?projectId=9aef7510-658f-4ed6-93e0-eb587a2b6a1d&limit=500",
+      "headers": {
+        "x-qa-project-id": "9aef7510-658f-4ed6-93e0-eb587a2b6a1d",
+        "accept": "application/vnd.relay-qa-hub.v1.1+json"
+      },
+      "timestamp": 276579.640467,
+      "wallTime": 1789050309.178558
+    },
+    {
+      "phase": "route-1",
+      "requestId": "7972.15",
+      "method": "GET",
+      "url": "qa-hub-preview-v21-e2e-fresh-0910://app/api/v1/projects/9aef7510-658f-4ed6-93e0-eb587a2b6a1d/members?limit=100",
+      "headers": {
+        "x-qa-project-id": "9aef7510-658f-4ed6-93e0-eb587a2b6a1d",
+        "accept": "application/vnd.relay-qa-hub.v1.1+json"
+      },
+      "timestamp": 276580.32319,
+      "wallTime": 1789050309.86141
+    },
+    {
+      "phase": "route-1",
+      "requestId": "7972.16",
+      "method": "GET",
+      "url": "qa-hub-preview-v21-e2e-fresh-0910://app/api/v1/bugs?projectId=9aef7510-658f-4ed6-93e0-eb587a2b6a1d&limit=500&ownerId=4276d9e1-c0a0-4235-8c8d-f3d746dbc17c",
+      "headers": {
+        "x-qa-project-id": "9aef7510-658f-4ed6-93e0-eb587a2b6a1d",
+        "accept": "application/vnd.relay-qa-hub.v1.1+json"
+      },
+      "timestamp": 276580.323535,
+      "wallTime": 1789050309.861615
+    },
+    {
+      "phase": "route-1",
+      "requestId": "7972.17",
+      "method": "GET",
+      "url": "qa-hub-preview-v21-e2e-fresh-0910://app/api/v1/bugs?projectId=9aef7510-658f-4ed6-93e0-eb587a2b6a1d&limit=500&verificationOwnerId=4276d9e1-c0a0-4235-8c8d-f3d746dbc17c",
+      "headers": {
+        "x-qa-project-id": "9aef7510-658f-4ed6-93e0-eb587a2b6a1d",
+        "accept": "application/vnd.relay-qa-hub.v1.1+json"
+      },
+      "timestamp": 276580.323686,
+      "wallTime": 1789050309.861765
+    },
+    {
+      "phase": "route-1",
+      "requestId": "7972.18",
+      "method": "GET",
+      "url": "qa-hub-preview-v21-e2e-fresh-0910://app/api/v1/bugs?projectId=9aef7510-658f-4ed6-93e0-eb587a2b6a1d&limit=500",
+      "headers": {
+        "x-qa-project-id": "9aef7510-658f-4ed6-93e0-eb587a2b6a1d",
+        "accept": "application/vnd.relay-qa-hub.v1.1+json"
+      },
+      "timestamp": 276580.323835,
+      "wallTime": 1789050309.861918
+    },
+    {
+      "phase": "route-1",
+      "requestId": "7972.19",
+      "method": "GET",
+      "url": "qa-hub-preview-v21-e2e-fresh-0910://app/api/v1/projects/9aef7510-658f-4ed6-93e0-eb587a2b6a1d/components",
+      "headers": {
+        "x-qa-project-id": "9aef7510-658f-4ed6-93e0-eb587a2b6a1d",
+        "accept": "application/vnd.relay-qa-hub.v1.1+json"
+      },
+      "timestamp": 276584.639186,
+      "wallTime": 1789050314.177284
+    },
+    {
+      "phase": "route-1",
+      "requestId": "7972.20",
+      "method": "GET",
+      "url": "qa-hub-preview-v21-e2e-fresh-0910://app/api/v1/projects/9aef7510-658f-4ed6-93e0-eb587a2b6a1d/members?limit=100",
+      "headers": {
+        "x-qa-project-id": "9aef7510-658f-4ed6-93e0-eb587a2b6a1d",
+        "accept": "application/vnd.relay-qa-hub.v1.1+json"
+      },
+      "timestamp": 276584.641986,
+      "wallTime": 1789050314.180079
+    },
+    {
+      "phase": "route-1",
+      "requestId": "7972.21",
+      "method": "GET",
+      "url": "qa-hub-preview-v21-e2e-fresh-0910://app/api/v1/bugs?projectId=9aef7510-658f-4ed6-93e0-eb587a2b6a1d&limit=500&ownerId=4276d9e1-c0a0-4235-8c8d-f3d746dbc17c",
+      "headers": {
+        "x-qa-project-id": "9aef7510-658f-4ed6-93e0-eb587a2b6a1d",
+        "accept": "application/vnd.relay-qa-hub.v1.1+json"
+      },
+      "timestamp": 276584.642182,
+      "wallTime": 1789050314.180266
+    },
+    {
+      "phase": "route-1",
+      "requestId": "7972.22",
+      "method": "GET",
+      "url": "qa-hub-preview-v21-e2e-fresh-0910://app/api/v1/bugs?projectId=9aef7510-658f-4ed6-93e0-eb587a2b6a1d&limit=500&verificationOwnerId=4276d9e1-c0a0-4235-8c8d-f3d746dbc17c",
+      "headers": {
+        "x-qa-project-id": "9aef7510-658f-4ed6-93e0-eb587a2b6a1d",
+        "accept": "application/vnd.relay-qa-hub.v1.1+json"
+      },
+      "timestamp": 276584.642341,
+      "wallTime": 1789050314.180419
+    },
+    {
+      "phase": "route-1",
+      "requestId": "7972.23",
+      "method": "GET",
+      "url": "qa-hub-preview-v21-e2e-fresh-0910://app/api/v1/bugs?projectId=9aef7510-658f-4ed6-93e0-eb587a2b6a1d&limit=500",
+      "headers": {
+        "x-qa-project-id": "9aef7510-658f-4ed6-93e0-eb587a2b6a1d",
+        "accept": "application/vnd.relay-qa-hub.v1.1+json"
+      },
+      "timestamp": 276584.642488,
+      "wallTime": 1789050314.180571
+    },
+    {
+      "phase": "route-1",
+      "requestId": "7972.24",
+      "method": "GET",
+      "url": "qa-hub-preview-v21-e2e-fresh-0910://app/api/v1/projects/9aef7510-658f-4ed6-93e0-eb587a2b6a1d/components",
+      "headers": {
+        "x-qa-project-id": "9aef7510-658f-4ed6-93e0-eb587a2b6a1d",
+        "accept": "application/vnd.relay-qa-hub.v1.1+json"
+      },
+      "timestamp": 276589.638988,
+      "wallTime": 1789050319.177083
+    },
+    {
+      "phase": "route-1",
+      "requestId": "7972.25",
+      "method": "GET",
+      "url": "qa-hub-preview-v21-e2e-fresh-0910://app/api/v1/projects/9aef7510-658f-4ed6-93e0-eb587a2b6a1d/members?limit=100",
+      "headers": {
+        "x-qa-project-id": "9aef7510-658f-4ed6-93e0-eb587a2b6a1d",
+        "accept": "application/vnd.relay-qa-hub.v1.1+json"
+      },
+      "timestamp": 276589.642388,
+      "wallTime": 1789050319.180483
+    },
+    {
+      "phase": "route-1",
+      "requestId": "7972.26",
+      "method": "GET",
+      "url": "qa-hub-preview-v21-e2e-fresh-0910://app/api/v1/bugs?projectId=9aef7510-658f-4ed6-93e0-eb587a2b6a1d&limit=500&ownerId=4276d9e1-c0a0-4235-8c8d-f3d746dbc17c",
+      "headers": {
+        "x-qa-project-id": "9aef7510-658f-4ed6-93e0-eb587a2b6a1d",
+        "accept": "application/vnd.relay-qa-hub.v1.1+json"
+      },
+      "timestamp": 276589.642603,
+      "wallTime": 1789050319.180685
+    },
+    {
+      "phase": "route-1",
+      "requestId": "7972.27",
+      "method": "GET",
+      "url": "qa-hub-preview-v21-e2e-fresh-0910://app/api/v1/bugs?projectId=9aef7510-658f-4ed6-93e0-eb587a2b6a1d&limit=500&verificationOwnerId=4276d9e1-c0a0-4235-8c8d-f3d746dbc17c",
+      "headers": {
+        "x-qa-project-id": "9aef7510-658f-4ed6-93e0-eb587a2b6a1d",
+        "accept": "application/vnd.relay-qa-hub.v1.1+json"
+      },
+      "timestamp": 276589.64275,
+      "wallTime": 1789050319.180829
+    },
+    {
+      "phase": "route-1",
+      "requestId": "7972.28",
+      "method": "GET",
+      "url": "qa-hub-preview-v21-e2e-fresh-0910://app/api/v1/bugs?projectId=9aef7510-658f-4ed6-93e0-eb587a2b6a1d&limit=500",
+      "headers": {
+        "x-qa-project-id": "9aef7510-658f-4ed6-93e0-eb587a2b6a1d",
+        "accept": "application/vnd.relay-qa-hub.v1.1+json"
+      },
+      "timestamp": 276589.642894,
+      "wallTime": 1789050319.180974
+    },
+    {
+      "phase": "route-1",
+      "requestId": "7972.29",
+      "method": "GET",
+      "url": "qa-hub-preview-v21-e2e-fresh-0910://app/api/v1/projects/9aef7510-658f-4ed6-93e0-eb587a2b6a1d/components",
+      "headers": {
+        "x-qa-project-id": "9aef7510-658f-4ed6-93e0-eb587a2b6a1d",
+        "accept": "application/vnd.relay-qa-hub.v1.1+json"
+      },
+      "timestamp": 276594.639063,
+      "wallTime": 1789050324.177163
+    },
+    {
+      "phase": "route-1",
+      "requestId": "7972.30",
+      "method": "GET",
+      "url": "qa-hub-preview-v21-e2e-fresh-0910://app/api/v1/projects/9aef7510-658f-4ed6-93e0-eb587a2b6a1d/members?limit=100",
+      "headers": {
+        "x-qa-project-id": "9aef7510-658f-4ed6-93e0-eb587a2b6a1d",
+        "accept": "application/vnd.relay-qa-hub.v1.1+json"
+      },
+      "timestamp": 276594.641473,
+      "wallTime": 1789050324.179577
+    },
+    {
+      "phase": "route-1",
+      "requestId": "7972.31",
+      "method": "GET",
+      "url": "qa-hub-preview-v21-e2e-fresh-0910://app/api/v1/bugs?projectId=9aef7510-658f-4ed6-93e0-eb587a2b6a1d&limit=500&ownerId=4276d9e1-c0a0-4235-8c8d-f3d746dbc17c",
+      "headers": {
+        "x-qa-project-id": "9aef7510-658f-4ed6-93e0-eb587a2b6a1d",
+        "accept": "application/vnd.relay-qa-hub.v1.1+json"
+      },
+      "timestamp": 276594.641683,
+      "wallTime": 1789050324.179765
+    },
+    {
+      "phase": "route-1",
+      "requestId": "7972.32",
+      "method": "GET",
+      "url": "qa-hub-preview-v21-e2e-fresh-0910://app/api/v1/bugs?projectId=9aef7510-658f-4ed6-93e0-eb587a2b6a1d&limit=500&verificationOwnerId=4276d9e1-c0a0-4235-8c8d-f3d746dbc17c",
+      "headers": {
+        "x-qa-project-id": "9aef7510-658f-4ed6-93e0-eb587a2b6a1d",
+        "accept": "application/vnd.relay-qa-hub.v1.1+json"
+      },
+      "timestamp": 276594.641826,
+      "wallTime": 1789050324.179906
+    },
+    {
+      "phase": "route-1",
+      "requestId": "7972.33",
+      "method": "GET",
+      "url": "qa-hub-preview-v21-e2e-fresh-0910://app/api/v1/bugs?projectId=9aef7510-658f-4ed6-93e0-eb587a2b6a1d&limit=500",
+      "headers": {
+        "x-qa-project-id": "9aef7510-658f-4ed6-93e0-eb587a2b6a1d",
+        "accept": "application/vnd.relay-qa-hub.v1.1+json"
+      },
+      "timestamp": 276594.641962,
+      "wallTime": 1789050324.180043
+    },
+    {
+      "phase": "route-1",
+      "requestId": "7972.34",
+      "method": "GET",
+      "url": "qa-hub-preview-v21-e2e-fresh-0910://app/api/v1/projects/9aef7510-658f-4ed6-93e0-eb587a2b6a1d/components",
+      "headers": {
+        "x-qa-project-id": "9aef7510-658f-4ed6-93e0-eb587a2b6a1d",
+        "accept": "application/vnd.relay-qa-hub.v1.1+json"
+      },
+      "timestamp": 276599.639315,
+      "wallTime": 1789050329.17741
+    },
+    {
+      "phase": "route-1",
+      "requestId": "7972.35",
+      "method": "GET",
+      "url": "qa-hub-preview-v21-e2e-fresh-0910://app/api/v1/projects/9aef7510-658f-4ed6-93e0-eb587a2b6a1d/members?limit=100",
+      "headers": {
+        "x-qa-project-id": "9aef7510-658f-4ed6-93e0-eb587a2b6a1d",
+        "accept": "application/vnd.relay-qa-hub.v1.1+json"
+      },
+      "timestamp": 276599.642184,
+      "wallTime": 1789050329.180277
+    },
+    {
+      "phase": "route-1",
+      "requestId": "7972.36",
+      "method": "GET",
+      "url": "qa-hub-preview-v21-e2e-fresh-0910://app/api/v1/bugs?projectId=9aef7510-658f-4ed6-93e0-eb587a2b6a1d&limit=500&ownerId=4276d9e1-c0a0-4235-8c8d-f3d746dbc17c",
+      "headers": {
+        "x-qa-project-id": "9aef7510-658f-4ed6-93e0-eb587a2b6a1d",
+        "accept": "application/vnd.relay-qa-hub.v1.1+json"
+      },
+      "timestamp": 276599.642416,
+      "wallTime": 1789050329.180504
+    },
+    {
+      "phase": "route-1",
+      "requestId": "7972.37",
+      "method": "GET",
+      "url": "qa-hub-preview-v21-e2e-fresh-0910://app/api/v1/bugs?projectId=9aef7510-658f-4ed6-93e0-eb587a2b6a1d&limit=500&verificationOwnerId=4276d9e1-c0a0-4235-8c8d-f3d746dbc17c",
+      "headers": {
+        "x-qa-project-id": "9aef7510-658f-4ed6-93e0-eb587a2b6a1d",
+        "accept": "application/vnd.relay-qa-hub.v1.1+json"
+      },
+      "timestamp": 276599.642631,
+      "wallTime": 1789050329.180718
+    },
+    {
+      "phase": "route-1",
+      "requestId": "7972.38",
+      "method": "GET",
+      "url": "qa-hub-preview-v21-e2e-fresh-0910://app/api/v1/bugs?projectId=9aef7510-658f-4ed6-93e0-eb587a2b6a1d&limit=500",
+      "headers": {
+        "x-qa-project-id": "9aef7510-658f-4ed6-93e0-eb587a2b6a1d",
+        "accept": "application/vnd.relay-qa-hub.v1.1+json"
+      },
+      "timestamp": 276599.642774,
+      "wallTime": 1789050329.180862
+    },
+    {
+      "phase": "route-1",
+      "requestId": "7972.39",
+      "method": "GET",
+      "url": "qa-hub-preview-v21-e2e-fresh-0910://app/api/v1/projects/9aef7510-658f-4ed6-93e0-eb587a2b6a1d/components",
+      "headers": {
+        "x-qa-project-id": "9aef7510-658f-4ed6-93e0-eb587a2b6a1d",
+        "accept": "application/vnd.relay-qa-hub.v1.1+json"
+      },
+      "timestamp": 276604.639038,
+      "wallTime": 1789050334.177148
+    },
+    {
+      "phase": "route-1",
+      "requestId": "7972.40",
+      "method": "GET",
+      "url": "qa-hub-preview-v21-e2e-fresh-0910://app/api/v1/projects/9aef7510-658f-4ed6-93e0-eb587a2b6a1d/members?limit=100",
+      "headers": {
+        "x-qa-project-id": "9aef7510-658f-4ed6-93e0-eb587a2b6a1d",
+        "accept": "application/vnd.relay-qa-hub.v1.1+json"
+      },
+      "timestamp": 276604.642792,
+      "wallTime": 1789050334.180899
+    },
+    {
+      "phase": "route-1",
+      "requestId": "7972.41",
+      "method": "GET",
+      "url": "qa-hub-preview-v21-e2e-fresh-0910://app/api/v1/bugs?projectId=9aef7510-658f-4ed6-93e0-eb587a2b6a1d&limit=500&ownerId=4276d9e1-c0a0-4235-8c8d-f3d746dbc17c",
+      "headers": {
+        "x-qa-project-id": "9aef7510-658f-4ed6-93e0-eb587a2b6a1d",
+        "accept": "application/vnd.relay-qa-hub.v1.1+json"
+      },
+      "timestamp": 276604.64308,
+      "wallTime": 1789050334.181175
+    },
+    {
+      "phase": "route-1",
+      "requestId": "7972.42",
+      "method": "GET",
+      "url": "qa-hub-preview-v21-e2e-fresh-0910://app/api/v1/bugs?projectId=9aef7510-658f-4ed6-93e0-eb587a2b6a1d&limit=500&verificationOwnerId=4276d9e1-c0a0-4235-8c8d-f3d746dbc17c",
+      "headers": {
+        "x-qa-project-id": "9aef7510-658f-4ed6-93e0-eb587a2b6a1d",
+        "accept": "application/vnd.relay-qa-hub.v1.1+json"
+      },
+      "timestamp": 276604.643311,
+      "wallTime": 1789050334.181404
+    },
+    {
+      "phase": "route-1",
+      "requestId": "7972.43",
+      "method": "GET",
+      "url": "qa-hub-preview-v21-e2e-fresh-0910://app/api/v1/bugs?projectId=9aef7510-658f-4ed6-93e0-eb587a2b6a1d&limit=500",
+      "headers": {
+        "x-qa-project-id": "9aef7510-658f-4ed6-93e0-eb587a2b6a1d",
+        "accept": "application/vnd.relay-qa-hub.v1.1+json"
+      },
+      "timestamp": 276604.64356,
+      "wallTime": 1789050334.181652
+    },
+    {
+      "phase": "route-1",
+      "requestId": "7972.44",
+      "method": "GET",
+      "url": "qa-hub-preview-v21-e2e-fresh-0910://app/api/v1/projects/9aef7510-658f-4ed6-93e0-eb587a2b6a1d/components",
+      "headers": {
+        "x-qa-project-id": "9aef7510-658f-4ed6-93e0-eb587a2b6a1d",
+        "accept": "application/vnd.relay-qa-hub.v1.1+json"
+      },
+      "timestamp": 276609.639021,
+      "wallTime": 1789050339.177121
+    },
+    {
+      "phase": "route-1",
+      "requestId": "7972.45",
+      "method": "GET",
+      "url": "qa-hub-preview-v21-e2e-fresh-0910://app/api/v1/projects/9aef7510-658f-4ed6-93e0-eb587a2b6a1d/members?limit=100",
+      "headers": {
+        "x-qa-project-id": "9aef7510-658f-4ed6-93e0-eb587a2b6a1d",
+        "accept": "application/vnd.relay-qa-hub.v1.1+json"
+      },
+      "timestamp": 276609.64187,
+      "wallTime": 1789050339.179962
+    },
+    {
+      "phase": "route-1",
+      "requestId": "7972.46",
+      "method": "GET",
+      "url": "qa-hub-preview-v21-e2e-fresh-0910://app/api/v1/bugs?projectId=9aef7510-658f-4ed6-93e0-eb587a2b6a1d&limit=500&ownerId=4276d9e1-c0a0-4235-8c8d-f3d746dbc17c",
+      "headers": {
+        "x-qa-project-id": "9aef7510-658f-4ed6-93e0-eb587a2b6a1d",
+        "accept": "application/vnd.relay-qa-hub.v1.1+json"
+      },
+      "timestamp": 276609.642081,
+      "wallTime": 1789050339.180166
+    },
+    {
+      "phase": "route-1",
+      "requestId": "7972.47",
+      "method": "GET",
+      "url": "qa-hub-preview-v21-e2e-fresh-0910://app/api/v1/bugs?projectId=9aef7510-658f-4ed6-93e0-eb587a2b6a1d&limit=500&verificationOwnerId=4276d9e1-c0a0-4235-8c8d-f3d746dbc17c",
+      "headers": {
+        "x-qa-project-id": "9aef7510-658f-4ed6-93e0-eb587a2b6a1d",
+        "accept": "application/vnd.relay-qa-hub.v1.1+json"
+      },
+      "timestamp": 276609.642243,
+      "wallTime": 1789050339.180324
+    },
+    {
+      "phase": "route-1",
+      "requestId": "7972.48",
+      "method": "GET",
+      "url": "qa-hub-preview-v21-e2e-fresh-0910://app/api/v1/bugs?projectId=9aef7510-658f-4ed6-93e0-eb587a2b6a1d&limit=500",
+      "headers": {
+        "x-qa-project-id": "9aef7510-658f-4ed6-93e0-eb587a2b6a1d",
+        "accept": "application/vnd.relay-qa-hub.v1.1+json"
+      },
+      "timestamp": 276609.642384,
+      "wallTime": 1789050339.180461
+    }
+  ],
+  "guarantees": {
+    "productionRootsRejected": [
+      "D:\\Relay-QA-Hub",
+      "D:\\Relay-QA-Hub-Data",
+      "D:\\Relay-QA-Hub-Config",
+      "E:\\Relay-QA-Hub-Archives",
+      "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHub",
+      "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview",
+      "C:\\Users\\lin0\\AppData\\Local\\Relay QA Hub",
+      "C:\\Users\\lin0\\AppData\\Roaming\\Relay QA Hub"
+    ],
+    "productionPortsRejected": [
+      4319,
+      4174,
+      4320
+    ],
+    "foreignProcessesAreNeverSignaled": true,
+    "noForceKillFallback": true,
+    "fixturesAreRetained": true
+  },
+  "ports": {
+    "mcp": 63374,
+    "cdp": 63375,
+    "inspector": 63376
+  },
+  "error": {
+    "name": "AssertionError",
+    "message": "a1_REAL_TOAST_NOT_OBSERVED"
+  },
+  "hostAfter": {
+    "capturedAt": "2026-09-10T14:25:44.8093809Z",
+    "sessionId": 2,
+    "processes": [
+      {
+        "pid": 17160,
+        "parentPid": 24088,
+        "name": "RelayQaHub.exe",
+        "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHub\\RelayQaHub.exe",
+        "startedAt": "2026-09-08T10:24:12.5269520Z",
+        "commandLineSha256": "0877b43443e2a4cfbe1a0e676912b9dfcfc812ceeb1ad371fd9ef0a516221a77",
+        "commandLine": "\"C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHub\\RelayQaHub.exe\" --updated"
+      },
+      {
+        "pid": 10744,
+        "parentPid": 17160,
+        "name": "RelayQaHub.exe",
+        "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHub\\RelayQaHub.exe",
+        "startedAt": "2026-09-08T10:24:12.6574810Z",
+        "commandLineSha256": "ef640b5d223baafb1b55652982938f69285aaaf8d37daab258238ff681f63549",
+        "commandLine": "\"C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHub\\RelayQaHub.exe\" --type --user-data-dir=\"C:\\Users\\lin0\\AppData\\Roaming\\@relay-qa-hub\\desktop\" --gpu-preferences --field-trial-handle --enable-features --disable-features --variations-seed-version --trace-process-track-uuid --mojo-platform-channel-handle /prefetch:2"
+      },
+      {
+        "pid": 23944,
+        "parentPid": 17160,
+        "name": "RelayQaHub.exe",
+        "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHub\\RelayQaHub.exe",
+        "startedAt": "2026-09-08T10:24:12.6985200Z",
+        "commandLineSha256": "31089bf64ff57bae2d8a04a0d4764c67d65e9fe3dc103454afc41dbffa1502f0",
+        "commandLine": "\"C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHub\\RelayQaHub.exe\" --type --utility-sub-type --lang --service-sandbox-type --user-data-dir=\"C:\\Users\\lin0\\AppData\\Roaming\\@relay-qa-hub\\desktop\" --standard-schemes --secure-schemes --cors-schemes --fetch-schemes --streaming-schemes --field-trial-handle --enable-features --disable-features --variations-seed-version --trace-process-track-uuid --mojo-platform-channel-handle /prefetch:11"
+      },
+      {
+        "pid": 3452,
+        "parentPid": 17160,
+        "name": "RelayQaHub.exe",
+        "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHub\\RelayQaHub.exe",
+        "startedAt": "2026-09-08T10:24:12.7633970Z",
+        "commandLineSha256": "f18fb4fa9486f1e9e4b0de71a49ba0c15cd9d686f5a69872fa123342d582adb9",
+        "commandLine": "\"C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHub\\RelayQaHub.exe\" --type --user-data-dir=\"C:\\Users\\lin0\\AppData\\Roaming\\@relay-qa-hub\\desktop\" --standard-schemes --secure-schemes --cors-schemes --fetch-schemes --streaming-schemes --app-user-model-id --app-path --enable-sandbox --lang --device-scale-factor --num-raster-threads --enable-main-frame-before-activation --time-ticks-at-unix-epoch --launch-time-ticks --field-trial-handle --enable-features --disable-features --variations-seed-version --trace-process-track-uuid --mojo-platform-channel-handle /prefetch:1"
+      },
+      {
+        "pid": 13564,
+        "parentPid": 9232,
+        "name": "RelayQaHubPreview.exe",
+        "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview\\RelayQaHubPreview.exe",
+        "startedAt": "2026-09-09T01:44:08.4163170Z",
+        "commandLineSha256": "893a817c34861eedfa3a3a0a968755ae0746e6cbe6a400c55df28550c877eb59",
+        "commandLine": "\"C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview\\RelayQaHubPreview.exe\" --updated"
+      },
+      {
+        "pid": 164,
+        "parentPid": 13564,
+        "name": "RelayQaHubPreview.exe",
+        "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview\\RelayQaHubPreview.exe",
+        "startedAt": "2026-09-09T01:44:08.6454770Z",
+        "commandLineSha256": "57b7c73ac644856fa52c597b0ae3a1cdbb6def14950fa6845de3e80102886da2",
+        "commandLine": "\"C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview\\RelayQaHubPreview.exe\" --type --user-data-dir=\"C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\desktop\\profile\" --gpu-preferences --field-trial-handle --enable-features --disable-features --variations-seed-version --trace-process-track-uuid --mojo-platform-channel-handle /prefetch:2"
+      },
+      {
+        "pid": 20984,
+        "parentPid": 13564,
+        "name": "RelayQaHubPreview.exe",
+        "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview\\RelayQaHubPreview.exe",
+        "startedAt": "2026-09-09T01:44:08.6727490Z",
+        "commandLineSha256": "a23cf06b5604dbe8e8c40e1c2f0b94ffdb26c37f59df36401fca0a0d3b7a3637",
+        "commandLine": "\"C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview\\RelayQaHubPreview.exe\" --type --utility-sub-type --lang --service-sandbox-type --user-data-dir=\"C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\desktop\\profile\" --standard-schemes --secure-schemes --cors-schemes --fetch-schemes --streaming-schemes --field-trial-handle --enable-features --disable-features --variations-seed-version --trace-process-track-uuid --mojo-platform-channel-handle /prefetch:11"
+      },
+      {
+        "pid": 8632,
+        "parentPid": 13564,
+        "name": "RelayQaHubPreview.exe",
+        "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview\\RelayQaHubPreview.exe",
+        "startedAt": "2026-09-09T01:44:08.8187730Z",
+        "commandLineSha256": "1a58dc2a01b4e2cc7e586856e1f6f3cdfb30eb54c9b3c39238a4fb738a528aef",
+        "commandLine": "\"C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview\\RelayQaHubPreview.exe\" --type --user-data-dir=\"C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\desktop\\profile\" --standard-schemes --secure-schemes --cors-schemes --fetch-schemes --streaming-schemes --app-user-model-id --app-path --enable-sandbox --lang --device-scale-factor --num-raster-threads --enable-main-frame-before-activation --time-ticks-at-unix-epoch --launch-time-ticks --field-trial-handle --enable-features --disable-features --variations-seed-version --trace-process-track-uuid --mojo-platform-channel-handle /prefetch:1"
+      },
+      {
+        "pid": 26828,
+        "parentPid": 19820,
+        "name": "RelayQaHub.exe",
+        "path": "D:\\Relay-QA-Hub\\apps\\desktop\\release\\RelayQaHub-win32-x64\\RelayQaHub.exe",
+        "startedAt": "2026-09-10T10:48:47.3434440Z",
+        "commandLineSha256": "2caedf0420c6bfbf2a720702a5a12356aee3cbb941872c0b76c0692e187dedf9",
+        "commandLine": "\"D:\\Relay-QA-Hub\\apps\\desktop\\release\\RelayQaHub-win32-x64\\RelayQaHub.exe\" --hidden --user-data-dir=D:\\Relay-QA-Hub\\work\\eight-build-acceptance\\client-profile"
+      },
+      {
+        "pid": 26660,
+        "parentPid": 26828,
+        "name": "RelayQaHub.exe",
+        "path": "D:\\Relay-QA-Hub\\apps\\desktop\\release\\RelayQaHub-win32-x64\\RelayQaHub.exe",
+        "startedAt": "2026-09-10T10:48:47.4690790Z",
+        "commandLineSha256": "fa4cbc206d6a98847d7e60470bfd9fb0fcea17531e11c1adc21247ef20201c32",
+        "commandLine": "\"D:\\Relay-QA-Hub\\apps\\desktop\\release\\RelayQaHub-win32-x64\\RelayQaHub.exe\" --type --user-data-dir=\"D:\\Relay-QA-Hub\\work\\eight-build-acceptance\\client-profile\" --gpu-preferences --field-trial-handle --enable-features --disable-features --variations-seed-version --trace-process-track-uuid --mojo-platform-channel-handle /prefetch:2"
+      },
+      {
+        "pid": 23112,
+        "parentPid": 26828,
+        "name": "RelayQaHub.exe",
+        "path": "D:\\Relay-QA-Hub\\apps\\desktop\\release\\RelayQaHub-win32-x64\\RelayQaHub.exe",
+        "startedAt": "2026-09-10T10:48:47.4786740Z",
+        "commandLineSha256": "d4be73d72d5d2b6268634ec9c55de800a9afdd8bec2f594031ac217cdd728374",
+        "commandLine": "\"D:\\Relay-QA-Hub\\apps\\desktop\\release\\RelayQaHub-win32-x64\\RelayQaHub.exe\" --type --utility-sub-type --lang --service-sandbox-type --user-data-dir=\"D:\\Relay-QA-Hub\\work\\eight-build-acceptance\\client-profile\" --standard-schemes --secure-schemes --cors-schemes --fetch-schemes --streaming-schemes --field-trial-handle --enable-features --disable-features --variations-seed-version --trace-process-track-uuid --mojo-platform-channel-handle /prefetch:11"
+      },
+      {
+        "pid": 23528,
+        "parentPid": 26828,
+        "name": "RelayQaHub.exe",
+        "path": "D:\\Relay-QA-Hub\\apps\\desktop\\release\\RelayQaHub-win32-x64\\RelayQaHub.exe",
+        "startedAt": "2026-09-10T10:48:47.5454310Z",
+        "commandLineSha256": "5527caeb78b30015a746e441c1162e7fb72302c669a8a04a9262a6ea92aba450",
+        "commandLine": "\"D:\\Relay-QA-Hub\\apps\\desktop\\release\\RelayQaHub-win32-x64\\RelayQaHub.exe\" --type --user-data-dir=\"D:\\Relay-QA-Hub\\work\\eight-build-acceptance\\client-profile\" --standard-schemes --secure-schemes --cors-schemes --fetch-schemes --streaming-schemes --app-user-model-id --app-path --enable-sandbox --video-capture-use-gpu-memory-buffer --device-scale-factor --num-raster-threads --enable-main-frame-before-activation --time-ticks-at-unix-epoch --launch-time-ticks --field-trial-handle --enable-features --disable-features --variations-seed-version --trace-process-track-uuid --mojo-platform-channel-handle /prefetch:1"
+      }
+    ],
+    "listeners": [
+      {
+        "port": 4319,
+        "listening": true,
+        "address": "0.0.0.0",
+        "pid": 14044
+      },
+      {
+        "port": 4174,
+        "listening": true,
+        "address": "0.0.0.0",
+        "pid": 7420
+      },
+      {
+        "port": 4320,
+        "listening": true,
+        "address": "127.0.0.1",
+        "pid": 17160
+      },
+      {
+        "port": 4639,
+        "listening": true,
+        "address": "127.0.0.1",
+        "pid": 19004
+      },
+      {
+        "port": 4640,
+        "listening": true,
+        "address": "127.0.0.1",
+        "pid": 20452
+      },
+      {
+        "port": 4641,
+        "listening": true,
+        "address": "127.0.0.1",
+        "pid": 19112
+      },
+      {
+        "port": 4642,
+        "listening": false
+      },
+      {
+        "port": 63374,
+        "listening": false
+      },
+      {
+        "port": 63375,
+        "listening": false
+      },
+      {
+        "port": 63376,
+        "listening": false
+      }
+    ]
+  },
+  "finishedAt": "2026-09-10T14:25:45.045Z"
+}

@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "capturedAt": "2026-09-10T15:16:15.2695529Z",
+  "gate": "desktop-native-notification-visible-and-invokable",
+  "runId": "9ca4df2d-11a7-4d1c-8707-c66884afb2a6",
+  "proof": "../../../../desktop-notification-project-route-live/9ca4df2d-11a7-4d1c-8707-c66884afb2a6/proof.json",
+  "durableNotificationAt": "2026-09-10T15:01:05.2180000+00:00",
+  "platformDeliveryAt": "2026-09-10T15:01:05.8112762+00:00",
+  "deliveryDelayMs": 593.276,
+  "observerSessionId": 2,
+  "toastDestinationSessionId": 1,
+  "sessionMismatch": true,
+  "appUserModelId": "com.relayqahub.desktop.preview.v21.e2e.fresh.0910",
+  "trackingId": "5638",
+  "eventRecordId": 72708,
+  "rawEvent": "session-routing-event-5638.json",
+  "result": "not_passed",
+  "conclusion": "The exact notification was accepted by Windows immediately after the durable notification readback, but Windows routed it to session 1 while the UI Automation observer ran in active RDP session 2. The current run therefore cannot prove a visible or invokable toast and remains a mandatory FAIL; the delivery log is not treated as UI proof."
+}

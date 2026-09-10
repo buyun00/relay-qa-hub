@@ -1,0 +1,46 @@
+{
+  "schemaVersion": 1,
+  "capturedAt": "2026-09-10T14:56:46.4532921Z",
+  "gate": "desktop-native-notification-visible-and-invokable",
+  "passed": false,
+  "status": "failed",
+  "installedVersion": "0.2.0-preview.17",
+  "canonicalExe": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview-v21-e2e-fresh-0910\\RelayQaHubPreview-v21-e2e-fresh-0910.exe",
+  "appUserModelId": "com.relayqahub.desktop.preview.v21.e2e.fresh.0910",
+  "probes": [
+    {
+      "kind": "exact-uia",
+      "triggerId": "build-1789051046-finished",
+      "result": "EXACT_TOAST_NOT_FOUND"
+    },
+    {
+      "kind": "fuzzy-uia",
+      "triggerId": "build-1789051379-finished",
+      "sampleCount": 0,
+      "result": "NO_NOTIFICATION_TEXT_ELEMENT"
+    },
+    {
+      "kind": "exact-uia",
+      "triggerId": "build-1789051762-finished",
+      "result": "EXACT_TOAST_NOT_FOUND"
+    }
+  ],
+  "windowsSettings": {
+    "globalNotifications": "On",
+    "doNotDisturb": "Off",
+    "previewApplication": "On",
+    "previewApplicationSummary": "横幅、声音"
+  },
+  "platformEvidence": {
+    "electronShownEventsPresent": true,
+    "windowsPushEventsPresent": true,
+    "lastNotificationAddedTimePresent": true,
+    "correctShortcutAumidAndActivatorPresent": true
+  },
+  "conclusion": "Windows accepted the native notifications, but no exact or fuzzy visible UI Automation notification element appeared in the active interactive session. The mandatory visible and InvokePattern gate remains failed.",
+  "delegatedUserGatesAffected": false,
+  "sourceReferences": [
+    "https://learn.microsoft.com/en-us/windows/win32/shell/enable-desktop-toast-with-appusermodelid",
+    "https://www.electronjs.org/docs/latest/tutorial/notifications"
+  ]
+}

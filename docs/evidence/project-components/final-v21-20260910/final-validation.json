@@ -1,21 +1,39 @@
 {
-  "schemaVersion": 1,
-  "validatedAt": "2026-09-10T09:25:31.614Z",
-  "sourceCommit": "88a6d0f9c31106f6cd3fc9edbadca0db6bf6397b",
+  "schemaVersion": 2,
+  "validatedAt": "2026-09-10T16:24:40.201Z",
+  "validationScope": "evidence_structure_and_declared_gate_consistency",
+  "sourceCommit": "c4e2eb7d9341a16d2430df9073a93f44f381dd2b",
+  "productSourceCommit": "c4e2eb7d9341a16d2430df9073a93f44f381dd2b",
   "acceptanceOverallStatus": "not_complete",
-  "agentScopeStatus": "complete_user_acceptance_pending",
+  "agentScopeStatus": "incomplete_agent_revalidation_pending",
   "completionAllowed": false,
   "delegatedUserCases": 6,
   "delegatedCasesAllNotRun": true,
+  "agentGatesAllPassed": false,
   "fineGrainedCoverage": {
     "items": 1030,
     "retiredItems": 47,
     "needsRevalidation": 637
   },
   "coverageSourceHead": "7b14dce3c981e56d5841ce38ea9025606fa44d0c",
-  "coverageProductSourceMatches": true,
-  "parsedJsonFiles": 57,
-  "preValidationIndexEntriesVerified": 258,
+  "coverageProductSourceMatches": false,
+  "indexedTrackedFiles": 355,
+  "parsedIndexedJsonFiles": 147,
+  "indexCompleteTrackedSetVerified": true,
+  "serverMcpEvidenceScope": {
+    "claim": "catalog_and_executed_business_subset",
+    "catalogToolCountsObserved": [
+      96,
+      96
+    ],
+    "executedTools": [
+      "qa_list_bugs",
+      "qa_list_projects",
+      "qa_login"
+    ],
+    "allCatalogToolsBusinessValidated": false
+  },
   "credentialsPersisted": false,
-  "passed": true
+  "evidenceStructurePassed": true,
+  "productAcceptancePassed": false
 }

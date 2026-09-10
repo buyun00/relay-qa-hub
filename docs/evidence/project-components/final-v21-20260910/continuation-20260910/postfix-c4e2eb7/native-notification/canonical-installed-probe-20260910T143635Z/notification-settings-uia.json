@@ -1,0 +1,418 @@
+{
+  "schemaVersion": 1,
+  "capturedAt": "2026-09-10T14:48:31.5904158Z",
+  "sessionId": 2,
+  "settingsWindow": {
+    "name": "设置",
+    "processId": 14692,
+    "nativeWindowHandle": 176424860
+  },
+  "beforeProcessIds": [
+    16388
+  ],
+  "afterProcessIds": [
+    16388
+  ],
+  "matches": [
+    {
+      "name": "关闭 设置",
+      "automationId": "Close",
+      "className": "",
+      "controlType": "ControlType.Button",
+      "offscreen": false,
+      "enabled": true,
+      "supportsToggle": false,
+      "toggleState": null
+    },
+    {
+      "name": "游戏",
+      "automationId": "",
+      "className": "Microsoft.UI.Xaml.Controls.NavigationViewItem",
+      "controlType": "ControlType.ListItem",
+      "offscreen": false,
+      "enabled": true,
+      "supportsToggle": false,
+      "toggleState": null
+    },
+    {
+      "name": "通知",
+      "automationId": "",
+      "className": "Microsoft.UI.Xaml.Controls.BreadcrumbBarItem",
+      "controlType": "ControlType.Button",
+      "offscreen": false,
+      "enabled": true,
+      "supportsToggle": false,
+      "toggleState": null
+    },
+    {
+      "name": "通知",
+      "automationId": "",
+      "className": "TextBlock",
+      "controlType": "ControlType.Text",
+      "offscreen": false,
+      "enabled": true,
+      "supportsToggle": false,
+      "toggleState": null
+    },
+    {
+      "name": "通知",
+      "automationId": "",
+      "className": "NamedContainerAutomationPeer",
+      "controlType": "ControlType.Group",
+      "offscreen": false,
+      "enabled": true,
+      "supportsToggle": false,
+      "toggleState": null
+    },
+    {
+      "name": "通知",
+      "automationId": "",
+      "className": "TextBlock",
+      "controlType": "ControlType.Text",
+      "offscreen": false,
+      "enabled": true,
+      "supportsToggle": false,
+      "toggleState": null
+    },
+    {
+      "name": "获取来自应用和其他发送者的通知",
+      "automationId": "",
+      "className": "TextBlock",
+      "controlType": "ControlType.Text",
+      "offscreen": false,
+      "enabled": true,
+      "supportsToggle": false,
+      "toggleState": null
+    },
+    {
+      "name": "通知",
+      "automationId": "SystemSettings_Notifications_ShowAppNotifications_ToggleSwitch",
+      "className": "ToggleSwitch",
+      "controlType": "ControlType.Button",
+      "offscreen": false,
+      "enabled": true,
+      "supportsToggle": true,
+      "toggleState": "On"
+    },
+    {
+      "name": "通知将直接发送到通知中心",
+      "automationId": "",
+      "className": "TextBlock",
+      "controlType": "ControlType.Text",
+      "offscreen": false,
+      "enabled": true,
+      "supportsToggle": false,
+      "toggleState": null
+    },
+    {
+      "name": "请勿打扰",
+      "automationId": "SystemSettings_Notifications_QuietHours_MuteNotification_Enabled_ToggleSwitch",
+      "className": "ToggleSwitch",
+      "controlType": "ControlType.Button",
+      "offscreen": false,
+      "enabled": true,
+      "supportsToggle": true,
+      "toggleState": "Off"
+    },
+    {
+      "name": "设置优先级通知",
+      "automationId": "SystemSettings_Notifications_QuietHours_EditProfile_EntityItem",
+      "className": "NamedContainerAutomationPeer",
+      "controlType": "ControlType.Group",
+      "offscreen": false,
+      "enabled": true,
+      "supportsToggle": false,
+      "toggleState": null
+    },
+    {
+      "name": "设置优先级通知",
+      "automationId": "",
+      "className": "TextBlock",
+      "controlType": "ControlType.Text",
+      "offscreen": false,
+      "enabled": true,
+      "supportsToggle": false,
+      "toggleState": null
+    },
+    {
+      "name": "设置优先级通知",
+      "automationId": "EntityItemButton",
+      "className": "Button",
+      "controlType": "ControlType.Button",
+      "offscreen": false,
+      "enabled": true,
+      "supportsToggle": false,
+      "toggleState": null
+    },
+    {
+      "name": "专注",
+      "automationId": "SystemSettings_Notifications_FocusAssistSettingLink_ButtonEntityItem",
+      "className": "NamedContainerAutomationPeer",
+      "controlType": "ControlType.Group",
+      "offscreen": false,
+      "enabled": true,
+      "supportsToggle": false,
+      "toggleState": null
+    },
+    {
+      "name": "来自应用和其他发送者的通知",
+      "automationId": "",
+      "className": "NamedContainerAutomationPeer",
+      "controlType": "ControlType.Group",
+      "offscreen": false,
+      "enabled": true,
+      "supportsToggle": false,
+      "toggleState": null
+    },
+    {
+      "name": "来自应用和其他发送者的通知",
+      "automationId": "",
+      "className": "TextBlock",
+      "controlType": "ControlType.Text",
+      "offscreen": false,
+      "enabled": true,
+      "supportsToggle": false,
+      "toggleState": null
+    },
+    {
+      "name": "",
+      "automationId": "SystemSettings_Notifications_AppList_ListView",
+      "className": "SettingsListItemsRepeaterAutomationPeer",
+      "controlType": "ControlType.List",
+      "offscreen": false,
+      "enabled": true,
+      "supportsToggle": false,
+      "toggleState": null
+    },
+    {
+      "name": "QA Hub Project Preview (v21-e2e-fresh-0910)",
+      "automationId": "com.relayqahub.desktop.preview.v21.e2e.fresh.09102_EntityItem",
+      "className": "NamedContainerAutomationPeer",
+      "controlType": "ControlType.Group",
+      "offscreen": false,
+      "enabled": true,
+      "supportsToggle": false,
+      "toggleState": null
+    },
+    {
+      "name": "QA Hub Project Preview (v21-e2e-fresh-0910)",
+      "automationId": "EntityItemButton",
+      "className": "Button",
+      "controlType": "ControlType.Button",
+      "offscreen": false,
+      "enabled": true,
+      "supportsToggle": false,
+      "toggleState": null
+    },
+    {
+      "name": "QA Hub Project Preview (v21-e2e-fresh-0910)",
+      "automationId": "",
+      "className": "TextBlock",
+      "controlType": "ControlType.Text",
+      "offscreen": false,
+      "enabled": true,
+      "supportsToggle": false,
+      "toggleState": null
+    },
+    {
+      "name": "横幅、声音",
+      "automationId": "",
+      "className": "TextBlock",
+      "controlType": "ControlType.Text",
+      "offscreen": false,
+      "enabled": true,
+      "supportsToggle": false,
+      "toggleState": null
+    },
+    {
+      "name": "QA Hub Project Preview (v21-e2e-fresh-0910)",
+      "automationId": "com.relayqahub.desktop.preview.v21.e2e.fresh.09102_ToggleSwitch",
+      "className": "ToggleSwitch",
+      "controlType": "ControlType.Button",
+      "offscreen": false,
+      "enabled": true,
+      "supportsToggle": true,
+      "toggleState": "On"
+    },
+    {
+      "name": "横幅、声音",
+      "automationId": "",
+      "className": "TextBlock",
+      "controlType": "ControlType.Text",
+      "offscreen": false,
+      "enabled": true,
+      "supportsToggle": false,
+      "toggleState": null
+    },
+    {
+      "name": "横幅、声音",
+      "automationId": "",
+      "className": "TextBlock",
+      "controlType": "ControlType.Text",
+      "offscreen": false,
+      "enabled": true,
+      "supportsToggle": false,
+      "toggleState": null
+    },
+    {
+      "name": "QA Hub Project Preview",
+      "automationId": "com.relayqahub.desktop.preview1_EntityItem",
+      "className": "NamedContainerAutomationPeer",
+      "controlType": "ControlType.Group",
+      "offscreen": false,
+      "enabled": true,
+      "supportsToggle": false,
+      "toggleState": null
+    },
+    {
+      "name": "QA Hub Project Preview",
+      "automationId": "EntityItemButton",
+      "className": "Button",
+      "controlType": "ControlType.Button",
+      "offscreen": false,
+      "enabled": true,
+      "supportsToggle": false,
+      "toggleState": null
+    },
+    {
+      "name": "QA Hub Project Preview",
+      "automationId": "",
+      "className": "TextBlock",
+      "controlType": "ControlType.Text",
+      "offscreen": false,
+      "enabled": true,
+      "supportsToggle": false,
+      "toggleState": null
+    },
+    {
+      "name": "横幅、声音",
+      "automationId": "",
+      "className": "TextBlock",
+      "controlType": "ControlType.Text",
+      "offscreen": false,
+      "enabled": true,
+      "supportsToggle": false,
+      "toggleState": null
+    },
+    {
+      "name": "QA Hub Project Preview",
+      "automationId": "com.relayqahub.desktop.preview1_ToggleSwitch",
+      "className": "ToggleSwitch",
+      "controlType": "ControlType.Button",
+      "offscreen": false,
+      "enabled": true,
+      "supportsToggle": true,
+      "toggleState": "On"
+    },
+    {
+      "name": "横幅、声音",
+      "automationId": "",
+      "className": "TextBlock",
+      "controlType": "ControlType.Text",
+      "offscreen": false,
+      "enabled": true,
+      "supportsToggle": false,
+      "toggleState": null
+    },
+    {
+      "name": "横幅、声音",
+      "automationId": "",
+      "className": "TextBlock",
+      "controlType": "ControlType.Text",
+      "offscreen": false,
+      "enabled": true,
+      "supportsToggle": false,
+      "toggleState": null
+    },
+    {
+      "name": "横幅、声音",
+      "automationId": "",
+      "className": "TextBlock",
+      "controlType": "ControlType.Text",
+      "offscreen": false,
+      "enabled": true,
+      "supportsToggle": false,
+      "toggleState": null
+    },
+    {
+      "name": "横幅、声音",
+      "automationId": "",
+      "className": "TextBlock",
+      "controlType": "ControlType.Text",
+      "offscreen": true,
+      "enabled": true,
+      "supportsToggle": false,
+      "toggleState": null
+    },
+    {
+      "name": "启动应用通知",
+      "automationId": "Windows.SystemToast.StartupApp8_EntityItem",
+      "className": "NamedContainerAutomationPeer",
+      "controlType": "ControlType.Group",
+      "offscreen": true,
+      "enabled": true,
+      "supportsToggle": false,
+      "toggleState": null
+    },
+    {
+      "name": "启动应用通知",
+      "automationId": "EntityItemButton",
+      "className": "Button",
+      "controlType": "ControlType.Button",
+      "offscreen": true,
+      "enabled": true,
+      "supportsToggle": false,
+      "toggleState": null
+    },
+    {
+      "name": "启动应用通知",
+      "automationId": "",
+      "className": "TextBlock",
+      "controlType": "ControlType.Text",
+      "offscreen": true,
+      "enabled": true,
+      "supportsToggle": false,
+      "toggleState": null
+    },
+    {
+      "name": "启动应用通知",
+      "automationId": "Windows.SystemToast.StartupApp8_ToggleSwitch",
+      "className": "ToggleSwitch",
+      "controlType": "ControlType.Button",
+      "offscreen": true,
+      "enabled": true,
+      "supportsToggle": true,
+      "toggleState": "Off"
+    },
+    {
+      "name": "屏幕指示器的位置",
+      "automationId": "SystemSettings_Notifications_OnScreenConfirmatorPosition_ComboBox",
+      "className": "ComboBox",
+      "controlType": "ControlType.ComboBox",
+      "offscreen": true,
+      "enabled": true,
+      "supportsToggle": false,
+      "toggleState": null
+    },
+    {
+      "name": "自定义通知和快速设置",
+      "automationId": "",
+      "className": "Hyperlink",
+      "controlType": "ControlType.Hyperlink",
+      "offscreen": true,
+      "enabled": true,
+      "supportsToggle": false,
+      "toggleState": null
+    },
+    {
+      "name": "自定义通知和快速设置",
+      "automationId": "",
+      "className": "TextBlock",
+      "controlType": "ControlType.Text",
+      "offscreen": true,
+      "enabled": true,
+      "supportsToggle": false,
+      "toggleState": null
+    }
+  ]
+}

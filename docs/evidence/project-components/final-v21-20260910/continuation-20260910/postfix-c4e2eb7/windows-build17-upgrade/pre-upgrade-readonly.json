@@ -1,0 +1,206 @@
+{
+  "schemaVersion": 1,
+  "capturedAt": "2026-09-10T14:12:53.900Z",
+  "expected": {
+    "runtimeVersion": "0.2.0-preview.16",
+    "updateStatus": "ready",
+    "updateVersion": "0.2.0-preview.17",
+    "updateReleaseId": "20260910T135324626Z",
+    "connectionLastError": "INBOX_READ_FAILED"
+  },
+  "target": {
+    "id": "BF571811BD109168ACD84884EC660142",
+    "url": "qa-hub-preview-v21-e2e-fresh-0910://app/index.html"
+  },
+  "beforeReload": {
+    "readOnlyStorage": true,
+    "url": "qa-hub-preview-v21-e2e-fresh-0910://app/index.html",
+    "readyState": "complete",
+    "bridgeType": "object",
+    "bridgeMethods": [
+      "checkForUpdate",
+      "getConnectionStatus",
+      "getNotificationsPaused",
+      "getRuntimeInfo",
+      "getUpdateState",
+      "getWindowState",
+      "installUpdate",
+      "notifyPackaging",
+      "onBugChanged",
+      "onConnectionStatus",
+      "onOpenBug",
+      "onOpenPackaging",
+      "onUpdateState",
+      "onWindowState",
+      "uploader",
+      "windowAction",
+      "windowControlsOverlay"
+    ],
+    "appReady": true,
+    "loginVisible": false,
+    "loginNameVisible": true,
+    "projectId": "305b4def-ae7e-4a2d-ae96-a05d616390bf",
+    "runtime": {
+      "apiBaseUrl": "http://127.0.0.1:4639",
+      "notificationsEnabled": true,
+      "version": "0.2.0-preview.16",
+      "mcp": {
+        "state": "listening",
+        "port": 4642,
+        "url": "http://127.0.0.1:4642/mcp",
+        "lastError": null
+      }
+    },
+    "update": {
+      "status": "ready",
+      "releaseId": "20260910T135324626Z",
+      "version": "0.2.0-preview.17",
+      "publishedAt": "2026-09-10T13:55:51.464Z"
+    },
+    "connection": {
+      "state": "connected",
+      "reconnectAttempt": 0,
+      "lastError": "INBOX_READ_FAILED"
+    },
+    "uiDraft": {
+      "length": 21,
+      "sha256": "125cf35171bf74f353b590141b55f8b51d8c03f6bf9b7a66bb4da317832ac56c"
+    },
+    "database": {
+      "name": "qa-hub-preview-project-drafts-v1",
+      "version": 1,
+      "store": "drafts",
+      "records": [
+        {
+          "serviceIdentity": "http://127.0.0.1:4639",
+          "projectId": "305b4def-ae7e-4a2d-ae96-a05d616390bf",
+          "userId": "0ddff48b-536c-4c30-8b42-511741010610",
+          "kind": "bug-drafts",
+          "newContentLength": 21,
+          "newContentSha256": "125cf35171bf74f353b590141b55f8b51d8c03f6bf9b7a66bb4da317832ac56c"
+        },
+        {
+          "serviceIdentity": "http://127.0.0.1:4639",
+          "projectId": "305b4def-ae7e-4a2d-ae96-a05d616390bf",
+          "userId": "eb15d62a-f9d2-4015-a5f3-c95f1a729e23",
+          "kind": "bug-drafts",
+          "newContentLength": 73,
+          "newContentSha256": "f4b903da91a5bd83b6d354d2feef1e8a40efd6b092c348a2bf5b20e1f4657d59"
+        },
+        {
+          "serviceIdentity": "qa-hub-preview-v21-e2e-fresh-0910://app",
+          "projectId": "305b4def-ae7e-4a2d-ae96-a05d616390bf",
+          "userId": "0ddff48b-536c-4c30-8b42-511741010610",
+          "kind": "bug-drafts",
+          "newContentLength": 25,
+          "newContentSha256": "4633cd88dc0b379c68827d385575105a4e24f407314a2c4ca3638a62918d0166"
+        }
+      ]
+    }
+  },
+  "afterReload": {
+    "readOnlyStorage": true,
+    "url": "qa-hub-preview-v21-e2e-fresh-0910://app/index.html",
+    "readyState": "complete",
+    "bridgeType": "object",
+    "bridgeMethods": [
+      "checkForUpdate",
+      "getConnectionStatus",
+      "getNotificationsPaused",
+      "getRuntimeInfo",
+      "getUpdateState",
+      "getWindowState",
+      "installUpdate",
+      "notifyPackaging",
+      "onBugChanged",
+      "onConnectionStatus",
+      "onOpenBug",
+      "onOpenPackaging",
+      "onUpdateState",
+      "onWindowState",
+      "uploader",
+      "windowAction",
+      "windowControlsOverlay"
+    ],
+    "appReady": true,
+    "loginVisible": false,
+    "loginNameVisible": true,
+    "projectId": "305b4def-ae7e-4a2d-ae96-a05d616390bf",
+    "runtime": {
+      "apiBaseUrl": "http://127.0.0.1:4639",
+      "notificationsEnabled": true,
+      "version": "0.2.0-preview.16",
+      "mcp": {
+        "state": "listening",
+        "port": 4642,
+        "url": "http://127.0.0.1:4642/mcp",
+        "lastError": null
+      }
+    },
+    "update": {
+      "status": "ready",
+      "releaseId": "20260910T135324626Z",
+      "version": "0.2.0-preview.17",
+      "publishedAt": "2026-09-10T13:55:51.464Z"
+    },
+    "connection": {
+      "state": "connected",
+      "reconnectAttempt": 0,
+      "lastError": "INBOX_READ_FAILED"
+    },
+    "uiDraft": {
+      "length": 21,
+      "sha256": "125cf35171bf74f353b590141b55f8b51d8c03f6bf9b7a66bb4da317832ac56c"
+    },
+    "database": {
+      "name": "qa-hub-preview-project-drafts-v1",
+      "version": 1,
+      "store": "drafts",
+      "records": [
+        {
+          "serviceIdentity": "http://127.0.0.1:4639",
+          "projectId": "305b4def-ae7e-4a2d-ae96-a05d616390bf",
+          "userId": "0ddff48b-536c-4c30-8b42-511741010610",
+          "kind": "bug-drafts",
+          "newContentLength": 21,
+          "newContentSha256": "125cf35171bf74f353b590141b55f8b51d8c03f6bf9b7a66bb4da317832ac56c"
+        },
+        {
+          "serviceIdentity": "http://127.0.0.1:4639",
+          "projectId": "305b4def-ae7e-4a2d-ae96-a05d616390bf",
+          "userId": "eb15d62a-f9d2-4015-a5f3-c95f1a729e23",
+          "kind": "bug-drafts",
+          "newContentLength": 73,
+          "newContentSha256": "f4b903da91a5bd83b6d354d2feef1e8a40efd6b092c348a2bf5b20e1f4657d59"
+        },
+        {
+          "serviceIdentity": "qa-hub-preview-v21-e2e-fresh-0910://app",
+          "projectId": "305b4def-ae7e-4a2d-ae96-a05d616390bf",
+          "userId": "0ddff48b-536c-4c30-8b42-511741010610",
+          "kind": "bug-drafts",
+          "newContentLength": 25,
+          "newContentSha256": "4633cd88dc0b379c68827d385575105a4e24f407314a2c4ca3638a62918d0166"
+        }
+      ]
+    }
+  },
+  "reloadEvents": [],
+  "checks": {
+    "exactTarget": true,
+    "bridgeAvailableBeforeReload": true,
+    "bridgeAvailableAfterReload": true,
+    "requiredBridgeMethodsAfterReload": true,
+    "appReadyAfterReload": true,
+    "signedInAfterReload": true,
+    "projectExactAfterReload": true,
+    "runtimeExpectedAfterReload": true,
+    "mcp4642AfterReload": true,
+    "updateExpectedAfterReload": true,
+    "connectionExpectedAfterReload": true,
+    "primaryDraftVisibleAfterReload": true,
+    "primaryRecordRetained": true,
+    "fallbackRecordRetained": true,
+    "noPreloadOrModuleErrorOnReload": true
+  },
+  "passed": true
+}

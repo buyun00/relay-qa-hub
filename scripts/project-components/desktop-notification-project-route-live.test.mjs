@@ -8,9 +8,11 @@ import {
   TOAST_UIA_PS,
   classifyBugDetailRequest,
   durableToastBody,
+  liveRequestAccept,
   notificationProjectKey,
   parseArguments,
   redactEvidence,
+  relayProcessFingerprint,
 } from "./desktop-notification-project-route-live.mjs";
 
 const INSTANCE = "C:\\isolated\\qa-hub-preview-test\\instance.json";
@@ -50,6 +52,14 @@ test("toast body follows the frozen v1.1 Inbox shape and accepts a future explic
     "QA-12 · Login failure",
   );
   assert.throws(() => durableToastBody({ type: "" }), /INVALID_TOAST_BODY/u);
+});
+
+test("live notification reads request the base representation with the durable body", () => {
+  assert.equal(
+    liveRequestAccept("/api/v1/notifications?projectId=10000000-0000-4000-8000-000000000001"),
+    "application/json",
+  );
+  assert.equal(liveRequestAccept("/api/v1/bugs"), "application/vnd.relay-qa-hub.v1.1+json");
 });
 
 test("detail classifier requires an exact GET path and preserves the project header", () => {
@@ -112,6 +122,33 @@ test("evidence redaction removes auth material from keys and free text", () => {
   assert.match(serialized, /REDACTED/u);
 });
 
+test("Relay process fingerprint includes canonical and pre-existing processes", () => {
+  const snapshot = {
+    processes: [
+      {
+        pid: 22,
+        parentPid: 2,
+        name: "RelayQaHubPreview-test.exe",
+        path: "C:\\isolated\\RelayQaHubPreview-test\\RelayQaHubPreview-test.exe",
+        startedAt: "2026-09-10T00:00:00.000Z",
+        commandLineSha256: "b".repeat(64),
+      },
+      {
+        pid: 11,
+        parentPid: 1,
+        name: "RelayQaHub.exe",
+        path: "D:\\Relay-QA-Hub\\RelayQaHub.exe",
+        startedAt: "2026-09-09T00:00:00.000Z",
+        commandLineSha256: "a".repeat(64),
+      },
+    ],
+  };
+  assert.deepEqual(
+    relayProcessFingerprint(snapshot).map((item) => item.pid),
+    [11, 22],
+  );
+});
+
 test("toast helper performs exact title/body lookup and only invokes through InvokePattern", () => {
   assert.match(TOAST_UIA_PS, /Get-Content[^\n]+-Encoding utf8/u);
   assert.match(TOAST_UIA_PS, /AutomationElement\]::NameProperty/u);
@@ -143,9 +180,23 @@ test("second A notification is observed in A and only then clicked from B", () =
   );
 });
 
-test("runner has no force-kill path and graceful quit is bound to the copied EXE inspector", () => {
+test("runner directly launches the canonical EXE with isolated config and verified cleanup", () => {
   assert.doesNotMatch(runnerSource, /taskkill|Stop-Process|TerminateProcess|\.kill\s*\(/iu);
-  assert.match(runnerSource, /check\(`\$\{phase\} exact copied EXE`/u);
+  assert.doesNotMatch(runnerSource, /copyTreeExclusive|installed-copy|copiedExe/u);
+  assert.match(runnerSource, /child = spawn\(\s*scope\.executablePath/u);
+  assert.match(runnerSource, /cwd: scope\.installedRoot/u);
+  assert.match(runnerSource, /env\.QA_HUB_PREVIEW_DESKTOP_CONFIG = config\.file/u);
+  assert.match(runnerSource, /\$\{phase\} exact installed canonical EXE/u);
+  assert.match(runnerSource, /\$\{phase\} exact isolated profile/u);
+  assert.match(runnerSource, /canonical inputs unchanged before launch/u);
+  assert.match(runnerSource, /CLEANUP_PID_MISMATCH/u);
+  assert.match(runnerSource, /FINAL_CLEANUP_NO_VERIFIED_GRACEFUL_CHANNEL/u);
+  assert.match(runnerSource, /proof\.cleanupError[\s\S]+proof\.passed = false/u);
+  assert.match(runnerSource, /relayProcessFingerprint\(hostAfter\)/u);
+  const quitRequest = runnerSource.indexOf("OWN_APP_QUIT_SCHEDULED");
+  const inspectorDetach = runnerSource.indexOf("stoppingInspector.close()", quitRequest);
+  const exitWait = runnerSource.indexOf("stoppingChild.exitCode === null", inspectorDetach);
+  assert.ok(quitRequest >= 0 && inspectorDetach > quitRequest && exitWait > inspectorDetach);
   assert.match(runnerSource, /app\.quit\(\)/u);
   assert.match(runnerSource, /NO_GRACEFUL_CHANNEL/u);
 });

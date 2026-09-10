@@ -1,0 +1,24 @@
+{
+  "capturedAt": "2026-09-10T14:56:46.0185670Z",
+  "appUserModelId": "com.relayqahub.desktop.preview.v21.e2e.fresh.0910",
+  "global": {
+    "QuietHoursTelemetryLastRun": [
+      70,
+      177,
+      154,
+      106,
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  "app": {
+    "LastNotificationAddedTime": 134335253626076321,
+    "PeriodicNotificationCount": 28
+  },
+  "quietHours": {
+    "FullScreenProcess": "codex-computer-use.exe",
+    "QuietHoursServiceState": 0
+  }
+}
