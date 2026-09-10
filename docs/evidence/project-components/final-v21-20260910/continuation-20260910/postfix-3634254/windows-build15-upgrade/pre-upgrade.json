@@ -1,0 +1,93 @@
+{
+  "schemaVersion": 1,
+  "capturedAt": "2026-09-10T11:30:49.6403282Z",
+  "instanceId": "qa-hub-preview-v21-e2e-fresh-0910",
+  "candidate": {
+    "releaseId": "20260910T112450576Z",
+    "version": "0.2.0-preview.15",
+    "sourceCommit": "3634254a8109f540b4f17038a9d0d8746ebd3971",
+    "installerSha256": "dbb04e29aaa042665548e610a00106eb382bebec6fa2299f56a0ed9c8ee4b971"
+  },
+  "installedBefore": {
+    "version": "0.2.0-preview.13",
+    "sha256": "2bd7ee601175b06e433746babe6da4a826bf5eaa4ba15db807fff9b74b5d2e32",
+    "processes": [
+      {
+        "ProcessId": 14596,
+        "ParentProcessId": 19408,
+        "CreationDate": "2026-09-10T18:47:57.852505+08:00",
+        "ExecutablePath": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview-v21-e2e-fresh-0910\\RelayQaHubPreview-v21-e2e-fresh-0910.exe",
+        "CommandLine": "\"C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview-v21-e2e-fresh-0910\\RelayQaHubPreview-v21-e2e-fresh-0910.exe\" --update-failed --user-data-dir=\"C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-v21-e2e-fresh-0910\\desktop\\profile\""
+      },
+      {
+        "ProcessId": 15540,
+        "ParentProcessId": 14596,
+        "CreationDate": "2026-09-10T18:47:57.976239+08:00",
+        "ExecutablePath": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview-v21-e2e-fresh-0910\\RelayQaHubPreview-v21-e2e-fresh-0910.exe",
+        "CommandLine": "\"C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview-v21-e2e-fresh-0910\\RelayQaHubPreview-v21-e2e-fresh-0910.exe\" --type=gpu-process --user-data-dir=\"C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-v21-e2e-fresh-0910\\desktop\\profile\" --gpu-preferences=UAAAAAAAAADgAAAEAAAAAAAAAAAAAGAAOAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAABgAAAAAAAAAGAAAAAAAAAAIAAAAAAAAAAgAAAAAAAAACAAAAAAAAAA= --field-trial-handle=1880,i,2627626853646397019,15788811862383984549,262144 --enable-features=PdfUseShowSaveFilePicker --disable-features=DropInputEventsWhilePaintHolding,LocalNetworkAccessChecks,NetworkServiceSandbox,ScreenAIOCREnabled,SpareRendererForSitePerProcess,TraceSiteInstanceGetProcessCreation --variations-seed-version --pseudonymization-salt-handle=1884,i,4926616461814807945,2281827107030625857,4 --trace-process-track-uuid=3190708988185955192 --mojo-platform-channel-handle=1872 /prefetch:2"
+      },
+      {
+        "ProcessId": 23276,
+        "ParentProcessId": 14596,
+        "CreationDate": "2026-09-10T18:47:57.98559+08:00",
+        "ExecutablePath": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview-v21-e2e-fresh-0910\\RelayQaHubPreview-v21-e2e-fresh-0910.exe",
+        "CommandLine": "\"C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview-v21-e2e-fresh-0910\\RelayQaHubPreview-v21-e2e-fresh-0910.exe\" --type=utility --utility-sub-type=network.mojom.NetworkService --lang=zh-CN --service-sandbox-type=none --user-data-dir=\"C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-v21-e2e-fresh-0910\\desktop\\profile\" --standard-schemes=qa-hub-preview-v21-e2e-fresh-0910 --secure-schemes=qa-hub-preview-v21-e2e-fresh-0910 --cors-schemes=qa-hub-preview-v21-e2e-fresh-0910 --fetch-schemes=qa-hub-preview-v21-e2e-fresh-0910 --streaming-schemes=qa-hub-preview-v21-e2e-fresh-0910 --field-trial-handle=1880,i,2627626853646397019,15788811862383984549,262144 --enable-features=PdfUseShowSaveFilePicker --disable-features=DropInputEventsWhilePaintHolding,LocalNetworkAccessChecks,NetworkServiceSandbox,ScreenAIOCREnabled,SpareRendererForSitePerProcess,TraceSiteInstanceGetProcessCreation --variations-seed-version --pseudonymization-salt-handle=1884,i,4926616461814807945,2281827107030625857,4 --trace-process-track-uuid=3190708989122997041 --mojo-platform-channel-handle=1936 /prefetch:11"
+      },
+      {
+        "ProcessId": 20712,
+        "ParentProcessId": 14596,
+        "CreationDate": "2026-09-10T18:47:58.068466+08:00",
+        "ExecutablePath": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview-v21-e2e-fresh-0910\\RelayQaHubPreview-v21-e2e-fresh-0910.exe",
+        "CommandLine": "\"C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview-v21-e2e-fresh-0910\\RelayQaHubPreview-v21-e2e-fresh-0910.exe\" --type=renderer --user-data-dir=\"C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-v21-e2e-fresh-0910\\desktop\\profile\" --standard-schemes=qa-hub-preview-v21-e2e-fresh-0910 --secure-schemes=qa-hub-preview-v21-e2e-fresh-0910 --cors-schemes=qa-hub-preview-v21-e2e-fresh-0910 --fetch-schemes=qa-hub-preview-v21-e2e-fresh-0910 --streaming-schemes=qa-hub-preview-v21-e2e-fresh-0910 --app-user-model-id=com.relayqahub.desktop.preview.v21.e2e.fresh.0910 --app-path=\"C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview-v21-e2e-fresh-0910\\resources\\app.asar\" --enable-sandbox --video-capture-use-gpu-memory-buffer --lang=zh-CN --device-scale-factor=1.75 --num-raster-threads=4 --enable-main-frame-before-activation --renderer-client-id=4 --time-ticks-at-unix-epoch=-1788773729538061 --launch-time-ticks=263548524680 --field-trial-handle=1880,i,2627626853646397019,15788811862383984549,262144 --enable-features=PdfUseShowSaveFilePicker --disable-features=DropInputEventsWhilePaintHolding,LocalNetworkAccessChecks,NetworkServiceSandbox,ScreenAIOCREnabled,SpareRendererForSitePerProcess,TraceSiteInstanceGetProcessCreation --variations-seed-version --pseudonymization-salt-handle=1884,i,4926616461814807945,2281827107030625857,4 --trace-process-track-uuid=3190708990060038890 --mojo-platform-channel-handle=3288 /prefetch:1"
+      }
+    ]
+  },
+  "rememberedIdentity": {
+    "schemaVersion": 2,
+    "serviceOrigin": "http://127.0.0.1:4639",
+    "loginName": "Luna Worker 246",
+    "projectId": "305b4def-ae7e-4a2d-ae96-a05d616390bf",
+    "userId": "0ddff48b-536c-4c30-8b42-511741010610",
+    "identity": "employee"
+  },
+  "identitySha256": "e004fe7fb4a8f9da43546be1cd53cc2894549eaacda5f578a00c304af20d98ff",
+  "adapter": {
+    "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-v21-e2e-fresh-0910\\acceptance\\windows-build15-upgrade\\desktop-cdp-smoke-preview-9433.mjs",
+    "sourceSha256": "743d7ba1521daa125d65e7c0d0d4c595692a7ccd7309a41a43a9d873c1e32e32",
+    "adapterSha256": "6b9b86a75703b2baa6f2ab0c64112e4d0900f133fe320328c5deb0f2699bc11a",
+    "cdpPort": 9433,
+    "scheme": "qa-hub-preview-v21-e2e-fresh-0910"
+  },
+  "listeners": [
+    {
+      "port": 4319,
+      "pid": 9488
+    },
+    {
+      "port": 4174,
+      "pid": 7420
+    },
+    {
+      "port": 4320,
+      "pid": 17160
+    },
+    {
+      "port": 4642,
+      "pid": 14596
+    },
+    {
+      "port": 9333,
+      "pid": 26828
+    }
+  ],
+  "checks": {
+    "installedIs13": true,
+    "mainPid14596Present": true,
+    "desktopMcpOwnedBy14596": true,
+    "cdp9433Free": true,
+    "productionPortOwnersUnchanged": true,
+    "foreign9333Untouched": true
+  },
+  "productionAction": "read_only",
+  "productionTouched": false
+}

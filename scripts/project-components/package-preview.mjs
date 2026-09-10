@@ -11,12 +11,17 @@ import {
 import { join, resolve } from "node:path";
 import { execFileSync } from "node:child_process";
 import { createHash, generateKeyPairSync, sign } from "node:crypto";
+import asar from "@electron/asar";
 import { packager } from "@electron/packager";
 import { readParallelInstanceConfig } from "../../apps/api/src/parallel-instance.ts";
 import {
   assertCleanPreviewPackageSource,
   derivePreviewPackageIdentity,
 } from "./preview-package-identity.mjs";
+import {
+  assertSandboxPreloadBinding,
+  inspectSandboxPreload,
+} from "./sandbox-preload-require-gate.mjs";
 
 const config = readParallelInstanceConfig(process.argv[2]);
 const makensis = process.argv[3];
@@ -26,6 +31,9 @@ if (!makensis || !existsSync(makensis) || !Number.isSafeInteger(buildNumber) || 
 const packageIdentity = derivePreviewPackageIdentity(config.instanceId);
 // This gate precedes every runtime/package mutation. Recheck before publication below.
 const { sourceCommit, sourceDirty } = assertCleanPreviewPackageSource(config.sourceRoot);
+const preloadPath = join(config.sourceRoot, "apps/desktop/dist/preload.cjs");
+const sourcePreloadBytes = Buffer.from(readFileSync(preloadPath));
+const sourcePreloadSnapshot = inspectSandboxPreload(sourcePreloadBytes, preloadPath);
 const releaseId = new Date().toISOString().replace(/[-:.]/gu, "");
 const version = `0.2.0-preview.${buildNumber}`;
 const root = join(config.runtimeRoot, "packages", releaseId);
@@ -43,6 +51,13 @@ for (const [source, destination] of [
     force: false,
   });
 }
+const stagedPreloadPath = join(stage, "dist", "preload.cjs");
+const stagedPreloadSnapshot = assertSandboxPreloadBinding(
+  readFileSync(stagedPreloadPath),
+  sourcePreloadBytes,
+  sourcePreloadSnapshot,
+  stagedPreloadPath,
+);
 const save = (file, value) =>
   writeFileSync(file, JSON.stringify(value, null, 2) + "\n", { flag: "wx" });
 save(join(stage, "package.json"), {
@@ -61,6 +76,7 @@ save(join(stage, "release.json"), {
   sourceDirty,
   instanceId: config.instanceId,
   packageIdentity,
+  preload: sourcePreloadSnapshot,
 });
 const assets = join(stage, "assets");
 mkdirSync(assets);
@@ -127,6 +143,21 @@ const packaged = await packager({
 const packageDirectory = packaged[0];
 if (!packageDirectory || !resolve(packageDirectory).startsWith(resolve(root)))
   throw new Error("PACKAGE_PATH_INVALID");
+const packagedAsarPath = join(packageDirectory, "resources", "app.asar");
+let packagedPreloadBytes;
+try {
+  packagedPreloadBytes = asar.extractFile(packagedAsarPath, "dist/preload.cjs");
+} catch (cause) {
+  const error = new Error("PREVIEW_SANDBOX_PRELOAD_ASAR_ENTRY_MISSING", { cause });
+  error.code = "PREVIEW_SANDBOX_PRELOAD_ASAR_ENTRY_MISSING";
+  throw error;
+}
+const packagedPreloadSnapshot = assertSandboxPreloadBinding(
+  packagedPreloadBytes,
+  sourcePreloadBytes,
+  sourcePreloadSnapshot,
+  `${packagedAsarPath}:dist/preload.cjs`,
+);
 save(join(packageDirectory, "preview-instance.json"), {
   schemaVersion: 1,
   instanceId: config.instanceId,
@@ -188,6 +219,20 @@ writeFileSync(
   ]),
 );
 const archive = readFileSync(stagedInstaller);
+let finalPackagedPreloadBytes;
+try {
+  finalPackagedPreloadBytes = asar.extractFile(packagedAsarPath, "dist/preload.cjs");
+} catch (cause) {
+  const error = new Error("PREVIEW_SANDBOX_PRELOAD_ASAR_ENTRY_MISSING", { cause });
+  error.code = "PREVIEW_SANDBOX_PRELOAD_ASAR_ENTRY_MISSING";
+  throw error;
+}
+const finalPackagedPreloadSnapshot = assertSandboxPreloadBinding(
+  finalPackagedPreloadBytes,
+  sourcePreloadBytes,
+  sourcePreloadSnapshot,
+  `${packagedAsarPath}:dist/preload.cjs:post-installer`,
+);
 const payload = {
   schemaVersion: 1,
   releaseId,
@@ -208,6 +253,12 @@ save(join(root, "signed-manifest.json"), { ...payload, signature });
 const manifestPath = join(config.downloadsRoot, `${config.instanceId}-windows-latest.json`);
 const temporary = `${manifestPath}.${releaseId}.tmp`;
 assertCleanPreviewPackageSource(config.sourceRoot, sourceCommit);
+const finalSourcePreloadSnapshot = assertSandboxPreloadBinding(
+  readFileSync(preloadPath),
+  sourcePreloadBytes,
+  sourcePreloadSnapshot,
+  `${preloadPath}:publication`,
+);
 const installer = join(config.downloadsRoot, installerName);
 writeFileSync(installer, archive, { flag: "wx" });
 save(temporary, { ...payload, signature });
@@ -223,6 +274,13 @@ const receipt = {
   manifestPath,
   sha256: payload.archive.sha256,
   bytes: archive.length,
+  preload: {
+    source: sourcePreloadSnapshot,
+    staged: stagedPreloadSnapshot,
+    packaged: packagedPreloadSnapshot,
+    finalPackaged: finalPackagedPreloadSnapshot,
+    finalSource: finalSourcePreloadSnapshot,
+  },
 };
 save(join(root, "receipt.json"), receipt);
 console.log(JSON.stringify(receipt));

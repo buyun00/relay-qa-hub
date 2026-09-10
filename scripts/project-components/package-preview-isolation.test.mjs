@@ -8,6 +8,10 @@ import {
   assertCleanPreviewPackageSource,
   derivePreviewPackageIdentity,
 } from "./preview-package-identity.mjs";
+import {
+  assertSandboxPreloadBinding,
+  inspectSandboxPreload,
+} from "./sandbox-preload-require-gate.mjs";
 
 const scriptRoot = dirname(fileURLToPath(import.meta.url));
 const sourceRoot = resolve(scriptRoot, "../..");
@@ -15,12 +19,27 @@ const packageSource = readFileSync(resolve(scriptRoot, "package-preview.mjs"), "
 const installerSource = readFileSync(resolve(scriptRoot, "preview-installer.nsi"), "utf8");
 const updaterSource = readFileSync(resolve(sourceRoot, "apps/desktop/scripts/updater.nsi"), "utf8");
 
+const expectGateCode = (source, code) =>
+  assert.throws(
+    () => inspectSandboxPreload(source, "fixture-preload.cjs"),
+    (error) => error?.code === code,
+  );
+
 test("preview packaging has a clean-source gate and no shared Windows install identity", () => {
   assert.match(packageSource, /preview-package-identity\.mjs/u);
   assert.ok(
     packageSource.indexOf("assertCleanPreviewPackageSource(config.sourceRoot)") <
       packageSource.indexOf("mkdirSync(root"),
     "the clean-source gate must run before the release directory is created",
+  );
+  assert.match(
+    packageSource,
+    /const preloadPath = join\(config\.sourceRoot, "apps\/desktop\/dist\/preload\.cjs"\)/u,
+  );
+  const sandboxGateCall = "const sourcePreloadSnapshot = inspectSandboxPreload(";
+  assert.ok(
+    packageSource.indexOf(sandboxGateCall) < packageSource.indexOf("mkdirSync(root"),
+    "the sandbox preload gate must run before the release directory is created",
   );
   assert.match(packageSource, /appScheme: packageIdentity\.protocolScheme/u);
   assert.match(packageSource, /appUserModelId: packageIdentity\.appUserModelId/u);
@@ -43,6 +62,122 @@ test("preview packaging has a clean-source gate and no shared Windows install id
     assert.match(installerSource, new RegExp(`\\$\\{${definition}\\}`, "u"));
     assert.match(packageSource, new RegExp(`/D${definition}=`));
   }
+});
+
+test("sandbox preload AST gate accepts only direct allowlisted requires and ignores comments or strings", () => {
+  const source = [
+    "const text = 'require(\"./string-only.cjs\")';",
+    '// require("/comment-only.cjs");',
+    "/* require(dynamicComment); */",
+    ...["electron", "events", "timers", "url"].map(
+      (specifier) => `require(${JSON.stringify(specifier)});`,
+    ),
+  ].join("\n");
+  const result = inspectSandboxPreload(source, "valid-preload.cjs");
+  assert.equal(result.bytes, Buffer.byteLength(source));
+  assert.match(result.sha256, /^[0-9a-f]{64}$/u);
+  assert.deepEqual(result.modules, ["electron", "events", "timers", "url"]);
+
+  for (const specifier of [
+    "./bug-route.cjs",
+    "../shared.cjs",
+    "/tmp/local.cjs",
+    "C:\\local\\x.cjs",
+    "fs",
+  ]) {
+    expectGateCode(
+      `require("electron"); require(${JSON.stringify(specifier)});`,
+      "PREVIEW_SANDBOX_PRELOAD_REQUIRE_FORBIDDEN",
+    );
+  }
+});
+
+test("sandbox preload AST gate rejects syntax, missing Electron, dynamic and indirect require bypasses", () => {
+  expectGateCode("const broken = ;", "PREVIEW_SANDBOX_PRELOAD_SYNTAX_INVALID");
+  expectGateCode("const value = 1;", "PREVIEW_SANDBOX_PRELOAD_ELECTRON_REQUIRE_MISSING");
+  expectGateCode('require("events");', "PREVIEW_SANDBOX_PRELOAD_ELECTRON_REQUIRE_MISSING");
+  for (const source of [
+    "require(moduleName);",
+    'require("elec" + "tron");',
+    "require(`electron`);",
+    'require("electron", "events");',
+  ]) {
+    expectGateCode(source, "PREVIEW_SANDBOX_PRELOAD_REQUIRE_NON_LITERAL");
+  }
+  for (const source of [
+    'const loader = require; loader("electron");',
+    '(require)("electron");',
+    'require?.("electron");',
+    'globalThis.require("electron");',
+    'globalThis["require"]("electron");',
+    '(0, require)("electron");',
+    'require.call(null, "electron");',
+    'const { require: loader } = globalThis; loader("electron");',
+  ]) {
+    expectGateCode(source, "PREVIEW_SANDBOX_PRELOAD_REQUIRE_SHAPE_INVALID");
+  }
+});
+
+test("sandbox preload byte binding rejects any staged, packaged, or final-source drift", () => {
+  const source = Buffer.from('"use strict";\nconst electron = require("electron");\n');
+  const snapshot = inspectSandboxPreload(source, "source-preload.cjs");
+  assert.deepEqual(
+    assertSandboxPreloadBinding(Buffer.from(source), source, snapshot, "staged-preload.cjs"),
+    snapshot,
+  );
+  expectGateCode("", "PREVIEW_SANDBOX_PRELOAD_SOURCE_INVALID");
+  assert.throws(
+    () =>
+      assertSandboxPreloadBinding(
+        Buffer.concat([source, Buffer.from("\n")]),
+        source,
+        snapshot,
+        "packaged-preload.cjs",
+      ),
+    (error) => error?.code === "PREVIEW_SANDBOX_PRELOAD_BINDING_MISMATCH",
+  );
+  assert.throws(
+    () =>
+      assertSandboxPreloadBinding(source, source, { ...snapshot, sha256: "0".repeat(64) }, "final"),
+    (error) => error?.code === "PREVIEW_SANDBOX_PRELOAD_SOURCE_SNAPSHOT_INVALID",
+  );
+});
+
+test("preview packaging binds source, staged and app.asar preload before publication", () => {
+  const firstMkdir = packageSource.indexOf("mkdirSync(root");
+  const sourceGate = packageSource.indexOf("const sourcePreloadSnapshot = inspectSandboxPreload(");
+  const desktopCopy = packageSource.indexOf("cpSync(join(config.sourceRoot, source)");
+  const stagedGate = packageSource.indexOf(
+    "const stagedPreloadSnapshot = assertSandboxPreloadBinding(",
+  );
+  const packagerCall = packageSource.indexOf("const packaged = await packager(");
+  const packagedGate = packageSource.indexOf(
+    "const packagedPreloadSnapshot = assertSandboxPreloadBinding(",
+  );
+  const installerBuild = packageSource.indexOf("const installerName =");
+  const archiveRead = packageSource.indexOf("const archive = readFileSync(stagedInstaller);");
+  const finalPackagedGate = packageSource.indexOf(
+    "const finalPackagedPreloadSnapshot = assertSandboxPreloadBinding(",
+  );
+  const signing = packageSource.indexOf("const signature = sign(");
+  const finalCleanGate = packageSource.lastIndexOf(
+    "assertCleanPreviewPackageSource(config.sourceRoot, sourceCommit)",
+  );
+  const finalSourceGate = packageSource.indexOf(
+    "const finalSourcePreloadSnapshot = assertSandboxPreloadBinding(",
+  );
+  const publication = packageSource.indexOf("writeFileSync(installer, archive");
+
+  assert.ok(sourceGate >= 0 && sourceGate < firstMkdir);
+  assert.ok(desktopCopy >= 0 && desktopCopy < stagedGate && stagedGate < packagerCall);
+  assert.ok(packagerCall < packagedGate && packagedGate < installerBuild);
+  assert.ok(archiveRead < finalPackagedGate && finalPackagedGate < signing);
+  assert.ok(finalCleanGate < finalSourceGate && finalSourceGate < publication);
+  assert.equal(
+    packageSource.match(/asar\.extractFile\(packagedAsarPath, "dist\/preload\.cjs"\)/gu)?.length,
+    2,
+  );
+  assert.equal(packageSource.match(/sourcePreloadBytes,\s+sourcePreloadSnapshot,/gu)?.length, 4);
 });
 
 test("package identity preserves only the explicit legacy identity and isolates other instances", () => {

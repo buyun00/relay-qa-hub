@@ -1,0 +1,49 @@
+{
+  "schemaVersion": 1,
+  "verifiedAt": "2026-09-10T11:28:59.296Z",
+  "instanceId": "qa-hub-preview-v21-e2e-fresh-0910",
+  "releaseId": "20260910T112450576Z",
+  "version": "0.2.0-preview.15",
+  "sourceCommit": "3634254a8109f540b4f17038a9d0d8746ebd3971",
+  "sourceDirtyAtPackageGate": false,
+  "sourceHeadAtVerification": "3634254a8109f540b4f17038a9d0d8746ebd3971",
+  "checks": {
+    "receiptMatchesHead": true,
+    "signedManifestMatchesReceipt": true,
+    "signatureValid": true,
+    "localSizeMatches": true,
+    "localSha256": "dbb04e29aaa042665548e610a00106eb382bebec6fa2299f56a0ed9c8ee4b971",
+    "localSha256Matches": true,
+    "httpManifestStatus": 200,
+    "httpManifestByteExact": true,
+    "httpInstallerStatus": 200,
+    "httpInstallerSize": 108335814,
+    "httpInstallerSizeMatches": true,
+    "httpInstallerSha256": "dbb04e29aaa042665548e610a00106eb382bebec6fa2299f56a0ed9c8ee4b971",
+    "httpInstallerSha256Matches": true
+  },
+  "productionObservation": {
+    "action": "read_only",
+    "touched": false,
+    "readyStatus": 200,
+    "ready": {
+      "status": "ready",
+      "schemaVersion": "12",
+      "checks": [
+        {
+          "name": "database",
+          "status": "ok"
+        },
+        {
+          "name": "evidence",
+          "status": "ok"
+        },
+        {
+          "name": "worker",
+          "status": "ok"
+        }
+      ]
+    }
+  },
+  "passed": true
+}

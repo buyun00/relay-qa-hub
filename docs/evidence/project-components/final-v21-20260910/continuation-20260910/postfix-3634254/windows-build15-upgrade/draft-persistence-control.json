@@ -1,0 +1,48 @@
+{
+  "schemaVersion": 1,
+  "capturedAt": "2026-09-10T11:46:03.1503302Z",
+  "candidateVersion": "0.2.0-preview.15",
+  "prepare": {
+    "action": "prepare",
+    "createdTestDraft": true,
+    "valueLength": 25,
+    "valueSha256": "4633cd88dc0b379c68827d385575105a4e24f407314a2c4ca3638a62918d0166",
+    "projectId": "305b4def-ae7e-4a2d-ae96-a05d616390bf",
+    "runtime": null,
+    "matchesExpected": null
+  },
+  "beforeReload": {
+    "action": "verify",
+    "createdTestDraft": false,
+    "valueLength": 25,
+    "valueSha256": "4633cd88dc0b379c68827d385575105a4e24f407314a2c4ca3638a62918d0166",
+    "projectId": "305b4def-ae7e-4a2d-ae96-a05d616390bf",
+    "runtime": null,
+    "matchesExpected": true
+  },
+  "reload": {
+    "exitCode": 0,
+    "state": {
+      "bridgeType": "undefined",
+      "readyState": "complete",
+      "url": "qa-hub-preview-v21-e2e-fresh-0910://app/index.html",
+      "appReady": true
+    },
+    "preloadErrorCount": 2
+  },
+  "afterReload": {
+    "action": "verify",
+    "createdTestDraft": false,
+    "valueLength": 25,
+    "valueSha256": "4633cd88dc0b379c68827d385575105a4e24f407314a2c4ca3638a62918d0166",
+    "projectId": "305b4def-ae7e-4a2d-ae96-a05d616390bf",
+    "runtime": null,
+    "matchesExpected": true
+  },
+  "checks": {
+    "prepareExit": 0,
+    "createdNonempty": true,
+    "sameProcessReadback": true,
+    "afterReloadReadback": true
+  }
+}

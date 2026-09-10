@@ -1,0 +1,42 @@
+{
+  "capturedAt": "2026-09-10T11:41:52.104Z",
+  "state": {
+    "bridgeType": "undefined",
+    "readyState": "complete",
+    "url": "qa-hub-preview-v21-e2e-fresh-0910://app/index.html",
+    "appReady": true
+  },
+  "events": [
+    {
+      "method": "Runtime.consoleAPICalled",
+      "type": "error",
+      "args": [
+        "Unable to load preload script: C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview-v21-e2e-fresh-0910\\resources\\app.asar\\dist\\preload.cjs"
+      ]
+    },
+    {
+      "method": "Runtime.consoleAPICalled",
+      "type": "error",
+      "args": [
+        "Error: module not found: ./bug-route.cjs\n    at preloadRequire (node:electron/js2c/sandbox_bundle:2:120320)\n    at C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview-v21-e2e-fresh-0910\\resources\\app.asar\\dist\\preload.cjs:4:19\n    at runPreloadScript (node:electron/js2c/sandbox_bundle:2:120582)\n    at executeSandboxedPreloadScripts (node:electron/js2c/sandbox_bundle:2:119861)\n    at node:electron/js2c/sandbox_bundle:2:133036\n    at node:electron/js2c/sandbox_bundle:2:133238\n    at ___electron_webpack_init__ (node:electron/js2c/sandbox_bundle:2:133242)\n    at node:electron/js2c/sandbox_bundle:2:133365"
+      ]
+    },
+    {
+      "method": "Runtime.consoleAPICalled",
+      "type": "error",
+      "args": [
+        "Unable to load preload script: C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview-v21-e2e-fresh-0910\\resources\\app.asar\\dist\\preload.cjs"
+      ]
+    },
+    {
+      "method": "Runtime.consoleAPICalled",
+      "type": "error",
+      "args": [
+        "Error: module not found: ./bug-route.cjs\n    at preloadRequire (node:electron/js2c/sandbox_bundle:2:120320)\n    at C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview-v21-e2e-fresh-0910\\resources\\app.asar\\dist\\preload.cjs:4:19\n    at runPreloadScript (node:electron/js2c/sandbox_bundle:2:120582)\n    at executeSandboxedPreloadScripts (node:electron/js2c/sandbox_bundle:2:119861)\n    at node:electron/js2c/sandbox_bundle:2:133036\n    at node:electron/js2c/sandbox_bundle:2:133238\n    at ___electron_webpack_init__ (node:electron/js2c/sandbox_bundle:2:133242)\n    at node:electron/js2c/sandbox_bundle:2:133365"
+      ]
+    },
+    {
+      "method": "Page.loadEventFired"
+    }
+  ]
+}

@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 1,
+  "capturedAt": "2026-09-10T11:42:42.9608215Z",
+  "instanceId": "qa-hub-preview-v21-e2e-fresh-0910",
+  "sourceCommit": "3634254a8109f540b4f17038a9d0d8746ebd3971",
+  "candidate": {
+    "releaseId": "20260910T112450576Z",
+    "version": "0.2.0-preview.15",
+    "installerSha256": "dbb04e29aaa042665548e610a00106eb382bebec6fa2299f56a0ed9c8ee4b971"
+  },
+  "nativeUpdate": {
+    "installed": true,
+    "versionExact": true,
+    "autoRelaunchAcknowledged": true,
+    "desktopMcpRestarted": true
+  },
+  "packagedAcceptance": {
+    "appReady": true,
+    "desktopBridgeAvailable": false,
+    "bridgeType": "undefined",
+    "preloadError": "Error: module not found: ./bug-route.cjs\n    at preloadRequire (node:electron/js2c/sandbox_bundle:2:120320)\n    at C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview-v21-e2e-fresh-0910\\resources\\app.asar\\dist\\preload.cjs:4:19\n    at runPreloadScript (node:electron/js2c/sandbox_bundle:2:120582)\n    at executeSandboxedPreloadScripts (node:electron/js2c/sandbox_bundle:2:119861)\n    at node:electron/js2c/sandbox_bundle:2:133036\n    at node:electron/js2c/sandbox_bundle:2:133238\n    at ___electron_webpack_init__ (node:electron/js2c/sandbox_bundle:2:133242)\n    at node:electron/js2c/sandbox_bundle:2:133365",
+    "rootCause": "sandboxed Electron preload cannot require local ./bug-route.cjs",
+    "draftBeforeSha256": "125cf35171bf74f353b590141b55f8b51d8c03f6bf9b7a66bb4da317832ac56c",
+    "draftAfterUiReadback": "not_run_due_preload_failure",
+    "draftDeletionPerformed": false
+  },
+  "recovery": {
+    "prior13BackupExists": true,
+    "prior13BackupPath": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview-v21-e2e-fresh-0910.backup-20260910T112450576Z",
+    "backupTouched": false,
+    "current15Retained": true
+  },
+  "productionObservation": {
+    "touched": false,
+    "ownersPreserved": true,
+    "foreign9333Preserved": true
+  },
+  "passed": false,
+  "completionAllowed": false
+}

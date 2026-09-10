@@ -20,6 +20,7 @@ import { APP_HOST, appUrl, isAppUrl, parseBugDeepLink, parseDesktopConfig } from
 import { isPackageDownloadUrl } from "./package-downloads.js";
 import { parsePackagingNotice } from "./packaging-notifications.js";
 import type { DesktopBugChange, DesktopBugRoute, DesktopConnectionStatus } from "./bridge-types.js";
+import bugRoutes from "./bug-route.cjs";
 import { RendererDeliveryGate } from "./renderer-delivery-gate.js";
 import { NotificationHistory } from "./notification-history.js";
 import {
@@ -46,7 +47,6 @@ import { acknowledgeUpdateRelaunch } from "./update-relaunch.js";
 
 const currentDirectory = path.dirname(fileURLToPath(import.meta.url));
 const MAX_ASSET_BYTES = 50 * 1024 * 1024;
-const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/iu;
 const FALLBACK_TRAY_ICON =
   "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAMYSURBVFhHzZdrSBVBFMf92De7SmCf8lP1JfqS2O6mV9EsNB8INwQNboQZhhaE9tYLEdotKiG0h5VIJIFBVGRED+lBaVT0gF7QA8u8lN180ccT/6WdZs/o7kputPDjcmfOnPOfM2d2dhIS/rdnXjA4K9kwsgKGFplp4DcxGJzNY4onYGjbArr2M8nQyVd0vQkT5cEjiqGPBAzttAg+J5iW8k9mzkjWtIWmgGRNK+Gdk5GzLkx7Wlvo8s0eev/hJQ0OvqPrd2+YbeEd9Yq9O0s3e0p/at5y6jjfReMjQ45AzIJVBcr4qUBcVwEZa8rp1ZtnSrCpQFa8ZsNVAGbOgyP1R7s6qS7aRFWNO6mls52evnhksxn+OkBpZSHFH8dVAE87/kMUtwPR9lab7Z2+2zQ3O6jYyTgKKK3dqATnNpzavREaG3pN8XsnaPTjQ9p1+IBiI+MoAKm1gmMZ3GYD5ucso08dFRQ7XkTfLtSZRcltZBwFYLAlAGJ4PyclU6fe5nwzOEAWUJDcTsZRAAZbAlBsvJ/THVkpgg9faRRjF5eWKLYWUwpAulHJlpP19TXUUJ1LRmGm4gS0bMkTwXujxTT2/c9YbGNu7yoA9D15IJxcO1ZjOh9oK6LiUJbNbmtVrgj++GABra3fJMZhEtyvZwHY65ajvqunRBBZREVFtmh/e6SQFq3IsBUvJsH9ehaALWU5Am37qm0isCT4tf5nl2SaZ4U8BpPgfj0LQB3IbzikM9oYFiJkQmVZtP9kG8WHP9P4aMy0RxG7nQuOAgAKSC5GcOtcsy34od3lZtonJJvxkRhVNmxX/HFcBQC+FODH80vmiybef0a0TfyeuQWObLeXlycBAGuLQ4gL4YzEv0xLhGcBAIcQikrenhaolbMXu2nJ6pDS7yRiWgI4yEr+hkqlHUK9ivgrAU54FeGbADCZCCyTbOOrADCZCPlwEgKSdD3MB88UEIGvIwTHd4Xch4uQKQDf53zgTIOi5W24qpkCzCwYehc38JOArt0XwfHg0pik6z3c0A8QPDE9PdUmwHr8uhlb4BYmx/sF0/EiUq73hb4AAAAASUVORK5CYII=";
 const PACKAGED_TRAY_ICON_FILE = "RelayQaHub.ico";
@@ -281,10 +281,6 @@ function openMainWindow(): void {
   mainWindow.focus();
 }
 
-function normalizeBugId(value: string): string | null {
-  return UUID_PATTERN.test(value) ? value.toLowerCase() : null;
-}
-
 function deliverPendingBugRoute(): void {
   bugRouteDelivery.tryDeliver((route) => {
     if (mainWindow === null || mainWindow.isDestroyed() || mainWindow.webContents.isDestroyed()) {
@@ -301,18 +297,8 @@ function deliverPendingBugRoute(): void {
 }
 
 function routeToBug(route: DesktopBugRoute): void {
-  const bugId = normalizeBugId(route.bugId);
-  const projectId = route.projectId === null ? null : normalizeBugId(route.projectId);
-  const userId = route.userId === null ? null : normalizeBugId(route.userId);
-  if (
-    bugId === null ||
-    (route.projectId !== null && projectId === null) ||
-    (route.userId !== null && userId === null) ||
-    (projectId === null) !== (userId === null)
-  ) {
-    return;
-  }
-  const normalized = { bugId, projectId, userId };
+  const normalized = bugRoutes.parseDesktopBugRoute(route);
+  if (normalized === null) return;
   bugRouteDelivery.enqueue(normalized);
   openMainWindow();
   deliverPendingBugRoute();

@@ -1,5 +1,4 @@
 import electron = require("electron");
-import bugRoutes = require("./bug-route.cjs");
 
 import type {
   DesktopBugChange,
@@ -15,6 +14,7 @@ const { contextBridge, ipcRenderer } = electron;
 type IpcRendererEvent = import("electron").IpcRendererEvent;
 
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/iu;
+const BUG_ROUTE_KEYS = new Set(["projectId", "userId", "bugId"]);
 const STATES = new Set([
   "disabled",
   "stopped",
@@ -26,6 +26,35 @@ const STATES = new Set([
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+function nullableUuid(value: unknown): string | null | undefined {
+  if (value === null) return null;
+  if (typeof value !== "string" || !UUID_PATTERN.test(value)) return undefined;
+  return value.toLowerCase();
+}
+
+// Sandboxed Electron preloads cannot require local modules, so this parser must stay
+// self-contained. The sandbox preload smoke compares it with the main-process parser.
+function parseDesktopBugRoute(value: unknown): DesktopBugRoute | null {
+  if (!isRecord(value) || Object.keys(value).some((key) => !BUG_ROUTE_KEYS.has(key))) return null;
+  const bugId = value["bugId"];
+  const projectId = nullableUuid(value["projectId"]);
+  const userId = nullableUuid(value["userId"]);
+  if (
+    typeof bugId !== "string" ||
+    !UUID_PATTERN.test(bugId) ||
+    projectId === undefined ||
+    userId === undefined ||
+    (projectId === null) !== (userId === null)
+  ) {
+    return null;
+  }
+  return {
+    projectId,
+    userId,
+    bugId: bugId.toLowerCase(),
+  };
 }
 
 function parseWindowState(value: unknown): DesktopWindowState {
@@ -192,7 +221,7 @@ ipcRenderer.on("desktop:bug-changed", (_event: IpcRendererEvent, value: unknown)
   for (const listener of bugChangeListeners) listener(change);
 });
 ipcRenderer.on("desktop:open-bug", (_event: IpcRendererEvent, value: unknown) => {
-  const route = bugRoutes.parseDesktopBugRoute(value);
+  const route = parseDesktopBugRoute(value);
   if (route === null) return;
   if (openBugListeners.size === 0) pendingOpenBugRoute = route;
   for (const listener of openBugListeners) listener(route);
