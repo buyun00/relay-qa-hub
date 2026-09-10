@@ -3,7 +3,7 @@ import { act, Profiler } from "react";
 import { create, type ReactTestRenderer } from "react-test-renderer";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import App, { type AppDraft } from "./App";
+import App, { type AppDraft, type PendingDesktopBugRoute } from "./App";
 import * as api from "./api";
 import { listProjectComponents } from "./project-api";
 
@@ -200,31 +200,42 @@ afterEach(async () => {
   vi.unstubAllGlobals();
 });
 
-async function mountWorkbench(
-  commits: string[] = [],
-  options: {
-    readonly initialDraft?: AppDraft;
-    readonly onDraftChange?: (draft: AppDraft) => Promise<void>;
-  } = {},
-) {
+interface MountWorkbenchOptions {
+  readonly initialDraft?: AppDraft;
+  readonly onDraftChange?: (draft: AppDraft) => Promise<void>;
+  readonly desktopBugRoute?: PendingDesktopBugRoute | null;
+  readonly onDesktopBugRouteConsumed?: (sequence: number) => void;
+}
+
+function workbenchElement(commits: string[], options: MountWorkbenchOptions) {
+  return (
+    <Profiler
+      id="real-App"
+      onRender={() => {
+        if (renderer) commits.push(JSON.stringify(renderer.toJSON()));
+      }}
+    >
+      <App
+        principal={principal}
+        projectId={projectId}
+        initialDraft={options.initialDraft}
+        signingOut={false}
+        onSignOut={() => undefined}
+        onDraftChange={options.onDraftChange ?? (async () => undefined)}
+        {...(options.desktopBugRoute !== undefined
+          ? { desktopBugRoute: options.desktopBugRoute }
+          : {})}
+        {...(options.onDesktopBugRouteConsumed !== undefined
+          ? { onDesktopBugRouteConsumed: options.onDesktopBugRouteConsumed }
+          : {})}
+      />
+    </Profiler>
+  );
+}
+
+async function mountWorkbench(commits: string[] = [], options: MountWorkbenchOptions = {}) {
   await act(async () => {
-    renderer = create(
-      <Profiler
-        id="real-App"
-        onRender={() => {
-          if (renderer) commits.push(JSON.stringify(renderer.toJSON()));
-        }}
-      >
-        <App
-          principal={principal}
-          projectId={projectId}
-          initialDraft={options.initialDraft}
-          signingOut={false}
-          onSignOut={() => undefined}
-          onDraftChange={options.onDraftChange ?? (async () => undefined)}
-        />
-      </Profiler>,
-    );
+    renderer = create(workbenchElement(commits, options));
   });
   if (renderer === undefined) throw new Error("App did not mount");
   return renderer;
@@ -243,6 +254,52 @@ function expectPending(view: ReactTestRenderer) {
 }
 
 describe("Bug detail loading and explicit failure", () => {
+  it("opens a matching desktop route once and never opens a route from another scope", async () => {
+    vi.mocked(api.getBug).mockResolvedValue(bug);
+    const consumed = vi.fn();
+    const route: PendingDesktopBugRoute = {
+      sequence: 7,
+      projectId,
+      userId: actorId,
+      bugId,
+    };
+    const commits: string[] = [];
+    const view = await mountWorkbench(commits, {
+      desktopBugRoute: route,
+      onDesktopBugRouteConsumed: consumed,
+    });
+    await vi.waitFor(() => expect(api.getBug).toHaveBeenCalledWith(bugId));
+    expect(consumed).toHaveBeenCalledExactlyOnceWith(route.sequence);
+    const matchingRouteReads = vi.mocked(api.getBug).mock.calls.length;
+
+    await act(async () => {
+      view.update(
+        workbenchElement(commits, {
+          desktopBugRoute: { ...route },
+          onDesktopBugRouteConsumed: consumed,
+        }),
+      );
+    });
+    expect(api.getBug).toHaveBeenCalledTimes(matchingRouteReads);
+    expect(consumed).toHaveBeenCalledTimes(1);
+
+    const outOfScopeRoute = {
+      ...route,
+      sequence: route.sequence + 1,
+      projectId: "30000000-0000-4000-8000-000000000099",
+    };
+    await act(async () => {
+      view.update(
+        workbenchElement(commits, {
+          desktopBugRoute: outOfScopeRoute,
+          onDesktopBugRouteConsumed: consumed,
+        }),
+      );
+    });
+    expect(api.getBug).toHaveBeenCalledTimes(matchingRouteReads);
+    expect(consumed).toHaveBeenCalledTimes(1);
+  });
+
   it("shows loading for a selected record before the detail effect starts", () => {
     const markup = renderToStaticMarkup(
       <App

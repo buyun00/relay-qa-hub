@@ -11,6 +11,8 @@ import {
 const NOTIFICATION_ID = "10000000-0000-4000-8000-000000000001";
 const EVENT_ID = "20000000-0000-4000-8000-000000000001";
 const BUG_ID = "30000000-0000-4000-8000-000000000001";
+const PROJECT_ID = "40000000-0000-4000-8000-000000000001";
+const USER_ID = "50000000-0000-4000-8000-000000000001";
 
 class FakeSocket implements NotificationSocket {
   private readonly openListeners = new Set<() => void>();
@@ -79,8 +81,8 @@ class FakeSocket implements NotificationSocket {
 function inboxItem(readAt: string | null = null) {
   return {
     id: NOTIFICATION_ID,
-    projectId: "40000000-0000-4000-8000-000000000001",
-    userId: "50000000-0000-4000-8000-000000000001",
+    projectId: PROJECT_ID,
+    userId: USER_ID,
     type: "bug.updated",
     title: "Bug changed",
     body: "QA-12 · Login button does not respond",
@@ -131,9 +133,17 @@ test("push hints are strict, bounded, and do not carry arbitrary payloads", () =
 test("Inbox parser preserves only bounded notification fields", () => {
   const parsed = parseDurableInbox({ items: [inboxItem()], nextCursor: null, unreadCount: 1 });
   assert.equal(parsed.length, 1);
+  assert.equal(parsed[0]?.projectId, PROJECT_ID);
+  assert.equal(parsed[0]?.userId, USER_ID);
   assert.equal(parsed[0]?.bugId, BUG_ID);
   assert.equal(parsed[0]?.body, "QA-12 · Login button does not respond");
   assert.throws(() => parseDurableInbox({ items: [{ ...inboxItem(), extra: "secret" }] }));
+  assert.throws(() =>
+    parseDurableInbox({ items: [{ ...inboxItem(), projectId: undefined }], nextCursor: null }),
+  );
+  assert.throws(() =>
+    parseDurableInbox({ items: [{ ...inboxItem(), userId: "not-a-uuid" }], nextCursor: null }),
+  );
 });
 
 test("transport fetches durable Inbox once, dedupes reconnect replay, and deep-links Bug", async () => {
@@ -169,12 +179,15 @@ test("transport fetches durable Inbox once, dedupes reconnect replay, and deep-l
   await flush();
   assert.equal(inboxReads, 2);
   assert.equal(notifications.length, 1);
-  assert.equal((notifications[0] as { readonly bugId: string }).bugId, BUG_ID);
-  assert.equal((notifications[0] as { readonly title: string }).title, "这个单子已验收");
-  assert.equal(
-    (notifications[0] as { readonly body: string }).body,
-    "QA-12 · Login button does not respond",
-  );
+  assert.deepEqual(notifications[0], {
+    notificationId: NOTIFICATION_ID,
+    eventId: null,
+    projectId: PROJECT_ID,
+    userId: USER_ID,
+    title: "这个单子已验收",
+    body: "QA-12 · Login button does not respond",
+    bugId: BUG_ID,
+  });
   socket.closeFromPeer();
   transport.stop();
   assert.equal(notifications.length, 1);

@@ -12,7 +12,15 @@ export interface DesktopConnectionStatus {
 export interface DesktopBugChange {
   readonly notificationId: string;
   readonly eventId: string | null;
+  readonly projectId: string;
+  readonly userId: string;
   readonly bugId: string | null;
+}
+
+export interface DesktopBugRoute {
+  readonly projectId: string | null;
+  readonly userId: string | null;
+  readonly bugId: string;
 }
 
 export interface DesktopRuntimeInfo {
@@ -63,7 +71,7 @@ export interface QaHubDesktopBridge {
   readonly installUpdate: () => Promise<boolean>;
   readonly onConnectionStatus: (listener: (status: DesktopConnectionStatus) => void) => () => void;
   readonly onBugChanged: (listener: (change: DesktopBugChange) => void) => () => void;
-  readonly onOpenBug: (listener: (bugId: string) => void) => () => void;
+  readonly onOpenBug: (listener: (route: DesktopBugRoute) => void) => () => void;
   readonly onUpdateState: (listener: (state: DesktopUpdateState) => void) => () => void;
 }
 

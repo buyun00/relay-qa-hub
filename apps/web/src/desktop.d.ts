@@ -3,7 +3,15 @@ import type { UploaderBridge } from "../../desktop/src/uploader-types";
 interface QaHubDesktopBugChange {
   readonly notificationId: string;
   readonly eventId: string | null;
+  readonly projectId: string;
+  readonly userId: string;
   readonly bugId: string | null;
+}
+
+export interface DesktopBugRoute {
+  readonly projectId: string | null;
+  readonly userId: string | null;
+  readonly bugId: string;
 }
 
 interface QaHubDesktopRuntimeInfo {
@@ -68,7 +76,7 @@ interface QaHubDesktopBridge {
   readonly checkForUpdate: () => Promise<boolean>;
   readonly installUpdate: () => Promise<boolean>;
   readonly onBugChanged: (listener: (change: QaHubDesktopBugChange) => void) => () => void;
-  readonly onOpenBug: (listener: (bugId: string) => void) => () => void;
+  readonly onOpenBug: (listener: (route: DesktopBugRoute) => void) => () => void;
   readonly onUpdateState: (listener: (state: QaHubDesktopUpdateState) => void) => () => void;
 }
 

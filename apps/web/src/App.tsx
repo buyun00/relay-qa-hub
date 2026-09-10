@@ -121,6 +121,16 @@ interface AppProps {
   readonly onProjectChange?: (projectId: string) => void;
   readonly initialDraft?: AppDraft | undefined;
   readonly onDraftChange: (draft: AppDraft) => Promise<void>;
+  readonly desktopBugRoute?: PendingDesktopBugRoute | null;
+  readonly onDesktopBugRouteConsumed?: (sequence: number) => void;
+  readonly projectDirectoryRevision?: number;
+}
+
+export interface PendingDesktopBugRoute {
+  readonly sequence: number;
+  readonly projectId: string;
+  readonly userId: string;
+  readonly bugId: string;
 }
 
 interface EvidenceImage {
@@ -597,6 +607,9 @@ export default function App({
   onProjectChange,
   initialDraft,
   onDraftChange,
+  desktopBugRoute = null,
+  onDesktopBugRouteConsumed,
+  projectDirectoryRevision = 0,
 }: AppProps) {
   const [view, setView] = useState<WorkspaceView>("workbench");
   const [overviewDate, setOverviewDate] = useState<string | null>(null);
@@ -818,6 +831,7 @@ export default function App({
   const workbenchRequestRef = useRef(0);
   const detailRequestRef = useRef(0);
   const detailBugIdRef = useRef<string | null>(null);
+  const consumedDesktopBugRouteRef = useRef<number | null>(null);
   const selectedIdRef = useRef<string | null>(initialDraft?.selectedId ?? null);
   const pendingMutationsRef = useRef(new Map<string, Readonly<{ label: string; token: symbol }>>());
   const [overviewRevision, setOverviewRevision] = useState(0);
@@ -1411,7 +1425,7 @@ export default function App({
 
   useEffect(() => {
     void loadProjects().catch((cause: unknown) => setError(messageFor(cause)));
-  }, [loadProjects]);
+  }, [loadProjects, projectDirectoryRevision]);
 
   useEffect(() => {
     void loadWorkbench();
@@ -1446,6 +1460,7 @@ export default function App({
     const bridge = window.qaHubDesktop;
     if (bridge === undefined) return;
     const stopBugChanged = bridge.onBugChanged((change) => {
+      if (change.projectId !== projectId || change.userId !== principal.userId) return;
       void loadWorkbench(true, false);
       setOverviewRevision((value) => value + 1);
       const activeBugId = selectedIdRef.current;
@@ -1453,18 +1468,35 @@ export default function App({
         void loadDetail(activeBugId);
       }
     });
-    const stopOpenBug = bridge.onOpenBug((bugId) => {
-      setScopeId("team");
-      openDetail(bugId);
-      void loadWorkbench(true, false);
-    });
     const stopOpenPackaging = bridge.onOpenPackaging?.(() => setView("packaging"));
     return () => {
       stopBugChanged();
-      stopOpenBug();
       stopOpenPackaging?.();
     };
-  }, [loadDetail, loadWorkbench, openDetail]);
+  }, [loadDetail, loadWorkbench, principal.userId, projectId]);
+
+  useEffect(() => {
+    if (
+      desktopBugRoute === null ||
+      desktopBugRoute.projectId !== projectId ||
+      desktopBugRoute.userId !== principal.userId ||
+      consumedDesktopBugRouteRef.current === desktopBugRoute.sequence
+    ) {
+      return;
+    }
+    consumedDesktopBugRouteRef.current = desktopBugRoute.sequence;
+    setScopeId("team");
+    openDetail(desktopBugRoute.bugId);
+    void loadWorkbench(true, false);
+    onDesktopBugRouteConsumed?.(desktopBugRoute.sequence);
+  }, [
+    desktopBugRoute,
+    loadWorkbench,
+    onDesktopBugRouteConsumed,
+    openDetail,
+    principal.userId,
+    projectId,
+  ]);
 
   useEffect(
     () => () => {

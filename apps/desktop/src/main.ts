@@ -19,7 +19,8 @@ import {
 import { APP_HOST, appUrl, isAppUrl, parseBugDeepLink, parseDesktopConfig } from "./config.js";
 import { isPackageDownloadUrl } from "./package-downloads.js";
 import { parsePackagingNotice } from "./packaging-notifications.js";
-import type { DesktopBugChange, DesktopConnectionStatus } from "./bridge-types.js";
+import type { DesktopBugChange, DesktopBugRoute, DesktopConnectionStatus } from "./bridge-types.js";
+import { RendererDeliveryGate } from "./renderer-delivery-gate.js";
 import { NotificationHistory } from "./notification-history.js";
 import {
   NotificationTransport,
@@ -80,7 +81,7 @@ let updater: PortableUpdater | null = null;
 let mcpServer: QaHubMcpHttpServer | null = null;
 let apiClient: DesktopQaHubApiClient | null = null;
 let quitting = false;
-let pendingBugId: string | null = null;
+const bugRouteDelivery = new RendererDeliveryGate<DesktopBugRoute>();
 let assetsDirectory = config.webAssetsDirectory;
 async function loadRememberedLoginName(): Promise<void> {
   try {
@@ -284,19 +285,37 @@ function normalizeBugId(value: string): string | null {
   return UUID_PATTERN.test(value) ? value.toLowerCase() : null;
 }
 
-function routeToBug(bugId: string): void {
-  const normalized = normalizeBugId(bugId);
-  if (normalized === null) return;
-  pendingBugId = normalized;
-  openMainWindow();
-  if (mainWindow === null || mainWindow.isDestroyed()) return;
-  if (!mainWindow.webContents.isDestroyed()) {
-    mainWindow.webContents.send("desktop:open-bug", { bugId: normalized });
-    process.stdout.write(
-      `${JSON.stringify({ event: "desktop.bug-route.sent", bugId: normalized })}\n`,
-    );
-    pendingBugId = null;
+function deliverPendingBugRoute(): void {
+  bugRouteDelivery.tryDeliver((route) => {
+    if (mainWindow === null || mainWindow.isDestroyed() || mainWindow.webContents.isDestroyed()) {
+      return false;
+    }
+    try {
+      mainWindow.webContents.send("desktop:open-bug", route);
+      process.stdout.write(`${JSON.stringify({ event: "desktop.bug-route.sent", ...route })}\n`);
+      return true;
+    } catch {
+      return false;
+    }
+  });
+}
+
+function routeToBug(route: DesktopBugRoute): void {
+  const bugId = normalizeBugId(route.bugId);
+  const projectId = route.projectId === null ? null : normalizeBugId(route.projectId);
+  const userId = route.userId === null ? null : normalizeBugId(route.userId);
+  if (
+    bugId === null ||
+    (route.projectId !== null && projectId === null) ||
+    (route.userId !== null && userId === null) ||
+    (projectId === null) !== (userId === null)
+  ) {
+    return;
   }
+  const normalized = { bugId, projectId, userId };
+  bugRouteDelivery.enqueue(normalized);
+  openMainWindow();
+  deliverPendingBugRoute();
 }
 
 function handleSecondInstanceArguments(args: readonly unknown[]): void {
@@ -307,7 +326,7 @@ function handleSecondInstanceArguments(args: readonly unknown[]): void {
       process.stdout.write(
         `${JSON.stringify({ event: "desktop.second-instance.deep-link", bugId })}\n`,
       );
-      routeToBug(bugId);
+      routeToBug({ projectId: null, userId: null, bugId });
       return;
     }
   }
@@ -459,6 +478,8 @@ function showNativeNotification(notification: DesktopNotification): void {
   const change: DesktopBugChange = {
     notificationId: notification.notificationId,
     eventId: notification.eventId,
+    projectId: notification.projectId,
+    userId: notification.userId,
     bugId: notification.bugId,
   };
   if (mainWindow !== null && !mainWindow.isDestroyed() && !mainWindow.webContents.isDestroyed()) {
@@ -475,6 +496,8 @@ function showNativeNotification(notification: DesktopNotification): void {
         event: "desktop.notification.shown",
         notificationId: notification.notificationId,
         eventId: notification.eventId,
+        projectId: notification.projectId,
+        userId: notification.userId,
         bugId: notification.bugId,
       })}\n`,
     );
@@ -485,11 +508,18 @@ function showNativeNotification(notification: DesktopNotification): void {
         event: "desktop.notification.clicked",
         notificationId: notification.notificationId,
         eventId: notification.eventId,
+        projectId: notification.projectId,
+        userId: notification.userId,
         bugId: notification.bugId,
       })}\n`,
     );
-    if (notification.bugId !== null) routeToBug(notification.bugId);
-    else openMainWindow();
+    if (notification.bugId !== null) {
+      routeToBug({
+        projectId: notification.projectId,
+        userId: notification.userId,
+        bugId: notification.bugId,
+      });
+    } else openMainWindow();
   });
   nativeNotification.show();
   notificationHistory.record(notification.notificationId);
@@ -528,6 +558,7 @@ function installNavigationGuards(window: BrowserWindow): void {
 }
 
 function createWindow(): BrowserWindow {
+  bugRouteDelivery.startLoading();
   const window = new BrowserWindow({
     width: 1440,
     height: 960,
@@ -565,12 +596,11 @@ function createWindow(): BrowserWindow {
     event.preventDefault();
     window.hide();
   });
-  window.webContents.once("did-finish-load", () => {
-    if (pendingBugId !== null) {
-      const bugId = pendingBugId;
-      pendingBugId = null;
-      window.webContents.send("desktop:open-bug", { bugId });
-    }
+  window.webContents.on("did-start-loading", () => bugRouteDelivery.startLoading());
+  window.webContents.on("render-process-gone", () => bugRouteDelivery.startLoading());
+  window.webContents.on("did-finish-load", () => {
+    bugRouteDelivery.finishLoading();
+    deliverPendingBugRoute();
   });
   return window;
 }

@@ -19,6 +19,8 @@ export interface SafePushEvent {
 
 export interface DurableNotification {
   readonly id: string;
+  readonly projectId: string;
+  readonly userId: string;
   readonly type: string;
   readonly title: string;
   readonly body: string;
@@ -31,6 +33,8 @@ export interface DurableNotification {
 export interface DesktopNotification {
   readonly notificationId: string;
   readonly eventId: string | null;
+  readonly projectId: string;
+  readonly userId: string;
   readonly title: string;
   readonly body: string;
   readonly bugId: string | null;
@@ -156,6 +160,8 @@ export function parseDurableInbox(value: unknown): readonly DurableNotification[
     ]);
     if (!hasOnlyKeys(itemValue, allowed)) throw new Error("INVALID_INBOX_ITEM");
     const id = requiredUuid(itemValue["id"]);
+    const projectId = requiredUuid(itemValue["projectId"]);
+    const userId = requiredUuid(itemValue["userId"]);
     const type = boundedText(itemValue["type"], 120);
     const title = boundedText(itemValue["title"], MAX_SUMMARY_LENGTH);
     const body = itemValue["body"] === undefined ? type : boundedText(itemValue["body"], 500);
@@ -165,6 +171,8 @@ export function parseDurableInbox(value: unknown): readonly DurableNotification[
     const version = itemValue["version"];
     if (
       id === null ||
+      projectId === null ||
+      userId === null ||
       type === null ||
       title === null ||
       body === null ||
@@ -180,6 +188,8 @@ export function parseDurableInbox(value: unknown): readonly DurableNotification[
     }
     items.push({
       id,
+      projectId,
+      userId,
       type,
       title,
       body,
@@ -419,6 +429,8 @@ export class NotificationTransport {
       this.options.showNotification({
         notificationId: item.id,
         eventId: event?.eventId ?? null,
+        projectId: item.projectId,
+        userId: item.userId,
         title: item.title,
         body: item.body,
         bugId: item.bugId ?? event?.bugId ?? null,

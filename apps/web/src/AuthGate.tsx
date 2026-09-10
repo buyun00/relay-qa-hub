@@ -1,9 +1,10 @@
 import LocalDraftRecovery from "./LocalDraftRecovery";
 import "./project.css";
 import { type FormEvent, useCallback, useEffect, useRef, useState } from "react";
-import App, { type AppDraft } from "./App";
+import App, { type AppDraft, type PendingDesktopBugRoute } from "./App";
 import DesktopUpdateNotice from "./DesktopUpdateNotice";
 import ProjectManagementPage from "./ProjectManagementPage";
+import type { DesktopBugRoute } from "./desktop";
 import {
   getBrowserSession,
   listVisibleProjects,
@@ -30,12 +31,18 @@ function ProjectWorkspace({
   signingOut,
   onSignOut,
   onProjectChange,
+  desktopBugRoute,
+  onDesktopBugRouteConsumed,
+  projectDirectoryRevision,
 }: {
   principal: BrowserSessionPrincipal;
   projectId: string;
   signingOut: boolean;
   onSignOut: () => void;
   onProjectChange: (id: string) => void;
+  desktopBugRoute: PendingDesktopBugRoute | null;
+  onDesktopBugRouteConsumed: (sequence: number) => void;
+  projectDirectoryRevision: number;
 }) {
   const [loaded, setLoaded] = useState(false);
   const [denied, setDenied] = useState(false);
@@ -112,14 +119,23 @@ function ProjectWorkspace({
         onProjectChange={onProjectChange}
         initialDraft={draft}
         onDraftChange={saveDraft}
+        desktopBugRoute={desktopBugRoute}
+        onDesktopBugRouteConsumed={onDesktopBugRouteConsumed}
+        projectDirectoryRevision={projectDirectoryRevision}
       />
     </>
   );
 }
 
+interface QueuedDesktopBugRoute {
+  readonly sequence: number;
+  readonly route: DesktopBugRoute;
+}
+
 export default function AuthGate() {
   const authRevision = useRef(0);
   const entryRevision = useRef(0);
+  const desktopBugRouteSequence = useRef(0);
   const [state, setState] = useState<"checking" | "signed-out" | "signed-in" | "unavailable">(
     "checking",
   );
@@ -133,6 +149,13 @@ export default function AuthGate() {
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState("");
   const [endpoint, setEndpoint] = useState<string | null>(null);
+  const [queuedDesktopBugRoute, setQueuedDesktopBugRoute] = useState<QueuedDesktopBugRoute | null>(
+    null,
+  );
+  const [pendingDesktopBugRoute, setPendingDesktopBugRoute] =
+    useState<PendingDesktopBugRoute | null>(null);
+  const [desktopBugRouteMessage, setDesktopBugRouteMessage] = useState("");
+  const [projectDirectoryRevision, setProjectDirectoryRevision] = useState(0);
   const selectProject = useCallback(
     (id: string) => {
       setActiveProject(id, principal?.userId ?? "");
@@ -145,6 +168,103 @@ export default function AuthGate() {
     },
     [principal?.userId],
   );
+  useEffect(() => {
+    const bridge = window.qaHubDesktop;
+    if (bridge === undefined) return;
+    return bridge.onOpenBug((route) => {
+      setQueuedDesktopBugRoute({
+        sequence: ++desktopBugRouteSequence.current,
+        route,
+      });
+    });
+  }, []);
+  const consumeDesktopBugRoute = useCallback((sequence: number) => {
+    setPendingDesktopBugRoute((current) => (current?.sequence === sequence ? null : current));
+  }, []);
+  useEffect(() => {
+    if (
+      queuedDesktopBugRoute === null ||
+      state !== "signed-in" ||
+      principal === null ||
+      !projectId
+    ) {
+      return;
+    }
+    const request = queuedDesktopBugRoute;
+    let active = true;
+    const clearRequest = () => {
+      setQueuedDesktopBugRoute((current) =>
+        current?.sequence === request.sequence ? null : current,
+      );
+    };
+    const rejectRoute = (reason: string) => {
+      setDesktopBugRouteMessage(reason);
+      setProjectDirectoryRevision((value) => value + 1);
+      clearRequest();
+    };
+    void listVisibleProjects()
+      .then((available) => {
+        if (!active) return;
+        const { route } = request;
+        const isLegacyRoute = route.projectId === null && route.userId === null;
+        const isScopedRoute = route.projectId !== null && route.userId !== null;
+        if (!isLegacyRoute && !isScopedRoute) {
+          rejectRoute("通知路由无效，已保持当前项目并刷新项目列表。");
+          return;
+        }
+        const currentProjectVisible = available.items.some(
+          (project) => project.id.toLowerCase() === projectId.toLowerCase(),
+        );
+        if (!currentProjectVisible) {
+          const fallback = available.items[0];
+          setProjectDirectoryRevision((value) => value + 1);
+          clearRequest();
+          setPendingDesktopBugRoute(null);
+          if (fallback !== undefined) {
+            setDesktopBugRouteMessage("当前项目已不可访问，已切换到仍可访问的项目并刷新项目列表。");
+            selectProject(fallback.id);
+          } else {
+            invalidateProjectRequests();
+            setBrowserCsrfToken(null);
+            setActiveProject(projectId, "");
+            setDesktopBugRouteMessage("");
+            setMessage("当前项目访问已停用，请联系 GM 或项目人员恢复资格。");
+            setName(principal.displayName);
+            setPrincipal(null);
+            setState("signed-out");
+          }
+          return;
+        }
+        if (!isLegacyRoute && route.userId?.toLowerCase() !== principal.userId.toLowerCase()) {
+          rejectRoute("这条通知不属于当前登录人员，已保持当前项目并刷新项目列表。");
+          return;
+        }
+        const targetProjectId = route.projectId ?? projectId;
+        if (
+          !available.items.some(
+            (project) => project.id.toLowerCase() === targetProjectId.toLowerCase(),
+          )
+        ) {
+          rejectRoute("通知所属项目当前不可访问，已保持当前项目并刷新项目列表。");
+          return;
+        }
+        setDesktopBugRouteMessage("");
+        setPendingDesktopBugRoute({
+          sequence: request.sequence,
+          projectId: targetProjectId,
+          userId: principal.userId,
+          bugId: route.bugId,
+        });
+        clearRequest();
+        if (targetProjectId !== projectId) selectProject(targetProjectId);
+      })
+      .catch(() => {
+        if (active) rejectRoute("暂时无法核对通知所属项目，已保持当前项目。");
+      });
+    return () => {
+      active = false;
+    };
+  }, [principal, projectId, queuedDesktopBugRoute, selectProject, state]);
   const checkSession = async () => {
     const request = ++authRevision.current;
     setState("checking");
@@ -259,6 +379,9 @@ export default function AuthGate() {
     try {
       await logoutBrowserSession();
       setActiveProject(projectId, "");
+      setQueuedDesktopBugRoute(null);
+      setPendingDesktopBugRoute(null);
+      setDesktopBugRouteMessage("");
       setPrincipal(null);
       setState("signed-out");
       setName("");
@@ -369,6 +492,11 @@ export default function AuthGate() {
   return (
     <>
       <DesktopUpdateNotice />
+      {desktopBugRouteMessage && (
+        <div className="banner error-banner" role="alert">
+          {desktopBugRouteMessage}
+        </div>
+      )}
       <ProjectWorkspace
         key={projectStorageKey("workspace", projectId, principal.userId)}
         principal={principal}
@@ -376,6 +504,9 @@ export default function AuthGate() {
         signingOut={busy}
         onSignOut={() => void signOut()}
         onProjectChange={selectProject}
+        desktopBugRoute={pendingDesktopBugRoute}
+        onDesktopBugRouteConsumed={consumeDesktopBugRoute}
+        projectDirectoryRevision={projectDirectoryRevision}
       />
     </>
   );

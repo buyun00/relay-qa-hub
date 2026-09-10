@@ -1,7 +1,9 @@
 import electron = require("electron");
+import bugRoutes = require("./bug-route.cjs");
 
 import type {
   DesktopBugChange,
+  DesktopBugRoute,
   DesktopConnectionStatus,
   DesktopRuntimeInfo,
   DesktopUpdateState,
@@ -94,21 +96,21 @@ function parseRuntimeInfo(value: unknown): DesktopRuntimeInfo {
   };
 }
 
-function safeBugId(value: unknown): string | null {
-  if (!isRecord(value)) return null;
-  const bugId = value["bugId"];
-  return typeof bugId === "string" && UUID_PATTERN.test(bugId) ? bugId.toLowerCase() : null;
-}
-
 function parseBugChange(value: unknown): DesktopBugChange | null {
   if (!isRecord(value)) return null;
   const notificationId = value["notificationId"];
   const eventId = value["eventId"];
+  const projectId = value["projectId"];
+  const userId = value["userId"];
   const bugId = value["bugId"];
   if (
     typeof notificationId !== "string" ||
     !UUID_PATTERN.test(notificationId) ||
     (eventId !== null && (typeof eventId !== "string" || !UUID_PATTERN.test(eventId))) ||
+    typeof projectId !== "string" ||
+    !UUID_PATTERN.test(projectId) ||
+    typeof userId !== "string" ||
+    !UUID_PATTERN.test(userId) ||
     (bugId !== null && (typeof bugId !== "string" || !UUID_PATTERN.test(bugId)))
   ) {
     return null;
@@ -116,6 +118,8 @@ function parseBugChange(value: unknown): DesktopBugChange | null {
   return {
     notificationId: notificationId.toLowerCase(),
     eventId: eventId === null ? null : eventId.toLowerCase(),
+    projectId: projectId.toLowerCase(),
+    userId: userId.toLowerCase(),
     bugId: bugId === null ? null : bugId.toLowerCase(),
   };
 }
@@ -172,10 +176,10 @@ function parseUpdateState(value: unknown): DesktopUpdateState {
 
 const connectionStatusListeners = new Set<(status: DesktopConnectionStatus) => void>();
 const bugChangeListeners = new Set<(change: DesktopBugChange) => void>();
-const openBugListeners = new Set<(bugId: string) => void>();
+const openBugListeners = new Set<(route: DesktopBugRoute) => void>();
 const updateStateListeners = new Set<(state: DesktopUpdateState) => void>();
 let pendingBugChange: DesktopBugChange | null = null;
-let pendingOpenBugId: string | null = null;
+let pendingOpenBugRoute: DesktopBugRoute | null = null;
 
 ipcRenderer.on("desktop:connection-status", (_event: IpcRendererEvent, value: unknown) => {
   const status = parseStatus(value);
@@ -188,10 +192,10 @@ ipcRenderer.on("desktop:bug-changed", (_event: IpcRendererEvent, value: unknown)
   for (const listener of bugChangeListeners) listener(change);
 });
 ipcRenderer.on("desktop:open-bug", (_event: IpcRendererEvent, value: unknown) => {
-  const bugId = safeBugId(value);
-  if (bugId === null) return;
-  if (openBugListeners.size === 0) pendingOpenBugId = bugId;
-  for (const listener of openBugListeners) listener(bugId);
+  const route = bugRoutes.parseDesktopBugRoute(value);
+  if (route === null) return;
+  if (openBugListeners.size === 0) pendingOpenBugRoute = route;
+  for (const listener of openBugListeners) listener(route);
 });
 ipcRenderer.on("desktop:update-state", (_event: IpcRendererEvent, value: unknown) => {
   const state = parseUpdateState(value);
@@ -273,11 +277,11 @@ const bridge: QaHubDesktopBridge = {
   },
   onOpenBug: (listener) => {
     openBugListeners.add(listener);
-    if (pendingOpenBugId !== null) {
-      const bugId = pendingOpenBugId;
-      pendingOpenBugId = null;
+    if (pendingOpenBugRoute !== null) {
+      const route = pendingOpenBugRoute;
+      pendingOpenBugRoute = null;
       queueMicrotask(() => {
-        if (openBugListeners.has(listener)) listener(bugId);
+        if (openBugListeners.has(listener)) listener(route);
       });
     }
     return () => openBugListeners.delete(listener);
