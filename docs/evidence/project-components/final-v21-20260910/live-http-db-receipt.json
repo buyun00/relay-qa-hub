@@ -1,0 +1,46 @@
+{
+  "schemaVersion": 1,
+  "checkedAt": "2026-09-10T08:05:25.836Z",
+  "sourceCommit": "88a6d0f9c31106f6cd3fc9edbadca0db6bf6397b",
+  "database": {
+    "openedReadOnly": true,
+    "queryOnly": true,
+    "integrity": "ok",
+    "foreignKeyViolationCount": 0,
+    "journalMode": "wal"
+  },
+  "notification": {
+    "id": "136609dd-a8cf-4992-a35c-36426ac72a6f",
+    "projectId": "d84b0cd8-9bc4-49b3-854d-47027a71a146",
+    "actorId": "ea52638a-08f1-4dfa-8e62-6cca54645063",
+    "persistedReadAtMatchesHttp": true,
+    "persistedVersion": 2
+  },
+  "receipt": {
+    "count": 1,
+    "id": "b5c08cae-cc83-485c-b73f-9cfdd79b63ab",
+    "operationId": "markNotificationRead",
+    "status": "committed",
+    "httpStatus": 200,
+    "version": 2,
+    "requestDigest": "c02116713cfb536653fbc4f044d965076b8f8de19e65aa0ae59598b5ebc7a019",
+    "digestAlgorithm": "HMAC-SHA-256",
+    "digestMatchesCanonicalRequestAndProtectedServerKey": true,
+    "scopeDigestMatchesStoredCanonicalScope": true,
+    "responseMatchesPersistedNotification": true,
+    "rawIdempotencyKeyPersistedInEvidence": false,
+    "serverDigestKeyPersistedInEvidence": false
+  },
+  "auditEvent": {
+    "count": 1,
+    "id": "89645568-c4a7-427d-b3fc-dbd24bb4bc7e",
+    "type": "notification.read",
+    "receiptPointsToExactEvent": true,
+    "digestMatchesReceipt": true,
+    "versionTransition": {
+      "fromVersion": 1,
+      "toVersion": 2
+    }
+  },
+  "passed": true
+}

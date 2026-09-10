@@ -1,0 +1,5 @@
+    topResumedActivity=ActivityRecord{240440931 u0 com.relayqahub.android.preview.debug/com.relayqahub.android.MainActivity t152}
+    * Hist  #0: ActivityRecord{240440931 u0 com.relayqahub.android.preview.debug/com.relayqahub.android.MainActivity t152}
+      Intent { act=android.intent.action.MAIN cat=[android.intent.category.LAUNCHER] flg=0x10200000 cmp=com.relayqahub.android.preview.debug/com.relayqahub.android.MainActivity }
+      mActivityComponent=com.relayqahub.android.preview.debug/com.relayqahub.android.MainActivity
+      windows=[Window{f002050 u0 com.relayqahub.android.preview.debug/com.relayqahub.android.MainActivity}]

@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "verifiedAt": "2026-09-10T07:32:59.9480123Z",
+  "sourceCommit": "88a6d0f9c31106f6cd3fc9edbadca0db6bf6397b",
+  "path": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\apps\\android\\app\\build\\outputs\\apk\\debug\\app-debug.apk",
+  "packageName": "com.relayqahub.android.preview.debug",
+  "versionCode": 28,
+  "versionName": "0.2.0-preview.15",
+  "bytes": 35913773,
+  "sha256": "61a885f22b9a62383d923bf36ca0f9ade9f987c22bb30c7323bd8acbd7536e7a",
+  "signatureVerified": true,
+  "certificateSha256": "9bbf6d2a68c27871c00abc3203fb319629aabacdcac03674483262bcf09e2a83",
+  "apiBaseUrl": "http://127.0.0.1:4639/api/v1/",
+  "projectId": "10000000-0000-4000-8000-000000000004",
+  "fullBuildLog": "gradle-clean-test-lint-assemble.log",
+  "targetedTestLog": "gradle-targeted-update-ui-tests.log"
+}

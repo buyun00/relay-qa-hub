@@ -1,0 +1,16 @@
+  Window #4 Window{79ee34b u0 com.relayqahub.android.preview.debug}:
+    mOwnerUid=10051 showForAllUsers=false package=com.relayqahub.android.preview.debug appop=SYSTEM_ALERT_WINDOW
+    mAttrs={(0,63)(297x108) gr=TOP CENTER sim={adjust=pan} ty=APPLICATION_OVERLAY fmt=TRANSLUCENT surfaceInsets=Rect(36, 36 - 36, 36)
+  Window #5 Window{c57432f u0 com.relayqahub.android.preview.debug}:
+    mOwnerUid=10051 showForAllUsers=false package=com.relayqahub.android.preview.debug appop=SYSTEM_ALERT_WINDOW
+    mAttrs={(2497,480)(126x126) gr=TOP START CENTER sim={adjust=pan} ty=APPLICATION_OVERLAY fmt=TRANSLUCENT surfaceInsets=Rect(36, 36 - 36, 36)
+    mAttrs={(0,0)(fillxfill) sim={adjust=pan} layoutInDisplayCutoutMode=always ty=APPLICATION_OVERLAY fmt=TRANSLUCENT
+  Window #8 Window{f002050 u0 com.relayqahub.android.preview.debug/com.relayqahub.android.MainActivity}:
+    mOwnerUid=10051 showForAllUsers=false package=com.relayqahub.android.preview.debug appop=NONE
+    mBaseLayer=21000 mSubLayer=0    mToken=ActivityRecord{240440931 u0 com.relayqahub.android.preview.debug/com.relayqahub.android.MainActivity t152}
+    mActivityRecord=ActivityRecord{240440931 u0 com.relayqahub.android.preview.debug/com.relayqahub.android.MainActivity t152}
+    WindowStateAnimator{b6160ae com.relayqahub.android.preview.debug/com.relayqahub.android.MainActivity}:
+      mSurface=Surface(name=com.relayqahub.android.preview.debug/com.relayqahub.android.MainActivity)/@0x87f5e4f
+  imeLayeringTarget in display# 0 Window{f002050 u0 com.relayqahub.android.preview.debug/com.relayqahub.android.MainActivity}
+  imeInputTarget in display# 0 Window{f002050 u0 com.relayqahub.android.preview.debug/com.relayqahub.android.MainActivity}
+  imeControlTarget in display# 0 Window{f002050 u0 com.relayqahub.android.preview.debug/com.relayqahub.android.MainActivity}

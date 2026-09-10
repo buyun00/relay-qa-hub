@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "validatedAt": "2026-09-10T08:29:32.157Z",
+  "sourceCommit": "88a6d0f9c31106f6cd3fc9edbadca0db6bf6397b",
+  "acceptanceOverallStatus": "not_complete",
+  "completionAllowed": false,
+  "delegatedUserCases": 6,
+  "delegatedCasesAllNotRun": true,
+  "fineGrainedCoverage": {
+    "items": 1030,
+    "retiredItems": 47,
+    "needsRevalidation": 637
+  },
+  "parsedJsonFiles": 55,
+  "preValidationIndexEntriesVerified": 254,
+  "credentialsPersisted": false,
+  "passed": true
+}

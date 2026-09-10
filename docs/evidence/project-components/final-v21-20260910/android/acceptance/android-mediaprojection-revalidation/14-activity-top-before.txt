@@ -1,0 +1,52 @@
+  ACTIVITY app.lawnchair/.LawnchairLauncher 63361b pid=1065 userId=0 uid=10016 displayId=0(type=INTERNAL)
+    Local Activity 1be148a State:
+      mCurrentConfig={1.0 460mcc?mnc [zh_CN_#Hans] ldltr sw640dp w1138dp h640dp 360dpi lrg long land finger -keyb/v/v dpad/v winConfig={ mBounds=Rect(0, 0 - 2560, 1440) mAppBounds=Rect(0, 0 - 2560, 1440) mMaxBounds=Rect(0, 0 - 2560, 1440) mDisplayRotation=ROTATION_90 mWindowingMode=fullscreen mActivityType=home mAlwaysOnTop=undefined mRotation=ROTATION_90} s.3 fontWeightAdjustment=0}
+          mHost=android.app.Activity$HostCallbacks@fe5a957
+              mHost=android.app.Activity$HostCallbacks@fe5a957
+        mHost=android.app.Activity$HostCallbacks@fe5a957
+        mContainer=android.app.Activity$HostCallbacks@fe5a957
+      mLastReportedMergedConfiguration={mGlobalConfig={1.0 460mcc?mnc [zh_CN_#Hans] ldltr sw640dp w1138dp h640dp 360dpi lrg long land finger -keyb/v/v dpad/v winConfig={ mBounds=Rect(0, 0 - 2560, 1440) mAppBounds=Rect(0, 0 - 2560, 1440) mMaxBounds=Rect(0, 0 - 2560, 1440) mDisplayRotation=ROTATION_90 mWindowingMode=fullscreen mActivityType=undefined mAlwaysOnTop=undefined mRotation=ROTATION_90} s.8 fontWeightAdjustment=0} mOverrideConfig={1.0 460mcc?mnc [zh_CN_#Hans] ldltr sw640dp w1138dp h640dp 360dpi lrg long land finger -keyb/v/v dpad/v winConfig={ mBounds=Rect(0, 0 - 2560, 1440) mAppBounds=Rect(0, 0 - 2560, 1440) mMaxBounds=Rect(0, 0 - 2560, 1440) mDisplayRotation=ROTATION_90 mWindowingMode=fullscreen mActivityType=home mAlwaysOnTop=undefined mRotation=ROTATION_90} s.3 fontWeightAdjustment=0}}
+      mLastConfigurationFromResources={1.0 460mcc?mnc [zh_CN_#Hans] ldltr sw640dp w1138dp h640dp 394dpi lrg long land finger -keyb/v/v dpad/v winConfig={ mBounds=Rect(0, 0 - 2560, 1440) mAppBounds=Rect(0, 0 - 2560, 1440) mMaxBounds=Rect(0, 0 - 2560, 1440) mDisplayRotation=ROTATION_90 mWindowingMode=fullscreen mActivityType=home mAlwaysOnTop=undefined mRotation=ROTATION_90} s.3 fontWeightAdjustment=0}
+      mLastReportedActivityWindowInfo=ActivityWindowInfo{isEmbedded=false, taskBounds=Rect(0, 0 - 2560, 1440), taskFragmentBounds=Rect(0, 0 - 2560, 1440)}
+          Callback: android.app.Activity$$ExternalSyntheticLambda0@8062123 Priority=-1
+    	mActivityFlags: 
+    	mPendingRequestArgs=null mPendingActivityResult=null
+    	mRotationHelper: [mStateHandlerRequest=0, mCurrentStateRequest=0, mLastActivityFlags=-1, mIgnoreAutoRotateSettings=false, mHomeRotationEnabled=true, mForceAllowRotationForTesting=false, mDestroyed=false]
+    	Package index and name: 9/com.relayqahub.android.debug
+    	Package index and name: 10/com.relayqahub.android.preview.debug
+2026/9/9 00:42 SessionCommitReceiver Adding package name to install queue. Package name: com.relayqahub.android.preview.debug, has app icon: false, has app label: false
+2026/9/9 00:42 ItemInstallQueue Adding PendingInstallShortcutInfo to queue. Attached info: ItemInfo(id=-1 type=APP container=# com.android.launcher3.logger.LauncherAtom$ContainerInfo@7bc6f targetComponent=ComponentInfo{com.relayqahub.android.preview.debug/com.relayqahub.android.MainActivity} screen=-1 cell(-1,-1) span(1,1) minSpan(1,1) rank=0 user=UserHandle{0} title=QA Hub 项目预览 supportsMultiInstance=false nonResizeable=false)
+} targetComponent=ComponentInfo{com.relayqahub.android.preview.debug/com.relayqahub.android.MainActivity} screen=0 cell(4,1) span(1,1) minSpan(1,1) rank=0 user=UserHandle{0} title=QA Hub 项目预览 supportsMultiInstance=false nonResizeable=false)
+} targetComponent=ComponentInfo{com.android.gallery3d/com.android.gallery3d.app.GalleryActivity} screen=1 cell(1,0) span(1,1) minSpan(1,1) rank=0 user=UserHandle{0} title=图库 supportsMultiInstance=false nonResizeable=false)
+} targetComponent=ComponentInfo{com.android.documentsui/com.android.documentsui.LauncherActivity} screen=2 cell(2,0) span(1,1) minSpan(1,1) rank=0 user=UserHandle{0} title=文件 supportsMultiInstance=false nonResizeable=false)
+} targetComponent=ComponentInfo{com.netease.mumu.cloner/com.netease.mumu.cloner.multi.MainActivity} screen=4 cell(4,0) span(1,1) minSpan(1,1) rank=0 user=UserHandle{0} title=应用分身 supportsMultiInstance=false nonResizeable=false)
+} targetComponent=ComponentInfo{com.mumu.store/com.mumu.store.MainActivity} screen=0 cell(4,0) span(1,1) minSpan(1,1) rank=0 user=UserHandle{0} title=游戏中心 supportsMultiInstance=false nonResizeable=false)
+} targetComponent=ComponentInfo{com.relayqahub.android.debug/com.relayqahub.android.MainActivity} screen=0 cell(5,0) span(1,1) minSpan(1,1) rank=0 user=UserHandle{0} title=Relay QA Hub supportsMultiInstance=false nonResizeable=false)
+} targetComponent=ComponentInfo{com.chuyao.baloots/com.chuyao.baloot.ui.SplashActivity} screen=0 cell(6,0) span(1,1) minSpan(1,1) rank=0 user=UserHandle{0} title=baloot supportsMultiInstance=false nonResizeable=false)
+} targetComponent=ComponentInfo{com.relayqahub.android.preview.debug/com.relayqahub.android.MainActivity} screen=0 cell(4,1) span(1,1) minSpan(1,1) rank=0 user=UserHandle{0} title=QA Hub 项目预览 supportsMultiInstance=false nonResizeable=false)
+} targetComponent=ComponentInfo{com.android.gallery3d/com.android.gallery3d.app.GalleryActivity} screen=1 cell(1,0) span(1,1) minSpan(1,1) rank=0 user=UserHandle{0} title=图库 supportsMultiInstance=false nonResizeable=false)
+} targetComponent=ComponentInfo{com.android.documentsui/com.android.documentsui.LauncherActivity} screen=2 cell(2,0) span(1,1) minSpan(1,1) rank=0 user=UserHandle{0} title=文件 supportsMultiInstance=false nonResizeable=false)
+} targetComponent=ComponentInfo{com.netease.mumu.cloner/com.netease.mumu.cloner.multi.MainActivity} screen=4 cell(4,0) span(1,1) minSpan(1,1) rank=0 user=UserHandle{0} title=应用分身 supportsMultiInstance=false nonResizeable=false)
+} targetComponent=ComponentInfo{com.mumu.store/com.mumu.store.MainActivity} screen=0 cell(4,0) span(1,1) minSpan(1,1) rank=0 user=UserHandle{0} title=游戏中心 supportsMultiInstance=false nonResizeable=false)
+} targetComponent=ComponentInfo{com.relayqahub.android.debug/com.relayqahub.android.MainActivity} screen=0 cell(5,0) span(1,1) minSpan(1,1) rank=0 user=UserHandle{0} title=Relay QA Hub supportsMultiInstance=false nonResizeable=false)
+} targetComponent=ComponentInfo{com.chuyao.baloots/com.chuyao.baloot.ui.SplashActivity} screen=0 cell(6,0) span(1,1) minSpan(1,1) rank=0 user=UserHandle{0} title=baloot supportsMultiInstance=false nonResizeable=false)
+} targetComponent=ComponentInfo{com.relayqahub.android.preview.debug/com.relayqahub.android.MainActivity} screen=0 cell(4,1) span(1,1) minSpan(1,1) rank=0 user=UserHandle{0} title=QA Hub 项目预览 supportsMultiInstance=false nonResizeable=false)
+    ActivityTracker:
+    	mCurrentActivity=app.lawnchair.LawnchairLauncher@1be148a
+    	mOrientationState: [this=RecentsOrientedState@141907020 mOrientationHandler=PortraitPagedViewHandler@37558179 mDisplayRotation=0 mTouchRotation=0 mRecentsActivityRotation=1 mRecentsRotation=1 isRecentsActivityRotationAllowed=true mSystemRotation=true mStateId=38785 mFlags=303]
+TASK 10051:com.relayqahub.android.preview.debug id=152 userId=0 displayId=0(type=INTERNAL)
+  ACTIVITY com.relayqahub.android.preview.debug/com.relayqahub.android.MainActivity e54d663 pid=52177 userId=0 uid=10051 displayId=0(type=INTERNAL)
+    Local Activity 5c71e6e State:
+      mCurrentConfig={1.0 460mcc?mnc [zh_CN_#Hans] ldltr sw640dp w1138dp h640dp 360dpi lrg long land finger -keyb/v/v dpad/v winConfig={ mBounds=Rect(0, 0 - 2560, 1440) mAppBounds=Rect(0, 0 - 2560, 1440) mMaxBounds=Rect(0, 0 - 2560, 1440) mDisplayRotation=ROTATION_90 mWindowingMode=fullscreen mActivityType=standard mAlwaysOnTop=undefined mRotation=ROTATION_90} s.2 fontWeightAdjustment=0}
+          mHost=android.app.Activity$HostCallbacks@7b34bb2
+              mHost=android.app.Activity$HostCallbacks@7b34bb2
+        mHost=android.app.Activity$HostCallbacks@7b34bb2
+        mContainer=android.app.Activity$HostCallbacks@7b34bb2
+      mLastReportedMergedConfiguration={mGlobalConfig={1.0 460mcc?mnc [zh_CN_#Hans] ldltr sw640dp w1138dp h640dp 360dpi lrg long land finger -keyb/v/v dpad/v winConfig={ mBounds=Rect(0, 0 - 2560, 1440) mAppBounds=Rect(0, 0 - 2560, 1440) mMaxBounds=Rect(0, 0 - 2560, 1440) mDisplayRotation=ROTATION_90 mWindowingMode=fullscreen mActivityType=undefined mAlwaysOnTop=undefined mRotation=ROTATION_90} s.166 fontWeightAdjustment=0} mOverrideConfig={1.0 460mcc?mnc [zh_CN_#Hans] ldltr sw640dp w1138dp h640dp 360dpi lrg long land finger -keyb/v/v dpad/v winConfig={ mBounds=Rect(0, 0 - 2560, 1440) mAppBounds=Rect(0, 0 - 2560, 1440) mMaxBounds=Rect(0, 0 - 2560, 1440) mDisplayRotation=ROTATION_90 mWindowingMode=fullscreen mActivityType=standard mAlwaysOnTop=undefined mRotation=ROTATION_90} s.2 fontWeightAdjustment=0}}
+      mLastConfigurationFromResources={1.0 460mcc?mnc [zh_CN_#Hans] ldltr sw640dp w1138dp h640dp 360dpi lrg long land finger -keyb/v/v dpad/v winConfig={ mBounds=Rect(0, 0 - 2560, 1440) mAppBounds=Rect(0, 0 - 2560, 1440) mMaxBounds=Rect(0, 0 - 2560, 1440) mDisplayRotation=ROTATION_90 mWindowingMode=fullscreen mActivityType=standard mAlwaysOnTop=undefined mRotation=ROTATION_90} s.2 fontWeightAdjustment=0}
+      mLastReportedActivityWindowInfo=ActivityWindowInfo{isEmbedded=false, taskBounds=Rect(0, 0 - 2560, 1440), taskFragmentBounds=Rect(0, 0 - 2560, 1440)}
+       mInputChannel: f002050 com.relayqahub.android.preview.debug/com.relayqahub.android.MainActivity
+          mChannel = f002050 com.relayqahub.android.preview.debug/com.relayqahub.android.MainActivity
+      com.android.internal.policy.DecorView{a4964b9 V.E...... R....... 0,0-2560,1440 aid=0}[MainActivity]
+        androidx.activity.EdgeToEdge$enableEdgeToEdge$1$2{d49f0a G.E...... ......I. 0,0-0,0}
+          context: com.relayqahub.android.MainActivity@5c71e6e

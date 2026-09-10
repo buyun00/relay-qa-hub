@@ -1,0 +1,87 @@
+{
+  "schemaVersion": 1,
+  "status": "passed",
+  "completedAt": "2026-09-10T06:07:36.816Z",
+  "expected": {
+    "fileName": "Relay-QA-Hub-Android-27-0.2.0-preview.14.apk",
+    "bytes": 35913769,
+    "sha256": "5977070bb3594e9a69fd770d082727446ece339f3a2b127353a64c5990eee11b",
+    "sourceCommit": "910ac702c9418407f616b87ccf29ae8fbc93c6ef"
+  },
+  "checks": [
+    {
+      "surface": "api",
+      "operation": "manifest GET",
+      "status": 200,
+      "bytes": 388,
+      "sha256": "f51f361f2c2015fdd5d2be1b59ed14624b9a9eb4c38efe450c41c38594508af3",
+      "metadata": {
+        "schemaVersion": 1,
+        "channel": "preview",
+        "versionCode": 27,
+        "versionName": "0.2.0-preview.14",
+        "packageName": "com.relayqahub.android.preview.debug",
+        "fileName": "Relay-QA-Hub-Android-27-0.2.0-preview.14.apk",
+        "size": 35913769,
+        "sha256": "5977070bb3594e9a69fd770d082727446ece339f3a2b127353a64c5990eee11b",
+        "sourceCommit": "910ac702c9418407f616b87ccf29ae8fbc93c6ef"
+      }
+    },
+    {
+      "surface": "api",
+      "operation": "APK HEAD",
+      "status": 200,
+      "contentLength": 35913769,
+      "contentType": "application/vnd.android.package-archive"
+    },
+    {
+      "surface": "api",
+      "operation": "APK GET",
+      "status": 200,
+      "bytes": 35913769,
+      "sha256": "5977070bb3594e9a69fd770d082727446ece339f3a2b127353a64c5990eee11b",
+      "contentType": "application/vnd.android.package-archive"
+    },
+    {
+      "surface": "web",
+      "operation": "manifest GET",
+      "status": 200,
+      "bytes": 388,
+      "sha256": "f51f361f2c2015fdd5d2be1b59ed14624b9a9eb4c38efe450c41c38594508af3",
+      "metadata": {
+        "schemaVersion": 1,
+        "channel": "preview",
+        "versionCode": 27,
+        "versionName": "0.2.0-preview.14",
+        "packageName": "com.relayqahub.android.preview.debug",
+        "fileName": "Relay-QA-Hub-Android-27-0.2.0-preview.14.apk",
+        "size": 35913769,
+        "sha256": "5977070bb3594e9a69fd770d082727446ece339f3a2b127353a64c5990eee11b",
+        "sourceCommit": "910ac702c9418407f616b87ccf29ae8fbc93c6ef"
+      }
+    },
+    {
+      "surface": "web",
+      "operation": "APK HEAD",
+      "status": 200,
+      "contentLength": 35913769,
+      "contentType": "application/vnd.android.package-archive"
+    },
+    {
+      "surface": "web",
+      "operation": "APK GET",
+      "status": 200,
+      "bytes": 35913769,
+      "sha256": "5977070bb3594e9a69fd770d082727446ece339f3a2b127353a64c5990eee11b",
+      "contentType": "application/vnd.android.package-archive"
+    },
+    {
+      "surface": "api",
+      "operation": "APK range GET",
+      "status": 206,
+      "bytes": 32,
+      "sha256": "6f04e3f80dc3aa690819f3ae657109de147bee395e341122e91687ee2aeeecf0",
+      "contentRange": "bytes 0-31/35913769"
+    }
+  ]
+}

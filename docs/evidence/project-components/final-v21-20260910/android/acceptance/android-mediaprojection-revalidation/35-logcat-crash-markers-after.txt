@@ -1,0 +1,42 @@
+09-10 12:52:35.073 52516 52516 F libc    : Fatal signal 11 (SIGSEGV), code 1 (SEGV_MAPERR), fault addr 0x7e842fcc5be0 in tid 52516 (Shutdown thread), pid 52516 (Shutdown thread)
+09-10 12:52:35.081 52532 52532 I crash_dump64: obtaining output fd from tombstoned, type: kDebuggerdTombstoneProto
+09-10 12:52:35.081   513   513 I tombstoned: received crash request for pid 52516
+09-10 12:52:35.119 52532 52532 F DEBUG   : signal 11 (SIGSEGV), code 1 (SEGV_MAPERR), fault addr 0x00007e842fcc5be0
+09-10 12:52:35.122   513   513 E tombstoned: Tombstone written to: tombstone_07
+09-10 12:52:35.123   835   925 E NativeTombstoneManager: Tombstone's UID (2000) not an app, ignoring
+09-10 12:52:35.123   835   925 E NativeTombstoneManager: Tombstone's UID (2000) not an app, ignoring
+09-10 12:52:47.129 52544 52544 F libc    : Fatal signal 11 (SIGSEGV), code 1 (SEGV_MAPERR), fault addr 0x78e2ba6d0be0 in tid 52544 (Shutdown thread), pid 52544 (Shutdown thread)
+09-10 12:52:47.146 52561 52561 I crash_dump64: obtaining output fd from tombstoned, type: kDebuggerdTombstoneProto
+09-10 12:52:47.146   513   513 I tombstoned: received crash request for pid 52544
+09-10 12:52:47.193 52561 52561 F DEBUG   : signal 11 (SIGSEGV), code 1 (SEGV_MAPERR), fault addr 0x000078e2ba6d0be0
+09-10 12:52:47.196   513   513 E tombstoned: Tombstone written to: tombstone_08
+09-10 12:52:47.196   835   925 E NativeTombstoneManager: Tombstone's UID (2000) not an app, ignoring
+09-10 12:52:47.196   835   925 E NativeTombstoneManager: Tombstone's UID (2000) not an app, ignoring
+09-10 12:53:10.348 52580 52580 F libc    : Fatal signal 11 (SIGSEGV), code 1 (SEGV_MAPERR), fault addr 0x72d348924be0 in tid 52580 (Shutdown thread), pid 52580 (Shutdown thread)
+09-10 12:53:10.369 52595 52595 I crash_dump64: obtaining output fd from tombstoned, type: kDebuggerdTombstoneProto
+09-10 12:53:10.369   513   513 I tombstoned: received crash request for pid 52580
+09-10 12:53:10.417 52595 52595 F DEBUG   : signal 11 (SIGSEGV), code 1 (SEGV_MAPERR), fault addr 0x000072d348924be0
+09-10 12:53:10.420   513   513 E tombstoned: Tombstone written to: tombstone_09
+09-10 12:53:10.420   835   925 E NativeTombstoneManager: Tombstone's UID (2000) not an app, ignoring
+09-10 12:53:10.421   835   925 E NativeTombstoneManager: Tombstone's UID (2000) not an app, ignoring
+09-10 12:53:22.173 52608 52608 F libc    : Fatal signal 11 (SIGSEGV), code 1 (SEGV_MAPERR), fault addr 0x7c1b0a121be0 in tid 52608 (Shutdown thread), pid 52608 (Shutdown thread)
+09-10 12:53:22.189 52625 52625 I crash_dump64: obtaining output fd from tombstoned, type: kDebuggerdTombstoneProto
+09-10 12:53:22.189   513   513 I tombstoned: received crash request for pid 52608
+09-10 12:53:22.253 52625 52625 F DEBUG   : signal 11 (SIGSEGV), code 1 (SEGV_MAPERR), fault addr 0x00007c1b0a121be0
+09-10 12:53:22.256   513   513 E tombstoned: Tombstone written to: tombstone_10
+09-10 12:53:22.256   835   925 E NativeTombstoneManager: Tombstone's UID (2000) not an app, ignoring
+09-10 12:53:22.257   835   925 E NativeTombstoneManager: Tombstone's UID (2000) not an app, ignoring
+09-10 12:53:40.126 52648 52648 F libc    : Fatal signal 11 (SIGSEGV), code 1 (SEGV_MAPERR), fault addr 0x756290067be0 in tid 52648 (Shutdown thread), pid 52648 (Shutdown thread)
+09-10 12:53:40.135 52665 52665 I crash_dump64: obtaining output fd from tombstoned, type: kDebuggerdTombstoneProto
+09-10 12:53:40.135   513   513 I tombstoned: received crash request for pid 52648
+09-10 12:53:40.171 52665 52665 F DEBUG   : signal 11 (SIGSEGV), code 1 (SEGV_MAPERR), fault addr 0x0000756290067be0
+09-10 12:53:40.174   513   513 E tombstoned: Tombstone written to: tombstone_11
+09-10 12:53:40.175   835   925 E NativeTombstoneManager: Tombstone's UID (2000) not an app, ignoring
+09-10 12:53:40.175   835   925 E NativeTombstoneManager: Tombstone's UID (2000) not an app, ignoring
+09-10 12:55:05.443 52700 52700 F libc    : Fatal signal 7 (SIGBUS), code 2 (BUS_ADRERR), fault addr 0x75ab79923be0 in tid 52700 (Shutdown thread), pid 52700 (Shutdown thread)
+09-10 12:55:05.458 52716 52716 I crash_dump64: obtaining output fd from tombstoned, type: kDebuggerdTombstoneProto
+09-10 12:55:05.458   513   513 I tombstoned: received crash request for pid 52700
+09-10 12:55:05.499 52716 52716 F DEBUG   : signal 7 (SIGBUS), code 2 (BUS_ADRERR), fault addr 0x000075ab79923be0
+09-10 12:55:05.502   513   513 E tombstoned: Tombstone written to: tombstone_12
+09-10 12:55:05.502   835   925 E NativeTombstoneManager: Tombstone's UID (2000) not an app, ignoring
+09-10 12:55:05.503   835   925 E NativeTombstoneManager: Tombstone's UID (2000) not an app, ignoring

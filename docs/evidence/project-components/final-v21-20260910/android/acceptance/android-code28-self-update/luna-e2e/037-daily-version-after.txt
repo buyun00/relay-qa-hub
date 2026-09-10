@@ -1,0 +1,4 @@
+
+    versionCode=14 minSdk=29 targetSdk=37
+    versionName=0.1.13-debug
+

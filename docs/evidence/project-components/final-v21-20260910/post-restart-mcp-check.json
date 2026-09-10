@@ -1,0 +1,165 @@
+{
+  "schemaVersion": 1,
+  "checkedAt": "2026-09-10T08:05:40.273Z",
+  "sourceCommit": "88a6d0f9c31106f6cd3fc9edbadca0db6bf6397b",
+  "apiReady": {
+    "status": "ready",
+    "schemaVersion": "20",
+    "checks": [
+      {
+        "name": "database",
+        "status": "ok"
+      },
+      {
+        "name": "evidence",
+        "status": "ok"
+      },
+      {
+        "name": "worker",
+        "status": "ok"
+      }
+    ]
+  },
+  "authenticationSessionIssuedForServerMcp": true,
+  "businessMutationsPerformed": false,
+  "results": [
+    {
+      "label": "server",
+      "endpoint": "http://127.0.0.1:4641/mcp",
+      "initialize": {
+        "protocolVersion": "2025-06-18",
+        "serverName": "qa-hub-project-preview",
+        "serverVersion": "2.1"
+      },
+      "toolCount": 96,
+      "listBugsInputProperties": [
+        "projectId",
+        "bugId",
+        "userId",
+        "attachmentId",
+        "name",
+        "idempotencyKey",
+        "expectedVersion",
+        "request",
+        "filters",
+        "action",
+        "note",
+        "attemptId",
+        "verificationId",
+        "componentKey",
+        "sessionId",
+        "id",
+        "buildId",
+        "captureId",
+        "artifactKind",
+        "uri",
+        "query",
+        "chunkNumber",
+        "clientSubmissionId",
+        "clientAttachmentId",
+        "chunkSha256",
+        "bytesBase64"
+      ],
+      "serverLoginPerformed": true,
+      "readChecks": {
+        "listProjects": "passed",
+        "visibleProjectCount": 1,
+        "selectedProjectId": "10000000-0000-4000-8000-000000000004",
+        "listBugs": "passed",
+        "returnedBugCount": 2
+      },
+      "calls": [
+        {
+          "method": "initialize",
+          "status": 200
+        },
+        {
+          "method": "tools/list",
+          "status": 200
+        },
+        {
+          "method": "tools/call",
+          "toolName": "qa_login",
+          "status": 200
+        },
+        {
+          "method": "tools/call",
+          "toolName": "qa_list_projects",
+          "status": 200
+        },
+        {
+          "method": "tools/call",
+          "toolName": "qa_list_bugs",
+          "status": 200
+        }
+      ]
+    },
+    {
+      "label": "local",
+      "endpoint": "http://127.0.0.1:4642/mcp",
+      "initialize": {
+        "protocolVersion": "2025-06-18",
+        "serverName": "qa-hub-desktop-preview",
+        "serverVersion": "0.2.0-preview.13"
+      },
+      "toolCount": 96,
+      "listBugsInputProperties": [
+        "projectId",
+        "bugId",
+        "userId",
+        "attachmentId",
+        "name",
+        "idempotencyKey",
+        "expectedVersion",
+        "request",
+        "filters",
+        "action",
+        "note",
+        "attemptId",
+        "verificationId",
+        "componentKey",
+        "sessionId",
+        "id",
+        "buildId",
+        "captureId",
+        "artifactKind",
+        "uri",
+        "query",
+        "chunkNumber",
+        "clientSubmissionId",
+        "clientAttachmentId",
+        "chunkSha256",
+        "bytesBase64"
+      ],
+      "serverLoginPerformed": false,
+      "readChecks": {
+        "listProjects": "passed",
+        "visibleProjectCount": 1,
+        "selectedProjectId": "305b4def-ae7e-4a2d-ae96-a05d616390bf",
+        "listBugs": "passed",
+        "returnedBugCount": 1
+      },
+      "calls": [
+        {
+          "method": "initialize",
+          "status": 200
+        },
+        {
+          "method": "tools/list",
+          "status": 200
+        },
+        {
+          "method": "tools/call",
+          "toolName": "qa_list_projects",
+          "status": 200
+        },
+        {
+          "method": "tools/call",
+          "toolName": "qa_list_bugs",
+          "status": 200
+        }
+      ]
+    }
+  ],
+  "passed": true
+}

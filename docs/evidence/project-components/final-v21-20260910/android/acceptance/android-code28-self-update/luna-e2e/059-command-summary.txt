@@ -1,0 +1,21 @@
+Sanitized read-only evidence commands (device: 127.0.0.1:16384)
+
+adb devices -l
+adb -s 127.0.0.1:16384 shell getprop ro.build.fingerprint
+adb -s 127.0.0.1:16384 shell wm size
+adb -s 127.0.0.1:16384 reverse --list
+adb -s 127.0.0.1:16384 shell pidof com.relayqahub.android.preview.debug
+adb -s 127.0.0.1:16384 shell pidof com.relayqahub.android.debug
+adb -s 127.0.0.1:16384 shell dumpsys package <package> (versionCode/versionName/lastUpdateTime)
+adb -s 127.0.0.1:16384 shell dumpsys activity activities (focused activity)
+adb -s 127.0.0.1:16384 exec-out screencap -p > <evidence>.png
+adb -s 127.0.0.1:16384 shell uiautomator dump /sdcard/<name>.xml
+adb -s 127.0.0.1:16384 pull /sdcard/<name>.xml <evidence>.xml
+adb -s 127.0.0.1:16384 shell input tap <x> <y> (real MuMu app/system-installer UI taps; no install command)
+adb -s 127.0.0.1:16384 shell pm path com.relayqahub.android.preview.debug
+adb -s 127.0.0.1:16384 pull <resolved-package-path> <evidence>/032-installed-code28.apk
+Get-FileHash <evidence>/032-installed-code28.apk -Algorithm SHA256
+adb -s 127.0.0.1:16384 shell ps -A
+adb -s 127.0.0.1:16384 shell logcat -d -v threadtime
+
+No credentials, tokens, database contents, or personal-device identifiers were included. No uninstall, clear-data, force-stop, DB modification, submission, or physical-device operation was performed.

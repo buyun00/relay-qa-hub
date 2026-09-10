@@ -1,0 +1,2 @@
+18B32333AABF3C926EF3B70715DECD494AB7F8FDCD45290A42CE7D4D99690DAA  C:\Users\lin0\.codex\worktrees\7c86\Relay-QA-Hub\docs\evidence\project-components\final-v21-20260910\android\acceptance\android-mediaprojection-revalidation\10-screen-before.png
+117D2DDE86E02725407BE805CE057FCB1D125B08A450395645FD9962237CA4DB  C:\Users\lin0\.codex\worktrees\7c86\Relay-QA-Hub\docs\evidence\project-components\final-v21-20260910\android\acceptance\android-mediaprojection-revalidation\19-screen-after.png

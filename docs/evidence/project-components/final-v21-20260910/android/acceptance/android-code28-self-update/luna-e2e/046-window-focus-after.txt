@@ -1,0 +1,5 @@
+
+  mCurrentFocus=Window{b613caf u0 com.relayqahub.android.preview.debug/com.relayqahub.android.MainActivity}
+  mFocusedApp=ActivityRecord{57427750 u0 com.relayqahub.android.preview.debug/com.relayqahub.android.MainActivity t152}
+    mFocusedWindow=Window{b613caf u0 com.relayqahub.android.preview.debug/com.relayqahub.android.MainActivity}
+

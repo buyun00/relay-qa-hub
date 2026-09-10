@@ -1,0 +1,3 @@
+
+  mFocusedApp=ActivityRecord{57427750 u0 com.relayqahub.android.preview.debug/com.relayqahub.android.MainActivity t152}
+

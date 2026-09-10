@@ -1,0 +1,80 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-09-10T08:24:47.287Z",
+  "sourceCommit": "88a6d0f9c31106f6cd3fc9edbadca0db6bf6397b",
+  "finalRuns": {
+    "storage": {
+      "tests": 167,
+      "passed": 166,
+      "failed": 0,
+      "skipped": 1,
+      "evidence": {
+        "file": "storage-tests.tap.txt",
+        "bytes": 19888,
+        "sha256": "50c17fa25f2cff6d0b709b8335cd6d5c977393eebab7d85a4aaa83547a3c32b8"
+      }
+    },
+    "apiJavaScript": {
+      "tests": 274,
+      "passed": 274,
+      "failed": 0,
+      "skipped": 0,
+      "evidence": {
+        "file": "api-js-tests.tap.txt",
+        "bytes": 42036,
+        "sha256": "a39da19a73320af8bfe53dfa8c37b3d353fe218ec3c356c0b9cea12f559efb97"
+      }
+    },
+    "apiTypeScript": {
+      "tests": 47,
+      "passed": 47,
+      "failed": 0,
+      "skipped": 0,
+      "evidence": {
+        "file": "api-ts-tests.tap.txt",
+        "bytes": 7601,
+        "sha256": "a0704cfb51f52a4cc57a20718888812bbe87b54229e6f07ef2a46ba1345ba7cb"
+      }
+    },
+    "contracts": {
+      "status": "passed",
+      "checks": 5,
+      "evidence": {
+        "file": "contract-checks.txt",
+        "bytes": 1130,
+        "sha256": "50832df2c8404b6d9ef20a717b516f6ef67c555150e577b2d367f5422ad01a73"
+      }
+    },
+    "androidCleanUnitLintAssemble": {
+      "status": "passed",
+      "tasks": 59,
+      "evidence": {
+        "file": "../android/acceptance/android-code28-self-update/gradle-clean-test-lint-assemble.log",
+        "bytes": 4256,
+        "sha256": "e7c67dd0bb89f3037553610cea8632e0d3380a6321dc4c366fe3b989c327920f"
+      }
+    },
+    "androidTargetedUpdateUi": {
+      "status": "passed",
+      "tasks": 32,
+      "evidence": {
+        "file": "../android/acceptance/android-code28-self-update/gradle-targeted-update-ui-tests.log",
+        "bytes": 2870,
+        "sha256": "8d3dd4821b3f1a566d52c185d7d058ed81675ff84033e59d3c027e3dcc431a25"
+      }
+    }
+  },
+  "retainedFirstFailure": {
+    "status": "retained",
+    "trigger": "API suite ran concurrently with the storage suite",
+    "observed": "one isolated uploader supervisor fixture did not load its expected test login cache",
+    "independentFullRerunPassed": true,
+    "evidence": {
+      "file": "api-js-tests.concurrent-first-failure.tap.txt",
+      "bytes": 43243,
+      "sha256": "a362f7179b6820b2f28498576600a44637d95b9ff0669a2ed0068d81e1b2ac69"
+    }
+  },
+  "credentialsPersisted": false,
+  "passed": true
+}

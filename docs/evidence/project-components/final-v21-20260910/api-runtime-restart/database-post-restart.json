@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "checkedAt": "2026-09-10T07:40:58.109Z",
+  "readOnly": true,
+  "userVersion": 20,
+  "journalMode": "wal",
+  "integrity": [
+    "ok"
+  ],
+  "foreignKeyViolationCount": 0,
+  "passed": true
+}

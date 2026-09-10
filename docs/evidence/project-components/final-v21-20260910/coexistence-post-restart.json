@@ -1,0 +1,149 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-09-10T08:28:05.5959784Z",
+  "sourceCommit": "88a6d0f9c31106f6cd3fc9edbadca0db6bf6397b",
+  "mode": "read-only listener and anonymous HTTP observation",
+  "expectedListeners": 12,
+  "observedListeners": 12,
+  "productionWrites": 0,
+  "currentMcpBusinessProof": "post-restart-mcp-check.json",
+  "items": [
+    {
+      "name": "production-api",
+      "kind": "api",
+      "port": 4319,
+      "localAddress": "0.0.0.0",
+      "pid": 19624,
+      "processName": "node",
+      "http": {
+        "status": 200,
+        "readyStatus": "ready",
+        "schemaVersion": "12"
+      }
+    },
+    {
+      "name": "production-web",
+      "kind": "web",
+      "port": 4174,
+      "localAddress": "0.0.0.0",
+      "pid": 7420,
+      "processName": "node",
+      "http": {
+        "status": 200,
+        "readyStatus": null,
+        "schemaVersion": null
+      }
+    },
+    {
+      "name": "production-local-mcp",
+      "kind": "mcp",
+      "port": 4320,
+      "localAddress": "127.0.0.1",
+      "pid": 17160,
+      "processName": "RelayQaHub",
+      "http": null
+    },
+    {
+      "name": "old-preview-api",
+      "kind": "api",
+      "port": 4419,
+      "localAddress": "127.0.0.1",
+      "pid": 22852,
+      "processName": "node",
+      "http": {
+        "status": 200,
+        "readyStatus": "ready",
+        "schemaVersion": "14"
+      }
+    },
+    {
+      "name": "old-preview-web",
+      "kind": "web",
+      "port": 4274,
+      "localAddress": "127.0.0.1",
+      "pid": 20284,
+      "processName": "node",
+      "http": {
+        "status": 200,
+        "readyStatus": null,
+        "schemaVersion": null
+      }
+    },
+    {
+      "name": "old-preview-local-mcp",
+      "kind": "mcp",
+      "port": 4420,
+      "localAddress": "127.0.0.1",
+      "pid": 13564,
+      "processName": "RelayQaHubPreview",
+      "http": null
+    },
+    {
+      "name": "preserved-failed-migration-api",
+      "kind": "api",
+      "port": 4539,
+      "localAddress": "127.0.0.1",
+      "pid": 19636,
+      "processName": "node",
+      "http": {
+        "status": 200,
+        "readyStatus": "ready",
+        "schemaVersion": "20"
+      }
+    },
+    {
+      "name": "preserved-failed-migration-mcp",
+      "kind": "mcp",
+      "port": 4541,
+      "localAddress": "127.0.0.1",
+      "pid": 25676,
+      "processName": "node",
+      "http": null
+    },
+    {
+      "name": "v21-api",
+      "kind": "api",
+      "port": 4639,
+      "localAddress": "127.0.0.1",
+      "pid": 26088,
+      "processName": "node",
+      "http": {
+        "status": 200,
+        "readyStatus": "ready",
+        "schemaVersion": "20"
+      }
+    },
+    {
+      "name": "v21-web",
+      "kind": "web",
+      "port": 4640,
+      "localAddress": "127.0.0.1",
+      "pid": 12504,
+      "processName": "node",
+      "http": {
+        "status": 200,
+        "readyStatus": null,
+        "schemaVersion": null
+      }
+    },
+    {
+      "name": "v21-server-mcp",
+      "kind": "mcp",
+      "port": 4641,
+      "localAddress": "127.0.0.1",
+      "pid": 14552,
+      "processName": "node",
+      "http": null
+    },
+    {
+      "name": "v21-local-mcp",
+      "kind": "mcp",
+      "port": 4642,
+      "localAddress": "127.0.0.1",
+      "pid": 19564,
+      "processName": "RelayQaHubPreview-v21-e2e-fresh-0910",
+      "http": null
+    }
+  ],
+  "passed": true
+}

@@ -1,6 +1,6 @@
 # QA Hub 项目制与组件化真实验收矩阵
 
-生成时点：2026-09-10T05:18:59.365Z；设计 v2.1；源码 HEAD：`04f22a5075fb6e534ab1303c8ff4e886296168ed`。
+生成时点：2026-09-10T08:10:55.091Z；设计 v2.1；源码 HEAD：`88a6d0f9c31106f6cd3fc9edbadca0db6bf6397b`。
 
 本文件是代码和需求的验收清单，初始全部为 `not_run`。代码存在、静态推导、mock、编译成功、端口监听或排队成功均不算通过。逐入口真实操作并读回项目、操作人、状态、版本、事件、附件及最终产物后，才登记结果。
 
@@ -52,7 +52,7 @@ A = 此基线须通过该入口真实验收；— = 该条描述其他入口，�
 | desktop_menu_action | 6 |
 | external_full_chain | 10 |
 | http_registration_template | 3 |
-| http_route | 198 |
+| http_route | 201 |
 | mcp_tool | 116 |
 | required_mcp_parity | 17 |
 | state_action | 12 |
@@ -100,29 +100,28 @@ A = 此基线须通过该入口真实验收；— = 该条描述其他入口，�
 
 | 测试 ID | 功能/入口 | 适用客户端 | 来源 | 状态 |
 | --- | --- | --- | --- | --- |
-| android_control-71d090574dc17d | onClick = { perform { it.beginFix(bug, projectScope.actorId, note) } }, modifier = Modifier.testTag("bug-begin-fix"), ) { Text("开始修复") } | apk | apps/android/app/src/main/kotlin/com/relayqahub/android/ui/BugLifecyclePanel.kt:424 | not_run · revalidation required |
-| android_control-696ec4d517b176 | onClick = { perform { it.manualComplete(bug, note) } }, modifier = Modifier.testTag("bug-manual-complete"), ) { Text("人工完成") } | apk | apps/android/app/src/main/kotlin/com/relayqahub/android/ui/BugLifecyclePanel.kt:429 | not_run · revalidation required |
-| android_control-b0fb789c3cd177 | onClick = { perform { it.submitFix(bug, note, branch.takeIf { codeDelivery }, commit.takeIf { codeDelivery }) } }, modifier = Modifier.testTag("bug-submit-fix"), ) { Text(if (codeDelivery) "提交代码修复" else "提交无需代码的处理") } | apk | apps/android/app/src/main/kotlin/com/relayqahub/android/ui/BugLifecyclePanel.kt:442 | not_run · revalidation required |
-| android_control-3d660d3aa53da7 | onClick = { verificationImages = verificationImages.filterNot { it.localId == image.localId } }, ) { Text("移除") } } | apk | apps/android/app/src/main/kotlin/com/relayqahub/android/ui/BugLifecyclePanel.kt:514 | not_run · revalidation required |
-| android_control-494d9fbbd4b8f9 | onClick = { imagePicker.launch("image/*") }, modifier = Modifier.fillMaxWidth().testTag("bug-verification-add-evidence"), ) { Text("添加验收图片") } | apk | apps/android/app/src/main/kotlin/com/relayqahub/android/ui/BugLifecyclePanel.kt:521 | not_run · revalidation required |
-| android_control-97abd53fe0f3fe | onValueChange = { captureBundleIdInput = it.trim() }, enabled = mayEditVerification && !busy && verificationCaptureCanChange(pendingVerification), | apk | apps/android/app/src/main/kotlin/com/relayqahub/android/ui/BugLifecyclePanel.kt:526 | not_run · revalidation required |
-| android_control-3d878087b82b78 | onClick = { submitVerification(VerificationOutcome.PASSED) }, modifier = Modifier.testTag("bug-verify-pass"), ) { Text("验收通过并关闭") } | apk | apps/android/app/src/main/kotlin/com/relayqahub/android/ui/BugLifecyclePanel.kt:542 | not_run · revalidation required |
-| android_control-b1a883a1d3cfa6 | onClick = { submitVerification(VerificationOutcome.FAILED) }, modifier = Modifier.testTag("bug-verify-fail"), ) { Text("验收失败并退回") } | apk | apps/android/app/src/main/kotlin/com/relayqahub/android/ui/BugLifecyclePanel.kt:548 | not_run · revalidation required |
-| android_control-9139e710919cc3 | onClick = { submitVerification(VerificationOutcome.BLOCKED) }, modifier = Modifier.fillMaxWidth().testTag("bug-verify-blocked"), ) { Text("暂时无法验收（说明阻塞原因）") } | apk | apps/android/app/src/main/kotlin/com/relayqahub/android/ui/BugLifecyclePanel.kt:555 | not_run · revalidation required |
-| android_control-1c69a97aa9ed23 | onClick = { perform { container.commentTimelineClient.createComment(bug.id, commentId, comment, checkNotNull(token)) | apk | apps/android/app/src/main/kotlin/com/relayqahub/android/ui/BugLifecyclePanel.kt:565 | not_run · revalidation required |
-| android_control-e5d6876a6998ab | onClick = { deleteConfirm = true }, enabled = !busy, modifier = Modifier.testTag("bug-delete"), | apk | apps/android/app/src/main/kotlin/com/relayqahub/android/ui/BugLifecyclePanel.kt:590 | not_run · revalidation required |
-| android_control-569cdc831982bf | onClick = { coroutineScope.launch { busy = true | apk | apps/android/app/src/main/kotlin/com/relayqahub/android/ui/BugLifecyclePanel.kt:602 | not_run · revalidation required |
-| android_control-9194944cbece69 | onDismissRequest = { deleteConfirm = false }, title = { Text("删除 ${bug.key}") }, text = { Text("该 Bug 将从普通列表移除，历史和审计记录保留。") }, | apk | apps/android/app/src/main/kotlin/com/relayqahub/android/ui/BugLifecyclePanel.kt:630 | not_run · revalidation required |
-| android_control-1fbe4a8ef2536d | TextButton(onClick = { deleteConfirm = false perform(deleted = true) { it.delete(bug) } | apk | apps/android/app/src/main/kotlin/com/relayqahub/android/ui/BugLifecyclePanel.kt:634 | not_run · revalidation required |
-| android_control-66c3d5b487fcbf | dismissButton = { TextButton(onClick = { deleteConfirm = false }) { Text("取消") } }, ) } | apk | apps/android/app/src/main/kotlin/com/relayqahub/android/ui/BugLifecyclePanel.kt:639 | not_run · revalidation required |
-| android_control-663de743f92881 | onClick = { onFail(reason.trim()) }, modifier = Modifier.fillMaxWidth().testTag("bug-fail-repair-attempt"), ) { Text("结束本轮并退回待处理") } | apk | apps/android/app/src/main/kotlin/com/relayqahub/android/ui/BugLifecyclePanel.kt:683 | not_run · revalidation required |
-| android_control-24edacdd0c204e | OutlinedButton(onClick = { modeMenu = true }, enabled = !busy) { Text("处理方式：${successorMode.label()}") } | apk | apps/android/app/src/main/kotlin/com/relayqahub/android/ui/BugLifecyclePanel.kt:688 | not_run · revalidation required |
-| android_control-a1b58b9e09f3da | DropdownMenu(expanded = modeMenu, onDismissRequest = { modeMenu = false }) { RepairMode.entries.forEach { mode -> DropdownMenuItem( | apk | apps/android/app/src/main/kotlin/com/relayqahub/android/ui/BugLifecyclePanel.kt:691 | not_run · revalidation required |
-| android_control-ab2ffc00866dd4 | onClick = { successorModeName = mode.wireName; modeMenu = false }, ) } | apk | apps/android/app/src/main/kotlin/com/relayqahub/android/ui/BugLifecyclePanel.kt:695 | not_run · revalidation required |
-| android_control-1b920254f64512 | onClick = { assigneeMenu = true }, enabled = !busy && assigneeOptions.isNotEmpty(), ) { | apk | apps/android/app/src/main/kotlin/com/relayqahub/android/ui/BugLifecyclePanel.kt:702 | not_run · revalidation required |
-| android_control-b616438b104f10 | DropdownMenu(expanded = assigneeMenu, onDismissRequest = { assigneeMenu = false }) { assigneeOptions.forEach { (id, label) -> DropdownMenuItem( | apk | apps/android/app/src/main/kotlin/com/relayqahub/android/ui/BugLifecyclePanel.kt:709 | not_run · revalidation required |
-| android_control-417553d9e94c40 | onClick = { successorAssigneeId = id; assigneeMenu = false }, ) } | apk | apps/android/app/src/main/kotlin/com/relayqahub/android/ui/BugLifecyclePanel.kt:713 | not_run · revalidation required |
-| android_control-e105574d13a037 | onClick = { onSupersede( reason.trim(), successorId, successorMode, successorAssigneeId, | apk | apps/android/app/src/main/kotlin/com/relayqahub/android/ui/BugLifecyclePanel.kt:728 | not_run · revalidation required |
+| android_control-71d090574dc17d | onClick = { perform { it.beginFix(bug, projectScope.actorId, note) } }, modifier = Modifier.testTag("bug-begin-fix"), ) { Text("开始修复") } | apk | apps/android/app/src/main/kotlin/com/relayqahub/android/ui/BugLifecyclePanel.kt:406 | not_run · revalidation required |
+| android_control-696ec4d517b176 | onClick = { perform { it.manualComplete(bug, note) } }, modifier = Modifier.testTag("bug-manual-complete"), ) { Text("人工完成") } | apk | apps/android/app/src/main/kotlin/com/relayqahub/android/ui/BugLifecyclePanel.kt:411 | not_run · revalidation required |
+| android_control-b0fb789c3cd177 | onClick = { perform { it.submitFix(bug, note, branch.takeIf { codeDelivery }, commit.takeIf { codeDelivery }) } }, modifier = Modifier.testTag("bug-submit-fix"), ) { Text(if (codeDelivery) "提交代码修复" else "提交无需代码的处理") } | apk | apps/android/app/src/main/kotlin/com/relayqahub/android/ui/BugLifecyclePanel.kt:424 | not_run · revalidation required |
+| android_control-3d660d3aa53da7 | onClick = { verificationImages = verificationImages.filterNot { it.localId == image.localId } }, ) { Text("移除") } } | apk | apps/android/app/src/main/kotlin/com/relayqahub/android/ui/BugLifecyclePanel.kt:496 | not_run · revalidation required |
+| android_control-494d9fbbd4b8f9 | onClick = { imagePicker.launch("image/*") }, modifier = Modifier.fillMaxWidth().testTag("bug-verification-add-evidence"), ) { Text("添加验收图片") } | apk | apps/android/app/src/main/kotlin/com/relayqahub/android/ui/BugLifecyclePanel.kt:503 | not_run · revalidation required |
+| android_control-3d878087b82b78 | onClick = { submitVerification(VerificationOutcome.PASSED) }, modifier = Modifier.testTag("bug-verify-pass"), ) { Text("验收通过并关闭") } | apk | apps/android/app/src/main/kotlin/com/relayqahub/android/ui/BugLifecyclePanel.kt:513 | not_run · revalidation required |
+| android_control-b1a883a1d3cfa6 | onClick = { submitVerification(VerificationOutcome.FAILED) }, modifier = Modifier.testTag("bug-verify-fail"), ) { Text("验收失败并退回") } | apk | apps/android/app/src/main/kotlin/com/relayqahub/android/ui/BugLifecyclePanel.kt:519 | not_run · revalidation required |
+| android_control-9139e710919cc3 | onClick = { submitVerification(VerificationOutcome.BLOCKED) }, modifier = Modifier.fillMaxWidth().testTag("bug-verify-blocked"), ) { Text("暂时无法验收（说明阻塞原因）") } | apk | apps/android/app/src/main/kotlin/com/relayqahub/android/ui/BugLifecyclePanel.kt:526 | not_run · revalidation required |
+| android_control-1c69a97aa9ed23 | onClick = { perform { container.commentTimelineClient.createComment(bug.id, commentId, comment, checkNotNull(token)) | apk | apps/android/app/src/main/kotlin/com/relayqahub/android/ui/BugLifecyclePanel.kt:536 | not_run · revalidation required |
+| android_control-e5d6876a6998ab | onClick = { deleteConfirm = true }, enabled = !busy, modifier = Modifier.testTag("bug-delete"), | apk | apps/android/app/src/main/kotlin/com/relayqahub/android/ui/BugLifecyclePanel.kt:561 | not_run · revalidation required |
+| android_control-569cdc831982bf | onClick = { coroutineScope.launch { busy = true | apk | apps/android/app/src/main/kotlin/com/relayqahub/android/ui/BugLifecyclePanel.kt:573 | not_run · revalidation required |
+| android_control-9194944cbece69 | onDismissRequest = { deleteConfirm = false }, title = { Text("删除 ${bug.key}") }, text = { Text("该 Bug 将从普通列表移除，历史和审计记录保留。") }, | apk | apps/android/app/src/main/kotlin/com/relayqahub/android/ui/BugLifecyclePanel.kt:601 | not_run · revalidation required |
+| android_control-1fbe4a8ef2536d | TextButton(onClick = { deleteConfirm = false perform(deleted = true) { it.delete(bug) } | apk | apps/android/app/src/main/kotlin/com/relayqahub/android/ui/BugLifecyclePanel.kt:605 | not_run · revalidation required |
+| android_control-66c3d5b487fcbf | dismissButton = { TextButton(onClick = { deleteConfirm = false }) { Text("取消") } }, ) } | apk | apps/android/app/src/main/kotlin/com/relayqahub/android/ui/BugLifecyclePanel.kt:610 | not_run · revalidation required |
+| android_control-663de743f92881 | onClick = { onFail(reason.trim()) }, modifier = Modifier.fillMaxWidth().testTag("bug-fail-repair-attempt"), ) { Text("结束本轮并退回待处理") } | apk | apps/android/app/src/main/kotlin/com/relayqahub/android/ui/BugLifecyclePanel.kt:654 | not_run · revalidation required |
+| android_control-24edacdd0c204e | OutlinedButton(onClick = { modeMenu = true }, enabled = !busy) { Text("处理方式：${successorMode.label()}") } | apk | apps/android/app/src/main/kotlin/com/relayqahub/android/ui/BugLifecyclePanel.kt:659 | not_run · revalidation required |
+| android_control-a1b58b9e09f3da | DropdownMenu(expanded = modeMenu, onDismissRequest = { modeMenu = false }) { RepairMode.entries.forEach { mode -> DropdownMenuItem( | apk | apps/android/app/src/main/kotlin/com/relayqahub/android/ui/BugLifecyclePanel.kt:662 | not_run · revalidation required |
+| android_control-ab2ffc00866dd4 | onClick = { successorModeName = mode.wireName; modeMenu = false }, ) } | apk | apps/android/app/src/main/kotlin/com/relayqahub/android/ui/BugLifecyclePanel.kt:666 | not_run · revalidation required |
+| android_control-1b920254f64512 | onClick = { assigneeMenu = true }, enabled = !busy && assigneeOptions.isNotEmpty(), ) { | apk | apps/android/app/src/main/kotlin/com/relayqahub/android/ui/BugLifecyclePanel.kt:673 | not_run · revalidation required |
+| android_control-b616438b104f10 | DropdownMenu(expanded = assigneeMenu, onDismissRequest = { assigneeMenu = false }) { assigneeOptions.forEach { (id, label) -> DropdownMenuItem( | apk | apps/android/app/src/main/kotlin/com/relayqahub/android/ui/BugLifecyclePanel.kt:680 | not_run · revalidation required |
+| android_control-417553d9e94c40 | onClick = { successorAssigneeId = id; assigneeMenu = false }, ) } | apk | apps/android/app/src/main/kotlin/com/relayqahub/android/ui/BugLifecyclePanel.kt:684 | not_run · revalidation required |
+| android_control-e105574d13a037 | onClick = { onSupersede( reason.trim(), successorId, successorMode, successorAssigneeId, | apk | apps/android/app/src/main/kotlin/com/relayqahub/android/ui/BugLifecyclePanel.kt:699 | not_run · revalidation required |
 | android_control-3fa441fbf2db26 | TextButton(onClick = onBack) { Text("返回项目") } TextButton(onClick = { execute { reload(); JSONObject() } }, enabled = !busy) { Text("刷新") } } | apk | apps/android/app/src/main/kotlin/com/relayqahub/android/ui/ComponentTaskScreen.kt:78 | not_run · revalidation required |
 | android_control-638a71a5340ca4 | TextButton(onClick = { execute { reload(); JSONObject() } }, enabled = !busy) { Text("刷新") } } Text(component.displayName, style = MaterialTheme.typography.headlineSmall) | apk | apps/android/app/src/main/kotlin/com/relayqahub/android/ui/ComponentTaskScreen.kt:79 | not_run · revalidation required |
 | android_control-dc861317120de8 | TextButton(onClick = { preset = id }) { Text((if (preset == id) "✓ " else "") + name) } } Button(enabled = !busy, onClick = { execute { client.request("packaging/builds", token, "POST", JSONObject().put("preset", preset)) } }) { Text("开始打包" | apk | apps/android/app/src/main/kotlin/com/relayqahub/android/ui/ComponentTaskScreen.kt:90 | not_run · revalidation required |
@@ -145,10 +144,10 @@ A = 此基线须通过该入口真实验收；— = 该条描述其他入口，�
 | android_control-952ce77c0e0e6f | onClick = { onSelect(QaHubPage.BUG_LIST) }, modifier = Modifier.weight(1f).testTag("nav-bug-list"), ) | apk | apps/android/app/src/main/kotlin/com/relayqahub/android/ui/FoundationScreen.kt:389 | not_run · revalidation required |
 | android_control-f95af8f236e1e1 | onClick = { onSelect(QaHubPage.NEW_BUG) }, modifier = Modifier.size(62.dp).testTag("nav-new-bug"), shape = CircleShape, | apk | apps/android/app/src/main/kotlin/com/relayqahub/android/ui/FoundationScreen.kt:399 | passed · revalidation required |
 | android_control-dd9f1496114940 | Surface(onClick = onClick, modifier = modifier.fillMaxHeight(), color = Color.Transparent) { Column( modifier = Modifier.fillMaxSize().padding(top = 11.dp), | apk | apps/android/app/src/main/kotlin/com/relayqahub/android/ui/FoundationScreen.kt:430 | not_run · revalidation required |
-| android_control-e1d3f2cb7fca3d | onCheckedChange = { enabled -> if (enabled) onStartCaptureSession() else onStopCaptureSession() }, | apk | apps/android/app/src/main/kotlin/com/relayqahub/android/ui/FoundationScreen.kt:542 | not_run · revalidation required |
-| android_control-ef973454d585a1 | onClick = onStartCaptureSession, enabled = !active && !starting, modifier = Modifier.fillMaxWidth().testTag("start-capture"), | apk | apps/android/app/src/main/kotlin/com/relayqahub/android/ui/FoundationScreen.kt:555 | not_run · revalidation required |
-| android_control-490a72bb53f181 | onClick = onCaptureNow, enabled = active, modifier = Modifier.weight(1f).testTag("capture-now"), | apk | apps/android/app/src/main/kotlin/com/relayqahub/android/ui/FoundationScreen.kt:573 | not_run · revalidation required |
-| android_control-174f06380ad90a | onClick = onStopCaptureSession, enabled = active \|\| starting, modifier = Modifier.weight(1f).testTag("stop-capture"), | apk | apps/android/app/src/main/kotlin/com/relayqahub/android/ui/FoundationScreen.kt:580 | not_run · revalidation required |
+| android_control-e1d3f2cb7fca3d | onCheckedChange = { enabled -> if (enabled) onStartCaptureSession() else onStopCaptureSession() }, | apk | apps/android/app/src/main/kotlin/com/relayqahub/android/ui/FoundationScreen.kt:549 | not_run · revalidation required |
+| android_control-ef973454d585a1 | onClick = onStartCaptureSession, enabled = !active && !starting, modifier = Modifier.fillMaxWidth().testTag("start-capture"), | apk | apps/android/app/src/main/kotlin/com/relayqahub/android/ui/FoundationScreen.kt:562 | not_run · revalidation required |
+| android_control-490a72bb53f181 | onClick = onCaptureNow, enabled = active, modifier = Modifier.weight(1f).testTag("capture-now"), | apk | apps/android/app/src/main/kotlin/com/relayqahub/android/ui/FoundationScreen.kt:580 | not_run · revalidation required |
+| android_control-174f06380ad90a | onClick = onStopCaptureSession, enabled = active \|\| starting, modifier = Modifier.weight(1f).testTag("stop-capture"), | apk | apps/android/app/src/main/kotlin/com/relayqahub/android/ui/FoundationScreen.kt:587 | not_run · revalidation required |
 | android_control-286c8e46aab738 | onClick = onCheck, enabled = update.phase != "checking", modifier = Modifier.testTag("check-apk-update"), | apk | apps/android/app/src/main/kotlin/com/relayqahub/android/ui/FoundationScreen.kt:711 | not_run · revalidation required |
 | android_control-a36c942ecfc6b5 | onClick = onDownload, enabled = download.phase != "downloading" && download.phase != "installing", modifier = Modifier.fillMaxWidth().testTag("download-self-update"), | apk | apps/android/app/src/main/kotlin/com/relayqahub/android/ui/FoundationScreen.kt:723 | not_run · revalidation required |
 | android_control-54706ba0488349 | onClick = onRefresh, enabled = catalog.phase != "loading", modifier = Modifier.testTag("refresh-game-apks"), | apk | apps/android/app/src/main/kotlin/com/relayqahub/android/ui/FoundationScreen.kt:768 | not_run · revalidation required |
@@ -197,11 +196,12 @@ A = 此基线须通过该入口真实验收；— = 该条描述其他入口，�
 | android_control-43fecc575c56b9 | TextButton(onClick = { linkTarget = candidate }) { Text((if (linkTarget?.id == candidate.id) "✓ " else "") + candidate.name) } } } }, | apk | apps/android/app/src/main/kotlin/com/relayqahub/android/ui/ProjectToolsScreen.kt:90 | passed |
 | android_control-cad4fd5917bd51 | confirmButton = { TextButton(enabled = linkTarget != null && !busy, onClick = { val target = linkTarget ?: return@TextButton selectedUser = null; linkTarget = null | apk | apps/android/app/src/main/kotlin/com/relayqahub/android/ui/ProjectToolsScreen.kt:93 | passed |
 | android_control-fe76292b0913cc | }) { Text("关联") } }, dismissButton = { TextButton(onClick = { selectedUser = null; linkTarget = null }) { Text("取消") } }) } } | apk | apps/android/app/src/main/kotlin/com/relayqahub/android/ui/ProjectToolsScreen.kt:97 | not_run |
-| android_control-d535103c14e2f7 | TextButton(onClick = { projectPickerOpen = true }, enabled = !loginPending, modifier = Modifier.testTag("project-switch")) { Text("${currentProject.name} ▾") } DropdownMenu(expanded = projectPickerOpen, onDismissRequest = { projectPickerOpe | apk | apps/android/app/src/main/kotlin/com/relayqahub/android/ui/QaHubRoot.kt:118 | passed |
-| android_control-57f820b113ae4e | DropdownMenu(expanded = projectPickerOpen, onDismissRequest = { projectPickerOpen = false }) { projects.forEach { available -> DropdownMenuItem(text = { Text(available.name) }, onClick = { projectPickerOpen = false | apk | apps/android/app/src/main/kotlin/com/relayqahub/android/ui/QaHubRoot.kt:120 | not_run |
-| android_control-053937cef0ed1d | projects.forEach { available -> DropdownMenuItem(text = { Text(available.name) }, onClick = { projectPickerOpen = false if (available.id != currentProject.id) { | apk | apps/android/app/src/main/kotlin/com/relayqahub/android/ui/QaHubRoot.kt:121 | passed |
-| android_control-331c1002d7728f | TextButton(onClick = { toolsOpen = !toolsOpen }, modifier = Modifier.testTag("project-tools")) { Text(if (toolsOpen) "Bug 工作台" else "项目与组件") } | apk | apps/android/app/src/main/kotlin/com/relayqahub/android/ui/QaHubRoot.kt:131 | passed |
-| android_control-3eacdab8beec11 | Button(onClick = { onLogin(name) }, enabled = name.isNotBlank() && projectId.isNotBlank() && !pending, modifier = Modifier.fillMaxWidth().padding(top = 16.dp).testTag("identity-login")) { Text(if (pending) "正在进入项目…" else "进入项目") | apk | apps/android/app/src/main/kotlin/com/relayqahub/android/ui/QaHubRoot.kt:186 | passed |
+| android_control-d535103c14e2f7 | TextButton(onClick = { projectPickerOpen = true }, enabled = !loginPending, modifier = Modifier.testTag("project-switch")) { Text("${currentProject.name} ▾") } DropdownMenu(expanded = projectPickerOpen, onDismissRequest = { projectPickerOpe | apk | apps/android/app/src/main/kotlin/com/relayqahub/android/ui/QaHubRoot.kt:128 | passed · revalidation required |
+| android_control-57f820b113ae4e | DropdownMenu(expanded = projectPickerOpen, onDismissRequest = { projectPickerOpen = false }) { projects.forEach { available -> DropdownMenuItem(text = { Text(available.name) }, onClick = { projectPickerOpen = false | apk | apps/android/app/src/main/kotlin/com/relayqahub/android/ui/QaHubRoot.kt:130 | not_run · revalidation required |
+| android_control-053937cef0ed1d | projects.forEach { available -> DropdownMenuItem(text = { Text(available.name) }, onClick = { projectPickerOpen = false if (available.id != currentProject.id) { | apk | apps/android/app/src/main/kotlin/com/relayqahub/android/ui/QaHubRoot.kt:131 | passed · revalidation required |
+| android_control-e1a7c907c41e18 | onClick = { val destination = AuthenticatedSurface( page = foundationViewModel.uiState.value.page, | apk | apps/android/app/src/main/kotlin/com/relayqahub/android/ui/QaHubRoot.kt:143 | not_run · revalidation required |
+| android_control-331c1002d7728f | TextButton(onClick = { toolsOpen = !toolsOpen }, modifier = Modifier.testTag("project-tools")) { Text(if (toolsOpen) "Bug 工作台" else "项目与组件") } | apk | apps/android/app/src/main/kotlin/com/relayqahub/android/ui/QaHubRoot.kt:155 | passed · revalidation required |
+| android_control-3eacdab8beec11 | Button(onClick = { onLogin(name) }, enabled = name.isNotBlank() && projectId.isNotBlank() && !pending, modifier = Modifier.fillMaxWidth().padding(top = 16.dp).testTag("identity-login")) { Text(if (pending) "正在进入项目…" else "进入项目") | apk | apps/android/app/src/main/kotlin/com/relayqahub/android/ui/QaHubRoot.kt:211 | passed · revalidation required |
 | android_control-ddc3095eb2aa97 | TextButton(onClick = onBack) { Text("返回项目") } Text("第三方订单 · ${project.name}", style = MaterialTheme.typography.headlineSmall) if (!enabled) Text("组件未启用或待配置；历史 Bug 与本地状态不受影响。") | apk | apps/android/app/src/main/kotlin/com/relayqahub/android/ui/QingyuComponentScreen.kt:46 | not_run |
 | android_control-475d0e1e0a496c | Button(enabled = enabled && !busy, onClick = { perform { session = api.request("integrations/qingyu/login/start", token, "POST") } }) { Text("连接第三方账号") } val qrContent = session?.optJSONObject("login")?.optString("qrContent").orEmpty() val  | apk | apps/android/app/src/main/kotlin/com/relayqahub/android/ui/QingyuComponentScreen.kt:52 | not_run |
 | android_control-c1cbd00bd997ca | if (qrContent.isNotBlank()) TextButton(enabled = !busy, onClick = { perform { refreshSession(true) } }) { Text("已扫码，检查连接") } } else { Text("已连接：${session?.optJSONObject("user")?.optString("name").orEmpty()}") | apk | apps/android/app/src/main/kotlin/com/relayqahub/android/ui/QingyuComponentScreen.kt:62 | not_run |
@@ -226,7 +226,7 @@ A = 此基线须通过该入口真实验收；— = 该条描述其他入口，�
 | 测试 ID | 功能/入口 | 适用客户端 | 来源 | 状态 |
 | --- | --- | --- | --- | --- |
 | android_page_component-958057a4cdd2b9 | BugLifecyclePanel | apk | apps/android/app/src/main/kotlin/com/relayqahub/android/ui/BugLifecyclePanel.kt:33 | not_run · revalidation required |
-| android_page_component-ebfa3c65b63ee9 | RepairAttemptTerminalControls | apk | apps/android/app/src/main/kotlin/com/relayqahub/android/ui/BugLifecyclePanel.kt:645 | not_run · revalidation required |
+| android_page_component-ebfa3c65b63ee9 | RepairAttemptTerminalControls | apk | apps/android/app/src/main/kotlin/com/relayqahub/android/ui/BugLifecyclePanel.kt:616 | not_run · revalidation required |
 | android_page_component-b57d968a446aff | ComponentTaskScreen | apk | apps/android/app/src/main/kotlin/com/relayqahub/android/ui/ComponentTaskScreen.kt:19 | not_run · revalidation required |
 | android_page_component-40fd703b3305c9 | ComponentField | apk | apps/android/app/src/main/kotlin/com/relayqahub/android/ui/ComponentTaskScreen.kt:213 | not_run · revalidation required |
 | android_page_component-46524e95871465 | ComponentRecords | apk | apps/android/app/src/main/kotlin/com/relayqahub/android/ui/ComponentTaskScreen.kt:217 | not_run · revalidation required |
@@ -262,8 +262,8 @@ A = 此基线须通过该入口真实验收；— = 该条描述其他入口，�
 | android_page_component-6bb372ac194140 | AnnotationCanvas | apk | apps/android/app/src/main/kotlin/com/relayqahub/android/ui/FoundationScreen.kt:2305 | not_run · revalidation required |
 | android_page_component-8922a6200d8105 | PersonPicker | apk | apps/android/app/src/main/kotlin/com/relayqahub/android/ui/FoundationScreen.kt:2358 | not_run · revalidation required |
 | android_page_component-d0cd40a6f416d0 | ProjectToolsScreen | apk | apps/android/app/src/main/kotlin/com/relayqahub/android/ui/ProjectToolsScreen.kt:16 | not_run |
-| android_page_component-71f05acb34aaa9 | QaHubRoot | apk | apps/android/app/src/main/kotlin/com/relayqahub/android/ui/QaHubRoot.kt:24 | not_run |
-| android_page_component-2373e9cd9452a2 | IdentityGate | apk | apps/android/app/src/main/kotlin/com/relayqahub/android/ui/QaHubRoot.kt:164 | not_run |
+| android_page_component-71f05acb34aaa9 | QaHubRoot | apk | apps/android/app/src/main/kotlin/com/relayqahub/android/ui/QaHubRoot.kt:34 | not_run · revalidation required |
+| android_page_component-2373e9cd9452a2 | IdentityGate | apk | apps/android/app/src/main/kotlin/com/relayqahub/android/ui/QaHubRoot.kt:189 | not_run · revalidation required |
 | android_page_component-75a67328b6d818 | QingyuComponentScreen | apk | apps/android/app/src/main/kotlin/com/relayqahub/android/ui/QingyuComponentScreen.kt:21 | not_run |
 | android_page_component-76982dd5d1ca82 | RelayProductionScreen | apk | apps/android/app/src/main/kotlin/com/relayqahub/android/ui/RelayProductionScreen.kt:17 | not_run · revalidation required |
 | android_page_component-f6cc561bddb616 | QaHubTheme | apk | apps/android/app/src/main/kotlin/com/relayqahub/android/ui/Theme.kt:135 | not_run |
@@ -514,70 +514,73 @@ A = 此基线须通过该入口真实验收；— = 该条描述其他入口，�
 | http_route-d65bf262601bf6 | GET /api/v1/projects/:projectId/bugs/:id/integrations/qingyu | http | apps/api/src/project-components-runtime.ts:1596 | not_run · revalidation required |
 | http_route-def90a2a37e735 | POST /api/v1/bugs/:id/integrations/qingyu/resolve | http | apps/api/src/project-components-runtime.ts:1599 | not_run · revalidation required |
 | http_route-fb184b4887747c | POST /api/v1/projects/:projectId/bugs/:id/integrations/qingyu/resolve | http | apps/api/src/project-components-runtime.ts:1599 | not_run · revalidation required |
-| http_route-ba74efbe6c4a29 | GET /api/v1/projects/:projectId/bugs/:bugId/comments | http | apps/api/src/app.ts:666 | not_run · revalidation required |
-| http_route-e20df3cb12ff98 | GET /api/v1/integrations/qingyu/session | http | apps/api/src/app.ts:893 | not_run · revalidation required |
-| http_route-4d0d6a9945299e | POST /api/v1/integrations/qingyu/login/start | http | apps/api/src/app.ts:896 | not_run · revalidation required |
-| http_route-b16fff4e38476e | GET /api/v1/integrations/qingyu/login/status | http | apps/api/src/app.ts:899 | not_run · revalidation required |
-| http_route-0b9a05d3353c00 | POST /api/v1/integrations/qingyu/logout | http | apps/api/src/app.ts:902 | not_run · revalidation required |
-| http_route-fb4df5d6788e96 | GET /api/v1/integrations/qingyu/projects | http | apps/api/src/app.ts:905 | not_run · revalidation required |
-| http_route-734ef90385c2b4 | GET /api/v1/integrations/qingyu/defects | http | apps/api/src/app.ts:908 | not_run · revalidation required |
-| http_route-05c527f410d563 | POST /api/v1/integrations/qingyu/import | http | apps/api/src/app.ts:920 | not_run · revalidation required |
-| http_route-46019be68cb07c | GET /api/v1/bugs/:bugId/integrations/qingyu | http | apps/api/src/app.ts:943 | not_run · revalidation required |
-| http_route-488ec5565e8dbb | POST /api/v1/bugs/:bugId/integrations/qingyu/resolve | http | apps/api/src/app.ts:950 | not_run · revalidation required |
-| http_route-ce0b3ab5de0378 | GET /api/v1/health/live | http | apps/api/src/app.ts:975 | not_run · revalidation required |
-| http_route-26df99fae8d3cb | GET /api/v1/health/ready | http | apps/api/src/app.ts:987 | passed · revalidation required |
-| http_route-188681ac0da08e | GET /api/v1/health/deps | http | apps/api/src/app.ts:999 | not_run · revalidation required |
-| http_route-15d30cfca91ddc | GET /api/v1/projects | http | apps/api/src/app.ts:1022 | passed · revalidation required |
-| http_route-86a5dccd36f9b9 | GET /api/v1/projects/:projectId/members | http | apps/api/src/app.ts:1063 | not_run · revalidation required |
-| http_route-070fd3ccaaef52 | GET /api/v1/projects/:projectId/users | http | apps/api/src/app.ts:1108 | passed · revalidation required |
-| http_route-59983f06154358 | POST /api/v1/projects/:projectId/users/:userId/identity-link | http | apps/api/src/app.ts:1139 | passed · revalidation required |
-| http_route-9ffe2403f950fe | DELETE /api/v1/projects/:projectId/users/:userId/identity-link | http | apps/api/src/app.ts:1178 | passed · revalidation required |
-| http_route-a08902abfe6362 | DELETE /api/v1/projects/:projectId/users/:userId | http | apps/api/src/app.ts:1214 | not_run · revalidation required |
-| http_route-3941a7c4bf1de3 | GET /api/v1/projects/:projectId/modules | http | apps/api/src/app.ts:1250 | passed · revalidation required |
-| http_route-28fa750120b0f6 | GET /api/v1/projects/:projectId/metrics/overview | http | apps/api/src/app.ts:1282 | passed · revalidation required |
-| http_route-b1edbd66a463bf | POST /api/v1/integrations/relay/webhooks | http | apps/api/src/app.ts:1318 | not_run · revalidation required |
-| http_route-869c95e9cb22b6 | POST /api/v1/bugs | http | apps/api/src/app.ts:1431 | passed · revalidation required |
-| http_route-fc68d4ec88b267 | GET /api/v1/bugs | http | apps/api/src/app.ts:1464 | passed · revalidation required |
-| http_route-c5244a2b94ee13 | GET /api/v1/bugs/:bugId | http | apps/api/src/app.ts:1509 | passed · revalidation required |
-| http_route-662ac1e4f068be | GET /api/v1/bugs/:bugId/attachments | http | apps/api/src/app.ts:1524 | passed · revalidation required |
-| http_route-f2b76a8f2d3bd2 | GET /api/v1/attachments/:attachmentId | http | apps/api/src/app.ts:1562 | passed · revalidation required |
-| http_route-a04ed67480846a | GET /api/v1/bugs/:bugId/capture-bundles/:captureId/artifacts/:artifactKind | http | apps/api/src/app.ts:1599 | not_run · revalidation required |
-| http_route-7cbbf0261f199e | PATCH /api/v1/bugs/:bugId | http | apps/api/src/app.ts:1637 | passed · revalidation required |
-| http_route-3f8b6d79c3ec5a | DELETE /api/v1/bugs/:bugId | http | apps/api/src/app.ts:1678 | passed · revalidation required |
-| http_route-ece15477c6d8f2 | GET /api/v1/bugs/:bugId/duplicate-candidates | http | apps/api/src/app.ts:1729 | not_run · revalidation required |
-| http_route-fa0ad66b7c6d55 | POST /api/v1/bugs/:bugId/mark-duplicate | http | apps/api/src/app.ts:1761 | not_run · revalidation required |
-| http_route-b1421894d26272 | POST /api/v1/repair-attempts/:attemptId/fail | http | apps/api/src/app.ts:1871 | not_run · revalidation required |
-| http_route-3b27488bbdc5e6 | POST /api/v1/repair-attempts/:attemptId/supersede | http | apps/api/src/app.ts:1871 | not_run · revalidation required |
-| http_route-280fa057c65980 | POST /api/v1/bugs/:bugId/transitions | http | apps/api/src/app.ts:1935 | passed · revalidation required |
-| http_route-1c63e6c6d88251 | POST /api/v1/bugs/:bugId/complete | http | apps/api/src/app.ts:1960 | not_run · revalidation required |
-| http_route-91587d5ccb9fcd | POST /api/v1/bugs/:bugId/manual-complete | http | apps/api/src/app.ts:1985 | passed · revalidation required |
-| http_route-133e8410ae7ef7 | POST /api/v1/bugs/:bugId/repair-attempts | http | apps/api/src/app.ts:2013 | passed · revalidation required |
-| http_route-45735bc8af628d | POST /api/v1/repair-attempts/:attemptId/start | http | apps/api/src/app.ts:2110 | passed · revalidation required |
-| http_route-41e2d865a8623c | GET /api/v1/repair-attempts/:attemptId | http | apps/api/src/app.ts:2143 | passed · revalidation required |
-| http_route-144efd0c9334b8 | POST /api/v1/repair-attempts/:attemptId/deliver | http | apps/api/src/app.ts:2163 | passed · revalidation required |
-| http_route-db5ad310cd3847 | POST /api/v1/repair-attempts/:attemptId/dispatch/relay | http | apps/api/src/app.ts:2196 | not_run · revalidation required |
-| http_route-5e57e964b1adfd | POST /api/v1/repair-attempts/:attemptId/dispatch/relay/continue | http | apps/api/src/app.ts:2224 | not_run · revalidation required |
-| http_route-76ef6845b5667f | GET /api/v1/repair-attempts/:attemptId/relay-receipt | http | apps/api/src/app.ts:2252 | not_run · revalidation required |
-| http_route-458b653f20c1e7 | GET /api/v1/projects/:projectId/human-workflows/latest | http | apps/api/src/app.ts:2339 | not_run · revalidation required |
-| http_route-58b6388e1f18b2 | GET /api/v1/bugs/:bugId/human-workflow | http | apps/api/src/app.ts:2364 | passed · revalidation required |
-| http_route-9b7f74dec2b2b9 | GET /api/v1/bugs/:bugId/comments | http | apps/api/src/app.ts:2380 | passed · revalidation required |
-| http_route-9b794c870fa8c4 | POST /api/v1/bugs/:bugId/comments | http | apps/api/src/app.ts:2402 | passed · revalidation required |
-| http_route-c72542c420f961 | GET /api/v1/bugs/:bugId/events | http | apps/api/src/app.ts:2445 | passed · revalidation required |
-| http_route-a69cbb8894b7a0 | GET /api/v1/projects/:projectId/builds | http | apps/api/src/app.ts:2472 | not_run · revalidation required |
-| http_route-845f3dd811fe15 | POST /api/v1/projects/:projectId/builds | http | apps/api/src/app.ts:2499 | not_run · revalidation required |
-| http_route-0b655a74e571ea | GET /api/v1/builds/:buildId | http | apps/api/src/app.ts:2530 | not_run · revalidation required |
-| http_route-9294236825da5b | POST /api/v1/builds/:buildId/link-repair | http | apps/api/src/app.ts:2547 | not_run · revalidation required |
-| http_route-8d683a24515c8d | POST /api/v1/bugs/:bugId/verifications | http | apps/api/src/app.ts:2578 | passed · revalidation required |
-| http_route-36af4a3289727c | GET /api/v1/verifications/:verificationId | http | apps/api/src/app.ts:2610 | passed · revalidation required |
-| http_route-d250196281a746 | POST /api/v1/verifications/:verificationId/start | http | apps/api/src/app.ts:2633 | passed · revalidation required |
-| http_route-71b69634fdaab2 | POST /api/v1/verifications/:verificationId/result | http | apps/api/src/app.ts:2667 | passed · revalidation required |
-| http_route-b83c2fe59f4e18 | GET /api/v1/notifications | http | apps/api/src/app.ts:2731 | not_run · revalidation required |
-| http_route-ac6d99044543fe | POST /api/v1/capture-bundles | http | apps/api/src/app.ts:2777 | not_run · revalidation required |
-| http_route-b549a49f407c27 | GET /api/v1/capture-bundles/:captureId | http | apps/api/src/app.ts:2819 | not_run · revalidation required |
-| http_route-52f4781153b6ba | POST /api/v1/uploads/init | http | apps/api/src/app.ts:2834 | not_run · revalidation required |
-| http_route-1aed7cd39c68f5 | PUT /api/v1/uploads/:sessionId/chunks/:chunkNumber | http | apps/api/src/app.ts:2868 | not_run · revalidation required |
-| http_route-fa84a8b7df5b30 | POST /api/v1/uploads/:sessionId/finalize | http | apps/api/src/app.ts:2922 | not_run · revalidation required |
-| http_route-45b4878978d031 | POST /api/v1/attachments/:attachmentId/bind | http | apps/api/src/app.ts:2966 | passed · revalidation required |
+| http_route-ba74efbe6c4a29 | GET /api/v1/projects/:projectId/bugs/:bugId/comments | http | apps/api/src/app.ts:681 | not_run · revalidation required |
+| http_route-e20df3cb12ff98 | GET /api/v1/integrations/qingyu/session | http | apps/api/src/app.ts:908 | not_run · revalidation required |
+| http_route-4d0d6a9945299e | POST /api/v1/integrations/qingyu/login/start | http | apps/api/src/app.ts:911 | not_run · revalidation required |
+| http_route-b16fff4e38476e | GET /api/v1/integrations/qingyu/login/status | http | apps/api/src/app.ts:914 | not_run · revalidation required |
+| http_route-0b9a05d3353c00 | POST /api/v1/integrations/qingyu/logout | http | apps/api/src/app.ts:917 | not_run · revalidation required |
+| http_route-fb4df5d6788e96 | GET /api/v1/integrations/qingyu/projects | http | apps/api/src/app.ts:920 | not_run · revalidation required |
+| http_route-734ef90385c2b4 | GET /api/v1/integrations/qingyu/defects | http | apps/api/src/app.ts:923 | not_run · revalidation required |
+| http_route-05c527f410d563 | POST /api/v1/integrations/qingyu/import | http | apps/api/src/app.ts:935 | not_run · revalidation required |
+| http_route-46019be68cb07c | GET /api/v1/bugs/:bugId/integrations/qingyu | http | apps/api/src/app.ts:958 | not_run · revalidation required |
+| http_route-488ec5565e8dbb | POST /api/v1/bugs/:bugId/integrations/qingyu/resolve | http | apps/api/src/app.ts:965 | not_run · revalidation required |
+| http_route-ce0b3ab5de0378 | GET /api/v1/health/live | http | apps/api/src/app.ts:990 | not_run · revalidation required |
+| http_route-26df99fae8d3cb | GET /api/v1/health/ready | http | apps/api/src/app.ts:1002 | passed · revalidation required |
+| http_route-188681ac0da08e | GET /api/v1/health/deps | http | apps/api/src/app.ts:1014 | not_run · revalidation required |
+| http_route-15d30cfca91ddc | GET /api/v1/projects | http | apps/api/src/app.ts:1037 | passed · revalidation required |
+| http_route-86a5dccd36f9b9 | GET /api/v1/projects/:projectId/members | http | apps/api/src/app.ts:1078 | not_run · revalidation required |
+| http_route-070fd3ccaaef52 | GET /api/v1/projects/:projectId/users | http | apps/api/src/app.ts:1123 | passed · revalidation required |
+| http_route-59983f06154358 | POST /api/v1/projects/:projectId/users/:userId/identity-link | http | apps/api/src/app.ts:1154 | passed · revalidation required |
+| http_route-9ffe2403f950fe | DELETE /api/v1/projects/:projectId/users/:userId/identity-link | http | apps/api/src/app.ts:1193 | passed · revalidation required |
+| http_route-a08902abfe6362 | DELETE /api/v1/projects/:projectId/users/:userId | http | apps/api/src/app.ts:1229 | not_run · revalidation required |
+| http_route-3941a7c4bf1de3 | GET /api/v1/projects/:projectId/modules | http | apps/api/src/app.ts:1265 | passed · revalidation required |
+| http_route-28fa750120b0f6 | GET /api/v1/projects/:projectId/metrics/overview | http | apps/api/src/app.ts:1297 | passed · revalidation required |
+| http_route-b1edbd66a463bf | POST /api/v1/integrations/relay/webhooks | http | apps/api/src/app.ts:1333 | not_run · revalidation required |
+| http_route-869c95e9cb22b6 | POST /api/v1/bugs | http | apps/api/src/app.ts:1446 | passed · revalidation required |
+| http_route-fc68d4ec88b267 | GET /api/v1/bugs | http | apps/api/src/app.ts:1479 | passed · revalidation required |
+| http_route-c5244a2b94ee13 | GET /api/v1/bugs/:bugId | http | apps/api/src/app.ts:1524 | passed · revalidation required |
+| http_route-662ac1e4f068be | GET /api/v1/bugs/:bugId/attachments | http | apps/api/src/app.ts:1539 | passed · revalidation required |
+| http_route-f2b76a8f2d3bd2 | GET /api/v1/attachments/:attachmentId | http | apps/api/src/app.ts:1577 | passed · revalidation required |
+| http_route-a04ed67480846a | GET /api/v1/bugs/:bugId/capture-bundles/:captureId/artifacts/:artifactKind | http | apps/api/src/app.ts:1614 | not_run · revalidation required |
+| http_route-7cbbf0261f199e | PATCH /api/v1/bugs/:bugId | http | apps/api/src/app.ts:1652 | passed · revalidation required |
+| http_route-3f8b6d79c3ec5a | DELETE /api/v1/bugs/:bugId | http | apps/api/src/app.ts:1693 | passed · revalidation required |
+| http_route-ece15477c6d8f2 | GET /api/v1/bugs/:bugId/duplicate-candidates | http | apps/api/src/app.ts:1744 | not_run · revalidation required |
+| http_route-fa0ad66b7c6d55 | POST /api/v1/bugs/:bugId/mark-duplicate | http | apps/api/src/app.ts:1776 | not_run · revalidation required |
+| http_route-b1421894d26272 | POST /api/v1/repair-attempts/:attemptId/fail | http | apps/api/src/app.ts:1886 | not_run · revalidation required |
+| http_route-3b27488bbdc5e6 | POST /api/v1/repair-attempts/:attemptId/supersede | http | apps/api/src/app.ts:1886 | not_run · revalidation required |
+| http_route-280fa057c65980 | POST /api/v1/bugs/:bugId/transitions | http | apps/api/src/app.ts:1950 | passed · revalidation required |
+| http_route-1c63e6c6d88251 | POST /api/v1/bugs/:bugId/complete | http | apps/api/src/app.ts:1975 | not_run · revalidation required |
+| http_route-91587d5ccb9fcd | POST /api/v1/bugs/:bugId/manual-complete | http | apps/api/src/app.ts:2000 | passed · revalidation required |
+| http_route-133e8410ae7ef7 | POST /api/v1/bugs/:bugId/repair-attempts | http | apps/api/src/app.ts:2028 | passed · revalidation required |
+| http_route-45735bc8af628d | POST /api/v1/repair-attempts/:attemptId/start | http | apps/api/src/app.ts:2125 | passed · revalidation required |
+| http_route-41e2d865a8623c | GET /api/v1/repair-attempts/:attemptId | http | apps/api/src/app.ts:2158 | passed · revalidation required |
+| http_route-144efd0c9334b8 | POST /api/v1/repair-attempts/:attemptId/deliver | http | apps/api/src/app.ts:2178 | passed · revalidation required |
+| http_route-db5ad310cd3847 | POST /api/v1/repair-attempts/:attemptId/dispatch/relay | http | apps/api/src/app.ts:2211 | not_run · revalidation required |
+| http_route-5e57e964b1adfd | POST /api/v1/repair-attempts/:attemptId/dispatch/relay/continue | http | apps/api/src/app.ts:2239 | not_run · revalidation required |
+| http_route-76ef6845b5667f | GET /api/v1/repair-attempts/:attemptId/relay-receipt | http | apps/api/src/app.ts:2267 | not_run · revalidation required |
+| http_route-458b653f20c1e7 | GET /api/v1/projects/:projectId/human-workflows/latest | http | apps/api/src/app.ts:2354 | not_run · revalidation required |
+| http_route-58b6388e1f18b2 | GET /api/v1/bugs/:bugId/human-workflow | http | apps/api/src/app.ts:2379 | passed · revalidation required |
+| http_route-9b7f74dec2b2b9 | GET /api/v1/bugs/:bugId/comments | http | apps/api/src/app.ts:2395 | passed · revalidation required |
+| http_route-9b794c870fa8c4 | POST /api/v1/bugs/:bugId/comments | http | apps/api/src/app.ts:2417 | passed · revalidation required |
+| http_route-c72542c420f961 | GET /api/v1/bugs/:bugId/events | http | apps/api/src/app.ts:2460 | passed · revalidation required |
+| http_route-a69cbb8894b7a0 | GET /api/v1/projects/:projectId/builds | http | apps/api/src/app.ts:2487 | not_run · revalidation required |
+| http_route-845f3dd811fe15 | POST /api/v1/projects/:projectId/builds | http | apps/api/src/app.ts:2514 | not_run · revalidation required |
+| http_route-0b655a74e571ea | GET /api/v1/builds/:buildId | http | apps/api/src/app.ts:2545 | not_run · revalidation required |
+| http_route-9294236825da5b | POST /api/v1/builds/:buildId/link-repair | http | apps/api/src/app.ts:2562 | not_run · revalidation required |
+| http_route-8d683a24515c8d | POST /api/v1/bugs/:bugId/verifications | http | apps/api/src/app.ts:2593 | passed · revalidation required |
+| http_route-36af4a3289727c | GET /api/v1/verifications/:verificationId | http | apps/api/src/app.ts:2625 | passed · revalidation required |
+| http_route-d250196281a746 | POST /api/v1/verifications/:verificationId/start | http | apps/api/src/app.ts:2648 | passed · revalidation required |
+| http_route-71b69634fdaab2 | POST /api/v1/verifications/:verificationId/result | http | apps/api/src/app.ts:2682 | passed · revalidation required |
+| http_route-b83c2fe59f4e18 | GET /api/v1/notifications | http | apps/api/src/app.ts:2746 | not_run · revalidation required |
+| http_route-21efab473908d4 | POST /api/v1/notifications/:notificationId/read | http | apps/api/src/app.ts:2792 | not_run · revalidation required |
+| http_route-ac6d99044543fe | POST /api/v1/capture-bundles | http | apps/api/src/app.ts:2826 | not_run · revalidation required |
+| http_route-b549a49f407c27 | GET /api/v1/capture-bundles/:captureId | http | apps/api/src/app.ts:2868 | not_run · revalidation required |
+| http_route-65badca5cd2de0 | GET /api/v1/uploads/:sessionId | http | apps/api/src/app.ts:2883 | not_run · revalidation required |
+| http_route-52f4781153b6ba | POST /api/v1/uploads/init | http | apps/api/src/app.ts:2920 | not_run · revalidation required |
+| http_route-1aed7cd39c68f5 | PUT /api/v1/uploads/:sessionId/chunks/:chunkNumber | http | apps/api/src/app.ts:2954 | not_run · revalidation required |
+| http_route-fa84a8b7df5b30 | POST /api/v1/uploads/:sessionId/finalize | http | apps/api/src/app.ts:3008 | not_run · revalidation required |
+| http_route-45b4878978d031 | POST /api/v1/attachments/:attachmentId/bind | http | apps/api/src/app.ts:3052 | passed · revalidation required |
+| http_route-2499bd52bcbab1 | GET /api/v1/attachments/:attachmentId/metadata | http | apps/api/src/app.ts:3090 | not_run · revalidation required |
 
 ## mcp_tool
 

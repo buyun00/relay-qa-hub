@@ -1,0 +1,40 @@
+  * Task{703a260 #152 type=standard A=10051:com.relayqahub.android.preview.debug U=0 visible=true visibleRequested=true mode=fullscreen translucent=false sz=1}
+    topResumedActivity=ActivityRecord{240440931 u0 com.relayqahub.android.preview.debug/com.relayqahub.android.MainActivity t152}
+    * Hist  #0: ActivityRecord{240440931 u0 com.relayqahub.android.preview.debug/com.relayqahub.android.MainActivity t152}
+      packageName=com.relayqahub.android.preview.debug processName=com.relayqahub.android.preview.debug
+      app=ProcessRecord{2cd8c51 52177:com.relayqahub.android.preview.debug/u0a51}
+      Intent { act=android.intent.action.MAIN cat=[android.intent.category.LAUNCHER] flg=0x10200000 cmp=com.relayqahub.android.preview.debug/com.relayqahub.android.MainActivity }
+      rootOfTask=true task=Task{703a260 #152 type=standard A=10051:com.relayqahub.android.preview.debug}
+      taskAffinity=10051:com.relayqahub.android.preview.debug
+      mActivityComponent=com.relayqahub.android.preview.debug/com.relayqahub.android.MainActivity
+      baseDir=/data/app/~~9q1A_NfnIRLW3kJpzZEDjg==/com.relayqahub.android.preview.debug-YSMO5yL3bMuFiVY_73qvcw==/base.apk
+      dataDir=/data/user/0/com.relayqahub.android.preview.debug
+      windows=[Window{f002050 u0 com.relayqahub.android.preview.debug/com.relayqahub.android.MainActivity}]
+    Resumed: ActivityRecord{240440931 u0 com.relayqahub.android.preview.debug/com.relayqahub.android.MainActivity t152}
+  ResumedActivity: ActivityRecord{240440931 u0 com.relayqahub.android.preview.debug/com.relayqahub.android.MainActivity t152}
+  topDisplayFocusedRootTask=Task{703a260 #152 type=standard A=10051:com.relayqahub.android.preview.debug}
+  deepestLastOrientationSource=ActivityRecord{240440931 u0 com.relayqahub.android.preview.debug/com.relayqahub.android.MainActivity t152}
+  mCurrentFocus=Window{f002050 u0 com.relayqahub.android.preview.debug/com.relayqahub.android.MainActivity}
+  mFocusedApp=ActivityRecord{240440931 u0 com.relayqahub.android.preview.debug/com.relayqahub.android.MainActivity t152}
+  mObscuringWindow=Window{f002050 u0 com.relayqahub.android.preview.debug/com.relayqahub.android.MainActivity}
+  mLastWakeLockObscuringWindow=Window{6ad3a6c u0 com.relayqahub.android.preview.debug/com.relayqahub.android.MainActivity EXITING}
+      mPreferredTopFocusableRootTask=Task{703a260 #152 type=standard A=10051:com.relayqahub.android.preview.debug}
+      mLastFocusedRootTask=Task{703a260 #152 type=standard A=10051:com.relayqahub.android.preview.debug}
+      * Task{703a260 #152 type=standard A=10051:com.relayqahub.android.preview.debug U=0 visible=true visibleRequested=true mode=fullscreen translucent=false sz=1}
+        * ActivityRecord{240440931 u0 com.relayqahub.android.preview.debug/com.relayqahub.android.MainActivity t152}
+    mFocusedWindow=Window{f002050 u0 com.relayqahub.android.preview.debug/com.relayqahub.android.MainActivity}
+    mTopFullscreenOpaqueWindowState=Window{f002050 u0 com.relayqahub.android.preview.debug/com.relayqahub.android.MainActivity}
+    mSystemBarColorApps={ActivityRecord{240440931 u0 com.relayqahub.android.preview.debug/com.relayqahub.android.MainActivity t152}}
+      Window{f002050 u0 com.relayqahub.android.preview.debug/com.relayqahub.android.MainActivity}
+        source=ActivityRecord{113284527 u0 com.relayqahub.android.preview.debug/com.relayqahub.android.MainActivity t150} SCREEN_ORIENTATION_UNSPECIFIED
+        source=ActivityRecord{234738123 u0 com.relayqahub.android.preview.debug/com.relayqahub.android.MainActivity t151} SCREEN_ORIENTATION_UNSPECIFIED
+        source=ActivityRecord{234738123 u0 com.relayqahub.android.preview.debug/com.relayqahub.android.MainActivity t151} SCREEN_ORIENTATION_UNSPECIFIED
+        source=ActivityRecord{234738123 u0 com.relayqahub.android.preview.debug/com.relayqahub.android.MainActivity t151} SCREEN_ORIENTATION_UNSPECIFIED
+      Window{f002050 u0 com.relayqahub.android.preview.debug/com.relayqahub.android.MainActivity}:
+        mAdapter=ControlAdapter mCapturedLeash=Surface(name=Surface(name=b973d7c InputMethod)/@0x58e65a - animation-leash of insets_animation)/@0xb354b1e
+        mControlTarget=Window{f002050 u0 com.relayqahub.android.preview.debug/com.relayqahub.android.MainActivity}
+        mAdapter=ControlAdapter mCapturedLeash=Surface(name=Surface(name=a6fa835 StatusBar)/@0x3f6f513 - animation-leash of insets_animation)/@0x9c84fff
+        mControlTarget=Window{f002050 u0 com.relayqahub.android.preview.debug/com.relayqahub.android.MainActivity}
+  mFocusedApp=null
+        (fullscreen) Task{703a260 #152 type=standard A=10051:com.relayqahub.android.preview.debug}
+  VisibleActivityProcess:[ ProcessRecord{2cd8c51 52177:com.relayqahub.android.preview.debug/u0a51}]

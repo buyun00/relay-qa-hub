@@ -1,0 +1,325 @@
+{
+  "schemaVersion": 1,
+  "startedAt": "2026-09-10T07:53:12.790Z",
+  "completedAt": "2026-09-10T07:53:12.973Z",
+  "apiOrigin": "http://127.0.0.1:4639",
+  "sourceCommit": "88a6d0f9c31106f6cd3fc9edbadca0db6bf6397b",
+  "isolatedOnly": true,
+  "credentialsPersisted": false,
+  "projects": {
+    "a": {
+      "id": "d84b0cd8-9bc4-49b3-854d-47027a71a146",
+      "key": "V21ATV8D00M",
+      "userId": "ea52638a-08f1-4dfa-8e62-6cca54645063"
+    },
+    "b": {
+      "id": "fddeaf6e-83be-48ae-9a28-59ff06e2bc2a",
+      "key": "V21BTV8D00M",
+      "userId": "c463cb4d-0b37-4a7a-8aef-1924474ffe59"
+    }
+  },
+  "upload": {
+    "sessionId": "f6bdea96-c49d-493b-ad37-b1b2eeff00cb",
+    "attachmentId": "8839ba43-a793-4657-9eb4-ab8de94cc1d5",
+    "clientSubmissionId": "99a7a244-7b26-4e4a-842b-787d4498a206",
+    "clientAttachmentId": "e9337596-aef9-46eb-8d6f-4ef40dee346b",
+    "bytes": 68,
+    "sha256": "6b1048f8a6d40bac0b2954c18fefa40c4ea7a96120fc2e54b7317c0e43c2bbec",
+    "transitions": [
+      {
+        "status": "open",
+        "version": 1
+      },
+      {
+        "status": "finalizing",
+        "version": 2
+      },
+      {
+        "status": "finalized",
+        "version": 3
+      }
+    ],
+    "metadataVersions": {
+      "unbound": 3,
+      "reserved": 4,
+      "claimed": 5
+    }
+  },
+  "bug": {
+    "id": "516e4c4d-8d65-4cea-882e-153692840b00",
+    "key": "V21ATV8D00M-1",
+    "version": 1
+  },
+  "notification": {
+    "id": "136609dd-a8cf-4992-a35c-36426ac72a6f",
+    "versionBefore": 1,
+    "versionAfter": 2,
+    "readAt": "2026-09-10T07:53:12.938Z",
+    "exactReplay": true,
+    "removedFromUnread": true,
+    "persistedAfterRead": true
+  },
+  "negativeProbes": [
+    {
+      "label": "upload-project-isolation",
+      "method": "GET",
+      "path": "/api/v1/uploads/f6bdea96-c49d-493b-ad37-b1b2eeff00cb",
+      "status": 404
+    },
+    {
+      "label": "metadata-project-isolation",
+      "method": "GET",
+      "path": "/api/v1/attachments/8839ba43-a793-4657-9eb4-ab8de94cc1d5/metadata",
+      "status": 404
+    },
+    {
+      "label": "upload-unauthenticated",
+      "method": "GET",
+      "path": "/api/v1/uploads/f6bdea96-c49d-493b-ad37-b1b2eeff00cb",
+      "status": 401
+    },
+    {
+      "label": "metadata-unauthenticated",
+      "method": "GET",
+      "path": "/api/v1/attachments/8839ba43-a793-4657-9eb4-ab8de94cc1d5/metadata",
+      "status": 401
+    },
+    {
+      "label": "upload-malformed-uuid",
+      "method": "GET",
+      "path": "/api/v1/uploads/not-a-uuid",
+      "status": 400
+    },
+    {
+      "label": "notification-project-isolation",
+      "method": "POST",
+      "path": "/api/v1/notifications/136609dd-a8cf-4992-a35c-36426ac72a6f/read",
+      "status": 404
+    },
+    {
+      "label": "notification-unauthenticated",
+      "method": "POST",
+      "path": "/api/v1/notifications/136609dd-a8cf-4992-a35c-36426ac72a6f/read",
+      "status": 401
+    },
+    {
+      "label": "notification-read-key-mismatch",
+      "method": "POST",
+      "path": "/api/v1/notifications/136609dd-a8cf-4992-a35c-36426ac72a6f/read",
+      "status": 409
+    },
+    {
+      "label": "notification-read-stale-version",
+      "method": "POST",
+      "path": "/api/v1/notifications/136609dd-a8cf-4992-a35c-36426ac72a6f/read",
+      "status": 412
+    }
+  ],
+  "cleanup": [
+    {
+      "projectId": "d84b0cd8-9bc4-49b3-854d-47027a71a146",
+      "priorVersion": 1,
+      "finalVersion": 2
+    },
+    {
+      "projectId": "fddeaf6e-83be-48ae-9a28-59ff06e2bc2a",
+      "priorVersion": 1,
+      "finalVersion": 2
+    }
+  ],
+  "ledger": [
+    {
+      "label": "gm-login",
+      "method": "POST",
+      "path": "/api/v1/auth/gm/login",
+      "status": 200
+    },
+    {
+      "label": "create-project-a",
+      "method": "POST",
+      "path": "/api/v1/gm/projects",
+      "status": 200
+    },
+    {
+      "label": "create-project-b",
+      "method": "POST",
+      "path": "/api/v1/gm/projects",
+      "status": 200
+    },
+    {
+      "label": "login-project-a",
+      "method": "POST",
+      "path": "/api/v1/auth/login",
+      "status": 200
+    },
+    {
+      "label": "login-project-b",
+      "method": "POST",
+      "path": "/api/v1/auth/login",
+      "status": 200
+    },
+    {
+      "label": "upload-init",
+      "method": "POST",
+      "path": "/api/v1/uploads/init",
+      "status": 201
+    },
+    {
+      "label": "upload-chunk-lost-ack",
+      "method": "PUT",
+      "path": "/api/v1/uploads/f6bdea96-c49d-493b-ad37-b1b2eeff00cb/chunks/0",
+      "status": 204
+    },
+    {
+      "label": "recover-chunk-receipt",
+      "method": "GET",
+      "path": "/api/v1/uploads/f6bdea96-c49d-493b-ad37-b1b2eeff00cb",
+      "status": 200
+    },
+    {
+      "label": "upload-finalize-lost-ack",
+      "method": "POST",
+      "path": "/api/v1/uploads/f6bdea96-c49d-493b-ad37-b1b2eeff00cb/finalize",
+      "status": 200
+    },
+    {
+      "label": "recover-finalize-receipt",
+      "method": "GET",
+      "path": "/api/v1/uploads/f6bdea96-c49d-493b-ad37-b1b2eeff00cb",
+      "status": 200
+    },
+    {
+      "label": "metadata-unbound",
+      "method": "GET",
+      "path": "/api/v1/attachments/8839ba43-a793-4657-9eb4-ab8de94cc1d5/metadata",
+      "status": 200
+    },
+    {
+      "label": "attachment-bind",
+      "method": "POST",
+      "path": "/api/v1/attachments/8839ba43-a793-4657-9eb4-ab8de94cc1d5/bind",
+      "status": 200
+    },
+    {
+      "label": "metadata-reserved",
+      "method": "GET",
+      "path": "/api/v1/attachments/8839ba43-a793-4657-9eb4-ab8de94cc1d5/metadata",
+      "status": 200
+    },
+    {
+      "label": "create-bug-and-claim",
+      "method": "POST",
+      "path": "/api/v1/bugs",
+      "status": 201
+    },
+    {
+      "label": "metadata-claimed",
+      "method": "GET",
+      "path": "/api/v1/attachments/8839ba43-a793-4657-9eb4-ab8de94cc1d5/metadata",
+      "status": 200
+    },
+    {
+      "label": "upload-project-isolation",
+      "method": "GET",
+      "path": "/api/v1/uploads/f6bdea96-c49d-493b-ad37-b1b2eeff00cb",
+      "status": 404
+    },
+    {
+      "label": "metadata-project-isolation",
+      "method": "GET",
+      "path": "/api/v1/attachments/8839ba43-a793-4657-9eb4-ab8de94cc1d5/metadata",
+      "status": 404
+    },
+    {
+      "label": "upload-unauthenticated",
+      "method": "GET",
+      "path": "/api/v1/uploads/f6bdea96-c49d-493b-ad37-b1b2eeff00cb",
+      "status": 401
+    },
+    {
+      "label": "metadata-unauthenticated",
+      "method": "GET",
+      "path": "/api/v1/attachments/8839ba43-a793-4657-9eb4-ab8de94cc1d5/metadata",
+      "status": 401
+    },
+    {
+      "label": "upload-malformed-uuid",
+      "method": "GET",
+      "path": "/api/v1/uploads/not-a-uuid",
+      "status": 400
+    },
+    {
+      "label": "notifications-before-read",
+      "method": "GET",
+      "path": "/api/v1/notifications?projectId=d84b0cd8-9bc4-49b3-854d-47027a71a146&limit=100",
+      "status": 200
+    },
+    {
+      "label": "notification-project-isolation",
+      "method": "POST",
+      "path": "/api/v1/notifications/136609dd-a8cf-4992-a35c-36426ac72a6f/read",
+      "status": 404
+    },
+    {
+      "label": "notification-unauthenticated",
+      "method": "POST",
+      "path": "/api/v1/notifications/136609dd-a8cf-4992-a35c-36426ac72a6f/read",
+      "status": 401
+    },
+    {
+      "label": "notification-read",
+      "method": "POST",
+      "path": "/api/v1/notifications/136609dd-a8cf-4992-a35c-36426ac72a6f/read",
+      "status": 200
+    },
+    {
+      "label": "notification-read-replay",
+      "method": "POST",
+      "path": "/api/v1/notifications/136609dd-a8cf-4992-a35c-36426ac72a6f/read",
+      "status": 200
+    },
+    {
+      "label": "notification-read-key-mismatch",
+      "method": "POST",
+      "path": "/api/v1/notifications/136609dd-a8cf-4992-a35c-36426ac72a6f/read",
+      "status": 409
+    },
+    {
+      "label": "notification-read-stale-version",
+      "method": "POST",
+      "path": "/api/v1/notifications/136609dd-a8cf-4992-a35c-36426ac72a6f/read",
+      "status": 412
+    },
+    {
+      "label": "notifications-unread-after-read",
+      "method": "GET",
+      "path": "/api/v1/notifications?projectId=d84b0cd8-9bc4-49b3-854d-47027a71a146&unreadOnly=true&limit=100",
+      "status": 200
+    },
+    {
+      "label": "notifications-all-after-read",
+      "method": "GET",
+      "path": "/api/v1/notifications?projectId=d84b0cd8-9bc4-49b3-854d-47027a71a146&limit=100",
+      "status": 200
+    },
+    {
+      "label": "list-projects-for-cleanup",
+      "method": "GET",
+      "path": "/api/v1/gm/projects",
+      "status": 200
+    },
+    {
+      "label": "deactivate-project-a",
+      "method": "PATCH",
+      "path": "/api/v1/gm/projects/d84b0cd8-9bc4-49b3-854d-47027a71a146",
+      "status": 200
+    },
+    {
+      "label": "deactivate-project-b",
+      "method": "PATCH",
+      "path": "/api/v1/gm/projects/fddeaf6e-83be-48ae-9a28-59ff06e2bc2a",
+      "status": 200
+    }
+  ],
+  "assertionsPassed": true
+}

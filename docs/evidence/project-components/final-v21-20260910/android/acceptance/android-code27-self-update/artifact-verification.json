@@ -1,0 +1,60 @@
+{
+  "schemaVersion": 1,
+  "status": "passed",
+  "recordedAt": "2026-09-10T06:10:12.397Z",
+  "sourceCommit": "910ac702c9418407f616b87ccf29ae8fbc93c6ef",
+  "apk": {
+    "path": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\apps\\android\\app\\build\\outputs\\apk\\debug\\app-debug.apk",
+    "bytes": 35913769,
+    "sha256": "5977070bb3594e9a69fd770d082727446ece339f3a2b127353a64c5990eee11b",
+    "applicationId": "com.relayqahub.android.preview.debug",
+    "versionCode": 27,
+    "versionName": "0.2.0-preview.14"
+  },
+  "signature": {
+    "v2": true,
+    "certificateSha256": "9bbf6d2a68c27871c00abc3203fb319629aabacdcac03674483262bcf09e2a83"
+  },
+  "manifestBadging": {
+    "package": "com.relayqahub.android.preview.debug",
+    "versionCode": 27,
+    "versionName": "0.2.0-preview.14"
+  },
+  "targetedTests": {
+    "tests": 4,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "file": {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-v21-e2e-fresh-0910\\acceptance\\android-code27-self-update\\ApkInstallFlowTest.xml",
+      "bytes": 923,
+      "sha256": "99b9cbbddf3358cfe49d3be08c51f2327fdccd40793de0b8b128267fea1132d9"
+    }
+  },
+  "lint": {
+    "errors": 0,
+    "warnings": 40,
+    "file": {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-v21-e2e-fresh-0910\\acceptance\\android-code27-self-update\\lint-results-debug.txt",
+      "bytes": 17710,
+      "sha256": "2817006efa30421f17954f2c93a1272bbcd7a8f08096eb444b87f2ebe18c1db1"
+    }
+  },
+  "buildLogs": [
+    {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-v21-e2e-fresh-0910\\acceptance\\android-code27-self-update\\assemble-code27.log",
+      "bytes": 3246,
+      "sha256": "921a640e8ddf09519707f4b57e89d33784519c3d6d96a7d01be81301afda9d57"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-v21-e2e-fresh-0910\\acceptance\\android-code27-self-update\\assemble-code27-corrected.log",
+      "bytes": 1181,
+      "sha256": "3088a0a9379539bebdabecca3f14da66e11828b10435907f7c9fcb453d4441b0"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-v21-e2e-fresh-0910\\acceptance\\android-code27-self-update\\assemble-code27-corrected2.log",
+      "bytes": 2749,
+      "sha256": "5aa26a12c9bac47d0e89a6474efc72b1d4959384b64bb306e1150f81b2ee1a32"
+    }
+  ]
+}

@@ -1,10 +1,10 @@
 {
   "schemaVersion": 1,
-  "recordedAt": "2026-09-10T05:31:42.177Z",
+  "recordedAt": "2026-09-10T08:29:07.941Z",
   "designVersion": "2.1",
-  "overallStatus": "blocked",
+  "overallStatus": "not_complete",
   "completionAllowed": false,
-  "productSourceCommit": "867387fe69714ae0c3aafa6182946ffd80495768",
+  "productSourceCommit": "88a6d0f9c31106f6cd3fc9edbadca0db6bf6397b",
   "coverageFixCommit": "04f22a5075fb6e534ab1303c8ff4e886296168ed",
   "isolatedRuntime": {
     "api": "http://127.0.0.1:4639",
@@ -16,15 +16,19 @@
     "pass": "real entry executed and read back",
     "fail": "real execution exposed a failure",
     "unrun": "required resource or reachable entry unavailable",
-    "partial": "a subset passed and another mandatory aspect failed or was unrun"
+    "partial": "a subset passed and another mandatory aspect failed or was unrun",
+    "user_handoff": "用户自测／已移交，代理未执行"
   },
   "artifacts": {
     "android": {
-      "versionCode": 26,
-      "versionName": "0.2.0-preview.13",
+      "packageName": "com.relayqahub.android.preview.debug",
+      "versionCode": 28,
+      "versionName": "0.2.0-preview.15",
       "bytes": 35913773,
-      "sha256": "63fb67774b0fed95f923f975a1e20956a7821a629157be965950379191953acb",
-      "signatureV2": true
+      "sha256": "61a885f22b9a62383d923bf36ca0f9ade9f987c22bb30c7323bd8acbd7536e7a",
+      "signatureV2": true,
+      "certificateSha256": "9bbf6d2a68c27871c00abc3203fb319629aabacdcac03674483262bcf09e2a83",
+      "sourceCommit": "88a6d0f9c31106f6cd3fc9edbadca0db6bf6397b"
     },
     "windows": {
       "releaseId": "20260910T044149231Z",
@@ -85,7 +89,8 @@
       "status": "pass",
       "evidence": [
         "web/attachment-e2e.json",
-        "web/comment-readback.json"
+        "web/comment-readback.json",
+        "live-http-e2e.json"
       ]
     },
     {
@@ -133,10 +138,15 @@
         "server_mcp",
         "local_mcp"
       ],
-      "status": "unrun",
+      "status": "not_run",
       "evidence": [
-        "external/README.md"
-      ]
+        "external/README.md",
+        "user-self-test-handoff.md"
+      ],
+      "owner": "user",
+      "handoffStatus": "delegated_to_user",
+      "agentExecuted": false,
+      "resultLabel": "用户自测／已移交，代理未执行"
     },
     {
       "id": "external-single-build-upload-terminal",
@@ -148,10 +158,15 @@
         "server_mcp",
         "local_mcp"
       ],
-      "status": "unrun",
+      "status": "not_run",
       "evidence": [
-        "external/README.md"
-      ]
+        "external/README.md",
+        "user-self-test-handoff.md"
+      ],
+      "owner": "user",
+      "handoffStatus": "delegated_to_user",
+      "agentExecuted": false,
+      "resultLabel": "用户自测／已移交，代理未执行"
     },
     {
       "id": "external-incremental-publication-terminal",
@@ -163,10 +178,15 @@
         "server_mcp",
         "local_mcp"
       ],
-      "status": "unrun",
+      "status": "not_run",
       "evidence": [
-        "external/README.md"
-      ]
+        "external/README.md",
+        "user-self-test-handoff.md"
+      ],
+      "owner": "user",
+      "handoffStatus": "delegated_to_user",
+      "agentExecuted": false,
+      "resultLabel": "用户自测／已移交，代理未执行"
     },
     {
       "id": "external-relay-delivery-terminal",
@@ -178,10 +198,15 @@
         "server_mcp",
         "local_mcp"
       ],
-      "status": "unrun",
+      "status": "not_run",
       "evidence": [
-        "external/audit.json"
-      ]
+        "external/audit.json",
+        "user-self-test-handoff.md"
+      ],
+      "owner": "user",
+      "handoffStatus": "delegated_to_user",
+      "agentExecuted": false,
+      "resultLabel": "用户自测／已移交，代理未执行"
     },
     {
       "id": "external-qingyu-order-terminal",
@@ -193,10 +218,15 @@
         "server_mcp",
         "local_mcp"
       ],
-      "status": "unrun",
+      "status": "not_run",
       "evidence": [
-        "external/README.md"
-      ]
+        "external/README.md",
+        "user-self-test-handoff.md"
+      ],
+      "owner": "user",
+      "handoffStatus": "delegated_to_user",
+      "agentExecuted": false,
+      "resultLabel": "用户自测／已移交，代理未执行"
     },
     {
       "id": "web-final-asset-and-dependency-error",
@@ -216,8 +246,12 @@
       "status": "pass",
       "evidence": [
         "web/core-e2e-report.md",
-        "migration/result.json"
-      ]
+        "migration/result.json",
+        "api-runtime-restart/restart-verification.json",
+        "live-http-e2e.json",
+        "live-http-db-receipt.json"
+      ],
+      "detail": "The restarted commit-88a6d0f API completed upload lost-ack reconciliation, metadata unbound/reserved/claimed transitions, exact notification replay, authorization/CAS negatives, and retained the read receipt in SQLite."
     },
     {
       "id": "server-mcp-96-tools-business",
@@ -226,7 +260,8 @@
       ],
       "status": "pass",
       "evidence": [
-        "web/core-e2e-report.md"
+        "web/core-e2e-report.md",
+        "post-restart-mcp-check.json"
       ]
     },
     {
@@ -238,7 +273,8 @@
       "status": "pass",
       "evidence": [
         "windows/acceptance-matrix.md",
-        "windows/post-upgrade-process-mcp.json"
+        "windows/post-upgrade-process-mcp.json",
+        "post-restart-mcp-check.json"
       ]
     },
     {
@@ -248,40 +284,50 @@
       ],
       "status": "pass",
       "evidence": [
-        "builds/android-code26-artifact.json",
-        "builds/android-code26-feed-http.json",
-        "android/code26-result.md"
-      ]
+        "android/acceptance/android-code28-self-update/artifact-verification.json",
+        "android/acceptance/android-code28-self-update/publication.json",
+        "android/acceptance/android-code28-self-update/feed-http-verification.json",
+        "android/acceptance/android-code28-self-update/luna-e2e/058-verdict.md"
+      ],
+      "detail": "Code 28 was built from the final source, signed, atomically published only to the isolated feed, served byte-exactly by API and Web, and pulled back byte-exactly after the native update."
     },
     {
       "id": "android-native-self-update",
       "surfaces": [
         "apk"
       ],
-      "status": "unrun",
+      "status": "pass",
       "evidence": [
-        "android/code26-result.md"
-      ]
+        "android/acceptance/android-code27-self-update/luna-e2e/189-verdict.md",
+        "android/acceptance/android-code28-self-update/luna-e2e/058-verdict.md"
+      ],
+      "detail": "MuMu completed code 26 to 27 and code 27 to 28 through the app update UI plus Android system installer; project, identity, closed Bug, screenshot draft, reverse mappings, and the daily package were preserved."
     },
     {
       "id": "android-mediaprojection-draft",
       "surfaces": [
         "apk"
       ],
-      "status": "partial",
+      "status": "pass",
       "evidence": [
-        "android/code26-result.md",
-        "android/capture-after-click.png",
-        "android/capture-final-logcat.txt"
-      ]
+        "android/acceptance/android-mediaprojection-revalidation/36-revalidation-verdict.md",
+        "android/acceptance/android-code28-self-update/luna-e2e/058-verdict.md"
+      ],
+      "detail": "A fresh MuMu capture kept the QA Hub process alive, retained the visible screenshot draft, preserved reverse mappings, and produced no product fatal marker; later native updates preserved that draft."
     },
     {
       "id": "android-physical-device",
       "surfaces": [
         "apk"
       ],
-      "status": "unrun",
-      "evidence": []
+      "status": "not_run",
+      "evidence": [
+        "user-self-test-handoff.md"
+      ],
+      "owner": "user",
+      "handoffStatus": "delegated_to_user",
+      "agentExecuted": false,
+      "resultLabel": "用户自测／已移交，代理未执行"
     },
     {
       "id": "schema19-20-19-migration-rollback",
@@ -305,7 +351,8 @@
       ],
       "status": "pass",
       "evidence": [
-        "coexistence-final.json"
+        "coexistence-final.json",
+        "coexistence-post-restart.json"
       ]
     },
     {
@@ -315,69 +362,224 @@
       ],
       "status": "pass",
       "evidence": [
-        "source-gate/final-summary.json"
+        "source-gate/final-summary.json",
+        "source-verification-88a6d0f/summary.json"
+      ]
+    },
+    {
+      "id": "final-api-runtime-restart-and-durable-readback",
+      "surfaces": [
+        "http",
+        "server_mcp",
+        "local_mcp"
+      ],
+      "status": "pass",
+      "detail": "Only the isolated API process was restarted after the final build; its exact receipt/listener/readiness and schema-20 DB were verified while Web and both MCP PIDs stayed unchanged. Live HTTP and both MCP read paths passed afterward.",
+      "evidence": [
+        "api-runtime-restart/build-summary.json",
+        "api-runtime-restart/restart-verification.json",
+        "api-runtime-restart/database-post-restart.json",
+        "live-http-e2e.json",
+        "live-http-db-receipt.json",
+        "post-restart-mcp-check.json"
       ]
     }
   ],
   "blocking": [
     {
-      "id": "android-mumu-native-stability",
-      "status": "fail",
-      "detail": "MediaProjection created a visible draft, then MuMu emitted Fatal signal 7 (SIGBUS)."
-    },
-    {
-      "id": "android-native-self-update",
-      "status": "unrun",
-      "detail": "The preview detail surface exposed no reachable native self-update entry."
+      "id": "fine-grained-coverage-open",
+      "status": "not_run",
+      "detail": "The regenerated 1,030-item matrix still has broad not_run coverage and 637 rows requiring revalidation; those rows remain authoritative.",
+      "evidence": [
+        "../coverage-matrix.json",
+        "../coverage-matrix.md"
+      ]
     },
     {
       "id": "android-physical-device",
-      "status": "unrun",
-      "detail": "No physical Android device was available."
+      "status": "not_run",
+      "owner": "user",
+      "handoffStatus": "delegated_to_user",
+      "agentExecuted": false,
+      "resultLabel": "用户自测／已移交，代理未执行"
     },
     {
-      "id": "external-build",
-      "status": "unrun",
-      "detail": "No isolated real Jenkins job/executor/artifact target."
+      "id": "external-build-terminal",
+      "status": "not_run",
+      "owner": "user",
+      "handoffStatus": "delegated_to_user",
+      "agentExecuted": false,
+      "resultLabel": "用户自测／已移交，代理未执行"
     },
     {
-      "id": "external-upload",
-      "status": "unrun",
-      "detail": "No isolated real upload account/product/channel/object prefix."
+      "id": "external-single-build-upload-terminal",
+      "status": "not_run",
+      "owner": "user",
+      "handoffStatus": "delegated_to_user",
+      "agentExecuted": false,
+      "resultLabel": "用户自测／已移交，代理未执行"
     },
     {
-      "id": "external-relay",
-      "status": "unrun",
-      "detail": "No isolated real Relay project/workspace/executor/callback."
+      "id": "external-incremental-publication-terminal",
+      "status": "not_run",
+      "owner": "user",
+      "handoffStatus": "delegated_to_user",
+      "agentExecuted": false,
+      "resultLabel": "用户自测／已移交，代理未执行"
     },
     {
-      "id": "external-qingyu",
-      "status": "unrun",
-      "detail": "No isolated Qingyu identity/project/order."
+      "id": "external-relay-delivery-terminal",
+      "status": "not_run",
+      "owner": "user",
+      "handoffStatus": "delegated_to_user",
+      "agentExecuted": false,
+      "resultLabel": "用户自测／已移交，代理未执行"
+    },
+    {
+      "id": "external-qingyu-order-terminal",
+      "status": "not_run",
+      "owner": "user",
+      "handoffStatus": "delegated_to_user",
+      "agentExecuted": false,
+      "resultLabel": "用户自测／已移交，代理未执行"
     }
   ],
   "sourceGate": {
-    "effectiveStages": {
-      "total": 37,
-      "passed": 37,
-      "failed": 0
+    "previousGate": {
+      "commit": "04f22a5075fb6e534ab1303c8ff4e886296168ed",
+      "effectiveStages": {
+        "total": 37,
+        "passed": 37,
+        "failed": 0
+      },
+      "tests": {
+        "total": 1122,
+        "passed": 1121,
+        "failed": 0,
+        "skipped": 1
+      },
+      "androidLint": {
+        "errors": 0,
+        "warnings": 40
+      },
+      "evidence": "source-gate/final-summary.json"
     },
-    "tests": {
-      "total": 1122,
-      "passed": 1121,
-      "failed": 0,
-      "skipped": 1
+    "currentCommit": {
+      "commit": "88a6d0f9c31106f6cd3fc9edbadca0db6bf6397b",
+      "typescriptBuilds": "passed",
+      "storage": {
+        "tests": 167,
+        "passed": 166,
+        "failed": 0,
+        "skipped": 1
+      },
+      "apiJavaScript": {
+        "tests": 274,
+        "passed": 274,
+        "failed": 0,
+        "skipped": 0
+      },
+      "apiTypeScript": {
+        "tests": 47,
+        "passed": 47,
+        "failed": 0,
+        "skipped": 0
+      },
+      "contracts": {
+        "status": "passed",
+        "checks": 5
+      },
+      "androidCleanUnitLintAssemble": {
+        "status": "passed",
+        "tasks": 59
+      },
+      "androidTargetedUpdateUi": {
+        "status": "passed",
+        "tasks": 32
+      },
+      "evidence": "source-verification-88a6d0f/summary.json"
     },
-    "androidLint": {
-      "errors": 0,
-      "warnings": 40
+    "retainedTransientFailure": {
+      "status": "retained",
+      "isolatedRerunPassed": true,
+      "evidence": "source-verification-88a6d0f/api-js-tests.concurrent-first-failure.tap.txt"
     }
   },
   "fineGrainedCoverage": {
-    "items": 1027,
-    "retiredItems": 46,
-    "needsRevalidation": 627,
+    "items": 1030,
+    "retiredItems": 47,
+    "needsRevalidation": 637,
     "unavailableReviewedEvidence": 1,
     "note": "Fine-grained not_run and needsRevalidation rows remain authoritative; this release must not be marked complete."
-  }
+  },
+  "agentScopeStatus": "candidate_validated_with_known_coverage_gaps",
+  "userAcceptanceStatus": "delegated_pending",
+  "sourceProvenance": {
+    "api": "88a6d0f9c31106f6cd3fc9edbadca0db6bf6397b",
+    "android": "88a6d0f9c31106f6cd3fc9edbadca0db6bf6397b",
+    "windows": "867387fe69714ae0c3aafa6182946ffd80495768",
+    "web": "867387fe69714ae0c3aafa6182946ffd80495768",
+    "note": "Windows and Web trial artifacts were retained unchanged; API and Android were rebuilt from the final source commit."
+  },
+  "agentBlocking": [
+    {
+      "id": "fine-grained-coverage-open",
+      "status": "not_run",
+      "detail": "The regenerated 1,030-item matrix still has broad not_run coverage and 637 rows requiring revalidation; those rows remain authoritative.",
+      "evidence": [
+        "../coverage-matrix.json",
+        "../coverage-matrix.md"
+      ]
+    }
+  ],
+  "userAcceptancePending": [
+    {
+      "id": "android-physical-device",
+      "status": "not_run",
+      "owner": "user",
+      "handoffStatus": "delegated_to_user",
+      "agentExecuted": false,
+      "resultLabel": "用户自测／已移交，代理未执行"
+    },
+    {
+      "id": "external-build-terminal",
+      "status": "not_run",
+      "owner": "user",
+      "handoffStatus": "delegated_to_user",
+      "agentExecuted": false,
+      "resultLabel": "用户自测／已移交，代理未执行"
+    },
+    {
+      "id": "external-single-build-upload-terminal",
+      "status": "not_run",
+      "owner": "user",
+      "handoffStatus": "delegated_to_user",
+      "agentExecuted": false,
+      "resultLabel": "用户自测／已移交，代理未执行"
+    },
+    {
+      "id": "external-incremental-publication-terminal",
+      "status": "not_run",
+      "owner": "user",
+      "handoffStatus": "delegated_to_user",
+      "agentExecuted": false,
+      "resultLabel": "用户自测／已移交，代理未执行"
+    },
+    {
+      "id": "external-relay-delivery-terminal",
+      "status": "not_run",
+      "owner": "user",
+      "handoffStatus": "delegated_to_user",
+      "agentExecuted": false,
+      "resultLabel": "用户自测／已移交，代理未执行"
+    },
+    {
+      "id": "external-qingyu-order-terminal",
+      "status": "not_run",
+      "owner": "user",
+      "handoffStatus": "delegated_to_user",
+      "agentExecuted": false,
+      "resultLabel": "用户自测／已移交，代理未执行"
+    }
+  ]
 }

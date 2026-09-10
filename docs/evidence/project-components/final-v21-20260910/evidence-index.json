@@ -1,18 +1,866 @@
 {
   "schemaVersion": 1,
-  "recordedAt": "2026-09-10T05:31:42.277Z",
+  "recordedAt": "2026-09-10T08:29:32.466Z",
   "root": "docs/evidence/project-components/final-v21-20260910",
-  "files": 57,
+  "sourceCommit": "88a6d0f9c31106f6cd3fc9edbadca0db6bf6397b",
+  "files": 254,
+  "totalBytes": 46049553,
+  "aggregateSha256": "f3bc40a14402c69131e84aafd2cbaf69ba7c48c41b682a153b0789600dcad324",
   "entries": [
     {
       "path": "acceptance-matrix.json",
-      "bytes": 8568,
-      "sha256": "d175f17319165e55859b3742d536fc4a61c5f54fdf3898ea04250b7237f35f91"
+      "bytes": 16749,
+      "sha256": "a382dac0ad0049f13f1bc0c757b93e702329b41a5b821fdb15b5f29e0885a767"
     },
     {
       "path": "acceptance-matrix.md",
-      "bytes": 9034,
-      "sha256": "2cebdecc65d1b1175a41840c09726ce280aa1eda94579d25c98ce556259c4c93"
+      "bytes": 11123,
+      "sha256": "3afaeb66289588bbcd44d5221a47d0548fc8b54b21b0fb0751f0c2d7de524246"
+    },
+    {
+      "path": "android/acceptance/android-code27-self-update/aapt-code27-corrected.log",
+      "bytes": 6159,
+      "sha256": "8407bd7221e8d0aaac957eb545b38f1e6caf63eb1b8a91703d1206b876ed15e6"
+    },
+    {
+      "path": "android/acceptance/android-code27-self-update/android-code27-feed-http.json",
+      "bytes": 2820,
+      "sha256": "87360bc60995e5190e209294469e33d24a0fb2a82d4d7740dd6b9bf57d28c3da"
+    },
+    {
+      "path": "android/acceptance/android-code27-self-update/ApkInstallFlowTest.xml",
+      "bytes": 923,
+      "sha256": "99b9cbbddf3358cfe49d3be08c51f2327fdccd40793de0b8b128267fea1132d9"
+    },
+    {
+      "path": "android/acceptance/android-code27-self-update/apksigner-code27-corrected.log",
+      "bytes": 1425,
+      "sha256": "65475181e170a815a2393c2643d025af715f2f5ed50ac20a6996a2ba29298abf"
+    },
+    {
+      "path": "android/acceptance/android-code27-self-update/artifact-verification.json",
+      "bytes": 2380,
+      "sha256": "e23d6d7975b5cc18e93b965bac19249e5ab20624ead3b37d4420146089d5c07b"
+    },
+    {
+      "path": "android/acceptance/android-code27-self-update/assemble-code27-corrected2.log",
+      "bytes": 2749,
+      "sha256": "5aa26a12c9bac47d0e89a6474efc72b1d4959384b64bb306e1150f81b2ee1a32"
+    },
+    {
+      "path": "android/acceptance/android-code27-self-update/lint-results-debug.txt",
+      "bytes": 17710,
+      "sha256": "2817006efa30421f17954f2c93a1272bbcd7a8f08096eb444b87f2ebe18c1db1"
+    },
+    {
+      "path": "android/acceptance/android-code27-self-update/luna-e2e/100-screen-current.png",
+      "bytes": 180368,
+      "sha256": "5fad3fc36d6d4227750ab69085c542008df93e414078fe31a928578bd0b3f1bc"
+    },
+    {
+      "path": "android/acceptance/android-code27-self-update/luna-e2e/102-ui-current.xml",
+      "bytes": 21762,
+      "sha256": "b2d18d7f6ca19326e6b0af2e5eaef566a90bb72bdde1822810bef884499191fa"
+    },
+    {
+      "path": "android/acceptance/android-code27-self-update/luna-e2e/104-action-swipe-floating-1.txt",
+      "bytes": 66,
+      "sha256": "cea0d3e160686bc0f56d97fcfc3e010328f29d451c8210b4486ab343372056ba"
+    },
+    {
+      "path": "android/acceptance/android-code27-self-update/luna-e2e/105-screen-floating-swipe-1.png",
+      "bytes": 249139,
+      "sha256": "b114462980e091db96bd89618f881621ac908288bae93dccd63005386cc1fd29"
+    },
+    {
+      "path": "android/acceptance/android-code27-self-update/luna-e2e/109-action-swipe-floating-2.txt",
+      "bytes": 66,
+      "sha256": "f4be965722b16f50fe35e2e6f2f2dfab7db268bd44bc84563a7c98ae7db9351a"
+    },
+    {
+      "path": "android/acceptance/android-code27-self-update/luna-e2e/110-screen-floating-swipe-2.png",
+      "bytes": 214259,
+      "sha256": "478a1b182e93e0623727826e34421a1ff6a7f979c150896078b8bd6509bbb52a"
+    },
+    {
+      "path": "android/acceptance/android-code27-self-update/luna-e2e/112-ui-floating-swipe-2.xml",
+      "bytes": 20832,
+      "sha256": "eac0c50f83540082cdcd3d57ebd071ed5178d70f9057f5ae5a7cde43b814fa79"
+    },
+    {
+      "path": "android/acceptance/android-code27-self-update/luna-e2e/114-action-recheck.txt",
+      "bytes": 71,
+      "sha256": "16da608cb879ec81858df4952f3a187417624447cf64782b23c7a82d31153366"
+    },
+    {
+      "path": "android/acceptance/android-code27-self-update/luna-e2e/115-screen-rechecking.png",
+      "bytes": 125314,
+      "sha256": "20cd3e587342ef65d7446fb7b4fc03f41865057b5f08f9025b55f47f5b7852a1"
+    },
+    {
+      "path": "android/acceptance/android-code27-self-update/luna-e2e/117-ui-rechecking.xml",
+      "bytes": 8471,
+      "sha256": "cac527a81463f9f310afbb835649f0d25eb00c3f212a8d510415e47650295a20"
+    },
+    {
+      "path": "android/acceptance/android-code27-self-update/luna-e2e/119-action-enable-unknown-source.txt",
+      "bytes": 71,
+      "sha256": "8e71cbdabd672757b289c4e0b522865a9e925866080d881e1705b9f9c9c407f0"
+    },
+    {
+      "path": "android/acceptance/android-code27-self-update/luna-e2e/120-screen-unknown-source-enabled.png",
+      "bytes": 123925,
+      "sha256": "376b844a21ec6283e628f22d30e8849375d8c505d12c9583637639c1707d9100"
+    },
+    {
+      "path": "android/acceptance/android-code27-self-update/luna-e2e/122-ui-unknown-source-enabled.xml",
+      "bytes": 8470,
+      "sha256": "99abfcde0398964b1fe5b011b998067b18d5a2b5f81a1aea38ea59b6dceb6088"
+    },
+    {
+      "path": "android/acceptance/android-code27-self-update/luna-e2e/124-action-back-to-app.txt",
+      "bytes": 77,
+      "sha256": "7865a0960a6be1bab5381a92dfd7d7e1536fc2d5dd1151d4ce53a631cf5f3dad"
+    },
+    {
+      "path": "android/acceptance/android-code27-self-update/luna-e2e/125-screen-back-app.png",
+      "bytes": 227943,
+      "sha256": "c24944536ad0642f9983c77f0937929effcb5a6d36913df671173b851fd15397"
+    },
+    {
+      "path": "android/acceptance/android-code27-self-update/luna-e2e/127-ui-back-app.xml",
+      "bytes": 6267,
+      "sha256": "f2fd5adbb50d4c9b1786690127a5c96cdb6401b3718f0c819a2e64974de75366"
+    },
+    {
+      "path": "android/acceptance/android-code27-self-update/luna-e2e/129-action-system-update.txt",
+      "bytes": 81,
+      "sha256": "c462bc920922229d4bd250bca4aa57786eddb86eb71df18ccea481e8a7e895aa"
+    },
+    {
+      "path": "android/acceptance/android-code27-self-update/luna-e2e/130-screen-install-progress.png",
+      "bytes": 1880877,
+      "sha256": "47d6716fbaa6c5c9dfea821c929f1dc1563827f1450c3ce308e2dd2da25653af"
+    },
+    {
+      "path": "android/acceptance/android-code27-self-update/luna-e2e/132-ui-install-progress.xml",
+      "bytes": 6248,
+      "sha256": "c2c6034a6b13114ec698ff074eaf6a95d7bdd1cf611e30a341874b9b528e0d93"
+    },
+    {
+      "path": "android/acceptance/android-code27-self-update/luna-e2e/134-action-system-open.txt",
+      "bytes": 81,
+      "sha256": "da7524040ef5fbc21e6e2b1ff8bacbbb03bc2108896b54e1cb38419d1749ef2a"
+    },
+    {
+      "path": "android/acceptance/android-code27-self-update/luna-e2e/135-screen-code27-open.png",
+      "bytes": 172937,
+      "sha256": "8b5c29163cdf59a014abe0f018adf650d0fc5f7401fd929c2af48012690f1145"
+    },
+    {
+      "path": "android/acceptance/android-code27-self-update/luna-e2e/137-ui-code27-open.xml",
+      "bytes": 18427,
+      "sha256": "d341914cd44199386f4dd10d6b15ec8bc379866e6183a59e1ce081ff59f13821"
+    },
+    {
+      "path": "android/acceptance/android-code27-self-update/luna-e2e/140-preview-pid-code27.txt",
+      "bytes": 7,
+      "sha256": "5c3bdfea4eec588607e9b667e832eb8ae18cdbe5bbc54f8140a9a7f2da17672c"
+    },
+    {
+      "path": "android/acceptance/android-code27-self-update/luna-e2e/141-daily-pid-code27.txt",
+      "bytes": 6,
+      "sha256": "591f6b4021386d86e5661d22bb571d8336a11e9a6a33a5c295b8f5e53eba804c"
+    },
+    {
+      "path": "android/acceptance/android-code27-self-update/luna-e2e/142-preview-package-code27.txt",
+      "bytes": 9623,
+      "sha256": "40af348eecff95aff3335930bc6d60eea43a455ed9d56e7b73f71e63cbfdd0c1"
+    },
+    {
+      "path": "android/acceptance/android-code27-self-update/luna-e2e/143-daily-version-code27.txt",
+      "bytes": 157,
+      "sha256": "5e036f42558697e69a20112a1a2c7cb945df8cab9beef0bbc56a57b589d2ee13"
+    },
+    {
+      "path": "android/acceptance/android-code27-self-update/luna-e2e/145-apk-sha256-code27.txt",
+      "bytes": 175,
+      "sha256": "5470addb7986152fac31d3ea195a850c80d5605e2fc62338031a95877dadb3e2"
+    },
+    {
+      "path": "android/acceptance/android-code27-self-update/luna-e2e/146-reverse-code27.txt",
+      "bytes": 56,
+      "sha256": "0d73f5af5927ca12c8d35e5a0550fc42b8fbdf39edc3fb7aa87087e9599308b8"
+    },
+    {
+      "path": "android/acceptance/android-code27-self-update/luna-e2e/148-screen-code27-main.png",
+      "bytes": 172937,
+      "sha256": "8b5c29163cdf59a014abe0f018adf650d0fc5f7401fd929c2af48012690f1145"
+    },
+    {
+      "path": "android/acceptance/android-code27-self-update/luna-e2e/150-media-projection-code27.txt",
+      "bytes": 79,
+      "sha256": "22f81409697dfe4dc7725ebb22cb0f15d83bf68cadfd97900549703724352f89"
+    },
+    {
+      "path": "android/acceptance/android-code27-self-update/luna-e2e/152-screen-components-code27.png",
+      "bytes": 111433,
+      "sha256": "a905a25633fdfa1f20ee14a7f5bcc32d92bb2cad92a405aeb712db5c0475de20"
+    },
+    {
+      "path": "android/acceptance/android-code27-self-update/luna-e2e/154-ui-components-code27.xml",
+      "bytes": 19847,
+      "sha256": "5980de705d4f2ddcdd9fbf87e7a6e14a8444c4d000ab1495be3b0f75b2a94a5a"
+    },
+    {
+      "path": "android/acceptance/android-code27-self-update/luna-e2e/156-action-open-component-detail.txt",
+      "bytes": 79,
+      "sha256": "6820bd83ac8035d29cb04f61bf4f4b323bc5518deae07c6c41a783137ebb9834"
+    },
+    {
+      "path": "android/acceptance/android-code27-self-update/luna-e2e/162-screen-component-detail-code27.png",
+      "bytes": 93755,
+      "sha256": "6865c63a76fbf8e2c8a5c7ad6e50050d00dfd8c2fe3bb804ccf60b8b1ad2acb4"
+    },
+    {
+      "path": "android/acceptance/android-code27-self-update/luna-e2e/164-ui-component-detail-code27.xml",
+      "bytes": 11707,
+      "sha256": "262b6d1f6704c2619265889fa53092fece6e7e21948d15d68f330a526d52140d"
+    },
+    {
+      "path": "android/acceptance/android-code27-self-update/luna-e2e/166-action-top-check-update-from-detail.txt",
+      "bytes": 85,
+      "sha256": "7ea3a62cbc6c3b9c903c7448619e096d754548c73b89201eca70797135c5e02f"
+    },
+    {
+      "path": "android/acceptance/android-code27-self-update/luna-e2e/167-screen-update-card-code27-first.png",
+      "bytes": 194799,
+      "sha256": "8a847cfe75b4f2bef7887809b9653de01272de7cac888120f0cb0a43d0cac567"
+    },
+    {
+      "path": "android/acceptance/android-code27-self-update/luna-e2e/169-ui-update-card-code27-first.xml",
+      "bytes": 22986,
+      "sha256": "cb51c9c91424e05a5214704761de4da6be8ce680e3552a48c3d8089009df1942"
+    },
+    {
+      "path": "android/acceptance/android-code27-self-update/luna-e2e/171-action-open-bug-list.txt",
+      "bytes": 76,
+      "sha256": "78da7c8c47e0d713ae8a0f82c80525e52041adadff61fd619ec12ec4e4f30fab"
+    },
+    {
+      "path": "android/acceptance/android-code27-self-update/luna-e2e/172-screen-bug-list-code27.png",
+      "bytes": 164814,
+      "sha256": "3c673801216054b2d681dbbca1b9461e2ddc33b07c3ee212b215c3d261c0e301"
+    },
+    {
+      "path": "android/acceptance/android-code27-self-update/luna-e2e/174-ui-bug-list-code27.xml",
+      "bytes": 27663,
+      "sha256": "12d2da7f1e963e844ecbfe52bf90b2754d3e711c02a2ed6e370e8553d45dfcca"
+    },
+    {
+      "path": "android/acceptance/android-code27-self-update/luna-e2e/177-preview-pid-final.txt",
+      "bytes": 7,
+      "sha256": "5c3bdfea4eec588607e9b667e832eb8ae18cdbe5bbc54f8140a9a7f2da17672c"
+    },
+    {
+      "path": "android/acceptance/android-code27-self-update/luna-e2e/178-daily-pid-final.txt",
+      "bytes": 6,
+      "sha256": "591f6b4021386d86e5661d22bb571d8336a11e9a6a33a5c295b8f5e53eba804c"
+    },
+    {
+      "path": "android/acceptance/android-code27-self-update/luna-e2e/179-preview-package-final.txt",
+      "bytes": 9623,
+      "sha256": "939d5221eb3f2165f892a59efd926c94f50b52f83d14f4cc8559974f0d631a4e"
+    },
+    {
+      "path": "android/acceptance/android-code27-self-update/luna-e2e/180-daily-version-final.txt",
+      "bytes": 157,
+      "sha256": "5e036f42558697e69a20112a1a2c7cb945df8cab9beef0bbc56a57b589d2ee13"
+    },
+    {
+      "path": "android/acceptance/android-code27-self-update/luna-e2e/182-apk-sha256-final.txt",
+      "bytes": 175,
+      "sha256": "5470addb7986152fac31d3ea195a850c80d5605e2fc62338031a95877dadb3e2"
+    },
+    {
+      "path": "android/acceptance/android-code27-self-update/luna-e2e/183-reverse-final.txt",
+      "bytes": 56,
+      "sha256": "0d73f5af5927ca12c8d35e5a0550fc42b8fbdf39edc3fb7aa87087e9599308b8"
+    },
+    {
+      "path": "android/acceptance/android-code27-self-update/luna-e2e/185-screen-final.png",
+      "bytes": 164881,
+      "sha256": "9c900cc9342442219ad1c56aab834908ed11cf97dee58c1f5f91043179fc11bd"
+    },
+    {
+      "path": "android/acceptance/android-code27-self-update/luna-e2e/187-logcat-product-pids-final.txt",
+      "bytes": 137001,
+      "sha256": "d2f97ce396b09882f67f9011bcb43173f3cdb2c56e74169a5086292138e4341a"
+    },
+    {
+      "path": "android/acceptance/android-code27-self-update/luna-e2e/188-logcat-product-fatal-final.txt",
+      "bytes": 67,
+      "sha256": "3d60eff0dc1714b56b0dfc3f1f5c462418f7df8c3744afc5cbac1e9f63fea097"
+    },
+    {
+      "path": "android/acceptance/android-code27-self-update/luna-e2e/189-verdict.md",
+      "bytes": 2106,
+      "sha256": "8149f5cf24be68d12d97a6511a71aed7984c73efedac977548f5119b99ca0e84"
+    },
+    {
+      "path": "android/acceptance/android-code27-self-update/output-metadata.json",
+      "bytes": 432,
+      "sha256": "a3a763fa9ef716bf2b9d47731611819e5404bf94d1eecb9a0562582ee8507d28"
+    },
+    {
+      "path": "android/acceptance/android-code27-self-update/prepublish-latest.json",
+      "bytes": 397,
+      "sha256": "9b5a45cc260a208a42cc1a707a7c7c2481bc2185e01e1ca30a1de9b2a84465bb"
+    },
+    {
+      "path": "android/acceptance/android-code27-self-update/prepublish.json",
+      "bytes": 1614,
+      "sha256": "81db42a2fee0228af2bdd34c8c9e04d7eeb9919246819ad8dfe5513f9d1e7014"
+    },
+    {
+      "path": "android/acceptance/android-code27-self-update/publication.json",
+      "bytes": 2349,
+      "sha256": "5dbd036d0c05160ba6a0135afbd05f2a04b839f909937b46310ab609b6f38104"
+    },
+    {
+      "path": "android/acceptance/android-code28-self-update/aapt-badging.txt",
+      "bytes": 6159,
+      "sha256": "ff500857f34824df2bb127641a0833e8bea0a5f8f98a64c2b7ec87e63da8fc52"
+    },
+    {
+      "path": "android/acceptance/android-code28-self-update/apksigner-verify.txt",
+      "bytes": 1429,
+      "sha256": "8811eaf034435d549438e0d0f318de11305d886042700163503fd51421bc6e5f"
+    },
+    {
+      "path": "android/acceptance/android-code28-self-update/artifact-verification.json",
+      "bytes": 840,
+      "sha256": "9254f6a91a6ca6c0866d4a0249cc8aa31f77b082c37487b0facd67ddd31d084d"
+    },
+    {
+      "path": "android/acceptance/android-code28-self-update/feed-http-verification.json",
+      "bytes": 2785,
+      "sha256": "837ee7faec114c75a3d8c1f2d8255095e0a7b2530d4f071e264db0ac4b74325c"
+    },
+    {
+      "path": "android/acceptance/android-code28-self-update/gradle-clean-test-lint-assemble.log",
+      "bytes": 4256,
+      "sha256": "e7c67dd0bb89f3037553610cea8632e0d3380a6321dc4c366fe3b989c327920f"
+    },
+    {
+      "path": "android/acceptance/android-code28-self-update/gradle-targeted-update-ui-tests.log",
+      "bytes": 2870,
+      "sha256": "8d3dd4821b3f1a566d52c185d7d058ed81675ff84033e59d3c027e3dcc431a25"
+    },
+    {
+      "path": "android/acceptance/android-code28-self-update/luna-e2e/000-host-timestamp.txt",
+      "bytes": 35,
+      "sha256": "b1ce1508ef5f8a37b9b59f2bd026f3f7b71aec838262e7c0a9b9916cbc7bfa51"
+    },
+    {
+      "path": "android/acceptance/android-code28-self-update/luna-e2e/001-device-fingerprint.txt",
+      "bytes": 53,
+      "sha256": "ef5df4b23f4be601ed3a8c3042fa3c3370714e3802b7607e60c6c2f45f696c98"
+    },
+    {
+      "path": "android/acceptance/android-code28-self-update/luna-e2e/002-display-size.txt",
+      "bytes": 26,
+      "sha256": "19e1ab70e0d7242bb570183dc146bd715046d3ca33f5b31605f34b4cc4c22b74"
+    },
+    {
+      "path": "android/acceptance/android-code28-self-update/luna-e2e/005-preview-package-before.txt",
+      "bytes": 117,
+      "sha256": "242620037a97df03e7070d44f7de8dcb288231c646a7f34b45db3dd01eb981bc"
+    },
+    {
+      "path": "android/acceptance/android-code28-self-update/luna-e2e/006-preview-pid-before.txt",
+      "bytes": 7,
+      "sha256": "5c3bdfea4eec588607e9b667e832eb8ae18cdbe5bbc54f8140a9a7f2da17672c"
+    },
+    {
+      "path": "android/acceptance/android-code28-self-update/luna-e2e/007-daily-debug-pid-before.txt",
+      "bytes": 6,
+      "sha256": "591f6b4021386d86e5661d22bb571d8336a11e9a6a33a5c295b8f5e53eba804c"
+    },
+    {
+      "path": "android/acceptance/android-code28-self-update/luna-e2e/008-reverse-before.txt",
+      "bytes": 56,
+      "sha256": "0d73f5af5927ca12c8d35e5a0550fc42b8fbdf39edc3fb7aa87087e9599308b8"
+    },
+    {
+      "path": "android/acceptance/android-code28-self-update/luna-e2e/009-activity-before.txt",
+      "bytes": 121,
+      "sha256": "88a33e863a45cc7f019ababf2f414a40a050e3129776226ec33fc8bfefed0c44"
+    },
+    {
+      "path": "android/acceptance/android-code28-self-update/luna-e2e/010-screen-before.png",
+      "bytes": 164886,
+      "sha256": "e166074926dc606ffeea6ba10d0d36cfb9535301aa094f1588664c3fb8215756"
+    },
+    {
+      "path": "android/acceptance/android-code28-self-update/luna-e2e/011-ui-before.xml",
+      "bytes": 27663,
+      "sha256": "12d2da7f1e963e844ecbfe52bf90b2754d3e711c02a2ed6e370e8553d45dfcca"
+    },
+    {
+      "path": "android/acceptance/android-code28-self-update/luna-e2e/012-action-check-update-before.txt",
+      "bytes": 69,
+      "sha256": "4e650bec7e6d3e6775383228ce9794dee142f4206739b4897907844770a6a6be"
+    },
+    {
+      "path": "android/acceptance/android-code28-self-update/luna-e2e/013-screen-update-card-before.png",
+      "bytes": 195543,
+      "sha256": "a16291848353517624a0bb2c822c3de69c33750d7a6292878df650e72fbf45fb"
+    },
+    {
+      "path": "android/acceptance/android-code28-self-update/luna-e2e/014-ui-update-card-before.xml",
+      "bytes": 22986,
+      "sha256": "cb51c9c91424e05a5214704761de4da6be8ce680e3552a48c3d8089009df1942"
+    },
+    {
+      "path": "android/acceptance/android-code28-self-update/luna-e2e/015-action-recheck-code28.txt",
+      "bytes": 69,
+      "sha256": "1bd9e92732b48e8244cca5b54a6983687c5565cc1965e44be1371d82a26336db"
+    },
+    {
+      "path": "android/acceptance/android-code28-self-update/luna-e2e/016-screen-rechecking-code28.png",
+      "bytes": 203413,
+      "sha256": "fc1235269da2e5da54e07c087652880454ba917641512d37690d5687ad9394b7"
+    },
+    {
+      "path": "android/acceptance/android-code28-self-update/luna-e2e/017-ui-rechecking-code28.xml",
+      "bytes": 6267,
+      "sha256": "f2fd5adbb50d4c9b1786690127a5c96cdb6401b3718f0c819a2e64974de75366"
+    },
+    {
+      "path": "android/acceptance/android-code28-self-update/luna-e2e/018-screen-installer-prompt.png",
+      "bytes": 203413,
+      "sha256": "fc1235269da2e5da54e07c087652880454ba917641512d37690d5687ad9394b7"
+    },
+    {
+      "path": "android/acceptance/android-code28-self-update/luna-e2e/019-ui-installer-prompt.xml",
+      "bytes": 6267,
+      "sha256": "f2fd5adbb50d4c9b1786690127a5c96cdb6401b3718f0c819a2e64974de75366"
+    },
+    {
+      "path": "android/acceptance/android-code28-self-update/luna-e2e/020-action-installer-update.txt",
+      "bytes": 79,
+      "sha256": "161088b13dde7d30c5aa2bbb62da8d3e5643d2a535358a66c09020106e39b8db"
+    },
+    {
+      "path": "android/acceptance/android-code28-self-update/luna-e2e/021-screen-install-progress.png",
+      "bytes": 1882579,
+      "sha256": "46a8acde3b7144c5569a3a7c44acf9ae30db200931731e1b31fdedefd207d61b"
+    },
+    {
+      "path": "android/acceptance/android-code28-self-update/luna-e2e/022-ui-install-progress.xml",
+      "bytes": 6248,
+      "sha256": "c2c6034a6b13114ec698ff074eaf6a95d7bdd1cf611e30a341874b9b528e0d93"
+    },
+    {
+      "path": "android/acceptance/android-code28-self-update/luna-e2e/023-action-system-open.txt",
+      "bytes": 79,
+      "sha256": "0147daf5d8ca9a41281e0a13cfa29e7ddf69aee46e52aea1c7e3949b4bf7a396"
+    },
+    {
+      "path": "android/acceptance/android-code28-self-update/luna-e2e/024-screen-code28-open.png",
+      "bytes": 173936,
+      "sha256": "e3cd3d0fac80c2f48201b8fb7a1f03e5b5eec953416a9fa103672f4ea5ba8a10"
+    },
+    {
+      "path": "android/acceptance/android-code28-self-update/luna-e2e/025-ui-code28-open.xml",
+      "bytes": 18427,
+      "sha256": "d341914cd44199386f4dd10d6b15ec8bc379866e6183a59e1ce081ff59f13821"
+    },
+    {
+      "path": "android/acceptance/android-code28-self-update/luna-e2e/026-preview-package-after.txt",
+      "bytes": 121,
+      "sha256": "a09ebc9dd2a90cf7b9c47990d9bc697f55d9b80d297f08b496fa9ce03291398e"
+    },
+    {
+      "path": "android/acceptance/android-code28-self-update/luna-e2e/027-preview-pid-after.txt",
+      "bytes": 7,
+      "sha256": "ceba8557102b0b2ac7d5ff882df6cee63c63466ca4032a7ff820b345e664eab5"
+    },
+    {
+      "path": "android/acceptance/android-code28-self-update/luna-e2e/028-action-open-bug-list-code28.txt",
+      "bytes": 68,
+      "sha256": "919b4b828940715e7fa27216f4b37de70472578525a4a0bc6d1393bde579a86a"
+    },
+    {
+      "path": "android/acceptance/android-code28-self-update/luna-e2e/029-screen-bug-list-code28.png",
+      "bytes": 165247,
+      "sha256": "840d4738c1c900d90595242fa0ae18572464a29252a9172149d938036aec6d39"
+    },
+    {
+      "path": "android/acceptance/android-code28-self-update/luna-e2e/030-ui-bug-list-code28.xml",
+      "bytes": 27663,
+      "sha256": "12d2da7f1e963e844ecbfe52bf90b2754d3e711c02a2ed6e370e8553d45dfcca"
+    },
+    {
+      "path": "android/acceptance/android-code28-self-update/luna-e2e/031-pm-path-after.txt",
+      "bytes": 235,
+      "sha256": "7eb9eb567fa8256276c4d34bd4416390a557757678bc0f1345c4dd538b3d873a"
+    },
+    {
+      "path": "android/acceptance/android-code28-self-update/luna-e2e/032-installed-code28.apk",
+      "bytes": 35913773,
+      "sha256": "61a885f22b9a62383d923bf36ca0f9ade9f987c22bb30c7323bd8acbd7536e7a"
+    },
+    {
+      "path": "android/acceptance/android-code28-self-update/luna-e2e/033-installed-apk-sha256.txt",
+      "bytes": 314,
+      "sha256": "2ea9b970e24f895ec86af3c3855f4693887a55de4137e192846873e668135868"
+    },
+    {
+      "path": "android/acceptance/android-code28-self-update/luna-e2e/034-reverse-after.txt",
+      "bytes": 56,
+      "sha256": "0d73f5af5927ca12c8d35e5a0550fc42b8fbdf39edc3fb7aa87087e9599308b8"
+    },
+    {
+      "path": "android/acceptance/android-code28-self-update/luna-e2e/035-preview-pid-after.txt",
+      "bytes": 7,
+      "sha256": "ceba8557102b0b2ac7d5ff882df6cee63c63466ca4032a7ff820b345e664eab5"
+    },
+    {
+      "path": "android/acceptance/android-code28-self-update/luna-e2e/036-daily-debug-pid-after.txt",
+      "bytes": 6,
+      "sha256": "591f6b4021386d86e5661d22bb571d8336a11e9a6a33a5c295b8f5e53eba804c"
+    },
+    {
+      "path": "android/acceptance/android-code28-self-update/luna-e2e/037-daily-version-after.txt",
+      "bytes": 77,
+      "sha256": "087e70d6343d4a001fb05d5d06beae0cf1c448b656b20841d3c1cfa102688e4b"
+    },
+    {
+      "path": "android/acceptance/android-code28-self-update/luna-e2e/038-activity-after.txt",
+      "bytes": 125,
+      "sha256": "4faca18faa19a78714f9a651e09e6b1096a1dd79a07761db71bbc48a62026c9f"
+    },
+    {
+      "path": "android/acceptance/android-code28-self-update/luna-e2e/039-action-open-existing-bug.txt",
+      "bytes": 82,
+      "sha256": "e5c1e31ccaa0455e9832cd643de2c0f044eb5b7a7519b06b3541213d27277e81"
+    },
+    {
+      "path": "android/acceptance/android-code28-self-update/luna-e2e/040-screen-existing-bug-code28.png",
+      "bytes": 147869,
+      "sha256": "a961de6386471a9320195bddd7617945cadd862eacd67a97360c0f0e63039f00"
+    },
+    {
+      "path": "android/acceptance/android-code28-self-update/luna-e2e/041-ui-existing-bug-code28.xml",
+      "bytes": 13654,
+      "sha256": "1a3ee1247dd882c474332c1ae9f1266b160470aca71f6d07c78583992103f5a1"
+    },
+    {
+      "path": "android/acceptance/android-code28-self-update/luna-e2e/042-action-open-bug-lifecycle-form.txt",
+      "bytes": 74,
+      "sha256": "7fd303ac926bed1c608a80ea0277f336131e8eefca838eeaf6ba7a7e0b6a666a"
+    },
+    {
+      "path": "android/acceptance/android-code28-self-update/luna-e2e/043-screen-bug-lifecycle-code28.png",
+      "bytes": 138404,
+      "sha256": "ad962ace8aba3112dac6598fd607f4a54d118ba72ca3a6ed63188ec7ae9c25d0"
+    },
+    {
+      "path": "android/acceptance/android-code28-self-update/luna-e2e/044-ui-bug-lifecycle-code28.xml",
+      "bytes": 12528,
+      "sha256": "289d65c7d1f85237bc287333c3c2be420f198967e2248726d69a8ee5b36b99a8"
+    },
+    {
+      "path": "android/acceptance/android-code28-self-update/luna-e2e/045-logcat-product-pids-after.txt",
+      "bytes": 196329,
+      "sha256": "df93f84eb75ec93c1ff7b4d0e29933498c62d529edfa53d8c2a23e73f57e744b"
+    },
+    {
+      "path": "android/acceptance/android-code28-self-update/luna-e2e/046-window-focus-after.txt",
+      "bytes": 346,
+      "sha256": "45653df25f7bde7a614e33a5be7db7bf0dd284aafa14b08cc537690c824f4258"
+    },
+    {
+      "path": "android/acceptance/android-code28-self-update/luna-e2e/047-logcat-fatal-markers-after.txt",
+      "bytes": 44,
+      "sha256": "3250d6664a33bf1306ed46d26e2ff1350aea39a035bd8c2a990b6f1f99cfb4c8"
+    },
+    {
+      "path": "android/acceptance/android-code28-self-update/luna-e2e/048-action-close-lifecycle-detail.txt",
+      "bytes": 69,
+      "sha256": "c3a2b49d43406b26199b55d90054a9da569e0f29e054f9573eacdbc95afd461a"
+    },
+    {
+      "path": "android/acceptance/android-code28-self-update/luna-e2e/049-action-open-home.txt",
+      "bytes": 71,
+      "sha256": "a54dddaa17f5b5323a2643a26d3bb72dd7a306824aa2e3bd4ae244b4534bb68b"
+    },
+    {
+      "path": "android/acceptance/android-code28-self-update/luna-e2e/050-ui-home-code28.xml",
+      "bytes": 22986,
+      "sha256": "af09120cf2c5c44573b4fb4bcbfec55bdc94c1a4f58f3f0a2a5f3a458c8cd77c"
+    },
+    {
+      "path": "android/acceptance/android-code28-self-update/luna-e2e/051-screen-home-code28.png",
+      "bytes": 195068,
+      "sha256": "bcc8720200b73f4d77341a8d1540b691da7f4d22c9d66d659e426f1c662442da"
+    },
+    {
+      "path": "android/acceptance/android-code28-self-update/luna-e2e/052-action-recheck-after-code28.txt",
+      "bytes": 69,
+      "sha256": "a18a936092e4c126ee435462db600b9417cca9148b8f5e725513fa55d1acd321"
+    },
+    {
+      "path": "android/acceptance/android-code28-self-update/luna-e2e/053-screen-latest-code28.png",
+      "bytes": 195068,
+      "sha256": "bcc8720200b73f4d77341a8d1540b691da7f4d22c9d66d659e426f1c662442da"
+    },
+    {
+      "path": "android/acceptance/android-code28-self-update/luna-e2e/054-ui-latest-code28.xml",
+      "bytes": 22986,
+      "sha256": "af09120cf2c5c44573b4fb4bcbfec55bdc94c1a4f58f3f0a2a5f3a458c8cd77c"
+    },
+    {
+      "path": "android/acceptance/android-code28-self-update/luna-e2e/055-processes-after.txt",
+      "bytes": 206,
+      "sha256": "34ab434cdc50b397b92833f126904f5f529f3c30b429a8271ef04dab85d5d0d6"
+    },
+    {
+      "path": "android/acceptance/android-code28-self-update/luna-e2e/056-preview-package-final.txt",
+      "bytes": 81,
+      "sha256": "f3ad4cf9b5654470a29c468b7f3f645c4505d6a34b8f891caeee82ff5134afb6"
+    },
+    {
+      "path": "android/acceptance/android-code28-self-update/luna-e2e/057-reverse-final.txt",
+      "bytes": 56,
+      "sha256": "0d73f5af5927ca12c8d35e5a0550fc42b8fbdf39edc3fb7aa87087e9599308b8"
+    },
+    {
+      "path": "android/acceptance/android-code28-self-update/luna-e2e/058-verdict.md",
+      "bytes": 3966,
+      "sha256": "fcff6e7bdd186d54c49256833c6976866ad48aa9769cae4ab649d086abfa0032"
+    },
+    {
+      "path": "android/acceptance/android-code28-self-update/luna-e2e/059-command-summary.txt",
+      "bytes": 1336,
+      "sha256": "29feacce7c4849b8f4205f0c347b69d6f7f84c3cc046d3a7df78c3b0964aea5d"
+    },
+    {
+      "path": "android/acceptance/android-code28-self-update/output-metadata.json",
+      "bytes": 432,
+      "sha256": "a7432f23b01eea83471a60ac2cbfde9e4a48dc2b5dc99ffb2a18862cd1d80e77"
+    },
+    {
+      "path": "android/acceptance/android-code28-self-update/publication.json",
+      "bytes": 2462,
+      "sha256": "d930a158272493f84da04701e8a26b7ee5a5f94295495af017109d899365e157"
+    },
+    {
+      "path": "android/acceptance/android-mediaprojection-revalidation/00-host-timestamp.txt",
+      "bytes": 23,
+      "sha256": "1317b566d0c62b1a240b9693074c17939b9c468b054f9e65c2fc99ed5b34f510"
+    },
+    {
+      "path": "android/acceptance/android-mediaprojection-revalidation/01-adb-state.txt",
+      "bytes": 8,
+      "sha256": "5a49c5eb1807bf1dd12637504e6a6e49f1c9c4bce601ae34c9984843074b129c"
+    },
+    {
+      "path": "android/acceptance/android-mediaprojection-revalidation/02-device-fingerprint.txt",
+      "bytes": 53,
+      "sha256": "ef5df4b23f4be601ed3a8c3042fa3c3370714e3802b7607e60c6c2f45f696c98"
+    },
+    {
+      "path": "android/acceptance/android-mediaprojection-revalidation/03-display-size.txt",
+      "bytes": 26,
+      "sha256": "19e1ab70e0d7242bb570183dc146bd715046d3ca33f5b31605f34b4cc4c22b74"
+    },
+    {
+      "path": "android/acceptance/android-mediaprojection-revalidation/04-preview-resolve-activity.txt",
+      "bytes": 151,
+      "sha256": "c6dced7a959914e9841609ae729f387379bc20b73f309532f7eb7a212b1484cf"
+    },
+    {
+      "path": "android/acceptance/android-mediaprojection-revalidation/05-preview-package-before.txt",
+      "bytes": 9597,
+      "sha256": "5f6ff0db5932d831c2c5f67ffbd710acd89f96e9f06462032c1c477f6709793b"
+    },
+    {
+      "path": "android/acceptance/android-mediaprojection-revalidation/06-preview-pid-before.txt",
+      "bytes": 7,
+      "sha256": "9d54e90c071bb887702a53aa95fbfe23fcf39ded6a0b5229030dc79883c9bd90"
+    },
+    {
+      "path": "android/acceptance/android-mediaprojection-revalidation/08-reverse-before.txt",
+      "bytes": 56,
+      "sha256": "0d73f5af5927ca12c8d35e5a0550fc42b8fbdf39edc3fb7aa87087e9599308b8"
+    },
+    {
+      "path": "android/acceptance/android-mediaprojection-revalidation/09-activity-before.txt",
+      "bytes": 4466,
+      "sha256": "3c196e6dd5f76ce46ba4984258f2962d537781b0e758f2df28bf7cb09a453cf4"
+    },
+    {
+      "path": "android/acceptance/android-mediaprojection-revalidation/10-screen-before.png",
+      "bytes": 176885,
+      "sha256": "18b32333aabf3c926ef3b70715decd494ab7f8fdcd45290a42ce7d4d99690daa"
+    },
+    {
+      "path": "android/acceptance/android-mediaprojection-revalidation/11-host-pre-action.txt",
+      "bytes": 35,
+      "sha256": "c6113b052ce670dc69cc6337c86da2327ed6cab8b7b5538931a5321462c06dd9"
+    },
+    {
+      "path": "android/acceptance/android-mediaprojection-revalidation/12-daily-debug-pid-before.txt",
+      "bytes": 6,
+      "sha256": "591f6b4021386d86e5661d22bb571d8336a11e9a6a33a5c295b8f5e53eba804c"
+    },
+    {
+      "path": "android/acceptance/android-mediaprojection-revalidation/13-preview-pid-before.txt",
+      "bytes": 7,
+      "sha256": "9d54e90c071bb887702a53aa95fbfe23fcf39ded6a0b5229030dc79883c9bd90"
+    },
+    {
+      "path": "android/acceptance/android-mediaprojection-revalidation/14-activity-top-before.txt",
+      "bytes": 9872,
+      "sha256": "738bf1565e007141d86e052036b9642f1e25e8e8860645f3e419b4d039c6c7b2"
+    },
+    {
+      "path": "android/acceptance/android-mediaprojection-revalidation/15-logcat-filtered-before.txt",
+      "bytes": 32902,
+      "sha256": "a3ffde9b785a565fe93610eb3c68be9ef34f733baba8560a88c09ea66400ffd7"
+    },
+    {
+      "path": "android/acceptance/android-mediaprojection-revalidation/16-media-projection-before.txt",
+      "bytes": 145,
+      "sha256": "ab487121b8ae594a39670749d4ea92d110875d09ed09fdeb7c1b8f275da9f462"
+    },
+    {
+      "path": "android/acceptance/android-mediaprojection-revalidation/17-action.txt",
+      "bytes": 72,
+      "sha256": "b522f15e771e850a846330ce7789cb9e167325a934a7106a8969db68b90f1378"
+    },
+    {
+      "path": "android/acceptance/android-mediaprojection-revalidation/18-host-post-action.txt",
+      "bytes": 35,
+      "sha256": "addf2563ade0851f20c9a4856c2b83d4a3277fcc9181ebffb57aeea69c1dc63b"
+    },
+    {
+      "path": "android/acceptance/android-mediaprojection-revalidation/19-screen-after.png",
+      "bytes": 176236,
+      "sha256": "117d2dde86e02725407be805ce057fcb1d125b08a450395645fd9962237ca4db"
+    },
+    {
+      "path": "android/acceptance/android-mediaprojection-revalidation/20-preview-pid-after.txt",
+      "bytes": 7,
+      "sha256": "9d54e90c071bb887702a53aa95fbfe23fcf39ded6a0b5229030dc79883c9bd90"
+    },
+    {
+      "path": "android/acceptance/android-mediaprojection-revalidation/21-daily-debug-pid-after.txt",
+      "bytes": 6,
+      "sha256": "591f6b4021386d86e5661d22bb571d8336a11e9a6a33a5c295b8f5e53eba804c"
+    },
+    {
+      "path": "android/acceptance/android-mediaprojection-revalidation/22-activity-top-after.txt",
+      "bytes": 9872,
+      "sha256": "738bf1565e007141d86e052036b9642f1e25e8e8860645f3e419b4d039c6c7b2"
+    },
+    {
+      "path": "android/acceptance/android-mediaprojection-revalidation/23-activities-after.txt",
+      "bytes": 4775,
+      "sha256": "92b80566a019f5944cf3af20763136156c48f05adb82afb2e0ada7913195e53e"
+    },
+    {
+      "path": "android/acceptance/android-mediaprojection-revalidation/24-media-projection-after.txt",
+      "bytes": 145,
+      "sha256": "ab487121b8ae594a39670749d4ea92d110875d09ed09fdeb7c1b8f275da9f462"
+    },
+    {
+      "path": "android/acceptance/android-mediaprojection-revalidation/25-reverse-after.txt",
+      "bytes": 56,
+      "sha256": "0d73f5af5927ca12c8d35e5a0550fc42b8fbdf39edc3fb7aa87087e9599308b8"
+    },
+    {
+      "path": "android/acceptance/android-mediaprojection-revalidation/26-logcat-filtered-after.txt",
+      "bytes": 36748,
+      "sha256": "0d2d1f97a84a89b7ec30cbb3d3ad364924152b40cdbc73478bc07f0559070409"
+    },
+    {
+      "path": "android/acceptance/android-mediaprojection-revalidation/27-logcat-full-after.txt",
+      "bytes": 439209,
+      "sha256": "e7b40dc5ea5c818c910d012c5cb0aee3ea4e4719d0f047aa965975d1e0b3c5ce"
+    },
+    {
+      "path": "android/acceptance/android-mediaprojection-revalidation/28-preview-package-after.txt",
+      "bytes": 9597,
+      "sha256": "fe90928aa6e376377ee2da04081a24b32863af68d26df8c5b07f54e44b13e32a"
+    },
+    {
+      "path": "android/acceptance/android-mediaprojection-revalidation/29-processes-after.txt",
+      "bytes": 184,
+      "sha256": "6dfaf15653da36476bc3a7dae7f3f50376805dd71c935c7d7b595ad590f0a27a"
+    },
+    {
+      "path": "android/acceptance/android-mediaprojection-revalidation/30-activity-full-after.txt",
+      "bytes": 34654,
+      "sha256": "57a1a3cb5343c3092a2a3461fa0bd061ca84b66dc89795d2cdf52067ebef5bc0"
+    },
+    {
+      "path": "android/acceptance/android-mediaprojection-revalidation/31-window-focus-after.txt",
+      "bytes": 1850,
+      "sha256": "2b71905fbda29a242541d953f196aec48efcf88ccb13bcf9a98be2e86642b4e8"
+    },
+    {
+      "path": "android/acceptance/android-mediaprojection-revalidation/32-media-projection-final.txt",
+      "bytes": 145,
+      "sha256": "ab487121b8ae594a39670749d4ea92d110875d09ed09fdeb7c1b8f275da9f462"
+    },
+    {
+      "path": "android/acceptance/android-mediaprojection-revalidation/33-reverse-final.txt",
+      "bytes": 56,
+      "sha256": "0d73f5af5927ca12c8d35e5a0550fc42b8fbdf39edc3fb7aa87087e9599308b8"
+    },
+    {
+      "path": "android/acceptance/android-mediaprojection-revalidation/34-logcat-product-pid-after.txt",
+      "bytes": 30783,
+      "sha256": "f796009be9f5a010e82af4a7fe029fdb06aefa87d123d934e1c96d864f0be0db"
+    },
+    {
+      "path": "android/acceptance/android-mediaprojection-revalidation/35-logcat-crash-markers-after.txt",
+      "bytes": 4674,
+      "sha256": "a7e09999c2dc4439c7bed7b208cf09e3f91859f13abd3982db35904298255b6b"
+    },
+    {
+      "path": "android/acceptance/android-mediaprojection-revalidation/36-revalidation-verdict.md",
+      "bytes": 1456,
+      "sha256": "8638014b9b498aef222c89f1e99b7a4fcb34408c62ce37181af68e2225782b2a"
+    },
+    {
+      "path": "android/acceptance/android-mediaprojection-revalidation/37-host-final-check.txt",
+      "bytes": 35,
+      "sha256": "e4e17fd6befb6c853b387e3c8c2dfd14d71a98ee8b60591f62f5a1c698c98b9f"
+    },
+    {
+      "path": "android/acceptance/android-mediaprojection-revalidation/38-preview-pid-final-check.txt",
+      "bytes": 7,
+      "sha256": "9d54e90c071bb887702a53aa95fbfe23fcf39ded6a0b5229030dc79883c9bd90"
+    },
+    {
+      "path": "android/acceptance/android-mediaprojection-revalidation/39-daily-debug-pid-final-check.txt",
+      "bytes": 6,
+      "sha256": "591f6b4021386d86e5661d22bb571d8336a11e9a6a33a5c295b8f5e53eba804c"
+    },
+    {
+      "path": "android/acceptance/android-mediaprojection-revalidation/40-activity-final-check.txt",
+      "bytes": 643,
+      "sha256": "1a3f6ba69481ddb2e25f81846d2b0d6fab452e343e292a380aed2f054fcf12d5"
+    },
+    {
+      "path": "android/acceptance/android-mediaprojection-revalidation/41-screen-hashes.txt",
+      "bytes": 489,
+      "sha256": "9aab6ef7758f8378713ce4792ecc0fe557d919d74ff1c6a785e0591c5dfdb4d1"
     },
     {
       "path": "android/capture-after-click.png",
@@ -105,6 +953,36 @@
       "sha256": "567435235dfa925888c810dc3f7de172fdbc00be731a507e93b75970fb71be84"
     },
     {
+      "path": "api-runtime-restart/build-summary.json",
+      "bytes": 322,
+      "sha256": "8ce3b9986b99167107c02c3ba22fa49149ce79e79cb76587c83e19f06daba0dc"
+    },
+    {
+      "path": "api-runtime-restart/build.log",
+      "bytes": 181,
+      "sha256": "a76dce0f927af26429f554354bdc8ac2ec0e10abcf1fd979a74766cd28ab30d3"
+    },
+    {
+      "path": "api-runtime-restart/database-post-restart.json",
+      "bytes": 215,
+      "sha256": "b8b609e22e632cfed032fefe58cfc12a944ba33103f9e57ce3de6c8385bbd802"
+    },
+    {
+      "path": "api-runtime-restart/manager-start.log",
+      "bytes": 31,
+      "sha256": "5bd89b589c5b443bde696e4f768ef674a9dd8a9c814751557a961d8b8e2bf118"
+    },
+    {
+      "path": "api-runtime-restart/pre-restart-identity.json",
+      "bytes": 2161,
+      "sha256": "160c254102122c290f8c616e448778aa14b813d1ac107018454893b2b2d66a3f"
+    },
+    {
+      "path": "api-runtime-restart/restart-verification.json",
+      "bytes": 2223,
+      "sha256": "463be380ac924319d1e1200e87f28a93938ef4505e828370e1928c6f237a4081"
+    },
+    {
       "path": "builds/android-code26-artifact.json",
       "bytes": 1394,
       "sha256": "d8fb939c1e3690ccd53433b1eda311c9734163eb54f06f3f6848d4612c11fac1"
@@ -130,9 +1008,24 @@
       "sha256": "5a02841e5772355d0b045596b59dc19c6cf5b87c46ff1f1318e2956660729501"
     },
     {
+      "path": "capture-coexistence-post-restart.ps1",
+      "bytes": 3587,
+      "sha256": "a1bf517c4f8e45ab4788c38abd8959b63f9802a9f2b87d6c9fa94ba1b31a8dc1"
+    },
+    {
       "path": "coexistence-final.json",
       "bytes": 9285,
       "sha256": "3ad5d0f95132410f0ea2d4e8e855eaa6b635785d4108c27dfb66ad7d31f0e19a"
+    },
+    {
+      "path": "coexistence-post-restart.json",
+      "bytes": 3488,
+      "sha256": "850a519aabbd59b574118cb54382b8eab4390a8ab9b4e35fa004a1ee6f602b46"
+    },
+    {
+      "path": "external/audit.json",
+      "bytes": 2333,
+      "sha256": "02a90bbc9e4feba11c5b8457a583c368054c3f6b014924286263292b8a40b346"
     },
     {
       "path": "external/README.md",
@@ -140,9 +1033,29 @@
       "sha256": "b5780833682bc955db00265d8150fb6309d4a7ad348833a4009872556c5f8a4e"
     },
     {
-      "path": "external/audit.json",
-      "bytes": 2333,
-      "sha256": "02a90bbc9e4feba11c5b8457a583c368054c3f6b014924286263292b8a40b346"
+      "path": "final-validation.json",
+      "bytes": 493,
+      "sha256": "cc48b0085bee33dcc7fe38b0a5059daba6e622a10061fab455e18ab838a4cc3e"
+    },
+    {
+      "path": "generate-evidence-index.mjs",
+      "bytes": 2262,
+      "sha256": "9e5508d70dd7410761e2c5acee36577b1fa9d5d7a0de771172545ed5910bf9a9"
+    },
+    {
+      "path": "live-http-db-receipt.json",
+      "bytes": 1419,
+      "sha256": "e8552d7fbe485a08b9cec0ff34f5457d6419733537d0de7624e523ffda5cfeab"
+    },
+    {
+      "path": "live-http-e2e-runner.mjs",
+      "bytes": 15103,
+      "sha256": "6976559f6cdb8031aa20d11d56b8ddff4286e405d4e6ff113a6f6decde1ff10f"
+    },
+    {
+      "path": "live-http-e2e.json",
+      "bytes": 8875,
+      "sha256": "a37b1ac59953796e45b0c6649f25e37e69cdee75dd7dd165abe1c382998b3c18"
     },
     {
       "path": "migration/README.md",
@@ -153,6 +1066,26 @@
       "path": "migration/result.json",
       "bytes": 10057,
       "sha256": "2f3b9c244b98ddcf96603a1788c90341b13335e6cae479273f8e35a5b307541e"
+    },
+    {
+      "path": "post-restart-mcp-check.json",
+      "bytes": 3753,
+      "sha256": "67dfe4a15df5eb29da79c0bab53251321624d2cc9503561164542b5363063596"
+    },
+    {
+      "path": "post-restart-mcp-check.mjs",
+      "bytes": 4494,
+      "sha256": "a93932470146e467899906233efba6f31a40ec78a284e1d66810b11df1697f98"
+    },
+    {
+      "path": "scan-evidence-secrets.mjs",
+      "bytes": 3045,
+      "sha256": "7ab64a17d09e0ad060f9272b865b3b2d030e03af213234461ec5f5e093062000"
+    },
+    {
+      "path": "secret-scan.json",
+      "bytes": 404,
+      "sha256": "f7605096a0608d6ef8aae58075c81f71c9ac5cfb49f35c45788b0ee96ce624d4"
     },
     {
       "path": "source-gate/02-project-components-tests.result.json",
@@ -203,6 +1136,61 @@
       "path": "source-gate/final-summary.json",
       "bytes": 3628,
       "sha256": "93cfe18c9c9697f46c1b71f4d925ebbde90a96e8a17785153e1307c26cfe39ce"
+    },
+    {
+      "path": "source-verification-88a6d0f/api-js-tests.concurrent-first-failure.tap.txt",
+      "bytes": 43243,
+      "sha256": "a362f7179b6820b2f28498576600a44637d95b9ff0669a2ed0068d81e1b2ac69"
+    },
+    {
+      "path": "source-verification-88a6d0f/api-js-tests.tap.txt",
+      "bytes": 42036,
+      "sha256": "a39da19a73320af8bfe53dfa8c37b3d353fe218ec3c356c0b9cea12f559efb97"
+    },
+    {
+      "path": "source-verification-88a6d0f/api-ts-tests.tap.txt",
+      "bytes": 7601,
+      "sha256": "a0704cfb51f52a4cc57a20718888812bbe87b54229e6f07ef2a46ba1345ba7cb"
+    },
+    {
+      "path": "source-verification-88a6d0f/contract-checks.txt",
+      "bytes": 1130,
+      "sha256": "50832df2c8404b6d9ef20a717b516f6ef67c555150e577b2d367f5422ad01a73"
+    },
+    {
+      "path": "source-verification-88a6d0f/storage-tests.tap.txt",
+      "bytes": 19888,
+      "sha256": "50c17fa25f2cff6d0b709b8335cd6d5c977393eebab7d85a4aaa83547a3c32b8"
+    },
+    {
+      "path": "source-verification-88a6d0f/summarize.mjs",
+      "bytes": 3025,
+      "sha256": "d3020e572ad7d4a4d16520cf7a4596df1ff4d061a3c313879e056ec2193671a0"
+    },
+    {
+      "path": "source-verification-88a6d0f/summary.json",
+      "bytes": 2419,
+      "sha256": "bbfdd3f575cab152690670763264d95497a53f3da48286c1153142dfa478f841"
+    },
+    {
+      "path": "update-acceptance-matrix.mjs",
+      "bytes": 8160,
+      "sha256": "753dd98508c48165ed0f7d930cc1da9df20605d4509ead34396f6e4cb7c01299"
+    },
+    {
+      "path": "user-self-test-handoff.md",
+      "bytes": 6372,
+      "sha256": "47e617872b66c4a254d3facf61edaf25dc6477c3d36aaa3ce203c9a7f22ef565"
+    },
+    {
+      "path": "validate-final-evidence.mjs",
+      "bytes": 4740,
+      "sha256": "410af6dd6daa70c2947e264a640e4a2ff5e6b7e019b4f3194914ff0abacbdd4b"
+    },
+    {
+      "path": "verify-live-http-db-receipt.mjs",
+      "bytes": 6639,
+      "sha256": "5538556a454c97d4dab631c438d72e05c7cee2287c32c3b29695a92023317d11"
     },
     {
       "path": "web-final-867387f/asset-sha256.json",

@@ -1,0 +1,4 @@
+    versionCode=14 minSdk=29 targetSdk=37
+    versionName=0.1.13-debug
+    lastUpdateTime=2026-09-08 16:57:11
+      firstInstallTime=2026-08-25 08:18:02

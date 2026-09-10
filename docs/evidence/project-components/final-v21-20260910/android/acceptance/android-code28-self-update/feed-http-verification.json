@@ -1,0 +1,86 @@
+{
+  "schemaVersion": 1,
+  "verifiedAt": "2026-09-10T07:34:49.451Z",
+  "isolatedOnly": true,
+  "expected": {
+    "versionCode": 28,
+    "versionName": "0.2.0-preview.15",
+    "packageName": "com.relayqahub.android.preview.debug",
+    "fileName": "Relay-QA-Hub-Android-28-0.2.0-preview.15.apk",
+    "size": 35913773,
+    "sha256": "61a885f22b9a62383d923bf36ca0f9ade9f987c22bb30c7323bd8acbd7536e7a",
+    "sourceCommit": "88a6d0f9c31106f6cd3fc9edbadca0db6bf6397b"
+  },
+  "results": [
+    {
+      "origin": "http://127.0.0.1:4639",
+      "manifest": {
+        "status": 200,
+        "cacheControl": "no-store",
+        "body": {
+          "schemaVersion": 1,
+          "channel": "preview",
+          "versionCode": 28,
+          "versionName": "0.2.0-preview.15",
+          "packageName": "com.relayqahub.android.preview.debug",
+          "fileName": "Relay-QA-Hub-Android-28-0.2.0-preview.15.apk",
+          "size": 35913773,
+          "sha256": "61a885f22b9a62383d923bf36ca0f9ade9f987c22bb30c7323bd8acbd7536e7a",
+          "sourceCommit": "88a6d0f9c31106f6cd3fc9edbadca0db6bf6397b"
+        }
+      },
+      "head": {
+        "status": 200,
+        "contentLength": 35913773,
+        "etag": "W/\"224002d-1a08a39f7b7\"",
+        "acceptRanges": "bytes"
+      },
+      "range": {
+        "status": 206,
+        "contentRange": "bytes 0-1023/35913773",
+        "bytes": 1024,
+        "sha256": "fcb575089ecdab07d7ad89c7562ce0552f0454e52ac59e875592e35413c15d86"
+      },
+      "get": {
+        "status": 200,
+        "bytes": 35913773,
+        "sha256": "61a885f22b9a62383d923bf36ca0f9ade9f987c22bb30c7323bd8acbd7536e7a"
+      }
+    },
+    {
+      "origin": "http://127.0.0.1:4640",
+      "manifest": {
+        "status": 200,
+        "cacheControl": "no-store",
+        "body": {
+          "schemaVersion": 1,
+          "channel": "preview",
+          "versionCode": 28,
+          "versionName": "0.2.0-preview.15",
+          "packageName": "com.relayqahub.android.preview.debug",
+          "fileName": "Relay-QA-Hub-Android-28-0.2.0-preview.15.apk",
+          "size": 35913773,
+          "sha256": "61a885f22b9a62383d923bf36ca0f9ade9f987c22bb30c7323bd8acbd7536e7a",
+          "sourceCommit": "88a6d0f9c31106f6cd3fc9edbadca0db6bf6397b"
+        }
+      },
+      "head": {
+        "status": 200,
+        "contentLength": 35913773,
+        "etag": "W/\"224002d-1a08a39f7b7\"",
+        "acceptRanges": "bytes"
+      },
+      "range": {
+        "status": 206,
+        "contentRange": "bytes 0-1023/35913773",
+        "bytes": 1024,
+        "sha256": "fcb575089ecdab07d7ad89c7562ce0552f0454e52ac59e875592e35413c15d86"
+      },
+      "get": {
+        "status": 200,
+        "bytes": 35913773,
+        "sha256": "61a885f22b9a62383d923bf36ca0f9ade9f987c22bb30c7323bd8acbd7536e7a"
+      }
+    }
+  ]
+}

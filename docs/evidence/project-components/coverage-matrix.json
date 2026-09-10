@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-09-10T05:18:59.365Z",
+  "generatedAt": "2026-09-10T08:10:55.091Z",
   "evidenceMapping": {
-    "at": "2026-09-10T05:18:57.595Z",
+    "at": "2026-09-10T08:10:53.393Z",
     "scope": "Only explicit real HTTP/MCP/browser observations. Unit/build results never mark external E2E or broad untested baselines passed.",
     "sourceReports": [
       "redaction-corrections/index.json",
@@ -567,7 +567,7 @@
           {
             "path": "apps/android/app/src/main/kotlin/com/relayqahub/android/ui/FoundationScreen.kt",
             "reviewedSha256": "592ec742249e32c87f274029795c6ada50e2cf96be51fb135fae3df0ff093e3e",
-            "currentSha256": "099ffb09e165931974b1a03563f3cacd6a5b7fc903fc27cd2ffe30e00943f8e3",
+            "currentSha256": "2ff187a869513119022c3abe8b966bce868cb34efe207cd1d3652cce274e0815",
             "exists": true,
             "matched": false
           },
@@ -1548,7 +1548,7 @@
           "surface": "http",
           "source": {
             "file": "apps/api/src/app.ts",
-            "line": 2834
+            "line": 2920
           },
           "title": "POST /api/v1/uploads/init",
           "preservedStatus": "not_run"
@@ -1559,7 +1559,7 @@
           "surface": "http",
           "source": {
             "file": "apps/api/src/app.ts",
-            "line": 2868
+            "line": 2954
           },
           "title": "PUT /api/v1/uploads/:sessionId/chunks/:chunkNumber",
           "preservedStatus": "not_run"
@@ -1570,7 +1570,7 @@
           "surface": "http",
           "source": {
             "file": "apps/api/src/app.ts",
-            "line": 2922
+            "line": 3008
           },
           "title": "POST /api/v1/uploads/:sessionId/finalize",
           "preservedStatus": "not_run"
@@ -1581,7 +1581,7 @@
           "surface": "http",
           "source": {
             "file": "apps/api/src/app.ts",
-            "line": 1431
+            "line": 1446
           },
           "title": "POST /api/v1/bugs",
           "preservedStatus": "passed"
@@ -1719,7 +1719,7 @@
         }
       ],
       "absent": [],
-      "inputSourceFileCount": 198,
+      "inputSourceFileCount": 199,
       "sourceSnapshotScope": "Input matrix sourceHashes/sourceHead describe its previous generation, not current source. This append neither refreshes that inventory nor clears revalidation flags.",
       "statusPolicy": "Only server MCP baseline02/04 have explicit completed requirement promotion from the e21431f0 run. All other additions are evidence only. Historical failures and source revalidation remain; whole baselines are independent."
     },
@@ -1736,7 +1736,7 @@
       }
     ]
   },
-  "sourceHead": "04f22a5075fb6e534ab1303c8ff4e886296168ed",
+  "sourceHead": "88a6d0f9c31106f6cd3fc9edbadca0db6bf6397b",
   "sourceRoots": [
     "apps/api/src",
     "apps/web/src",
@@ -1797,11 +1797,11 @@
     "apps/android/app/src/main/kotlin/com/relayqahub/android/security/AppPrivateCredentialVault.kt": "dfde0c365a9d5b1f8113689729291a0824fd600ad289f851b90518c1f3067934",
     "apps/android/app/src/main/kotlin/com/relayqahub/android/security/CredentialVault.kt": "171156a798a670e03a555a003fe2b50824be323dce1d91ea4c509f61e522030d",
     "apps/android/app/src/main/kotlin/com/relayqahub/android/security/SessionLifecycleCoordinator.kt": "e28a6cfc223e5519dffa732e6d2802571d524fe9abd2a5e1100066f60ab6fb53",
-    "apps/android/app/src/main/kotlin/com/relayqahub/android/ui/BugLifecyclePanel.kt": "a43581d983b96480ac8166f4ce322f28af683bd30b2bef9babd678930d9c5bdb",
+    "apps/android/app/src/main/kotlin/com/relayqahub/android/ui/BugLifecyclePanel.kt": "276b673049fb0d2a5cb7c7e18e4ce871e18708de538ae2a3407aedf2b56fe0c5",
     "apps/android/app/src/main/kotlin/com/relayqahub/android/ui/ComponentTaskScreen.kt": "5844605adcb535076dbd8b0058d0035a23ce533663eab8c457228483315113c9",
-    "apps/android/app/src/main/kotlin/com/relayqahub/android/ui/FoundationScreen.kt": "099ffb09e165931974b1a03563f3cacd6a5b7fc903fc27cd2ffe30e00943f8e3",
+    "apps/android/app/src/main/kotlin/com/relayqahub/android/ui/FoundationScreen.kt": "2ff187a869513119022c3abe8b966bce868cb34efe207cd1d3652cce274e0815",
     "apps/android/app/src/main/kotlin/com/relayqahub/android/ui/ProjectToolsScreen.kt": "b855afdc572dcb224cae5a34d7dad7e77d0fdde68eee59c46fe2cf2fad0e1b9e",
-    "apps/android/app/src/main/kotlin/com/relayqahub/android/ui/QaHubRoot.kt": "d15e19fb95b9fece7c486f37e6039a4682569b6403e360f0c041a1ef726d874c",
+    "apps/android/app/src/main/kotlin/com/relayqahub/android/ui/QaHubRoot.kt": "97e370e0e6e041eda95ceb0044a94959537f3b4b010f96239cc4893480e913cf",
     "apps/android/app/src/main/kotlin/com/relayqahub/android/ui/QingyuComponentScreen.kt": "7b9a988d8e503591af8395e65b54a60b2f798972f7d44a2ff786fc72e5578d87",
     "apps/android/app/src/main/kotlin/com/relayqahub/android/ui/RelayProductionScreen.kt": "08244b08952f53ad038024cfe36641e012e4f95817b799af23102f1e54cd2c6b",
     "apps/android/app/src/main/kotlin/com/relayqahub/android/ui/Theme.kt": "caa4a0ff69369bec0313477ab86d1833e0108fc866a21f20181070519c2bb003",
@@ -1811,7 +1811,7 @@
     "apps/android/app/src/main/kotlin/com/relayqahub/android/work/OfflineSyncWorker.kt": "8a21d7135249a4ff7a5c5128f2f993c1654347e34d8b8803de4950d11da0dde9",
     "apps/android/app/src/main/kotlin/com/relayqahub/android/work/SyncScheduler.kt": "73fe9a7903c711dc1222009527fa1056847a3cfdeeeda5d865658e7e23e6a236",
     "apps/api/src/android-updates.ts": "368e4013e58a9f4fb28a128ff5d55de4cd77d3d9176e90c9b9862d08b0e45c5e",
-    "apps/api/src/app.ts": "d52232cf21ad1d40d1804211417fffb3d19bf3ae3bd7f7ce4f535f57e37afabd",
+    "apps/api/src/app.ts": "7f3f4a44029bcfa5349998368d3237e863b38d728ae56a6440aa28f47755cce9",
     "apps/api/src/automation-routes.ts": "f58995ecd509d865fed6a9374c5ea35694aa403fc7191c13b25f22195adedc45",
     "apps/api/src/automation-verification-result.ts": "adf2b08b2e731f85c5bb1b21ce47494318d190bc72d80a6621cf7c61f6fb4d61",
     "apps/api/src/automation.ts": "bb21e5d802e72687f39b1b8cee47d4edc177be4fdac9594cd9c288b6e98c76ad",
@@ -1827,18 +1827,18 @@
     "apps/api/src/health.ts": "406ff4f0c169d3afccead5cfc8535027af8c81760ca768bfe446ed53c8bd7f79",
     "apps/api/src/import-execution-hold.ts": "7770ae7614e1d46398f889da9423106386cb8fc5daebda64e5157e89a98b5d49",
     "apps/api/src/increment-upload.ts": "bf21ecbaeb2e2a3bb43a522814da86bdb238fa65a55ffe29e0800e88aa4fd140",
-    "apps/api/src/index.ts": "8823c5d013fa87545bf958b36f373a41bd4acf7179b17302ab3b377c32be1fee",
+    "apps/api/src/index.ts": "9734040b33ff9b1636c2d2390754d583c4c347bc0166f9807cf8fe3ae1510d1a",
     "apps/api/src/jenkins-builds.ts": "6142e5f2e7b6d7b64cf3b53b56d41525be6b74fc5876a614d822c92cf3a67190",
     "apps/api/src/jenkins-progress.ts": "15975bebc8c0e99df6a7df81d5b42a69d324224710fc7f68144bb6f9e16fc10b",
-    "apps/api/src/main.ts": "c6be678b25047e5ff30de0fec2383c9940fcc67e8ae816ef4d1695a5fc302f6b",
-    "apps/api/src/mobile-attachments.ts": "8b6bf08255554f9ff560803aeefd69854796db9e5c6d0ef79c6bd5bb24a88229",
+    "apps/api/src/main.ts": "f9003f747cb74d0e8984aa17d1cd4883780386ae70bf3fbd46cc414529bb3f3a",
+    "apps/api/src/mobile-attachments.ts": "b6b881c6a933894f2e1f779ef4af8dce24f552b1e13b08e748bd5283d8de0e89",
     "apps/api/src/mobile-bugs.ts": "e7a7b82c9b148578bae6ca643b68b7b65796026048bf72979fb023b7af84125e",
     "apps/api/src/mobile-builds.ts": "6461239e705000e23262c777826c950c569559dc5721e8acbcee15487201755b",
     "apps/api/src/mobile-captures.ts": "abfaad6cc210b8091bf2d2e896ca5212eb41290628e626f47a9a325a150e0a3d",
     "apps/api/src/mobile-comments.ts": "67fe38022b226c95c20032a8e53bf58d77ed8e7e08cf8e864c8f984d4422e354",
     "apps/api/src/mobile-duplicates.ts": "485f162a0b6657f5f4b01aa36e4b0ae9e8e12dc09726f1e20eeeca2c3a568783",
     "apps/api/src/mobile-human-workflows.ts": "818dec33b4a8233636cba40857023d69b8ddc499aaad9fcab25cc25439799777",
-    "apps/api/src/mobile-inbox.ts": "81c4f4640e51735318fa8967e65330249e5da7b517252986904f991c7016f3b2",
+    "apps/api/src/mobile-inbox.ts": "b7acd3873d996be9da854013df794a0404505453d0f6ee064afb7ea45c45ed09",
     "apps/api/src/mobile-metrics.ts": "1a4b6d8de6a0371249eb49a9d027b9b2f354396825f0797312405c350f49fc3d",
     "apps/api/src/mobile-notification-hints.ts": "d6bbb80f24c79d6371237d01aaad861dcf8ad9854c04b2c7a88916d20613a290",
     "apps/api/src/mobile-project-directory.ts": "75dea0096a2cecc4d4071cb7e62475040cdd45471444634d3332bfe4932ff0e0",
@@ -1846,6 +1846,7 @@
     "apps/api/src/mobile-relay-outbox.ts": "827c9f04ff4f1425319c9ee2b5db3984b8fd8c6c09fc58ae63339516722c0d90",
     "apps/api/src/mobile-relay-webhook.ts": "bc45dee3b21ec5d0cf4ad6a307862f94dde562a154f1e2ca68a044fb9c648767",
     "apps/api/src/mobile-relay.ts": "faaaf924eb3e819d62235fcf0c4b86c7eb4cc65dadc633b40e904507032aaf70",
+    "apps/api/src/mobile-replay-digest.ts": "3d7fc06a7d86825dcb0b4725c216675892a4527f6b07da7e6117b24f0ec8f85e",
     "apps/api/src/mobile-user-management.ts": "f87119d0244e773154efd3ff0720933cbfebc2ae2f884ac2168f0bb092a5ecf8",
     "apps/api/src/mobile-verification.ts": "e88e461f57f3d708af98b1067607521ffeef996ea7db37fe8d5eab823b5eec99",
     "apps/api/src/parallel-instance.ts": "7afdade726a8aeaa3b95b55123fa760f22f639a50e1b6a436c15a9f0409d44a0",
@@ -1853,19 +1854,19 @@
     "apps/api/src/production-tasks.ts": "b1d4311bd4c39325ab92901e1bc5dc0b35d9299a8037aa3ac40c4c408cd2d6d2",
     "apps/api/src/project-components-runtime.ts": "cc626cdbf0da7e2761efcc5495c2b7ada38322a01697bb3108fccb6fc499376f",
     "apps/api/src/project-management.ts": "7f59ce43990cadc517d804f8819c0a8fcb933093192cf74df7d9c7eb2a975dc6",
-    "apps/api/src/project-request-context.ts": "070ce75ac44875a8d338dcb927ba1f4cc89fbdedc8cd9753b0e34e909a132bab",
+    "apps/api/src/project-request-context.ts": "af3e72d6310e1389c5e44ec15be2521744913edb3df11b29fdb01e8e960d018a",
     "apps/api/src/qingyu-client.ts": "b3db21ecec4e9500e8cc243b87409984aa18cd211a4a57df8038efc89bf89347",
     "apps/api/src/qingyu-integration.ts": "3725c3d2e0a063e0b6b08e5d14fa1bc9f0f4dec5bae02afcb753968bc85e7597",
     "apps/api/src/repair-attempt-terminal.ts": "dbdee43e11a0cca65cee4a6d488436054b412ac84c098630cdf14b050d5b2929",
     "apps/api/src/server.ts": "679f7834b88188ffdfd39e51d0d06e29ef76df7194d7ad76ad967f2319f6fba8",
-    "apps/api/src/sqlite-mobile-attachment-store.ts": "b7eb40634f0be98982749009cd9f2d62b58c13b2acbb7f731ded4eccc94e8dce",
+    "apps/api/src/sqlite-mobile-attachment-store.ts": "e05f8bf6a607b39e650bbd4a47dcc17fe099580bfe1106df742f0395968f5eee",
     "apps/api/src/sqlite-mobile-bug-store.ts": "6b26aac284488a221108b062e85c4ab6624352ae6729b8cb49d9781ce26e545f",
     "apps/api/src/sqlite-mobile-build-store.ts": "cc46ae6cf45bbc81e4aa8a1a54d26d13e6d6ce86aa49145cf5a0236bf0300b14",
     "apps/api/src/sqlite-mobile-capture-store.ts": "e76ff833cfa5505064a102aa46ba588d617c74ecff4142d02ee36b7619f0c809",
     "apps/api/src/sqlite-mobile-comment-store.ts": "423210cf338f4a658692cf07b9f7ecd6f070fbe988acdcfa7ed587845c613325",
     "apps/api/src/sqlite-mobile-duplicate-store.ts": "935bd821574c4313cec7022a149ad43c7f95351560644495955c0730cd636985",
     "apps/api/src/sqlite-mobile-human-workflow-store.ts": "207d56de45f059822228c40975457416e5182d9013853eeb427bfc338e97d631",
-    "apps/api/src/sqlite-mobile-inbox-store.ts": "9f6cba0fe63f0dea88df7c8c343bbf6d5e06f5cbf865e22120c32f2a779607d9",
+    "apps/api/src/sqlite-mobile-inbox-store.ts": "0e61cecf9d0954fd559161becae92f164e07635f84ef00088f28a6ef4b0d3d4e",
     "apps/api/src/sqlite-mobile-metrics-store.ts": "349c16d78cba162df0e1bdc47ed41ee77bb760edc26c20f9b5d91fea760edb86",
     "apps/api/src/sqlite-mobile-project-directory-store.ts": "913780593bda5a28705205d511e6f93835db68de184c037eb908959856078180",
     "apps/api/src/sqlite-mobile-relay-store.ts": "b509e25ab5b89585025d1d5a59f33ee741b086b0fab2d6c64f51eaca8edd226d",
@@ -2045,7 +2046,7 @@
     }
   ],
   "summary": {
-    "itemCount": 1027,
+    "itemCount": 1030,
     "byKind": {
       "android_background_operation": 8,
       "android_control": 120,
@@ -2058,7 +2059,7 @@
       "desktop_menu_action": 6,
       "external_full_chain": 10,
       "http_registration_template": 3,
-      "http_route": 198,
+      "http_route": 201,
       "mcp_tool": 116,
       "required_mcp_parity": 17,
       "state_action": 12,
@@ -2067,7 +2068,7 @@
       "web_page_component": 34
     },
     "baselineCount": 24,
-    "fileCount": 198,
+    "fileCount": 199,
     "resultsBySurface": {
       "apk": {
         "not_run": 290,
@@ -2083,7 +2084,7 @@
       },
       "http": {
         "passed": 51,
-        "not_run": 305
+        "not_run": 308
       },
       "server_mcp": {
         "not_run": 237,
@@ -2181,7 +2182,7 @@
       },
       "manual": {
         "inventoryNote": "Design v2.1 section 13 baseline. Generator retention verified without marking any product test passed.",
-        "evidenceMappedAt": "2026-09-10T05:18:57.580Z",
+        "evidenceMappedAt": "2026-09-10T08:10:53.379Z",
         "surfaceProgress": {
           "apk": {
             "completed": [
@@ -2418,7 +2419,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-10T05:18:57.581Z",
+        "evidenceMappedAt": "2026-09-10T08:10:53.379Z",
         "surfaceProgress": {
           "apk": {
             "completed": [
@@ -3093,7 +3094,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-10T05:18:57.432Z",
+        "evidenceMappedAt": "2026-09-10T08:10:53.238Z",
         "surfaceProgress": {
           "apk": {
             "completed": [
@@ -3770,7 +3771,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-10T05:18:57.437Z",
+        "evidenceMappedAt": "2026-09-10T08:10:53.242Z",
         "surfaceProgress": {},
         "baselineCriterionReview": {
           "at": "2026-09-08T21:26:59.617Z",
@@ -3933,7 +3934,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-10T05:18:57.439Z",
+        "evidenceMappedAt": "2026-09-10T08:10:53.244Z",
         "surfaceProgress": {},
         "baselineCriterionReview": {
           "at": "2026-09-08T21:26:59.617Z",
@@ -4130,7 +4131,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-10T05:18:57.441Z",
+        "evidenceMappedAt": "2026-09-10T08:10:53.246Z",
         "surfaceProgress": {
           "local_mcp": {
             "completed": [
@@ -4922,7 +4923,7 @@
             }
           }
         ],
-        "evidenceMappedAt": "2026-09-10T05:18:57.567Z",
+        "evidenceMappedAt": "2026-09-10T08:10:53.366Z",
         "workflowConcurrencyRuns": [
           {
             "runId": "e94223b3-82c5-469d-b7ca-eea306ba0aab",
@@ -5873,7 +5874,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-10T05:18:57.445Z",
+        "evidenceMappedAt": "2026-09-10T08:10:53.250Z",
         "surfaceProgress": {
           "apk": {
             "completed": [
@@ -6513,7 +6514,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-10T05:18:57.575Z",
+        "evidenceMappedAt": "2026-09-10T08:10:53.373Z",
         "surfaceProgress": {
           "apk": {
             "completed": [
@@ -6676,7 +6677,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-10T05:18:57.447Z",
+        "evidenceMappedAt": "2026-09-10T08:10:53.251Z",
         "preview7Upgrade": {
           "at": "2026-09-08T19:54:02.443Z",
           "proof": "runs/exe-after-preview7-upgrade.json",
@@ -7199,7 +7200,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-10T05:18:57.449Z",
+        "evidenceMappedAt": "2026-09-10T08:10:53.254Z",
         "reviewedEvidence": {
           "proofHashes": {
             "runs/frozen-workflow-live-2026-09-08T20-40-57-088Z.json": "de8200288602407e53747505620241fc89247c896c2b32bb86cdc47006e3e387",
@@ -9056,7 +9057,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-10T05:18:57.451Z",
+        "evidenceMappedAt": "2026-09-10T08:10:53.256Z",
         "reviewedEvidence": {
           "proofHashes": {
             "runs/frozen-workflow-live-2026-09-08T20-40-57-088Z.json": "de8200288602407e53747505620241fc89247c896c2b32bb86cdc47006e3e387",
@@ -19791,7 +19792,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-10T05:18:57.453Z",
+        "evidenceMappedAt": "2026-09-10T08:10:53.258Z",
         "retainedReviewNotes": [
           {
             "surface": "server_mcp",
@@ -20038,7 +20039,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-10T05:18:57.455Z",
+        "evidenceMappedAt": "2026-09-10T08:10:53.259Z",
         "retainedReviewNotes": [
           {
             "surface": "server_mcp",
@@ -20332,7 +20333,7 @@
           "at": "2026-09-08T21:26:59.617Z",
           "reason": "Actual EXE-absent direct HTTP and server JSON-RPC cases; preserve remaining full-function requirements."
         },
-        "evidenceMappedAt": "2026-09-10T05:18:57.554Z",
+        "evidenceMappedAt": "2026-09-10T08:10:53.354Z",
         "projectIsolationRuns": [
           {
             "runId": "789bd648-e5df-43d7-b5b1-283327f83b07",
@@ -20544,7 +20545,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-10T05:18:57.554Z",
+        "evidenceMappedAt": "2026-09-10T08:10:53.355Z",
         "retainedReviewNotes": [
           {
             "surface": "server_mcp",
@@ -20868,7 +20869,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-10T05:18:57.460Z",
+        "evidenceMappedAt": "2026-09-10T08:10:53.264Z",
         "retainedReviewNotes": [
           {
             "surface": "server_mcp",
@@ -21154,7 +21155,7 @@
           "at": "2026-09-08T21:26:59.617Z",
           "reason": "Actual EXE-absent direct HTTP and server JSON-RPC cases; preserve remaining full-function requirements."
         },
-        "evidenceMappedAt": "2026-09-10T05:18:57.555Z",
+        "evidenceMappedAt": "2026-09-10T08:10:53.357Z",
         "projectIsolationRuns": [
           {
             "runId": "789bd648-e5df-43d7-b5b1-283327f83b07",
@@ -21416,7 +21417,7 @@
             "progress": null
           }
         ],
-        "evidenceMappedAt": "2026-09-10T05:18:57.557Z",
+        "evidenceMappedAt": "2026-09-10T08:10:53.357Z",
         "projectIsolationRuns": [
           {
             "runId": "789bd648-e5df-43d7-b5b1-283327f83b07",
@@ -21659,7 +21660,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-10T05:18:57.565Z",
+        "evidenceMappedAt": "2026-09-10T08:10:53.364Z",
         "retainedReviewNotes": [
           {
             "surface": "server_mcp",
@@ -22101,7 +22102,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-10T05:18:57.555Z",
+        "evidenceMappedAt": "2026-09-10T08:10:53.357Z",
         "retainedReviewNotes": [
           {
             "surface": "server_mcp",
@@ -22387,7 +22388,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-10T05:18:57.554Z",
+        "evidenceMappedAt": "2026-09-10T08:10:53.355Z",
         "retainedReviewNotes": [
           {
             "surface": "server_mcp",
@@ -22699,7 +22700,7 @@
           "at": "2026-09-08T21:26:59.617Z",
           "reason": "Actual EXE-absent direct HTTP and server JSON-RPC cases; preserve remaining full-function requirements."
         },
-        "evidenceMappedAt": "2026-09-10T05:18:57.554Z",
+        "evidenceMappedAt": "2026-09-10T08:10:53.355Z",
         "projectIsolationRuns": [
           {
             "runId": "789bd648-e5df-43d7-b5b1-283327f83b07",
@@ -23293,7 +23294,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-10T05:18:57.472Z",
+        "evidenceMappedAt": "2026-09-10T08:10:53.276Z",
         "retainedReviewNotes": [
           {
             "surface": "server_mcp",
@@ -24193,7 +24194,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-10T05:18:57.555Z",
+        "evidenceMappedAt": "2026-09-10T08:10:53.357Z",
         "projectIsolationRuns": [
           {
             "runId": "789bd648-e5df-43d7-b5b1-283327f83b07",
@@ -34673,9 +34674,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 666
+        "line": 681
       },
-      "sourceHash": "d52232cf21ad1d40d1804211417fffb3d19bf3ae3bd7f7ce4f535f57e37afabd",
+      "sourceHash": "7f3f4a44029bcfa5349998368d3237e863b38d728ae56a6440aa28f47755cce9",
       "method": "GET",
       "path": "/api/v1/projects/:projectId/bugs/:bugId/comments",
       "registration": "direct",
@@ -34802,9 +34803,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 893
+        "line": 908
       },
-      "sourceHash": "d52232cf21ad1d40d1804211417fffb3d19bf3ae3bd7f7ce4f535f57e37afabd",
+      "sourceHash": "7f3f4a44029bcfa5349998368d3237e863b38d728ae56a6440aa28f47755cce9",
       "method": "GET",
       "path": "/api/v1/integrations/qingyu/session",
       "registration": "direct",
@@ -34931,9 +34932,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 896
+        "line": 911
       },
-      "sourceHash": "d52232cf21ad1d40d1804211417fffb3d19bf3ae3bd7f7ce4f535f57e37afabd",
+      "sourceHash": "7f3f4a44029bcfa5349998368d3237e863b38d728ae56a6440aa28f47755cce9",
       "method": "POST",
       "path": "/api/v1/integrations/qingyu/login/start",
       "registration": "direct",
@@ -35060,9 +35061,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 899
+        "line": 914
       },
-      "sourceHash": "d52232cf21ad1d40d1804211417fffb3d19bf3ae3bd7f7ce4f535f57e37afabd",
+      "sourceHash": "7f3f4a44029bcfa5349998368d3237e863b38d728ae56a6440aa28f47755cce9",
       "method": "GET",
       "path": "/api/v1/integrations/qingyu/login/status",
       "registration": "direct",
@@ -35189,9 +35190,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 902
+        "line": 917
       },
-      "sourceHash": "d52232cf21ad1d40d1804211417fffb3d19bf3ae3bd7f7ce4f535f57e37afabd",
+      "sourceHash": "7f3f4a44029bcfa5349998368d3237e863b38d728ae56a6440aa28f47755cce9",
       "method": "POST",
       "path": "/api/v1/integrations/qingyu/logout",
       "registration": "direct",
@@ -35318,9 +35319,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 905
+        "line": 920
       },
-      "sourceHash": "d52232cf21ad1d40d1804211417fffb3d19bf3ae3bd7f7ce4f535f57e37afabd",
+      "sourceHash": "7f3f4a44029bcfa5349998368d3237e863b38d728ae56a6440aa28f47755cce9",
       "method": "GET",
       "path": "/api/v1/integrations/qingyu/projects",
       "registration": "direct",
@@ -35447,9 +35448,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 908
+        "line": 923
       },
-      "sourceHash": "d52232cf21ad1d40d1804211417fffb3d19bf3ae3bd7f7ce4f535f57e37afabd",
+      "sourceHash": "7f3f4a44029bcfa5349998368d3237e863b38d728ae56a6440aa28f47755cce9",
       "method": "GET",
       "path": "/api/v1/integrations/qingyu/defects",
       "registration": "direct",
@@ -35576,9 +35577,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 920
+        "line": 935
       },
-      "sourceHash": "d52232cf21ad1d40d1804211417fffb3d19bf3ae3bd7f7ce4f535f57e37afabd",
+      "sourceHash": "7f3f4a44029bcfa5349998368d3237e863b38d728ae56a6440aa28f47755cce9",
       "method": "POST",
       "path": "/api/v1/integrations/qingyu/import",
       "registration": "direct",
@@ -35705,9 +35706,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 943
+        "line": 958
       },
-      "sourceHash": "d52232cf21ad1d40d1804211417fffb3d19bf3ae3bd7f7ce4f535f57e37afabd",
+      "sourceHash": "7f3f4a44029bcfa5349998368d3237e863b38d728ae56a6440aa28f47755cce9",
       "method": "GET",
       "path": "/api/v1/bugs/:bugId/integrations/qingyu",
       "registration": "direct",
@@ -35834,9 +35835,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 950
+        "line": 965
       },
-      "sourceHash": "d52232cf21ad1d40d1804211417fffb3d19bf3ae3bd7f7ce4f535f57e37afabd",
+      "sourceHash": "7f3f4a44029bcfa5349998368d3237e863b38d728ae56a6440aa28f47755cce9",
       "method": "POST",
       "path": "/api/v1/bugs/:bugId/integrations/qingyu/resolve",
       "registration": "direct",
@@ -35966,9 +35967,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 975
+        "line": 990
       },
-      "sourceHash": "d52232cf21ad1d40d1804211417fffb3d19bf3ae3bd7f7ce4f535f57e37afabd",
+      "sourceHash": "7f3f4a44029bcfa5349998368d3237e863b38d728ae56a6440aa28f47755cce9",
       "method": "GET",
       "path": "/api/v1/health/live",
       "registration": "direct",
@@ -36098,9 +36099,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 987
+        "line": 1002
       },
-      "sourceHash": "d52232cf21ad1d40d1804211417fffb3d19bf3ae3bd7f7ce4f535f57e37afabd",
+      "sourceHash": "7f3f4a44029bcfa5349998368d3237e863b38d728ae56a6440aa28f47755cce9",
       "method": "GET",
       "path": "/api/v1/health/ready",
       "registration": "direct",
@@ -36165,7 +36166,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-10T05:18:57.474Z",
+        "evidenceMappedAt": "2026-09-10T08:10:53.278Z",
         "reviewedEvidence": {
           "proofHashes": {
             "runs/frozen-workflow-live-2026-09-08T20-40-57-088Z.json": "de8200288602407e53747505620241fc89247c896c2b32bb86cdc47006e3e387",
@@ -36300,9 +36301,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 999
+        "line": 1014
       },
-      "sourceHash": "d52232cf21ad1d40d1804211417fffb3d19bf3ae3bd7f7ce4f535f57e37afabd",
+      "sourceHash": "7f3f4a44029bcfa5349998368d3237e863b38d728ae56a6440aa28f47755cce9",
       "method": "GET",
       "path": "/api/v1/health/deps",
       "registration": "direct",
@@ -36435,9 +36436,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 1022
+        "line": 1037
       },
-      "sourceHash": "d52232cf21ad1d40d1804211417fffb3d19bf3ae3bd7f7ce4f535f57e37afabd",
+      "sourceHash": "7f3f4a44029bcfa5349998368d3237e863b38d728ae56a6440aa28f47755cce9",
       "method": "GET",
       "path": "/api/v1/projects",
       "registration": "direct",
@@ -36500,7 +36501,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-10T05:18:57.476Z",
+        "evidenceMappedAt": "2026-09-10T08:10:53.280Z",
         "retainedReviewNotes": [
           {
             "surface": "http",
@@ -36630,9 +36631,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 1063
+        "line": 1078
       },
-      "sourceHash": "d52232cf21ad1d40d1804211417fffb3d19bf3ae3bd7f7ce4f535f57e37afabd",
+      "sourceHash": "7f3f4a44029bcfa5349998368d3237e863b38d728ae56a6440aa28f47755cce9",
       "method": "GET",
       "path": "/api/v1/projects/:projectId/members",
       "registration": "direct",
@@ -36765,9 +36766,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 1108
+        "line": 1123
       },
-      "sourceHash": "d52232cf21ad1d40d1804211417fffb3d19bf3ae3bd7f7ce4f535f57e37afabd",
+      "sourceHash": "7f3f4a44029bcfa5349998368d3237e863b38d728ae56a6440aa28f47755cce9",
       "method": "GET",
       "path": "/api/v1/projects/:projectId/users",
       "registration": "direct",
@@ -36909,9 +36910,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 1139
+        "line": 1154
       },
-      "sourceHash": "d52232cf21ad1d40d1804211417fffb3d19bf3ae3bd7f7ce4f535f57e37afabd",
+      "sourceHash": "7f3f4a44029bcfa5349998368d3237e863b38d728ae56a6440aa28f47755cce9",
       "method": "POST",
       "path": "/api/v1/projects/:projectId/users/:userId/identity-link",
       "registration": "direct",
@@ -37049,9 +37050,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 1178
+        "line": 1193
       },
-      "sourceHash": "d52232cf21ad1d40d1804211417fffb3d19bf3ae3bd7f7ce4f535f57e37afabd",
+      "sourceHash": "7f3f4a44029bcfa5349998368d3237e863b38d728ae56a6440aa28f47755cce9",
       "method": "DELETE",
       "path": "/api/v1/projects/:projectId/users/:userId/identity-link",
       "registration": "direct",
@@ -37189,9 +37190,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 1214
+        "line": 1229
       },
-      "sourceHash": "d52232cf21ad1d40d1804211417fffb3d19bf3ae3bd7f7ce4f535f57e37afabd",
+      "sourceHash": "7f3f4a44029bcfa5349998368d3237e863b38d728ae56a6440aa28f47755cce9",
       "method": "DELETE",
       "path": "/api/v1/projects/:projectId/users/:userId",
       "registration": "direct",
@@ -37324,9 +37325,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 1250
+        "line": 1265
       },
-      "sourceHash": "d52232cf21ad1d40d1804211417fffb3d19bf3ae3bd7f7ce4f535f57e37afabd",
+      "sourceHash": "7f3f4a44029bcfa5349998368d3237e863b38d728ae56a6440aa28f47755cce9",
       "method": "GET",
       "path": "/api/v1/projects/:projectId/modules",
       "registration": "direct",
@@ -37706,9 +37707,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 1282
+        "line": 1297
       },
-      "sourceHash": "d52232cf21ad1d40d1804211417fffb3d19bf3ae3bd7f7ce4f535f57e37afabd",
+      "sourceHash": "7f3f4a44029bcfa5349998368d3237e863b38d728ae56a6440aa28f47755cce9",
       "method": "GET",
       "path": "/api/v1/projects/:projectId/metrics/overview",
       "registration": "direct",
@@ -38083,9 +38084,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 1318
+        "line": 1333
       },
-      "sourceHash": "d52232cf21ad1d40d1804211417fffb3d19bf3ae3bd7f7ce4f535f57e37afabd",
+      "sourceHash": "7f3f4a44029bcfa5349998368d3237e863b38d728ae56a6440aa28f47755cce9",
       "method": "POST",
       "path": "/api/v1/integrations/relay/webhooks",
       "registration": "direct",
@@ -38215,9 +38216,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 1431
+        "line": 1446
       },
-      "sourceHash": "d52232cf21ad1d40d1804211417fffb3d19bf3ae3bd7f7ce4f535f57e37afabd",
+      "sourceHash": "7f3f4a44029bcfa5349998368d3237e863b38d728ae56a6440aa28f47755cce9",
       "method": "POST",
       "path": "/api/v1/bugs",
       "registration": "direct",
@@ -38284,7 +38285,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-10T05:18:57.565Z",
+        "evidenceMappedAt": "2026-09-10T08:10:53.364Z",
         "reviewedEvidence": {
           "proofHashes": {
             "runs/frozen-workflow-live-2026-09-08T20-40-57-088Z.json": "de8200288602407e53747505620241fc89247c896c2b32bb86cdc47006e3e387",
@@ -38458,9 +38459,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 1464
+        "line": 1479
       },
-      "sourceHash": "d52232cf21ad1d40d1804211417fffb3d19bf3ae3bd7f7ce4f535f57e37afabd",
+      "sourceHash": "7f3f4a44029bcfa5349998368d3237e863b38d728ae56a6440aa28f47755cce9",
       "method": "GET",
       "path": "/api/v1/bugs",
       "registration": "direct",
@@ -38766,7 +38767,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-10T05:18:57.548Z",
+        "evidenceMappedAt": "2026-09-10T08:10:53.349Z",
         "retainedReviewNotes": [
           {
             "surface": "http",
@@ -38943,9 +38944,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 1509
+        "line": 1524
       },
-      "sourceHash": "d52232cf21ad1d40d1804211417fffb3d19bf3ae3bd7f7ce4f535f57e37afabd",
+      "sourceHash": "7f3f4a44029bcfa5349998368d3237e863b38d728ae56a6440aa28f47755cce9",
       "method": "GET",
       "path": "/api/v1/bugs/:bugId",
       "registration": "direct",
@@ -39268,7 +39269,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-10T05:18:57.549Z",
+        "evidenceMappedAt": "2026-09-10T08:10:53.350Z",
         "reviewedEvidence": {
           "proofHashes": {
             "runs/frozen-workflow-live-2026-09-08T20-40-57-088Z.json": "de8200288602407e53747505620241fc89247c896c2b32bb86cdc47006e3e387",
@@ -39431,9 +39432,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 1524
+        "line": 1539
       },
-      "sourceHash": "d52232cf21ad1d40d1804211417fffb3d19bf3ae3bd7f7ce4f535f57e37afabd",
+      "sourceHash": "7f3f4a44029bcfa5349998368d3237e863b38d728ae56a6440aa28f47755cce9",
       "method": "GET",
       "path": "/api/v1/bugs/:bugId/attachments",
       "registration": "direct",
@@ -39724,7 +39725,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-10T05:18:57.551Z",
+        "evidenceMappedAt": "2026-09-10T08:10:53.352Z",
         "sourceEvidenceReview": {
           "nodeId": "http_route-662ac1e4f068be",
           "sourceFile": "apps/api/src/app.ts",
@@ -39817,9 +39818,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 1562
+        "line": 1577
       },
-      "sourceHash": "d52232cf21ad1d40d1804211417fffb3d19bf3ae3bd7f7ce4f535f57e37afabd",
+      "sourceHash": "7f3f4a44029bcfa5349998368d3237e863b38d728ae56a6440aa28f47755cce9",
       "method": "GET",
       "path": "/api/v1/attachments/:attachmentId",
       "registration": "direct",
@@ -40110,7 +40111,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-10T05:18:57.551Z",
+        "evidenceMappedAt": "2026-09-10T08:10:53.352Z",
         "sourceEvidenceReview": {
           "nodeId": "http_route-f2b76a8f2d3bd2",
           "sourceFile": "apps/api/src/app.ts",
@@ -40203,9 +40204,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 1599
+        "line": 1614
       },
-      "sourceHash": "d52232cf21ad1d40d1804211417fffb3d19bf3ae3bd7f7ce4f535f57e37afabd",
+      "sourceHash": "7f3f4a44029bcfa5349998368d3237e863b38d728ae56a6440aa28f47755cce9",
       "method": "GET",
       "path": "/api/v1/bugs/:bugId/capture-bundles/:captureId/artifacts/:artifactKind",
       "registration": "direct",
@@ -40335,9 +40336,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 1637
+        "line": 1652
       },
-      "sourceHash": "d52232cf21ad1d40d1804211417fffb3d19bf3ae3bd7f7ce4f535f57e37afabd",
+      "sourceHash": "7f3f4a44029bcfa5349998368d3237e863b38d728ae56a6440aa28f47755cce9",
       "method": "PATCH",
       "path": "/api/v1/bugs/:bugId",
       "registration": "direct",
@@ -40411,7 +40412,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-10T05:18:57.553Z",
+        "evidenceMappedAt": "2026-09-10T08:10:53.354Z",
         "retainedReviewNotes": [
           {
             "surface": "http",
@@ -40552,9 +40553,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 1678
+        "line": 1693
       },
-      "sourceHash": "d52232cf21ad1d40d1804211417fffb3d19bf3ae3bd7f7ce4f535f57e37afabd",
+      "sourceHash": "7f3f4a44029bcfa5349998368d3237e863b38d728ae56a6440aa28f47755cce9",
       "method": "DELETE",
       "path": "/api/v1/bugs/:bugId",
       "registration": "direct",
@@ -40671,7 +40672,7 @@
           "at": "2026-09-08T21:26:59.617Z",
           "reason": "Actual EXE-absent direct HTTP and server JSON-RPC cases; preserve remaining full-function requirements."
         },
-        "evidenceMappedAt": "2026-09-10T05:18:57.554Z",
+        "evidenceMappedAt": "2026-09-10T08:10:53.354Z",
         "sourceEvidenceReview": {
           "nodeId": "http_route-3f8b6d79c3ec5a",
           "sourceFile": "apps/api/src/app.ts",
@@ -40761,9 +40762,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 1729
+        "line": 1744
       },
-      "sourceHash": "d52232cf21ad1d40d1804211417fffb3d19bf3ae3bd7f7ce4f535f57e37afabd",
+      "sourceHash": "7f3f4a44029bcfa5349998368d3237e863b38d728ae56a6440aa28f47755cce9",
       "method": "GET",
       "path": "/api/v1/bugs/:bugId/duplicate-candidates",
       "registration": "direct",
@@ -40893,9 +40894,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 1761
+        "line": 1776
       },
-      "sourceHash": "d52232cf21ad1d40d1804211417fffb3d19bf3ae3bd7f7ce4f535f57e37afabd",
+      "sourceHash": "7f3f4a44029bcfa5349998368d3237e863b38d728ae56a6440aa28f47755cce9",
       "method": "POST",
       "path": "/api/v1/bugs/:bugId/mark-duplicate",
       "registration": "direct",
@@ -41025,9 +41026,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 1871
+        "line": 1886
       },
-      "sourceHash": "d52232cf21ad1d40d1804211417fffb3d19bf3ae3bd7f7ce4f535f57e37afabd",
+      "sourceHash": "7f3f4a44029bcfa5349998368d3237e863b38d728ae56a6440aa28f47755cce9",
       "method": "POST",
       "path": "/api/v1/repair-attempts/:attemptId/fail",
       "registration": "direct",
@@ -41114,9 +41115,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 1871
+        "line": 1886
       },
-      "sourceHash": "d52232cf21ad1d40d1804211417fffb3d19bf3ae3bd7f7ce4f535f57e37afabd",
+      "sourceHash": "7f3f4a44029bcfa5349998368d3237e863b38d728ae56a6440aa28f47755cce9",
       "method": "POST",
       "path": "/api/v1/repair-attempts/:attemptId/supersede",
       "registration": "direct",
@@ -41203,9 +41204,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 1935
+        "line": 1950
       },
-      "sourceHash": "d52232cf21ad1d40d1804211417fffb3d19bf3ae3bd7f7ce4f535f57e37afabd",
+      "sourceHash": "7f3f4a44029bcfa5349998368d3237e863b38d728ae56a6440aa28f47755cce9",
       "method": "POST",
       "path": "/api/v1/bugs/:bugId/transitions",
       "registration": "direct",
@@ -41308,7 +41309,7 @@
             "progress": null
           }
         ],
-        "evidenceMappedAt": "2026-09-10T05:18:57.565Z",
+        "evidenceMappedAt": "2026-09-10T08:10:53.364Z",
         "sourceEvidenceReview": {
           "nodeId": "http_route-280fa057c65980",
           "sourceFile": "apps/api/src/app.ts",
@@ -41405,9 +41406,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 1960
+        "line": 1975
       },
-      "sourceHash": "d52232cf21ad1d40d1804211417fffb3d19bf3ae3bd7f7ce4f535f57e37afabd",
+      "sourceHash": "7f3f4a44029bcfa5349998368d3237e863b38d728ae56a6440aa28f47755cce9",
       "method": "POST",
       "path": "/api/v1/bugs/:bugId/complete",
       "registration": "direct",
@@ -41537,9 +41538,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 1985
+        "line": 2000
       },
-      "sourceHash": "d52232cf21ad1d40d1804211417fffb3d19bf3ae3bd7f7ce4f535f57e37afabd",
+      "sourceHash": "7f3f4a44029bcfa5349998368d3237e863b38d728ae56a6440aa28f47755cce9",
       "method": "POST",
       "path": "/api/v1/bugs/:bugId/manual-complete",
       "registration": "direct",
@@ -41662,7 +41663,7 @@
           "at": "2026-09-08T21:26:59.617Z",
           "reason": "Actual EXE-absent direct HTTP and server JSON-RPC cases; preserve remaining full-function requirements."
         },
-        "evidenceMappedAt": "2026-09-10T05:18:57.553Z",
+        "evidenceMappedAt": "2026-09-10T08:10:53.354Z",
         "sourceEvidenceReview": {
           "nodeId": "http_route-91587d5ccb9fcd",
           "sourceFile": "apps/api/src/app.ts",
@@ -41754,9 +41755,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 2013
+        "line": 2028
       },
-      "sourceHash": "d52232cf21ad1d40d1804211417fffb3d19bf3ae3bd7f7ce4f535f57e37afabd",
+      "sourceHash": "7f3f4a44029bcfa5349998368d3237e863b38d728ae56a6440aa28f47755cce9",
       "method": "POST",
       "path": "/api/v1/bugs/:bugId/repair-attempts",
       "registration": "direct",
@@ -41859,7 +41860,7 @@
             "progress": null
           }
         ],
-        "evidenceMappedAt": "2026-09-10T05:18:57.565Z",
+        "evidenceMappedAt": "2026-09-10T08:10:53.364Z",
         "sourceEvidenceReview": {
           "nodeId": "http_route-133e8410ae7ef7",
           "sourceFile": "apps/api/src/app.ts",
@@ -41956,9 +41957,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 2110
+        "line": 2125
       },
-      "sourceHash": "d52232cf21ad1d40d1804211417fffb3d19bf3ae3bd7f7ce4f535f57e37afabd",
+      "sourceHash": "7f3f4a44029bcfa5349998368d3237e863b38d728ae56a6440aa28f47755cce9",
       "method": "POST",
       "path": "/api/v1/repair-attempts/:attemptId/start",
       "registration": "direct",
@@ -42061,7 +42062,7 @@
             "progress": null
           }
         ],
-        "evidenceMappedAt": "2026-09-10T05:18:57.565Z",
+        "evidenceMappedAt": "2026-09-10T08:10:53.364Z",
         "sourceEvidenceReview": {
           "nodeId": "http_route-45735bc8af628d",
           "sourceFile": "apps/api/src/app.ts",
@@ -42158,9 +42159,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 2143
+        "line": 2158
       },
-      "sourceHash": "d52232cf21ad1d40d1804211417fffb3d19bf3ae3bd7f7ce4f535f57e37afabd",
+      "sourceHash": "7f3f4a44029bcfa5349998368d3237e863b38d728ae56a6440aa28f47755cce9",
       "method": "GET",
       "path": "/api/v1/repair-attempts/:attemptId",
       "registration": "direct",
@@ -42334,9 +42335,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 2163
+        "line": 2178
       },
-      "sourceHash": "d52232cf21ad1d40d1804211417fffb3d19bf3ae3bd7f7ce4f535f57e37afabd",
+      "sourceHash": "7f3f4a44029bcfa5349998368d3237e863b38d728ae56a6440aa28f47755cce9",
       "method": "POST",
       "path": "/api/v1/repair-attempts/:attemptId/deliver",
       "registration": "direct",
@@ -42439,7 +42440,7 @@
             "progress": null
           }
         ],
-        "evidenceMappedAt": "2026-09-10T05:18:57.565Z",
+        "evidenceMappedAt": "2026-09-10T08:10:53.364Z",
         "sourceEvidenceReview": {
           "nodeId": "http_route-144efd0c9334b8",
           "sourceFile": "apps/api/src/app.ts",
@@ -42534,9 +42535,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 2196
+        "line": 2211
       },
-      "sourceHash": "d52232cf21ad1d40d1804211417fffb3d19bf3ae3bd7f7ce4f535f57e37afabd",
+      "sourceHash": "7f3f4a44029bcfa5349998368d3237e863b38d728ae56a6440aa28f47755cce9",
       "method": "POST",
       "path": "/api/v1/repair-attempts/:attemptId/dispatch/relay",
       "registration": "direct",
@@ -42664,9 +42665,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 2224
+        "line": 2239
       },
-      "sourceHash": "d52232cf21ad1d40d1804211417fffb3d19bf3ae3bd7f7ce4f535f57e37afabd",
+      "sourceHash": "7f3f4a44029bcfa5349998368d3237e863b38d728ae56a6440aa28f47755cce9",
       "method": "POST",
       "path": "/api/v1/repair-attempts/:attemptId/dispatch/relay/continue",
       "registration": "direct",
@@ -42794,9 +42795,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 2252
+        "line": 2267
       },
-      "sourceHash": "d52232cf21ad1d40d1804211417fffb3d19bf3ae3bd7f7ce4f535f57e37afabd",
+      "sourceHash": "7f3f4a44029bcfa5349998368d3237e863b38d728ae56a6440aa28f47755cce9",
       "method": "GET",
       "path": "/api/v1/repair-attempts/:attemptId/relay-receipt",
       "registration": "direct",
@@ -42929,9 +42930,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 2339
+        "line": 2354
       },
-      "sourceHash": "d52232cf21ad1d40d1804211417fffb3d19bf3ae3bd7f7ce4f535f57e37afabd",
+      "sourceHash": "7f3f4a44029bcfa5349998368d3237e863b38d728ae56a6440aa28f47755cce9",
       "method": "GET",
       "path": "/api/v1/projects/:projectId/human-workflows/latest",
       "registration": "direct",
@@ -43061,9 +43062,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 2364
+        "line": 2379
       },
-      "sourceHash": "d52232cf21ad1d40d1804211417fffb3d19bf3ae3bd7f7ce4f535f57e37afabd",
+      "sourceHash": "7f3f4a44029bcfa5349998368d3237e863b38d728ae56a6440aa28f47755cce9",
       "method": "GET",
       "path": "/api/v1/bugs/:bugId/human-workflow",
       "registration": "direct",
@@ -43128,7 +43129,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-10T05:18:57.491Z",
+        "evidenceMappedAt": "2026-09-10T08:10:53.294Z",
         "retainedReviewNotes": [
           {
             "surface": "http",
@@ -43259,9 +43260,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 2380
+        "line": 2395
       },
-      "sourceHash": "d52232cf21ad1d40d1804211417fffb3d19bf3ae3bd7f7ce4f535f57e37afabd",
+      "sourceHash": "7f3f4a44029bcfa5349998368d3237e863b38d728ae56a6440aa28f47755cce9",
       "method": "GET",
       "path": "/api/v1/bugs/:bugId/comments",
       "registration": "direct",
@@ -43553,7 +43554,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-10T05:18:57.550Z",
+        "evidenceMappedAt": "2026-09-10T08:10:53.351Z",
         "retainedReviewNotes": [
           {
             "surface": "http",
@@ -43696,9 +43697,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 2402
+        "line": 2417
       },
-      "sourceHash": "d52232cf21ad1d40d1804211417fffb3d19bf3ae3bd7f7ce4f535f57e37afabd",
+      "sourceHash": "7f3f4a44029bcfa5349998368d3237e863b38d728ae56a6440aa28f47755cce9",
       "method": "POST",
       "path": "/api/v1/bugs/:bugId/comments",
       "registration": "direct",
@@ -43774,7 +43775,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-10T05:18:57.553Z",
+        "evidenceMappedAt": "2026-09-10T08:10:53.354Z",
         "retainedReviewNotes": [
           {
             "surface": "http",
@@ -43915,9 +43916,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 2445
+        "line": 2460
       },
-      "sourceHash": "d52232cf21ad1d40d1804211417fffb3d19bf3ae3bd7f7ce4f535f57e37afabd",
+      "sourceHash": "7f3f4a44029bcfa5349998368d3237e863b38d728ae56a6440aa28f47755cce9",
       "method": "GET",
       "path": "/api/v1/bugs/:bugId/events",
       "registration": "direct",
@@ -44252,7 +44253,7 @@
           "at": "2026-09-08T21:26:59.617Z",
           "reason": "Actual EXE-absent direct HTTP and server JSON-RPC cases; preserve remaining full-function requirements."
         },
-        "evidenceMappedAt": "2026-09-10T05:18:57.550Z",
+        "evidenceMappedAt": "2026-09-10T08:10:53.351Z",
         "sourceEvidenceReview": {
           "nodeId": "http_route-c72542c420f961",
           "sourceFile": "apps/api/src/app.ts",
@@ -44345,9 +44346,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 2472
+        "line": 2487
       },
-      "sourceHash": "d52232cf21ad1d40d1804211417fffb3d19bf3ae3bd7f7ce4f535f57e37afabd",
+      "sourceHash": "7f3f4a44029bcfa5349998368d3237e863b38d728ae56a6440aa28f47755cce9",
       "method": "GET",
       "path": "/api/v1/projects/:projectId/builds",
       "registration": "direct",
@@ -44437,9 +44438,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 2499
+        "line": 2514
       },
-      "sourceHash": "d52232cf21ad1d40d1804211417fffb3d19bf3ae3bd7f7ce4f535f57e37afabd",
+      "sourceHash": "7f3f4a44029bcfa5349998368d3237e863b38d728ae56a6440aa28f47755cce9",
       "method": "POST",
       "path": "/api/v1/projects/:projectId/builds",
       "registration": "direct",
@@ -44569,9 +44570,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 2530
+        "line": 2545
       },
-      "sourceHash": "d52232cf21ad1d40d1804211417fffb3d19bf3ae3bd7f7ce4f535f57e37afabd",
+      "sourceHash": "7f3f4a44029bcfa5349998368d3237e863b38d728ae56a6440aa28f47755cce9",
       "method": "GET",
       "path": "/api/v1/builds/:buildId",
       "registration": "direct",
@@ -44701,9 +44702,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 2547
+        "line": 2562
       },
-      "sourceHash": "d52232cf21ad1d40d1804211417fffb3d19bf3ae3bd7f7ce4f535f57e37afabd",
+      "sourceHash": "7f3f4a44029bcfa5349998368d3237e863b38d728ae56a6440aa28f47755cce9",
       "method": "POST",
       "path": "/api/v1/builds/:buildId/link-repair",
       "registration": "direct",
@@ -44833,9 +44834,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 2578
+        "line": 2593
       },
-      "sourceHash": "d52232cf21ad1d40d1804211417fffb3d19bf3ae3bd7f7ce4f535f57e37afabd",
+      "sourceHash": "7f3f4a44029bcfa5349998368d3237e863b38d728ae56a6440aa28f47755cce9",
       "method": "POST",
       "path": "/api/v1/bugs/:bugId/verifications",
       "registration": "direct",
@@ -44978,7 +44979,7 @@
             "progress": null
           }
         ],
-        "evidenceMappedAt": "2026-09-10T05:18:57.565Z",
+        "evidenceMappedAt": "2026-09-10T08:10:53.364Z",
         "sourceEvidenceReview": {
           "nodeId": "http_route-8d683a24515c8d",
           "sourceFile": "apps/api/src/app.ts",
@@ -45077,9 +45078,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 2610
+        "line": 2625
       },
-      "sourceHash": "d52232cf21ad1d40d1804211417fffb3d19bf3ae3bd7f7ce4f535f57e37afabd",
+      "sourceHash": "7f3f4a44029bcfa5349998368d3237e863b38d728ae56a6440aa28f47755cce9",
       "method": "GET",
       "path": "/api/v1/verifications/:verificationId",
       "registration": "direct",
@@ -45253,9 +45254,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 2633
+        "line": 2648
       },
-      "sourceHash": "d52232cf21ad1d40d1804211417fffb3d19bf3ae3bd7f7ce4f535f57e37afabd",
+      "sourceHash": "7f3f4a44029bcfa5349998368d3237e863b38d728ae56a6440aa28f47755cce9",
       "method": "POST",
       "path": "/api/v1/verifications/:verificationId/start",
       "registration": "direct",
@@ -45398,7 +45399,7 @@
             "progress": null
           }
         ],
-        "evidenceMappedAt": "2026-09-10T05:18:57.565Z",
+        "evidenceMappedAt": "2026-09-10T08:10:53.364Z",
         "sourceEvidenceReview": {
           "nodeId": "http_route-d250196281a746",
           "sourceFile": "apps/api/src/app.ts",
@@ -45497,9 +45498,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 2667
+        "line": 2682
       },
-      "sourceHash": "d52232cf21ad1d40d1804211417fffb3d19bf3ae3bd7f7ce4f535f57e37afabd",
+      "sourceHash": "7f3f4a44029bcfa5349998368d3237e863b38d728ae56a6440aa28f47755cce9",
       "method": "POST",
       "path": "/api/v1/verifications/:verificationId/result",
       "registration": "direct",
@@ -45715,9 +45716,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 2731
+        "line": 2746
       },
-      "sourceHash": "d52232cf21ad1d40d1804211417fffb3d19bf3ae3bd7f7ce4f535f57e37afabd",
+      "sourceHash": "7f3f4a44029bcfa5349998368d3237e863b38d728ae56a6440aa28f47755cce9",
       "method": "GET",
       "path": "/api/v1/notifications",
       "registration": "direct",
@@ -45833,6 +45834,95 @@
       "generated": true
     },
     {
+      "id": "http_route-21efab473908d4",
+      "kind": "http_route",
+      "title": "POST /api/v1/notifications/:notificationId/read",
+      "group": "bug_base",
+      "baselineIds": [
+        5,
+        6,
+        9,
+        13,
+        14,
+        15
+      ],
+      "source": {
+        "file": "apps/api/src/app.ts",
+        "line": 2792
+      },
+      "sourceHash": "7f3f4a44029bcfa5349998368d3237e863b38d728ae56a6440aa28f47755cce9",
+      "method": "POST",
+      "path": "/api/v1/notifications/:notificationId/read",
+      "registration": "direct",
+      "declarationSource": null,
+      "prerequisites": "Dedicated preview instance; projects A/B; A-only, B-only and shared employee; unique GM. External components require independent test targets.",
+      "steps": [
+        "Prepare a fresh project-scoped test record and record its version.",
+        "Invoke this actual runtime entry with its valid parameters; inspect the visible result.",
+        "Read back persisted project, actor, state/version, events, attachments or final artifact as applicable.",
+        "Repeat applicable error cases (wrong project/membership, stale version, repeat request, deleted record, disabled component)."
+      ],
+      "expected": "Behavior and persisted result match the design and current business contract; no cross-project or production writes.",
+      "status": "not_run",
+      "results": {
+        "apk": {
+          "applicable": false,
+          "status": "not_run",
+          "evidence": [],
+          "actual": "",
+          "note": "This entry inventories a different surface; requirement-level coverage is tracked separately. Not an accepted scope exclusion."
+        },
+        "exe": {
+          "applicable": false,
+          "status": "not_run",
+          "evidence": [],
+          "actual": "",
+          "note": "This entry inventories a different surface; requirement-level coverage is tracked separately. Not an accepted scope exclusion."
+        },
+        "web": {
+          "applicable": false,
+          "status": "not_run",
+          "evidence": [],
+          "actual": "",
+          "note": "This entry inventories a different surface; requirement-level coverage is tracked separately. Not an accepted scope exclusion."
+        },
+        "http": {
+          "applicable": true,
+          "status": "not_run",
+          "evidence": [],
+          "actual": "",
+          "note": "Real execution and read-back required."
+        },
+        "server_mcp": {
+          "applicable": false,
+          "status": "not_run",
+          "evidence": [],
+          "actual": "",
+          "note": "This entry inventories a different surface; requirement-level coverage is tracked separately. Not an accepted scope exclusion."
+        },
+        "local_mcp": {
+          "applicable": false,
+          "status": "not_run",
+          "evidence": [],
+          "actual": "",
+          "note": "This entry inventories a different surface; requirement-level coverage is tracked separately. Not an accepted scope exclusion."
+        }
+      },
+      "manual": {
+        "sourceEvidenceReview": {
+          "nodeId": "http_route-21efab473908d4",
+          "sourceFile": "apps/api/src/app.ts",
+          "previousSourceHash": null,
+          "firstChangedSourceHash": "7f3f4a44029bcfa5349998368d3237e863b38d728ae56a6440aa28f47755cce9",
+          "reason": "new_source_node",
+          "priorResults": null,
+          "scope": "Historical results remain retained; this is a revalidation requirement, not new execution evidence."
+        }
+      },
+      "needsRevalidation": true,
+      "generated": true
+    },
+    {
       "id": "http_route-ac6d99044543fe",
       "kind": "http_route",
       "title": "POST /api/v1/capture-bundles",
@@ -45847,9 +45937,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 2777
+        "line": 2826
       },
-      "sourceHash": "d52232cf21ad1d40d1804211417fffb3d19bf3ae3bd7f7ce4f535f57e37afabd",
+      "sourceHash": "7f3f4a44029bcfa5349998368d3237e863b38d728ae56a6440aa28f47755cce9",
       "method": "POST",
       "path": "/api/v1/capture-bundles",
       "registration": "direct",
@@ -45979,9 +46069,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 2819
+        "line": 2868
       },
-      "sourceHash": "d52232cf21ad1d40d1804211417fffb3d19bf3ae3bd7f7ce4f535f57e37afabd",
+      "sourceHash": "7f3f4a44029bcfa5349998368d3237e863b38d728ae56a6440aa28f47755cce9",
       "method": "GET",
       "path": "/api/v1/capture-bundles/:captureId",
       "registration": "direct",
@@ -46097,6 +46187,95 @@
       "generated": true
     },
     {
+      "id": "http_route-65badca5cd2de0",
+      "kind": "http_route",
+      "title": "GET /api/v1/uploads/:sessionId",
+      "group": "bug_base",
+      "baselineIds": [
+        5,
+        6,
+        9,
+        13,
+        14,
+        15
+      ],
+      "source": {
+        "file": "apps/api/src/app.ts",
+        "line": 2883
+      },
+      "sourceHash": "7f3f4a44029bcfa5349998368d3237e863b38d728ae56a6440aa28f47755cce9",
+      "method": "GET",
+      "path": "/api/v1/uploads/:sessionId",
+      "registration": "direct",
+      "declarationSource": null,
+      "prerequisites": "Dedicated preview instance; projects A/B; A-only, B-only and shared employee; unique GM. External components require independent test targets.",
+      "steps": [
+        "Prepare a fresh project-scoped test record and record its version.",
+        "Invoke this actual runtime entry with its valid parameters; inspect the visible result.",
+        "Read back persisted project, actor, state/version, events, attachments or final artifact as applicable.",
+        "Repeat applicable error cases (wrong project/membership, stale version, repeat request, deleted record, disabled component)."
+      ],
+      "expected": "Behavior and persisted result match the design and current business contract; no cross-project or production writes.",
+      "status": "not_run",
+      "results": {
+        "apk": {
+          "applicable": false,
+          "status": "not_run",
+          "evidence": [],
+          "actual": "",
+          "note": "This entry inventories a different surface; requirement-level coverage is tracked separately. Not an accepted scope exclusion."
+        },
+        "exe": {
+          "applicable": false,
+          "status": "not_run",
+          "evidence": [],
+          "actual": "",
+          "note": "This entry inventories a different surface; requirement-level coverage is tracked separately. Not an accepted scope exclusion."
+        },
+        "web": {
+          "applicable": false,
+          "status": "not_run",
+          "evidence": [],
+          "actual": "",
+          "note": "This entry inventories a different surface; requirement-level coverage is tracked separately. Not an accepted scope exclusion."
+        },
+        "http": {
+          "applicable": true,
+          "status": "not_run",
+          "evidence": [],
+          "actual": "",
+          "note": "Real execution and read-back required."
+        },
+        "server_mcp": {
+          "applicable": false,
+          "status": "not_run",
+          "evidence": [],
+          "actual": "",
+          "note": "This entry inventories a different surface; requirement-level coverage is tracked separately. Not an accepted scope exclusion."
+        },
+        "local_mcp": {
+          "applicable": false,
+          "status": "not_run",
+          "evidence": [],
+          "actual": "",
+          "note": "This entry inventories a different surface; requirement-level coverage is tracked separately. Not an accepted scope exclusion."
+        }
+      },
+      "manual": {
+        "sourceEvidenceReview": {
+          "nodeId": "http_route-65badca5cd2de0",
+          "sourceFile": "apps/api/src/app.ts",
+          "previousSourceHash": null,
+          "firstChangedSourceHash": "7f3f4a44029bcfa5349998368d3237e863b38d728ae56a6440aa28f47755cce9",
+          "reason": "new_source_node",
+          "priorResults": null,
+          "scope": "Historical results remain retained; this is a revalidation requirement, not new execution evidence."
+        }
+      },
+      "needsRevalidation": true,
+      "generated": true
+    },
+    {
       "id": "http_route-52f4781153b6ba",
       "kind": "http_route",
       "title": "POST /api/v1/uploads/init",
@@ -46111,9 +46290,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 2834
+        "line": 2920
       },
-      "sourceHash": "d52232cf21ad1d40d1804211417fffb3d19bf3ae3bd7f7ce4f535f57e37afabd",
+      "sourceHash": "7f3f4a44029bcfa5349998368d3237e863b38d728ae56a6440aa28f47755cce9",
       "method": "POST",
       "path": "/api/v1/uploads/init",
       "registration": "direct",
@@ -46277,9 +46456,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 2868
+        "line": 2954
       },
-      "sourceHash": "d52232cf21ad1d40d1804211417fffb3d19bf3ae3bd7f7ce4f535f57e37afabd",
+      "sourceHash": "7f3f4a44029bcfa5349998368d3237e863b38d728ae56a6440aa28f47755cce9",
       "method": "PUT",
       "path": "/api/v1/uploads/:sessionId/chunks/:chunkNumber",
       "registration": "direct",
@@ -46443,9 +46622,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 2922
+        "line": 3008
       },
-      "sourceHash": "d52232cf21ad1d40d1804211417fffb3d19bf3ae3bd7f7ce4f535f57e37afabd",
+      "sourceHash": "7f3f4a44029bcfa5349998368d3237e863b38d728ae56a6440aa28f47755cce9",
       "method": "POST",
       "path": "/api/v1/uploads/:sessionId/finalize",
       "registration": "direct",
@@ -46609,9 +46788,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 2966
+        "line": 3052
       },
-      "sourceHash": "d52232cf21ad1d40d1804211417fffb3d19bf3ae3bd7f7ce4f535f57e37afabd",
+      "sourceHash": "7f3f4a44029bcfa5349998368d3237e863b38d728ae56a6440aa28f47755cce9",
       "method": "POST",
       "path": "/api/v1/attachments/:attachmentId/bind",
       "registration": "direct",
@@ -46755,6 +46934,95 @@
             "actual": "1997 requests/262 assertions; 60 read and 40 write denials with 100 unchanged owner snapshots. Fresh C/D fixtures; initial PNGs claimed, extra attachments reserved, four Bugs soft-deleted after valid human completion. Component logs not exercised."
           }
         ]
+      },
+      "needsRevalidation": true,
+      "generated": true
+    },
+    {
+      "id": "http_route-2499bd52bcbab1",
+      "kind": "http_route",
+      "title": "GET /api/v1/attachments/:attachmentId/metadata",
+      "group": "bug_base",
+      "baselineIds": [
+        5,
+        6,
+        9,
+        13,
+        14,
+        15
+      ],
+      "source": {
+        "file": "apps/api/src/app.ts",
+        "line": 3090
+      },
+      "sourceHash": "7f3f4a44029bcfa5349998368d3237e863b38d728ae56a6440aa28f47755cce9",
+      "method": "GET",
+      "path": "/api/v1/attachments/:attachmentId/metadata",
+      "registration": "direct",
+      "declarationSource": null,
+      "prerequisites": "Dedicated preview instance; projects A/B; A-only, B-only and shared employee; unique GM. External components require independent test targets.",
+      "steps": [
+        "Prepare a fresh project-scoped test record and record its version.",
+        "Invoke this actual runtime entry with its valid parameters; inspect the visible result.",
+        "Read back persisted project, actor, state/version, events, attachments or final artifact as applicable.",
+        "Repeat applicable error cases (wrong project/membership, stale version, repeat request, deleted record, disabled component)."
+      ],
+      "expected": "Behavior and persisted result match the design and current business contract; no cross-project or production writes.",
+      "status": "not_run",
+      "results": {
+        "apk": {
+          "applicable": false,
+          "status": "not_run",
+          "evidence": [],
+          "actual": "",
+          "note": "This entry inventories a different surface; requirement-level coverage is tracked separately. Not an accepted scope exclusion."
+        },
+        "exe": {
+          "applicable": false,
+          "status": "not_run",
+          "evidence": [],
+          "actual": "",
+          "note": "This entry inventories a different surface; requirement-level coverage is tracked separately. Not an accepted scope exclusion."
+        },
+        "web": {
+          "applicable": false,
+          "status": "not_run",
+          "evidence": [],
+          "actual": "",
+          "note": "This entry inventories a different surface; requirement-level coverage is tracked separately. Not an accepted scope exclusion."
+        },
+        "http": {
+          "applicable": true,
+          "status": "not_run",
+          "evidence": [],
+          "actual": "",
+          "note": "Real execution and read-back required."
+        },
+        "server_mcp": {
+          "applicable": false,
+          "status": "not_run",
+          "evidence": [],
+          "actual": "",
+          "note": "This entry inventories a different surface; requirement-level coverage is tracked separately. Not an accepted scope exclusion."
+        },
+        "local_mcp": {
+          "applicable": false,
+          "status": "not_run",
+          "evidence": [],
+          "actual": "",
+          "note": "This entry inventories a different surface; requirement-level coverage is tracked separately. Not an accepted scope exclusion."
+        }
+      },
+      "manual": {
+        "sourceEvidenceReview": {
+          "nodeId": "http_route-2499bd52bcbab1",
+          "sourceFile": "apps/api/src/app.ts",
+          "previousSourceHash": null,
+          "firstChangedSourceHash": "7f3f4a44029bcfa5349998368d3237e863b38d728ae56a6440aa28f47755cce9",
+          "reason": "new_source_node",
+          "priorResults": null,
+          "scope": "Historical results remain retained; this is a revalidation requirement, not new execution evidence."
+        }
       },
       "needsRevalidation": true,
       "generated": true
@@ -47959,7 +48227,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-10T05:18:57.418Z",
+        "evidenceMappedAt": "2026-09-10T08:10:53.224Z",
         "surfaceProgress": {
           "local_mcp": {
             "completed": [
@@ -48141,7 +48409,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-10T05:18:57.418Z",
+        "evidenceMappedAt": "2026-09-10T08:10:53.224Z",
         "surfaceProgress": {
           "local_mcp": {
             "completed": [
@@ -48424,7 +48692,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-10T05:18:57.418Z",
+        "evidenceMappedAt": "2026-09-10T08:10:53.224Z",
         "surfaceProgress": {
           "local_mcp": {
             "completed": [
@@ -50304,7 +50572,7 @@
             }
           }
         ],
-        "evidenceMappedAt": "2026-09-10T05:18:57.503Z",
+        "evidenceMappedAt": "2026-09-10T08:10:53.305Z",
         "sourceEvidenceReview": {
           "nodeId": "desktop_ipc_action-69b5a7dec2121d",
           "sourceFile": "apps/desktop/src/main.ts",
@@ -51764,7 +52032,7 @@
             }
           }
         ],
-        "evidenceMappedAt": "2026-09-10T05:18:57.576Z",
+        "evidenceMappedAt": "2026-09-10T08:10:53.374Z",
         "recentEvidenceObservations": [
           {
             "id": "exe-native-upgrade-7-to-8",
@@ -52048,7 +52316,7 @@
             }
           }
         ],
-        "evidenceMappedAt": "2026-09-10T05:18:57.576Z",
+        "evidenceMappedAt": "2026-09-10T08:10:53.374Z",
         "recentEvidenceObservations": [
           {
             "id": "exe-native-upgrade-7-to-8",
@@ -52833,7 +53101,7 @@
             }
           }
         ],
-        "evidenceMappedAt": "2026-09-10T05:18:57.503Z",
+        "evidenceMappedAt": "2026-09-10T08:10:53.306Z",
         "sourceEvidenceReview": {
           "nodeId": "desktop_event-66adc5b70ef413",
           "sourceFile": "apps/desktop/src/main.ts",
@@ -86842,7 +87110,7 @@
         "file": "apps/android/app/src/main/kotlin/com/relayqahub/android/ui/BugLifecyclePanel.kt",
         "line": 33
       },
-      "sourceHash": "a43581d983b96480ac8166f4ce322f28af683bd30b2bef9babd678930d9c5bdb",
+      "sourceHash": "276b673049fb0d2a5cb7c7e18e4ce871e18708de538ae2a3407aedf2b56fe0c5",
       "prerequisites": "Dedicated preview instance; projects A/B; A-only, B-only and shared employee; unique GM. External components require independent test targets.",
       "steps": [
         "Prepare a fresh project-scoped test record and record its version.",
@@ -86966,9 +87234,9 @@
       ],
       "source": {
         "file": "apps/android/app/src/main/kotlin/com/relayqahub/android/ui/BugLifecyclePanel.kt",
-        "line": 424
+        "line": 406
       },
-      "sourceHash": "a43581d983b96480ac8166f4ce322f28af683bd30b2bef9babd678930d9c5bdb",
+      "sourceHash": "276b673049fb0d2a5cb7c7e18e4ce871e18708de538ae2a3407aedf2b56fe0c5",
       "prerequisites": "Dedicated preview instance; projects A/B; A-only, B-only and shared employee; unique GM. External components require independent test targets.",
       "steps": [
         "Prepare a fresh project-scoped test record and record its version.",
@@ -87049,9 +87317,9 @@
       ],
       "source": {
         "file": "apps/android/app/src/main/kotlin/com/relayqahub/android/ui/BugLifecyclePanel.kt",
-        "line": 429
+        "line": 411
       },
-      "sourceHash": "a43581d983b96480ac8166f4ce322f28af683bd30b2bef9babd678930d9c5bdb",
+      "sourceHash": "276b673049fb0d2a5cb7c7e18e4ce871e18708de538ae2a3407aedf2b56fe0c5",
       "prerequisites": "Dedicated preview instance; projects A/B; A-only, B-only and shared employee; unique GM. External components require independent test targets.",
       "steps": [
         "Prepare a fresh project-scoped test record and record its version.",
@@ -87132,9 +87400,9 @@
       ],
       "source": {
         "file": "apps/android/app/src/main/kotlin/com/relayqahub/android/ui/BugLifecyclePanel.kt",
-        "line": 442
+        "line": 424
       },
-      "sourceHash": "a43581d983b96480ac8166f4ce322f28af683bd30b2bef9babd678930d9c5bdb",
+      "sourceHash": "276b673049fb0d2a5cb7c7e18e4ce871e18708de538ae2a3407aedf2b56fe0c5",
       "prerequisites": "Dedicated preview instance; projects A/B; A-only, B-only and shared employee; unique GM. External components require independent test targets.",
       "steps": [
         "Prepare a fresh project-scoped test record and record its version.",
@@ -87215,9 +87483,9 @@
       ],
       "source": {
         "file": "apps/android/app/src/main/kotlin/com/relayqahub/android/ui/BugLifecyclePanel.kt",
-        "line": 514
+        "line": 496
       },
-      "sourceHash": "a43581d983b96480ac8166f4ce322f28af683bd30b2bef9babd678930d9c5bdb",
+      "sourceHash": "276b673049fb0d2a5cb7c7e18e4ce871e18708de538ae2a3407aedf2b56fe0c5",
       "prerequisites": "Dedicated preview instance; projects A/B; A-only, B-only and shared employee; unique GM. External components require independent test targets.",
       "steps": [
         "Prepare a fresh project-scoped test record and record its version.",
@@ -87298,9 +87566,9 @@
       ],
       "source": {
         "file": "apps/android/app/src/main/kotlin/com/relayqahub/android/ui/BugLifecyclePanel.kt",
-        "line": 521
+        "line": 503
       },
-      "sourceHash": "a43581d983b96480ac8166f4ce322f28af683bd30b2bef9babd678930d9c5bdb",
+      "sourceHash": "276b673049fb0d2a5cb7c7e18e4ce871e18708de538ae2a3407aedf2b56fe0c5",
       "prerequisites": "Dedicated preview instance; projects A/B; A-only, B-only and shared employee; unique GM. External components require independent test targets.",
       "steps": [
         "Prepare a fresh project-scoped test record and record its version.",
@@ -87369,89 +87637,6 @@
       "generated": true
     },
     {
-      "id": "android_control-97abd53fe0f3fe",
-      "kind": "android_control",
-      "title": "onValueChange = { captureBundleIdInput = it.trim() }, enabled = mayEditVerification && !busy && verificationCaptureCanChange(pendingVerification),",
-      "group": "relay.production",
-      "baselineIds": [
-        16,
-        18,
-        19,
-        20
-      ],
-      "source": {
-        "file": "apps/android/app/src/main/kotlin/com/relayqahub/android/ui/BugLifecyclePanel.kt",
-        "line": 526
-      },
-      "sourceHash": "a43581d983b96480ac8166f4ce322f28af683bd30b2bef9babd678930d9c5bdb",
-      "prerequisites": "Dedicated preview instance; projects A/B; A-only, B-only and shared employee; unique GM. External components require independent test targets.",
-      "steps": [
-        "Prepare a fresh project-scoped test record and record its version.",
-        "Invoke this actual runtime entry with its valid parameters; inspect the visible result.",
-        "Read back persisted project, actor, state/version, events, attachments or final artifact as applicable.",
-        "Repeat applicable error cases (wrong project/membership, stale version, repeat request, deleted record, disabled component)."
-      ],
-      "expected": "Behavior and persisted result match the design and current business contract; no cross-project or production writes.",
-      "status": "not_run",
-      "results": {
-        "apk": {
-          "applicable": true,
-          "status": "not_run",
-          "evidence": [],
-          "actual": "",
-          "note": "Real execution and read-back required."
-        },
-        "exe": {
-          "applicable": false,
-          "status": "not_run",
-          "evidence": [],
-          "actual": "",
-          "note": "This entry inventories a different surface; requirement-level coverage is tracked separately. Not an accepted scope exclusion."
-        },
-        "web": {
-          "applicable": false,
-          "status": "not_run",
-          "evidence": [],
-          "actual": "",
-          "note": "This entry inventories a different surface; requirement-level coverage is tracked separately. Not an accepted scope exclusion."
-        },
-        "http": {
-          "applicable": false,
-          "status": "not_run",
-          "evidence": [],
-          "actual": "",
-          "note": "This entry inventories a different surface; requirement-level coverage is tracked separately. Not an accepted scope exclusion."
-        },
-        "server_mcp": {
-          "applicable": false,
-          "status": "not_run",
-          "evidence": [],
-          "actual": "",
-          "note": "This entry inventories a different surface; requirement-level coverage is tracked separately. Not an accepted scope exclusion."
-        },
-        "local_mcp": {
-          "applicable": false,
-          "status": "not_run",
-          "evidence": [],
-          "actual": "",
-          "note": "This entry inventories a different surface; requirement-level coverage is tracked separately. Not an accepted scope exclusion."
-        }
-      },
-      "manual": {
-        "sourceEvidenceReview": {
-          "nodeId": "android_control-97abd53fe0f3fe",
-          "sourceFile": "apps/android/app/src/main/kotlin/com/relayqahub/android/ui/BugLifecyclePanel.kt",
-          "previousSourceHash": null,
-          "firstChangedSourceHash": "a43581d983b96480ac8166f4ce322f28af683bd30b2bef9babd678930d9c5bdb",
-          "reason": "new_source_node",
-          "priorResults": null,
-          "scope": "Historical results remain retained; this is a revalidation requirement, not new execution evidence."
-        }
-      },
-      "needsRevalidation": true,
-      "generated": true
-    },
-    {
       "id": "android_control-3d878087b82b78",
       "kind": "android_control",
       "title": "onClick = { submitVerification(VerificationOutcome.PASSED) }, modifier = Modifier.testTag(\"bug-verify-pass\"), ) { Text(\"验收通过并关闭\") }",
@@ -87464,9 +87649,9 @@
       ],
       "source": {
         "file": "apps/android/app/src/main/kotlin/com/relayqahub/android/ui/BugLifecyclePanel.kt",
-        "line": 542
+        "line": 513
       },
-      "sourceHash": "a43581d983b96480ac8166f4ce322f28af683bd30b2bef9babd678930d9c5bdb",
+      "sourceHash": "276b673049fb0d2a5cb7c7e18e4ce871e18708de538ae2a3407aedf2b56fe0c5",
       "prerequisites": "Dedicated preview instance; projects A/B; A-only, B-only and shared employee; unique GM. External components require independent test targets.",
       "steps": [
         "Prepare a fresh project-scoped test record and record its version.",
@@ -87547,9 +87732,9 @@
       ],
       "source": {
         "file": "apps/android/app/src/main/kotlin/com/relayqahub/android/ui/BugLifecyclePanel.kt",
-        "line": 548
+        "line": 519
       },
-      "sourceHash": "a43581d983b96480ac8166f4ce322f28af683bd30b2bef9babd678930d9c5bdb",
+      "sourceHash": "276b673049fb0d2a5cb7c7e18e4ce871e18708de538ae2a3407aedf2b56fe0c5",
       "prerequisites": "Dedicated preview instance; projects A/B; A-only, B-only and shared employee; unique GM. External components require independent test targets.",
       "steps": [
         "Prepare a fresh project-scoped test record and record its version.",
@@ -87630,9 +87815,9 @@
       ],
       "source": {
         "file": "apps/android/app/src/main/kotlin/com/relayqahub/android/ui/BugLifecyclePanel.kt",
-        "line": 555
+        "line": 526
       },
-      "sourceHash": "a43581d983b96480ac8166f4ce322f28af683bd30b2bef9babd678930d9c5bdb",
+      "sourceHash": "276b673049fb0d2a5cb7c7e18e4ce871e18708de538ae2a3407aedf2b56fe0c5",
       "prerequisites": "Dedicated preview instance; projects A/B; A-only, B-only and shared employee; unique GM. External components require independent test targets.",
       "steps": [
         "Prepare a fresh project-scoped test record and record its version.",
@@ -87713,9 +87898,9 @@
       ],
       "source": {
         "file": "apps/android/app/src/main/kotlin/com/relayqahub/android/ui/BugLifecyclePanel.kt",
-        "line": 565
+        "line": 536
       },
-      "sourceHash": "a43581d983b96480ac8166f4ce322f28af683bd30b2bef9babd678930d9c5bdb",
+      "sourceHash": "276b673049fb0d2a5cb7c7e18e4ce871e18708de538ae2a3407aedf2b56fe0c5",
       "prerequisites": "Dedicated preview instance; projects A/B; A-only, B-only and shared employee; unique GM. External components require independent test targets.",
       "steps": [
         "Prepare a fresh project-scoped test record and record its version.",
@@ -87796,9 +87981,9 @@
       ],
       "source": {
         "file": "apps/android/app/src/main/kotlin/com/relayqahub/android/ui/BugLifecyclePanel.kt",
-        "line": 590
+        "line": 561
       },
-      "sourceHash": "a43581d983b96480ac8166f4ce322f28af683bd30b2bef9babd678930d9c5bdb",
+      "sourceHash": "276b673049fb0d2a5cb7c7e18e4ce871e18708de538ae2a3407aedf2b56fe0c5",
       "prerequisites": "Dedicated preview instance; projects A/B; A-only, B-only and shared employee; unique GM. External components require independent test targets.",
       "steps": [
         "Prepare a fresh project-scoped test record and record its version.",
@@ -87879,9 +88064,9 @@
       ],
       "source": {
         "file": "apps/android/app/src/main/kotlin/com/relayqahub/android/ui/BugLifecyclePanel.kt",
-        "line": 602
+        "line": 573
       },
-      "sourceHash": "a43581d983b96480ac8166f4ce322f28af683bd30b2bef9babd678930d9c5bdb",
+      "sourceHash": "276b673049fb0d2a5cb7c7e18e4ce871e18708de538ae2a3407aedf2b56fe0c5",
       "prerequisites": "Dedicated preview instance; projects A/B; A-only, B-only and shared employee; unique GM. External components require independent test targets.",
       "steps": [
         "Prepare a fresh project-scoped test record and record its version.",
@@ -87962,9 +88147,9 @@
       ],
       "source": {
         "file": "apps/android/app/src/main/kotlin/com/relayqahub/android/ui/BugLifecyclePanel.kt",
-        "line": 630
+        "line": 601
       },
-      "sourceHash": "a43581d983b96480ac8166f4ce322f28af683bd30b2bef9babd678930d9c5bdb",
+      "sourceHash": "276b673049fb0d2a5cb7c7e18e4ce871e18708de538ae2a3407aedf2b56fe0c5",
       "prerequisites": "Dedicated preview instance; projects A/B; A-only, B-only and shared employee; unique GM. External components require independent test targets.",
       "steps": [
         "Prepare a fresh project-scoped test record and record its version.",
@@ -88045,9 +88230,9 @@
       ],
       "source": {
         "file": "apps/android/app/src/main/kotlin/com/relayqahub/android/ui/BugLifecyclePanel.kt",
-        "line": 634
+        "line": 605
       },
-      "sourceHash": "a43581d983b96480ac8166f4ce322f28af683bd30b2bef9babd678930d9c5bdb",
+      "sourceHash": "276b673049fb0d2a5cb7c7e18e4ce871e18708de538ae2a3407aedf2b56fe0c5",
       "prerequisites": "Dedicated preview instance; projects A/B; A-only, B-only and shared employee; unique GM. External components require independent test targets.",
       "steps": [
         "Prepare a fresh project-scoped test record and record its version.",
@@ -88128,9 +88313,9 @@
       ],
       "source": {
         "file": "apps/android/app/src/main/kotlin/com/relayqahub/android/ui/BugLifecyclePanel.kt",
-        "line": 639
+        "line": 610
       },
-      "sourceHash": "a43581d983b96480ac8166f4ce322f28af683bd30b2bef9babd678930d9c5bdb",
+      "sourceHash": "276b673049fb0d2a5cb7c7e18e4ce871e18708de538ae2a3407aedf2b56fe0c5",
       "prerequisites": "Dedicated preview instance; projects A/B; A-only, B-only and shared employee; unique GM. External components require independent test targets.",
       "steps": [
         "Prepare a fresh project-scoped test record and record its version.",
@@ -88211,9 +88396,9 @@
       ],
       "source": {
         "file": "apps/android/app/src/main/kotlin/com/relayqahub/android/ui/BugLifecyclePanel.kt",
-        "line": 645
+        "line": 616
       },
-      "sourceHash": "a43581d983b96480ac8166f4ce322f28af683bd30b2bef9babd678930d9c5bdb",
+      "sourceHash": "276b673049fb0d2a5cb7c7e18e4ce871e18708de538ae2a3407aedf2b56fe0c5",
       "prerequisites": "Dedicated preview instance; projects A/B; A-only, B-only and shared employee; unique GM. External components require independent test targets.",
       "steps": [
         "Prepare a fresh project-scoped test record and record its version.",
@@ -88294,9 +88479,9 @@
       ],
       "source": {
         "file": "apps/android/app/src/main/kotlin/com/relayqahub/android/ui/BugLifecyclePanel.kt",
-        "line": 683
+        "line": 654
       },
-      "sourceHash": "a43581d983b96480ac8166f4ce322f28af683bd30b2bef9babd678930d9c5bdb",
+      "sourceHash": "276b673049fb0d2a5cb7c7e18e4ce871e18708de538ae2a3407aedf2b56fe0c5",
       "prerequisites": "Dedicated preview instance; projects A/B; A-only, B-only and shared employee; unique GM. External components require independent test targets.",
       "steps": [
         "Prepare a fresh project-scoped test record and record its version.",
@@ -88377,9 +88562,9 @@
       ],
       "source": {
         "file": "apps/android/app/src/main/kotlin/com/relayqahub/android/ui/BugLifecyclePanel.kt",
-        "line": 688
+        "line": 659
       },
-      "sourceHash": "a43581d983b96480ac8166f4ce322f28af683bd30b2bef9babd678930d9c5bdb",
+      "sourceHash": "276b673049fb0d2a5cb7c7e18e4ce871e18708de538ae2a3407aedf2b56fe0c5",
       "prerequisites": "Dedicated preview instance; projects A/B; A-only, B-only and shared employee; unique GM. External components require independent test targets.",
       "steps": [
         "Prepare a fresh project-scoped test record and record its version.",
@@ -88460,9 +88645,9 @@
       ],
       "source": {
         "file": "apps/android/app/src/main/kotlin/com/relayqahub/android/ui/BugLifecyclePanel.kt",
-        "line": 691
+        "line": 662
       },
-      "sourceHash": "a43581d983b96480ac8166f4ce322f28af683bd30b2bef9babd678930d9c5bdb",
+      "sourceHash": "276b673049fb0d2a5cb7c7e18e4ce871e18708de538ae2a3407aedf2b56fe0c5",
       "prerequisites": "Dedicated preview instance; projects A/B; A-only, B-only and shared employee; unique GM. External components require independent test targets.",
       "steps": [
         "Prepare a fresh project-scoped test record and record its version.",
@@ -88543,9 +88728,9 @@
       ],
       "source": {
         "file": "apps/android/app/src/main/kotlin/com/relayqahub/android/ui/BugLifecyclePanel.kt",
-        "line": 695
+        "line": 666
       },
-      "sourceHash": "a43581d983b96480ac8166f4ce322f28af683bd30b2bef9babd678930d9c5bdb",
+      "sourceHash": "276b673049fb0d2a5cb7c7e18e4ce871e18708de538ae2a3407aedf2b56fe0c5",
       "prerequisites": "Dedicated preview instance; projects A/B; A-only, B-only and shared employee; unique GM. External components require independent test targets.",
       "steps": [
         "Prepare a fresh project-scoped test record and record its version.",
@@ -88626,9 +88811,9 @@
       ],
       "source": {
         "file": "apps/android/app/src/main/kotlin/com/relayqahub/android/ui/BugLifecyclePanel.kt",
-        "line": 702
+        "line": 673
       },
-      "sourceHash": "a43581d983b96480ac8166f4ce322f28af683bd30b2bef9babd678930d9c5bdb",
+      "sourceHash": "276b673049fb0d2a5cb7c7e18e4ce871e18708de538ae2a3407aedf2b56fe0c5",
       "prerequisites": "Dedicated preview instance; projects A/B; A-only, B-only and shared employee; unique GM. External components require independent test targets.",
       "steps": [
         "Prepare a fresh project-scoped test record and record its version.",
@@ -88709,9 +88894,9 @@
       ],
       "source": {
         "file": "apps/android/app/src/main/kotlin/com/relayqahub/android/ui/BugLifecyclePanel.kt",
-        "line": 709
+        "line": 680
       },
-      "sourceHash": "a43581d983b96480ac8166f4ce322f28af683bd30b2bef9babd678930d9c5bdb",
+      "sourceHash": "276b673049fb0d2a5cb7c7e18e4ce871e18708de538ae2a3407aedf2b56fe0c5",
       "prerequisites": "Dedicated preview instance; projects A/B; A-only, B-only and shared employee; unique GM. External components require independent test targets.",
       "steps": [
         "Prepare a fresh project-scoped test record and record its version.",
@@ -88792,9 +88977,9 @@
       ],
       "source": {
         "file": "apps/android/app/src/main/kotlin/com/relayqahub/android/ui/BugLifecyclePanel.kt",
-        "line": 713
+        "line": 684
       },
-      "sourceHash": "a43581d983b96480ac8166f4ce322f28af683bd30b2bef9babd678930d9c5bdb",
+      "sourceHash": "276b673049fb0d2a5cb7c7e18e4ce871e18708de538ae2a3407aedf2b56fe0c5",
       "prerequisites": "Dedicated preview instance; projects A/B; A-only, B-only and shared employee; unique GM. External components require independent test targets.",
       "steps": [
         "Prepare a fresh project-scoped test record and record its version.",
@@ -88875,9 +89060,9 @@
       ],
       "source": {
         "file": "apps/android/app/src/main/kotlin/com/relayqahub/android/ui/BugLifecyclePanel.kt",
-        "line": 728
+        "line": 699
       },
-      "sourceHash": "a43581d983b96480ac8166f4ce322f28af683bd30b2bef9babd678930d9c5bdb",
+      "sourceHash": "276b673049fb0d2a5cb7c7e18e4ce871e18708de538ae2a3407aedf2b56fe0c5",
       "prerequisites": "Dedicated preview instance; projects A/B; A-only, B-only and shared employee; unique GM. External components require independent test targets.",
       "steps": [
         "Prepare a fresh project-scoped test record and record its version.",
@@ -90417,7 +90602,7 @@
         "file": "apps/android/app/src/main/kotlin/com/relayqahub/android/ui/FoundationScreen.kt",
         "line": 161
       },
-      "sourceHash": "099ffb09e165931974b1a03563f3cacd6a5b7fc903fc27cd2ffe30e00943f8e3",
+      "sourceHash": "2ff187a869513119022c3abe8b966bce868cb34efe207cd1d3652cce274e0815",
       "prerequisites": "Dedicated preview instance; projects A/B; A-only, B-only and shared employee; unique GM. External components require independent test targets.",
       "steps": [
         "Prepare a fresh project-scoped test record and record its version.",
@@ -90543,7 +90728,7 @@
         "file": "apps/android/app/src/main/kotlin/com/relayqahub/android/ui/FoundationScreen.kt",
         "line": 186
       },
-      "sourceHash": "099ffb09e165931974b1a03563f3cacd6a5b7fc903fc27cd2ffe30e00943f8e3",
+      "sourceHash": "2ff187a869513119022c3abe8b966bce868cb34efe207cd1d3652cce274e0815",
       "prerequisites": "Dedicated preview instance; projects A/B; A-only, B-only and shared employee; unique GM. External components require independent test targets.",
       "steps": [
         "Prepare a fresh project-scoped test record and record its version.",
@@ -90669,7 +90854,7 @@
         "file": "apps/android/app/src/main/kotlin/com/relayqahub/android/ui/FoundationScreen.kt",
         "line": 230
       },
-      "sourceHash": "099ffb09e165931974b1a03563f3cacd6a5b7fc903fc27cd2ffe30e00943f8e3",
+      "sourceHash": "2ff187a869513119022c3abe8b966bce868cb34efe207cd1d3652cce274e0815",
       "prerequisites": "Dedicated preview instance; projects A/B; A-only, B-only and shared employee; unique GM. External components require independent test targets.",
       "steps": [
         "Prepare a fresh project-scoped test record and record its version.",
@@ -90795,7 +90980,7 @@
         "file": "apps/android/app/src/main/kotlin/com/relayqahub/android/ui/FoundationScreen.kt",
         "line": 279
       },
-      "sourceHash": "099ffb09e165931974b1a03563f3cacd6a5b7fc903fc27cd2ffe30e00943f8e3",
+      "sourceHash": "2ff187a869513119022c3abe8b966bce868cb34efe207cd1d3652cce274e0815",
       "prerequisites": "Dedicated preview instance; projects A/B; A-only, B-only and shared employee; unique GM. External components require independent test targets.",
       "steps": [
         "Prepare a fresh project-scoped test record and record its version.",
@@ -90921,7 +91106,7 @@
         "file": "apps/android/app/src/main/kotlin/com/relayqahub/android/ui/FoundationScreen.kt",
         "line": 326
       },
-      "sourceHash": "099ffb09e165931974b1a03563f3cacd6a5b7fc903fc27cd2ffe30e00943f8e3",
+      "sourceHash": "2ff187a869513119022c3abe8b966bce868cb34efe207cd1d3652cce274e0815",
       "prerequisites": "Dedicated preview instance; projects A/B; A-only, B-only and shared employee; unique GM. External components require independent test targets.",
       "steps": [
         "Prepare a fresh project-scoped test record and record its version.",
@@ -91047,7 +91232,7 @@
         "file": "apps/android/app/src/main/kotlin/com/relayqahub/android/ui/FoundationScreen.kt",
         "line": 360
       },
-      "sourceHash": "099ffb09e165931974b1a03563f3cacd6a5b7fc903fc27cd2ffe30e00943f8e3",
+      "sourceHash": "2ff187a869513119022c3abe8b966bce868cb34efe207cd1d3652cce274e0815",
       "prerequisites": "Dedicated preview instance; projects A/B; A-only, B-only and shared employee; unique GM. External components require independent test targets.",
       "steps": [
         "Prepare a fresh project-scoped test record and record its version.",
@@ -91173,7 +91358,7 @@
         "file": "apps/android/app/src/main/kotlin/com/relayqahub/android/ui/FoundationScreen.kt",
         "line": 381
       },
-      "sourceHash": "099ffb09e165931974b1a03563f3cacd6a5b7fc903fc27cd2ffe30e00943f8e3",
+      "sourceHash": "2ff187a869513119022c3abe8b966bce868cb34efe207cd1d3652cce274e0815",
       "prerequisites": "Dedicated preview instance; projects A/B; A-only, B-only and shared employee; unique GM. External components require independent test targets.",
       "steps": [
         "Prepare a fresh project-scoped test record and record its version.",
@@ -91299,7 +91484,7 @@
         "file": "apps/android/app/src/main/kotlin/com/relayqahub/android/ui/FoundationScreen.kt",
         "line": 389
       },
-      "sourceHash": "099ffb09e165931974b1a03563f3cacd6a5b7fc903fc27cd2ffe30e00943f8e3",
+      "sourceHash": "2ff187a869513119022c3abe8b966bce868cb34efe207cd1d3652cce274e0815",
       "prerequisites": "Dedicated preview instance; projects A/B; A-only, B-only and shared employee; unique GM. External components require independent test targets.",
       "steps": [
         "Prepare a fresh project-scoped test record and record its version.",
@@ -91425,7 +91610,7 @@
         "file": "apps/android/app/src/main/kotlin/com/relayqahub/android/ui/FoundationScreen.kt",
         "line": 399
       },
-      "sourceHash": "099ffb09e165931974b1a03563f3cacd6a5b7fc903fc27cd2ffe30e00943f8e3",
+      "sourceHash": "2ff187a869513119022c3abe8b966bce868cb34efe207cd1d3652cce274e0815",
       "prerequisites": "Dedicated preview instance; projects A/B; A-only, B-only and shared employee; unique GM. External components require independent test targets.",
       "steps": [
         "Prepare a fresh project-scoped test record and record its version.",
@@ -91558,7 +91743,7 @@
         "file": "apps/android/app/src/main/kotlin/com/relayqahub/android/ui/FoundationScreen.kt",
         "line": 423
       },
-      "sourceHash": "099ffb09e165931974b1a03563f3cacd6a5b7fc903fc27cd2ffe30e00943f8e3",
+      "sourceHash": "2ff187a869513119022c3abe8b966bce868cb34efe207cd1d3652cce274e0815",
       "prerequisites": "Dedicated preview instance; projects A/B; A-only, B-only and shared employee; unique GM. External components require independent test targets.",
       "steps": [
         "Prepare a fresh project-scoped test record and record its version.",
@@ -91684,7 +91869,7 @@
         "file": "apps/android/app/src/main/kotlin/com/relayqahub/android/ui/FoundationScreen.kt",
         "line": 430
       },
-      "sourceHash": "099ffb09e165931974b1a03563f3cacd6a5b7fc903fc27cd2ffe30e00943f8e3",
+      "sourceHash": "2ff187a869513119022c3abe8b966bce868cb34efe207cd1d3652cce274e0815",
       "prerequisites": "Dedicated preview instance; projects A/B; A-only, B-only and shared employee; unique GM. External components require independent test targets.",
       "steps": [
         "Prepare a fresh project-scoped test record and record its version.",
@@ -91810,7 +91995,7 @@
         "file": "apps/android/app/src/main/kotlin/com/relayqahub/android/ui/FoundationScreen.kt",
         "line": 455
       },
-      "sourceHash": "099ffb09e165931974b1a03563f3cacd6a5b7fc903fc27cd2ffe30e00943f8e3",
+      "sourceHash": "2ff187a869513119022c3abe8b966bce868cb34efe207cd1d3652cce274e0815",
       "prerequisites": "Dedicated preview instance; projects A/B; A-only, B-only and shared employee; unique GM. External components require independent test targets.",
       "steps": [
         "Prepare a fresh project-scoped test record and record its version.",
@@ -91934,9 +92119,9 @@
       ],
       "source": {
         "file": "apps/android/app/src/main/kotlin/com/relayqahub/android/ui/FoundationScreen.kt",
-        "line": 542
+        "line": 549
       },
-      "sourceHash": "099ffb09e165931974b1a03563f3cacd6a5b7fc903fc27cd2ffe30e00943f8e3",
+      "sourceHash": "2ff187a869513119022c3abe8b966bce868cb34efe207cd1d3652cce274e0815",
       "prerequisites": "Dedicated preview instance; projects A/B; A-only, B-only and shared employee; unique GM. External components require independent test targets.",
       "steps": [
         "Prepare a fresh project-scoped test record and record its version.",
@@ -92060,9 +92245,9 @@
       ],
       "source": {
         "file": "apps/android/app/src/main/kotlin/com/relayqahub/android/ui/FoundationScreen.kt",
-        "line": 555
+        "line": 562
       },
-      "sourceHash": "099ffb09e165931974b1a03563f3cacd6a5b7fc903fc27cd2ffe30e00943f8e3",
+      "sourceHash": "2ff187a869513119022c3abe8b966bce868cb34efe207cd1d3652cce274e0815",
       "prerequisites": "Dedicated preview instance; projects A/B; A-only, B-only and shared employee; unique GM. External components require independent test targets.",
       "steps": [
         "Prepare a fresh project-scoped test record and record its version.",
@@ -92186,9 +92371,9 @@
       ],
       "source": {
         "file": "apps/android/app/src/main/kotlin/com/relayqahub/android/ui/FoundationScreen.kt",
-        "line": 573
+        "line": 580
       },
-      "sourceHash": "099ffb09e165931974b1a03563f3cacd6a5b7fc903fc27cd2ffe30e00943f8e3",
+      "sourceHash": "2ff187a869513119022c3abe8b966bce868cb34efe207cd1d3652cce274e0815",
       "prerequisites": "Dedicated preview instance; projects A/B; A-only, B-only and shared employee; unique GM. External components require independent test targets.",
       "steps": [
         "Prepare a fresh project-scoped test record and record its version.",
@@ -92312,9 +92497,9 @@
       ],
       "source": {
         "file": "apps/android/app/src/main/kotlin/com/relayqahub/android/ui/FoundationScreen.kt",
-        "line": 580
+        "line": 587
       },
-      "sourceHash": "099ffb09e165931974b1a03563f3cacd6a5b7fc903fc27cd2ffe30e00943f8e3",
+      "sourceHash": "2ff187a869513119022c3abe8b966bce868cb34efe207cd1d3652cce274e0815",
       "prerequisites": "Dedicated preview instance; projects A/B; A-only, B-only and shared employee; unique GM. External components require independent test targets.",
       "steps": [
         "Prepare a fresh project-scoped test record and record its version.",
@@ -92440,7 +92625,7 @@
         "file": "apps/android/app/src/main/kotlin/com/relayqahub/android/ui/FoundationScreen.kt",
         "line": 624
       },
-      "sourceHash": "099ffb09e165931974b1a03563f3cacd6a5b7fc903fc27cd2ffe30e00943f8e3",
+      "sourceHash": "2ff187a869513119022c3abe8b966bce868cb34efe207cd1d3652cce274e0815",
       "prerequisites": "Dedicated preview instance; projects A/B; A-only, B-only and shared employee; unique GM. External components require independent test targets.",
       "steps": [
         "Prepare a fresh project-scoped test record and record its version.",
@@ -92566,7 +92751,7 @@
         "file": "apps/android/app/src/main/kotlin/com/relayqahub/android/ui/FoundationScreen.kt",
         "line": 649
       },
-      "sourceHash": "099ffb09e165931974b1a03563f3cacd6a5b7fc903fc27cd2ffe30e00943f8e3",
+      "sourceHash": "2ff187a869513119022c3abe8b966bce868cb34efe207cd1d3652cce274e0815",
       "prerequisites": "Dedicated preview instance; projects A/B; A-only, B-only and shared employee; unique GM. External components require independent test targets.",
       "steps": [
         "Prepare a fresh project-scoped test record and record its version.",
@@ -92692,7 +92877,7 @@
         "file": "apps/android/app/src/main/kotlin/com/relayqahub/android/ui/FoundationScreen.kt",
         "line": 667
       },
-      "sourceHash": "099ffb09e165931974b1a03563f3cacd6a5b7fc903fc27cd2ffe30e00943f8e3",
+      "sourceHash": "2ff187a869513119022c3abe8b966bce868cb34efe207cd1d3652cce274e0815",
       "prerequisites": "Dedicated preview instance; projects A/B; A-only, B-only and shared employee; unique GM. External components require independent test targets.",
       "steps": [
         "Prepare a fresh project-scoped test record and record its version.",
@@ -92818,7 +93003,7 @@
         "file": "apps/android/app/src/main/kotlin/com/relayqahub/android/ui/FoundationScreen.kt",
         "line": 711
       },
-      "sourceHash": "099ffb09e165931974b1a03563f3cacd6a5b7fc903fc27cd2ffe30e00943f8e3",
+      "sourceHash": "2ff187a869513119022c3abe8b966bce868cb34efe207cd1d3652cce274e0815",
       "prerequisites": "Dedicated preview instance; projects A/B; A-only, B-only and shared employee; unique GM. External components require independent test targets.",
       "steps": [
         "Prepare a fresh project-scoped test record and record its version.",
@@ -92944,7 +93129,7 @@
         "file": "apps/android/app/src/main/kotlin/com/relayqahub/android/ui/FoundationScreen.kt",
         "line": 723
       },
-      "sourceHash": "099ffb09e165931974b1a03563f3cacd6a5b7fc903fc27cd2ffe30e00943f8e3",
+      "sourceHash": "2ff187a869513119022c3abe8b966bce868cb34efe207cd1d3652cce274e0815",
       "prerequisites": "Dedicated preview instance; projects A/B; A-only, B-only and shared employee; unique GM. External components require independent test targets.",
       "steps": [
         "Prepare a fresh project-scoped test record and record its version.",
@@ -93070,7 +93255,7 @@
         "file": "apps/android/app/src/main/kotlin/com/relayqahub/android/ui/FoundationScreen.kt",
         "line": 742
       },
-      "sourceHash": "099ffb09e165931974b1a03563f3cacd6a5b7fc903fc27cd2ffe30e00943f8e3",
+      "sourceHash": "2ff187a869513119022c3abe8b966bce868cb34efe207cd1d3652cce274e0815",
       "prerequisites": "Dedicated preview instance; projects A/B; A-only, B-only and shared employee; unique GM. External components require independent test targets.",
       "steps": [
         "Prepare a fresh project-scoped test record and record its version.",
@@ -93196,7 +93381,7 @@
         "file": "apps/android/app/src/main/kotlin/com/relayqahub/android/ui/FoundationScreen.kt",
         "line": 768
       },
-      "sourceHash": "099ffb09e165931974b1a03563f3cacd6a5b7fc903fc27cd2ffe30e00943f8e3",
+      "sourceHash": "2ff187a869513119022c3abe8b966bce868cb34efe207cd1d3652cce274e0815",
       "prerequisites": "Dedicated preview instance; projects A/B; A-only, B-only and shared employee; unique GM. External components require independent test targets.",
       "steps": [
         "Prepare a fresh project-scoped test record and record its version.",
@@ -93322,7 +93507,7 @@
         "file": "apps/android/app/src/main/kotlin/com/relayqahub/android/ui/FoundationScreen.kt",
         "line": 793
       },
-      "sourceHash": "099ffb09e165931974b1a03563f3cacd6a5b7fc903fc27cd2ffe30e00943f8e3",
+      "sourceHash": "2ff187a869513119022c3abe8b966bce868cb34efe207cd1d3652cce274e0815",
       "prerequisites": "Dedicated preview instance; projects A/B; A-only, B-only and shared employee; unique GM. External components require independent test targets.",
       "steps": [
         "Prepare a fresh project-scoped test record and record its version.",
@@ -93448,7 +93633,7 @@
         "file": "apps/android/app/src/main/kotlin/com/relayqahub/android/ui/FoundationScreen.kt",
         "line": 836
       },
-      "sourceHash": "099ffb09e165931974b1a03563f3cacd6a5b7fc903fc27cd2ffe30e00943f8e3",
+      "sourceHash": "2ff187a869513119022c3abe8b966bce868cb34efe207cd1d3652cce274e0815",
       "prerequisites": "Dedicated preview instance; projects A/B; A-only, B-only and shared employee; unique GM. External components require independent test targets.",
       "steps": [
         "Prepare a fresh project-scoped test record and record its version.",
@@ -93574,7 +93759,7 @@
         "file": "apps/android/app/src/main/kotlin/com/relayqahub/android/ui/FoundationScreen.kt",
         "line": 852
       },
-      "sourceHash": "099ffb09e165931974b1a03563f3cacd6a5b7fc903fc27cd2ffe30e00943f8e3",
+      "sourceHash": "2ff187a869513119022c3abe8b966bce868cb34efe207cd1d3652cce274e0815",
       "prerequisites": "Dedicated preview instance; projects A/B; A-only, B-only and shared employee; unique GM. External components require independent test targets.",
       "steps": [
         "Prepare a fresh project-scoped test record and record its version.",
@@ -93700,7 +93885,7 @@
         "file": "apps/android/app/src/main/kotlin/com/relayqahub/android/ui/FoundationScreen.kt",
         "line": 884
       },
-      "sourceHash": "099ffb09e165931974b1a03563f3cacd6a5b7fc903fc27cd2ffe30e00943f8e3",
+      "sourceHash": "2ff187a869513119022c3abe8b966bce868cb34efe207cd1d3652cce274e0815",
       "prerequisites": "Dedicated preview instance; projects A/B; A-only, B-only and shared employee; unique GM. External components require independent test targets.",
       "steps": [
         "Prepare a fresh project-scoped test record and record its version.",
@@ -93826,7 +94011,7 @@
         "file": "apps/android/app/src/main/kotlin/com/relayqahub/android/ui/FoundationScreen.kt",
         "line": 923
       },
-      "sourceHash": "099ffb09e165931974b1a03563f3cacd6a5b7fc903fc27cd2ffe30e00943f8e3",
+      "sourceHash": "2ff187a869513119022c3abe8b966bce868cb34efe207cd1d3652cce274e0815",
       "prerequisites": "Dedicated preview instance; projects A/B; A-only, B-only and shared employee; unique GM. External components require independent test targets.",
       "steps": [
         "Prepare a fresh project-scoped test record and record its version.",
@@ -93952,7 +94137,7 @@
         "file": "apps/android/app/src/main/kotlin/com/relayqahub/android/ui/FoundationScreen.kt",
         "line": 965
       },
-      "sourceHash": "099ffb09e165931974b1a03563f3cacd6a5b7fc903fc27cd2ffe30e00943f8e3",
+      "sourceHash": "2ff187a869513119022c3abe8b966bce868cb34efe207cd1d3652cce274e0815",
       "prerequisites": "Dedicated preview instance; projects A/B; A-only, B-only and shared employee; unique GM. External components require independent test targets.",
       "steps": [
         "Prepare a fresh project-scoped test record and record its version.",
@@ -94078,7 +94263,7 @@
         "file": "apps/android/app/src/main/kotlin/com/relayqahub/android/ui/FoundationScreen.kt",
         "line": 998
       },
-      "sourceHash": "099ffb09e165931974b1a03563f3cacd6a5b7fc903fc27cd2ffe30e00943f8e3",
+      "sourceHash": "2ff187a869513119022c3abe8b966bce868cb34efe207cd1d3652cce274e0815",
       "prerequisites": "Dedicated preview instance; projects A/B; A-only, B-only and shared employee; unique GM. External components require independent test targets.",
       "steps": [
         "Prepare a fresh project-scoped test record and record its version.",
@@ -94161,7 +94346,7 @@
         "file": "apps/android/app/src/main/kotlin/com/relayqahub/android/ui/FoundationScreen.kt",
         "line": 1017
       },
-      "sourceHash": "099ffb09e165931974b1a03563f3cacd6a5b7fc903fc27cd2ffe30e00943f8e3",
+      "sourceHash": "2ff187a869513119022c3abe8b966bce868cb34efe207cd1d3652cce274e0815",
       "prerequisites": "Dedicated preview instance; projects A/B; A-only, B-only and shared employee; unique GM. External components require independent test targets.",
       "steps": [
         "Prepare a fresh project-scoped test record and record its version.",
@@ -94287,7 +94472,7 @@
         "file": "apps/android/app/src/main/kotlin/com/relayqahub/android/ui/FoundationScreen.kt",
         "line": 1036
       },
-      "sourceHash": "099ffb09e165931974b1a03563f3cacd6a5b7fc903fc27cd2ffe30e00943f8e3",
+      "sourceHash": "2ff187a869513119022c3abe8b966bce868cb34efe207cd1d3652cce274e0815",
       "prerequisites": "Dedicated preview instance; projects A/B; A-only, B-only and shared employee; unique GM. External components require independent test targets.",
       "steps": [
         "Prepare a fresh project-scoped test record and record its version.",
@@ -94413,7 +94598,7 @@
         "file": "apps/android/app/src/main/kotlin/com/relayqahub/android/ui/FoundationScreen.kt",
         "line": 1049
       },
-      "sourceHash": "099ffb09e165931974b1a03563f3cacd6a5b7fc903fc27cd2ffe30e00943f8e3",
+      "sourceHash": "2ff187a869513119022c3abe8b966bce868cb34efe207cd1d3652cce274e0815",
       "prerequisites": "Dedicated preview instance; projects A/B; A-only, B-only and shared employee; unique GM. External components require independent test targets.",
       "steps": [
         "Prepare a fresh project-scoped test record and record its version.",
@@ -94539,7 +94724,7 @@
         "file": "apps/android/app/src/main/kotlin/com/relayqahub/android/ui/FoundationScreen.kt",
         "line": 1053
       },
-      "sourceHash": "099ffb09e165931974b1a03563f3cacd6a5b7fc903fc27cd2ffe30e00943f8e3",
+      "sourceHash": "2ff187a869513119022c3abe8b966bce868cb34efe207cd1d3652cce274e0815",
       "prerequisites": "Dedicated preview instance; projects A/B; A-only, B-only and shared employee; unique GM. External components require independent test targets.",
       "steps": [
         "Prepare a fresh project-scoped test record and record its version.",
@@ -94665,7 +94850,7 @@
         "file": "apps/android/app/src/main/kotlin/com/relayqahub/android/ui/FoundationScreen.kt",
         "line": 1065
       },
-      "sourceHash": "099ffb09e165931974b1a03563f3cacd6a5b7fc903fc27cd2ffe30e00943f8e3",
+      "sourceHash": "2ff187a869513119022c3abe8b966bce868cb34efe207cd1d3652cce274e0815",
       "prerequisites": "Dedicated preview instance; projects A/B; A-only, B-only and shared employee; unique GM. External components require independent test targets.",
       "steps": [
         "Prepare a fresh project-scoped test record and record its version.",
@@ -94791,7 +94976,7 @@
         "file": "apps/android/app/src/main/kotlin/com/relayqahub/android/ui/FoundationScreen.kt",
         "line": 1096
       },
-      "sourceHash": "099ffb09e165931974b1a03563f3cacd6a5b7fc903fc27cd2ffe30e00943f8e3",
+      "sourceHash": "2ff187a869513119022c3abe8b966bce868cb34efe207cd1d3652cce274e0815",
       "prerequisites": "Dedicated preview instance; projects A/B; A-only, B-only and shared employee; unique GM. External components require independent test targets.",
       "steps": [
         "Prepare a fresh project-scoped test record and record its version.",
@@ -94917,7 +95102,7 @@
         "file": "apps/android/app/src/main/kotlin/com/relayqahub/android/ui/FoundationScreen.kt",
         "line": 1120
       },
-      "sourceHash": "099ffb09e165931974b1a03563f3cacd6a5b7fc903fc27cd2ffe30e00943f8e3",
+      "sourceHash": "2ff187a869513119022c3abe8b966bce868cb34efe207cd1d3652cce274e0815",
       "prerequisites": "Dedicated preview instance; projects A/B; A-only, B-only and shared employee; unique GM. External components require independent test targets.",
       "steps": [
         "Prepare a fresh project-scoped test record and record its version.",
@@ -95043,7 +95228,7 @@
         "file": "apps/android/app/src/main/kotlin/com/relayqahub/android/ui/FoundationScreen.kt",
         "line": 1152
       },
-      "sourceHash": "099ffb09e165931974b1a03563f3cacd6a5b7fc903fc27cd2ffe30e00943f8e3",
+      "sourceHash": "2ff187a869513119022c3abe8b966bce868cb34efe207cd1d3652cce274e0815",
       "prerequisites": "Dedicated preview instance; projects A/B; A-only, B-only and shared employee; unique GM. External components require independent test targets.",
       "steps": [
         "Prepare a fresh project-scoped test record and record its version.",
@@ -95169,7 +95354,7 @@
         "file": "apps/android/app/src/main/kotlin/com/relayqahub/android/ui/FoundationScreen.kt",
         "line": 1166
       },
-      "sourceHash": "099ffb09e165931974b1a03563f3cacd6a5b7fc903fc27cd2ffe30e00943f8e3",
+      "sourceHash": "2ff187a869513119022c3abe8b966bce868cb34efe207cd1d3652cce274e0815",
       "prerequisites": "Dedicated preview instance; projects A/B; A-only, B-only and shared employee; unique GM. External components require independent test targets.",
       "steps": [
         "Prepare a fresh project-scoped test record and record its version.",
@@ -95302,7 +95487,7 @@
         "file": "apps/android/app/src/main/kotlin/com/relayqahub/android/ui/FoundationScreen.kt",
         "line": 1253
       },
-      "sourceHash": "099ffb09e165931974b1a03563f3cacd6a5b7fc903fc27cd2ffe30e00943f8e3",
+      "sourceHash": "2ff187a869513119022c3abe8b966bce868cb34efe207cd1d3652cce274e0815",
       "prerequisites": "Dedicated preview instance; projects A/B; A-only, B-only and shared employee; unique GM. External components require independent test targets.",
       "steps": [
         "Prepare a fresh project-scoped test record and record its version.",
@@ -95428,7 +95613,7 @@
         "file": "apps/android/app/src/main/kotlin/com/relayqahub/android/ui/FoundationScreen.kt",
         "line": 1271
       },
-      "sourceHash": "099ffb09e165931974b1a03563f3cacd6a5b7fc903fc27cd2ffe30e00943f8e3",
+      "sourceHash": "2ff187a869513119022c3abe8b966bce868cb34efe207cd1d3652cce274e0815",
       "prerequisites": "Dedicated preview instance; projects A/B; A-only, B-only and shared employee; unique GM. External components require independent test targets.",
       "steps": [
         "Prepare a fresh project-scoped test record and record its version.",
@@ -95554,7 +95739,7 @@
         "file": "apps/android/app/src/main/kotlin/com/relayqahub/android/ui/FoundationScreen.kt",
         "line": 1310
       },
-      "sourceHash": "099ffb09e165931974b1a03563f3cacd6a5b7fc903fc27cd2ffe30e00943f8e3",
+      "sourceHash": "2ff187a869513119022c3abe8b966bce868cb34efe207cd1d3652cce274e0815",
       "prerequisites": "Dedicated preview instance; projects A/B; A-only, B-only and shared employee; unique GM. External components require independent test targets.",
       "steps": [
         "Prepare a fresh project-scoped test record and record its version.",
@@ -95680,7 +95865,7 @@
         "file": "apps/android/app/src/main/kotlin/com/relayqahub/android/ui/FoundationScreen.kt",
         "line": 1319
       },
-      "sourceHash": "099ffb09e165931974b1a03563f3cacd6a5b7fc903fc27cd2ffe30e00943f8e3",
+      "sourceHash": "2ff187a869513119022c3abe8b966bce868cb34efe207cd1d3652cce274e0815",
       "prerequisites": "Dedicated preview instance; projects A/B; A-only, B-only and shared employee; unique GM. External components require independent test targets.",
       "steps": [
         "Prepare a fresh project-scoped test record and record its version.",
@@ -95806,7 +95991,7 @@
         "file": "apps/android/app/src/main/kotlin/com/relayqahub/android/ui/FoundationScreen.kt",
         "line": 1352
       },
-      "sourceHash": "099ffb09e165931974b1a03563f3cacd6a5b7fc903fc27cd2ffe30e00943f8e3",
+      "sourceHash": "2ff187a869513119022c3abe8b966bce868cb34efe207cd1d3652cce274e0815",
       "prerequisites": "Dedicated preview instance; projects A/B; A-only, B-only and shared employee; unique GM. External components require independent test targets.",
       "steps": [
         "Prepare a fresh project-scoped test record and record its version.",
@@ -95932,7 +96117,7 @@
         "file": "apps/android/app/src/main/kotlin/com/relayqahub/android/ui/FoundationScreen.kt",
         "line": 1393
       },
-      "sourceHash": "099ffb09e165931974b1a03563f3cacd6a5b7fc903fc27cd2ffe30e00943f8e3",
+      "sourceHash": "2ff187a869513119022c3abe8b966bce868cb34efe207cd1d3652cce274e0815",
       "prerequisites": "Dedicated preview instance; projects A/B; A-only, B-only and shared employee; unique GM. External components require independent test targets.",
       "steps": [
         "Prepare a fresh project-scoped test record and record its version.",
@@ -96058,7 +96243,7 @@
         "file": "apps/android/app/src/main/kotlin/com/relayqahub/android/ui/FoundationScreen.kt",
         "line": 1509
       },
-      "sourceHash": "099ffb09e165931974b1a03563f3cacd6a5b7fc903fc27cd2ffe30e00943f8e3",
+      "sourceHash": "2ff187a869513119022c3abe8b966bce868cb34efe207cd1d3652cce274e0815",
       "prerequisites": "Dedicated preview instance; projects A/B; A-only, B-only and shared employee; unique GM. External components require independent test targets.",
       "steps": [
         "Prepare a fresh project-scoped test record and record its version.",
@@ -96184,7 +96369,7 @@
         "file": "apps/android/app/src/main/kotlin/com/relayqahub/android/ui/FoundationScreen.kt",
         "line": 1537
       },
-      "sourceHash": "099ffb09e165931974b1a03563f3cacd6a5b7fc903fc27cd2ffe30e00943f8e3",
+      "sourceHash": "2ff187a869513119022c3abe8b966bce868cb34efe207cd1d3652cce274e0815",
       "prerequisites": "Dedicated preview instance; projects A/B; A-only, B-only and shared employee; unique GM. External components require independent test targets.",
       "steps": [
         "Prepare a fresh project-scoped test record and record its version.",
@@ -96310,7 +96495,7 @@
         "file": "apps/android/app/src/main/kotlin/com/relayqahub/android/ui/FoundationScreen.kt",
         "line": 1543
       },
-      "sourceHash": "099ffb09e165931974b1a03563f3cacd6a5b7fc903fc27cd2ffe30e00943f8e3",
+      "sourceHash": "2ff187a869513119022c3abe8b966bce868cb34efe207cd1d3652cce274e0815",
       "prerequisites": "Dedicated preview instance; projects A/B; A-only, B-only and shared employee; unique GM. External components require independent test targets.",
       "steps": [
         "Prepare a fresh project-scoped test record and record its version.",
@@ -96436,7 +96621,7 @@
         "file": "apps/android/app/src/main/kotlin/com/relayqahub/android/ui/FoundationScreen.kt",
         "line": 1550
       },
-      "sourceHash": "099ffb09e165931974b1a03563f3cacd6a5b7fc903fc27cd2ffe30e00943f8e3",
+      "sourceHash": "2ff187a869513119022c3abe8b966bce868cb34efe207cd1d3652cce274e0815",
       "prerequisites": "Dedicated preview instance; projects A/B; A-only, B-only and shared employee; unique GM. External components require independent test targets.",
       "steps": [
         "Prepare a fresh project-scoped test record and record its version.",
@@ -96562,7 +96747,7 @@
         "file": "apps/android/app/src/main/kotlin/com/relayqahub/android/ui/FoundationScreen.kt",
         "line": 1638
       },
-      "sourceHash": "099ffb09e165931974b1a03563f3cacd6a5b7fc903fc27cd2ffe30e00943f8e3",
+      "sourceHash": "2ff187a869513119022c3abe8b966bce868cb34efe207cd1d3652cce274e0815",
       "prerequisites": "Dedicated preview instance; projects A/B; A-only, B-only and shared employee; unique GM. External components require independent test targets.",
       "steps": [
         "Prepare a fresh project-scoped test record and record its version.",
@@ -96688,7 +96873,7 @@
         "file": "apps/android/app/src/main/kotlin/com/relayqahub/android/ui/FoundationScreen.kt",
         "line": 1730
       },
-      "sourceHash": "099ffb09e165931974b1a03563f3cacd6a5b7fc903fc27cd2ffe30e00943f8e3",
+      "sourceHash": "2ff187a869513119022c3abe8b966bce868cb34efe207cd1d3652cce274e0815",
       "prerequisites": "Dedicated preview instance; projects A/B; A-only, B-only and shared employee; unique GM. External components require independent test targets.",
       "steps": [
         "Prepare a fresh project-scoped test record and record its version.",
@@ -96814,7 +96999,7 @@
         "file": "apps/android/app/src/main/kotlin/com/relayqahub/android/ui/FoundationScreen.kt",
         "line": 1740
       },
-      "sourceHash": "099ffb09e165931974b1a03563f3cacd6a5b7fc903fc27cd2ffe30e00943f8e3",
+      "sourceHash": "2ff187a869513119022c3abe8b966bce868cb34efe207cd1d3652cce274e0815",
       "prerequisites": "Dedicated preview instance; projects A/B; A-only, B-only and shared employee; unique GM. External components require independent test targets.",
       "steps": [
         "Prepare a fresh project-scoped test record and record its version.",
@@ -96940,7 +97125,7 @@
         "file": "apps/android/app/src/main/kotlin/com/relayqahub/android/ui/FoundationScreen.kt",
         "line": 1770
       },
-      "sourceHash": "099ffb09e165931974b1a03563f3cacd6a5b7fc903fc27cd2ffe30e00943f8e3",
+      "sourceHash": "2ff187a869513119022c3abe8b966bce868cb34efe207cd1d3652cce274e0815",
       "prerequisites": "Dedicated preview instance; projects A/B; A-only, B-only and shared employee; unique GM. External components require independent test targets.",
       "steps": [
         "Prepare a fresh project-scoped test record and record its version.",
@@ -97066,7 +97251,7 @@
         "file": "apps/android/app/src/main/kotlin/com/relayqahub/android/ui/FoundationScreen.kt",
         "line": 1797
       },
-      "sourceHash": "099ffb09e165931974b1a03563f3cacd6a5b7fc903fc27cd2ffe30e00943f8e3",
+      "sourceHash": "2ff187a869513119022c3abe8b966bce868cb34efe207cd1d3652cce274e0815",
       "prerequisites": "Dedicated preview instance; projects A/B; A-only, B-only and shared employee; unique GM. External components require independent test targets.",
       "steps": [
         "Prepare a fresh project-scoped test record and record its version.",
@@ -97192,7 +97377,7 @@
         "file": "apps/android/app/src/main/kotlin/com/relayqahub/android/ui/FoundationScreen.kt",
         "line": 1812
       },
-      "sourceHash": "099ffb09e165931974b1a03563f3cacd6a5b7fc903fc27cd2ffe30e00943f8e3",
+      "sourceHash": "2ff187a869513119022c3abe8b966bce868cb34efe207cd1d3652cce274e0815",
       "prerequisites": "Dedicated preview instance; projects A/B; A-only, B-only and shared employee; unique GM. External components require independent test targets.",
       "steps": [
         "Prepare a fresh project-scoped test record and record its version.",
@@ -97318,7 +97503,7 @@
         "file": "apps/android/app/src/main/kotlin/com/relayqahub/android/ui/FoundationScreen.kt",
         "line": 1815
       },
-      "sourceHash": "099ffb09e165931974b1a03563f3cacd6a5b7fc903fc27cd2ffe30e00943f8e3",
+      "sourceHash": "2ff187a869513119022c3abe8b966bce868cb34efe207cd1d3652cce274e0815",
       "prerequisites": "Dedicated preview instance; projects A/B; A-only, B-only and shared employee; unique GM. External components require independent test targets.",
       "steps": [
         "Prepare a fresh project-scoped test record and record its version.",
@@ -97444,7 +97629,7 @@
         "file": "apps/android/app/src/main/kotlin/com/relayqahub/android/ui/FoundationScreen.kt",
         "line": 1879
       },
-      "sourceHash": "099ffb09e165931974b1a03563f3cacd6a5b7fc903fc27cd2ffe30e00943f8e3",
+      "sourceHash": "2ff187a869513119022c3abe8b966bce868cb34efe207cd1d3652cce274e0815",
       "prerequisites": "Dedicated preview instance; projects A/B; A-only, B-only and shared employee; unique GM. External components require independent test targets.",
       "steps": [
         "Prepare a fresh project-scoped test record and record its version.",
@@ -97570,7 +97755,7 @@
         "file": "apps/android/app/src/main/kotlin/com/relayqahub/android/ui/FoundationScreen.kt",
         "line": 1891
       },
-      "sourceHash": "099ffb09e165931974b1a03563f3cacd6a5b7fc903fc27cd2ffe30e00943f8e3",
+      "sourceHash": "2ff187a869513119022c3abe8b966bce868cb34efe207cd1d3652cce274e0815",
       "prerequisites": "Dedicated preview instance; projects A/B; A-only, B-only and shared employee; unique GM. External components require independent test targets.",
       "steps": [
         "Prepare a fresh project-scoped test record and record its version.",
@@ -97696,7 +97881,7 @@
         "file": "apps/android/app/src/main/kotlin/com/relayqahub/android/ui/FoundationScreen.kt",
         "line": 1963
       },
-      "sourceHash": "099ffb09e165931974b1a03563f3cacd6a5b7fc903fc27cd2ffe30e00943f8e3",
+      "sourceHash": "2ff187a869513119022c3abe8b966bce868cb34efe207cd1d3652cce274e0815",
       "prerequisites": "Dedicated preview instance; projects A/B; A-only, B-only and shared employee; unique GM. External components require independent test targets.",
       "steps": [
         "Prepare a fresh project-scoped test record and record its version.",
@@ -97822,7 +98007,7 @@
         "file": "apps/android/app/src/main/kotlin/com/relayqahub/android/ui/FoundationScreen.kt",
         "line": 1975
       },
-      "sourceHash": "099ffb09e165931974b1a03563f3cacd6a5b7fc903fc27cd2ffe30e00943f8e3",
+      "sourceHash": "2ff187a869513119022c3abe8b966bce868cb34efe207cd1d3652cce274e0815",
       "prerequisites": "Dedicated preview instance; projects A/B; A-only, B-only and shared employee; unique GM. External components require independent test targets.",
       "steps": [
         "Prepare a fresh project-scoped test record and record its version.",
@@ -97948,7 +98133,7 @@
         "file": "apps/android/app/src/main/kotlin/com/relayqahub/android/ui/FoundationScreen.kt",
         "line": 2031
       },
-      "sourceHash": "099ffb09e165931974b1a03563f3cacd6a5b7fc903fc27cd2ffe30e00943f8e3",
+      "sourceHash": "2ff187a869513119022c3abe8b966bce868cb34efe207cd1d3652cce274e0815",
       "prerequisites": "Dedicated preview instance; projects A/B; A-only, B-only and shared employee; unique GM. External components require independent test targets.",
       "steps": [
         "Prepare a fresh project-scoped test record and record its version.",
@@ -98081,7 +98266,7 @@
         "file": "apps/android/app/src/main/kotlin/com/relayqahub/android/ui/FoundationScreen.kt",
         "line": 2044
       },
-      "sourceHash": "099ffb09e165931974b1a03563f3cacd6a5b7fc903fc27cd2ffe30e00943f8e3",
+      "sourceHash": "2ff187a869513119022c3abe8b966bce868cb34efe207cd1d3652cce274e0815",
       "prerequisites": "Dedicated preview instance; projects A/B; A-only, B-only and shared employee; unique GM. External components require independent test targets.",
       "steps": [
         "Prepare a fresh project-scoped test record and record its version.",
@@ -98164,7 +98349,7 @@
         "file": "apps/android/app/src/main/kotlin/com/relayqahub/android/ui/FoundationScreen.kt",
         "line": 2087
       },
-      "sourceHash": "099ffb09e165931974b1a03563f3cacd6a5b7fc903fc27cd2ffe30e00943f8e3",
+      "sourceHash": "2ff187a869513119022c3abe8b966bce868cb34efe207cd1d3652cce274e0815",
       "prerequisites": "Dedicated preview instance; projects A/B; A-only, B-only and shared employee; unique GM. External components require independent test targets.",
       "steps": [
         "Prepare a fresh project-scoped test record and record its version.",
@@ -98324,7 +98509,7 @@
         "file": "apps/android/app/src/main/kotlin/com/relayqahub/android/ui/FoundationScreen.kt",
         "line": 2108
       },
-      "sourceHash": "099ffb09e165931974b1a03563f3cacd6a5b7fc903fc27cd2ffe30e00943f8e3",
+      "sourceHash": "2ff187a869513119022c3abe8b966bce868cb34efe207cd1d3652cce274e0815",
       "prerequisites": "Dedicated preview instance; projects A/B; A-only, B-only and shared employee; unique GM. External components require independent test targets.",
       "steps": [
         "Prepare a fresh project-scoped test record and record its version.",
@@ -98407,7 +98592,7 @@
         "file": "apps/android/app/src/main/kotlin/com/relayqahub/android/ui/FoundationScreen.kt",
         "line": 2117
       },
-      "sourceHash": "099ffb09e165931974b1a03563f3cacd6a5b7fc903fc27cd2ffe30e00943f8e3",
+      "sourceHash": "2ff187a869513119022c3abe8b966bce868cb34efe207cd1d3652cce274e0815",
       "prerequisites": "Dedicated preview instance; projects A/B; A-only, B-only and shared employee; unique GM. External components require independent test targets.",
       "steps": [
         "Prepare a fresh project-scoped test record and record its version.",
@@ -98490,7 +98675,7 @@
         "file": "apps/android/app/src/main/kotlin/com/relayqahub/android/ui/FoundationScreen.kt",
         "line": 2155
       },
-      "sourceHash": "099ffb09e165931974b1a03563f3cacd6a5b7fc903fc27cd2ffe30e00943f8e3",
+      "sourceHash": "2ff187a869513119022c3abe8b966bce868cb34efe207cd1d3652cce274e0815",
       "prerequisites": "Dedicated preview instance; projects A/B; A-only, B-only and shared employee; unique GM. External components require independent test targets.",
       "steps": [
         "Prepare a fresh project-scoped test record and record its version.",
@@ -98616,7 +98801,7 @@
         "file": "apps/android/app/src/main/kotlin/com/relayqahub/android/ui/FoundationScreen.kt",
         "line": 2183
       },
-      "sourceHash": "099ffb09e165931974b1a03563f3cacd6a5b7fc903fc27cd2ffe30e00943f8e3",
+      "sourceHash": "2ff187a869513119022c3abe8b966bce868cb34efe207cd1d3652cce274e0815",
       "prerequisites": "Dedicated preview instance; projects A/B; A-only, B-only and shared employee; unique GM. External components require independent test targets.",
       "steps": [
         "Prepare a fresh project-scoped test record and record its version.",
@@ -98742,7 +98927,7 @@
         "file": "apps/android/app/src/main/kotlin/com/relayqahub/android/ui/FoundationScreen.kt",
         "line": 2205
       },
-      "sourceHash": "099ffb09e165931974b1a03563f3cacd6a5b7fc903fc27cd2ffe30e00943f8e3",
+      "sourceHash": "2ff187a869513119022c3abe8b966bce868cb34efe207cd1d3652cce274e0815",
       "prerequisites": "Dedicated preview instance; projects A/B; A-only, B-only and shared employee; unique GM. External components require independent test targets.",
       "steps": [
         "Prepare a fresh project-scoped test record and record its version.",
@@ -98868,7 +99053,7 @@
         "file": "apps/android/app/src/main/kotlin/com/relayqahub/android/ui/FoundationScreen.kt",
         "line": 2219
       },
-      "sourceHash": "099ffb09e165931974b1a03563f3cacd6a5b7fc903fc27cd2ffe30e00943f8e3",
+      "sourceHash": "2ff187a869513119022c3abe8b966bce868cb34efe207cd1d3652cce274e0815",
       "prerequisites": "Dedicated preview instance; projects A/B; A-only, B-only and shared employee; unique GM. External components require independent test targets.",
       "steps": [
         "Prepare a fresh project-scoped test record and record its version.",
@@ -98994,7 +99179,7 @@
         "file": "apps/android/app/src/main/kotlin/com/relayqahub/android/ui/FoundationScreen.kt",
         "line": 2233
       },
-      "sourceHash": "099ffb09e165931974b1a03563f3cacd6a5b7fc903fc27cd2ffe30e00943f8e3",
+      "sourceHash": "2ff187a869513119022c3abe8b966bce868cb34efe207cd1d3652cce274e0815",
       "prerequisites": "Dedicated preview instance; projects A/B; A-only, B-only and shared employee; unique GM. External components require independent test targets.",
       "steps": [
         "Prepare a fresh project-scoped test record and record its version.",
@@ -99120,7 +99305,7 @@
         "file": "apps/android/app/src/main/kotlin/com/relayqahub/android/ui/FoundationScreen.kt",
         "line": 2283
       },
-      "sourceHash": "099ffb09e165931974b1a03563f3cacd6a5b7fc903fc27cd2ffe30e00943f8e3",
+      "sourceHash": "2ff187a869513119022c3abe8b966bce868cb34efe207cd1d3652cce274e0815",
       "prerequisites": "Dedicated preview instance; projects A/B; A-only, B-only and shared employee; unique GM. External components require independent test targets.",
       "steps": [
         "Prepare a fresh project-scoped test record and record its version.",
@@ -99246,7 +99431,7 @@
         "file": "apps/android/app/src/main/kotlin/com/relayqahub/android/ui/FoundationScreen.kt",
         "line": 2288
       },
-      "sourceHash": "099ffb09e165931974b1a03563f3cacd6a5b7fc903fc27cd2ffe30e00943f8e3",
+      "sourceHash": "2ff187a869513119022c3abe8b966bce868cb34efe207cd1d3652cce274e0815",
       "prerequisites": "Dedicated preview instance; projects A/B; A-only, B-only and shared employee; unique GM. External components require independent test targets.",
       "steps": [
         "Prepare a fresh project-scoped test record and record its version.",
@@ -99372,7 +99557,7 @@
         "file": "apps/android/app/src/main/kotlin/com/relayqahub/android/ui/FoundationScreen.kt",
         "line": 2305
       },
-      "sourceHash": "099ffb09e165931974b1a03563f3cacd6a5b7fc903fc27cd2ffe30e00943f8e3",
+      "sourceHash": "2ff187a869513119022c3abe8b966bce868cb34efe207cd1d3652cce274e0815",
       "prerequisites": "Dedicated preview instance; projects A/B; A-only, B-only and shared employee; unique GM. External components require independent test targets.",
       "steps": [
         "Prepare a fresh project-scoped test record and record its version.",
@@ -99498,7 +99683,7 @@
         "file": "apps/android/app/src/main/kotlin/com/relayqahub/android/ui/FoundationScreen.kt",
         "line": 2358
       },
-      "sourceHash": "099ffb09e165931974b1a03563f3cacd6a5b7fc903fc27cd2ffe30e00943f8e3",
+      "sourceHash": "2ff187a869513119022c3abe8b966bce868cb34efe207cd1d3652cce274e0815",
       "prerequisites": "Dedicated preview instance; projects A/B; A-only, B-only and shared employee; unique GM. External components require independent test targets.",
       "steps": [
         "Prepare a fresh project-scoped test record and record its version.",
@@ -99624,7 +99809,7 @@
         "file": "apps/android/app/src/main/kotlin/com/relayqahub/android/ui/FoundationScreen.kt",
         "line": 2379
       },
-      "sourceHash": "099ffb09e165931974b1a03563f3cacd6a5b7fc903fc27cd2ffe30e00943f8e3",
+      "sourceHash": "2ff187a869513119022c3abe8b966bce868cb34efe207cd1d3652cce274e0815",
       "prerequisites": "Dedicated preview instance; projects A/B; A-only, B-only and shared employee; unique GM. External components require independent test targets.",
       "steps": [
         "Prepare a fresh project-scoped test record and record its version.",
@@ -99750,7 +99935,7 @@
         "file": "apps/android/app/src/main/kotlin/com/relayqahub/android/ui/FoundationScreen.kt",
         "line": 2406
       },
-      "sourceHash": "099ffb09e165931974b1a03563f3cacd6a5b7fc903fc27cd2ffe30e00943f8e3",
+      "sourceHash": "2ff187a869513119022c3abe8b966bce868cb34efe207cd1d3652cce274e0815",
       "prerequisites": "Dedicated preview instance; projects A/B; A-only, B-only and shared employee; unique GM. External components require independent test targets.",
       "steps": [
         "Prepare a fresh project-scoped test record and record its version.",
@@ -99876,7 +100061,7 @@
         "file": "apps/android/app/src/main/kotlin/com/relayqahub/android/ui/FoundationScreen.kt",
         "line": 2410
       },
-      "sourceHash": "099ffb09e165931974b1a03563f3cacd6a5b7fc903fc27cd2ffe30e00943f8e3",
+      "sourceHash": "2ff187a869513119022c3abe8b966bce868cb34efe207cd1d3652cce274e0815",
       "prerequisites": "Dedicated preview instance; projects A/B; A-only, B-only and shared employee; unique GM. External components require independent test targets.",
       "steps": [
         "Prepare a fresh project-scoped test record and record its version.",
@@ -100002,7 +100187,7 @@
         "file": "apps/android/app/src/main/kotlin/com/relayqahub/android/ui/FoundationScreen.kt",
         "line": 2416
       },
-      "sourceHash": "099ffb09e165931974b1a03563f3cacd6a5b7fc903fc27cd2ffe30e00943f8e3",
+      "sourceHash": "2ff187a869513119022c3abe8b966bce868cb34efe207cd1d3652cce274e0815",
       "prerequisites": "Dedicated preview instance; projects A/B; A-only, B-only and shared employee; unique GM. External components require independent test targets.",
       "steps": [
         "Prepare a fresh project-scoped test record and record its version.",
@@ -100128,7 +100313,7 @@
         "file": "apps/android/app/src/main/kotlin/com/relayqahub/android/ui/FoundationScreen.kt",
         "line": 2422
       },
-      "sourceHash": "099ffb09e165931974b1a03563f3cacd6a5b7fc903fc27cd2ffe30e00943f8e3",
+      "sourceHash": "2ff187a869513119022c3abe8b966bce868cb34efe207cd1d3652cce274e0815",
       "prerequisites": "Dedicated preview instance; projects A/B; A-only, B-only and shared employee; unique GM. External components require independent test targets.",
       "steps": [
         "Prepare a fresh project-scoped test record and record its version.",
@@ -101012,9 +101197,9 @@
       ],
       "source": {
         "file": "apps/android/app/src/main/kotlin/com/relayqahub/android/ui/QaHubRoot.kt",
-        "line": 24
+        "line": 34
       },
-      "sourceHash": "d15e19fb95b9fece7c486f37e6039a4682569b6403e360f0c041a1ef726d874c",
+      "sourceHash": "97e370e0e6e041eda95ceb0044a94959537f3b4b010f96239cc4893480e913cf",
       "prerequisites": "Dedicated preview instance; projects A/B; A-only, B-only and shared employee; unique GM. External components require independent test targets.",
       "steps": [
         "Prepare a fresh project-scoped test record and record its version.",
@@ -101068,8 +101253,61 @@
           "note": "This entry inventories a different surface; requirement-level coverage is tracked separately. Not an accepted scope exclusion."
         }
       },
-      "manual": {},
-      "needsRevalidation": false,
+      "manual": {
+        "sourceEvidenceReview": {
+          "nodeId": "android_page_component-71f05acb34aaa9",
+          "sourceFile": "apps/android/app/src/main/kotlin/com/relayqahub/android/ui/QaHubRoot.kt",
+          "previousSourceHash": "d15e19fb95b9fece7c486f37e6039a4682569b6403e360f0c041a1ef726d874c",
+          "firstChangedSourceHash": "97e370e0e6e041eda95ceb0044a94959537f3b4b010f96239cc4893480e913cf",
+          "reason": "source_changed",
+          "priorResults": {
+            "apk": {
+              "applicable": true,
+              "status": "not_run",
+              "evidence": [],
+              "actual": "",
+              "note": "Real execution and read-back required."
+            },
+            "exe": {
+              "applicable": false,
+              "status": "not_run",
+              "evidence": [],
+              "actual": "",
+              "note": "This entry inventories a different surface; requirement-level coverage is tracked separately. Not an accepted scope exclusion."
+            },
+            "web": {
+              "applicable": false,
+              "status": "not_run",
+              "evidence": [],
+              "actual": "",
+              "note": "This entry inventories a different surface; requirement-level coverage is tracked separately. Not an accepted scope exclusion."
+            },
+            "http": {
+              "applicable": false,
+              "status": "not_run",
+              "evidence": [],
+              "actual": "",
+              "note": "This entry inventories a different surface; requirement-level coverage is tracked separately. Not an accepted scope exclusion."
+            },
+            "server_mcp": {
+              "applicable": false,
+              "status": "not_run",
+              "evidence": [],
+              "actual": "",
+              "note": "This entry inventories a different surface; requirement-level coverage is tracked separately. Not an accepted scope exclusion."
+            },
+            "local_mcp": {
+              "applicable": false,
+              "status": "not_run",
+              "evidence": [],
+              "actual": "",
+              "note": "This entry inventories a different surface; requirement-level coverage is tracked separately. Not an accepted scope exclusion."
+            }
+          },
+          "scope": "Historical results remain retained; this is a revalidation requirement, not new execution evidence."
+        }
+      },
+      "needsRevalidation": true,
       "generated": true
     },
     {
@@ -101085,9 +101323,9 @@
       ],
       "source": {
         "file": "apps/android/app/src/main/kotlin/com/relayqahub/android/ui/QaHubRoot.kt",
-        "line": 118
+        "line": 128
       },
-      "sourceHash": "d15e19fb95b9fece7c486f37e6039a4682569b6403e360f0c041a1ef726d874c",
+      "sourceHash": "97e370e0e6e041eda95ceb0044a94959537f3b4b010f96239cc4893480e913cf",
       "prerequisites": "Dedicated preview instance; projects A/B; A-only, B-only and shared employee; unique GM. External components require independent test targets.",
       "steps": [
         "Prepare a fresh project-scoped test record and record its version.",
@@ -101145,9 +101383,64 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T21:54:12.375Z"
+        "evidenceMappedAt": "2026-09-08T21:54:12.375Z",
+        "sourceEvidenceReview": {
+          "nodeId": "android_control-d535103c14e2f7",
+          "sourceFile": "apps/android/app/src/main/kotlin/com/relayqahub/android/ui/QaHubRoot.kt",
+          "previousSourceHash": "d15e19fb95b9fece7c486f37e6039a4682569b6403e360f0c041a1ef726d874c",
+          "firstChangedSourceHash": "97e370e0e6e041eda95ceb0044a94959537f3b4b010f96239cc4893480e913cf",
+          "reason": "source_changed",
+          "priorResults": {
+            "apk": {
+              "applicable": true,
+              "status": "passed",
+              "evidence": [
+                "android-implementation.md",
+                "../../../apps/android/app/build/evidence/project-components/preview-code16-return-a-draft-confirmed-ui.xml"
+              ],
+              "actual": "原生项目菜单实际从B返回A，恢复A草稿；不把网络延迟和跨设备并发算作通过。",
+              "note": "Real execution and read-back required."
+            },
+            "exe": {
+              "applicable": false,
+              "status": "not_run",
+              "evidence": [],
+              "actual": "",
+              "note": "This entry inventories a different surface; requirement-level coverage is tracked separately. Not an accepted scope exclusion."
+            },
+            "web": {
+              "applicable": false,
+              "status": "not_run",
+              "evidence": [],
+              "actual": "",
+              "note": "This entry inventories a different surface; requirement-level coverage is tracked separately. Not an accepted scope exclusion."
+            },
+            "http": {
+              "applicable": false,
+              "status": "not_run",
+              "evidence": [],
+              "actual": "",
+              "note": "This entry inventories a different surface; requirement-level coverage is tracked separately. Not an accepted scope exclusion."
+            },
+            "server_mcp": {
+              "applicable": false,
+              "status": "not_run",
+              "evidence": [],
+              "actual": "",
+              "note": "This entry inventories a different surface; requirement-level coverage is tracked separately. Not an accepted scope exclusion."
+            },
+            "local_mcp": {
+              "applicable": false,
+              "status": "not_run",
+              "evidence": [],
+              "actual": "",
+              "note": "This entry inventories a different surface; requirement-level coverage is tracked separately. Not an accepted scope exclusion."
+            }
+          },
+          "scope": "Historical results remain retained; this is a revalidation requirement, not new execution evidence."
+        }
       },
-      "needsRevalidation": false,
+      "needsRevalidation": true,
       "generated": true
     },
     {
@@ -101163,9 +101456,9 @@
       ],
       "source": {
         "file": "apps/android/app/src/main/kotlin/com/relayqahub/android/ui/QaHubRoot.kt",
-        "line": 120
+        "line": 130
       },
-      "sourceHash": "d15e19fb95b9fece7c486f37e6039a4682569b6403e360f0c041a1ef726d874c",
+      "sourceHash": "97e370e0e6e041eda95ceb0044a94959537f3b4b010f96239cc4893480e913cf",
       "prerequisites": "Dedicated preview instance; projects A/B; A-only, B-only and shared employee; unique GM. External components require independent test targets.",
       "steps": [
         "Prepare a fresh project-scoped test record and record its version.",
@@ -101219,8 +101512,61 @@
           "note": "This entry inventories a different surface; requirement-level coverage is tracked separately. Not an accepted scope exclusion."
         }
       },
-      "manual": {},
-      "needsRevalidation": false,
+      "manual": {
+        "sourceEvidenceReview": {
+          "nodeId": "android_control-57f820b113ae4e",
+          "sourceFile": "apps/android/app/src/main/kotlin/com/relayqahub/android/ui/QaHubRoot.kt",
+          "previousSourceHash": "d15e19fb95b9fece7c486f37e6039a4682569b6403e360f0c041a1ef726d874c",
+          "firstChangedSourceHash": "97e370e0e6e041eda95ceb0044a94959537f3b4b010f96239cc4893480e913cf",
+          "reason": "source_changed",
+          "priorResults": {
+            "apk": {
+              "applicable": true,
+              "status": "not_run",
+              "evidence": [],
+              "actual": "",
+              "note": "Real execution and read-back required."
+            },
+            "exe": {
+              "applicable": false,
+              "status": "not_run",
+              "evidence": [],
+              "actual": "",
+              "note": "This entry inventories a different surface; requirement-level coverage is tracked separately. Not an accepted scope exclusion."
+            },
+            "web": {
+              "applicable": false,
+              "status": "not_run",
+              "evidence": [],
+              "actual": "",
+              "note": "This entry inventories a different surface; requirement-level coverage is tracked separately. Not an accepted scope exclusion."
+            },
+            "http": {
+              "applicable": false,
+              "status": "not_run",
+              "evidence": [],
+              "actual": "",
+              "note": "This entry inventories a different surface; requirement-level coverage is tracked separately. Not an accepted scope exclusion."
+            },
+            "server_mcp": {
+              "applicable": false,
+              "status": "not_run",
+              "evidence": [],
+              "actual": "",
+              "note": "This entry inventories a different surface; requirement-level coverage is tracked separately. Not an accepted scope exclusion."
+            },
+            "local_mcp": {
+              "applicable": false,
+              "status": "not_run",
+              "evidence": [],
+              "actual": "",
+              "note": "This entry inventories a different surface; requirement-level coverage is tracked separately. Not an accepted scope exclusion."
+            }
+          },
+          "scope": "Historical results remain retained; this is a revalidation requirement, not new execution evidence."
+        }
+      },
+      "needsRevalidation": true,
       "generated": true
     },
     {
@@ -101236,9 +101582,9 @@
       ],
       "source": {
         "file": "apps/android/app/src/main/kotlin/com/relayqahub/android/ui/QaHubRoot.kt",
-        "line": 121
+        "line": 131
       },
-      "sourceHash": "d15e19fb95b9fece7c486f37e6039a4682569b6403e360f0c041a1ef726d874c",
+      "sourceHash": "97e370e0e6e041eda95ceb0044a94959537f3b4b010f96239cc4893480e913cf",
       "prerequisites": "Dedicated preview instance; projects A/B; A-only, B-only and shared employee; unique GM. External components require independent test targets.",
       "steps": [
         "Prepare a fresh project-scoped test record and record its version.",
@@ -101296,9 +101642,147 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T21:54:12.375Z"
+        "evidenceMappedAt": "2026-09-08T21:54:12.375Z",
+        "sourceEvidenceReview": {
+          "nodeId": "android_control-053937cef0ed1d",
+          "sourceFile": "apps/android/app/src/main/kotlin/com/relayqahub/android/ui/QaHubRoot.kt",
+          "previousSourceHash": "d15e19fb95b9fece7c486f37e6039a4682569b6403e360f0c041a1ef726d874c",
+          "firstChangedSourceHash": "97e370e0e6e041eda95ceb0044a94959537f3b4b010f96239cc4893480e913cf",
+          "reason": "source_changed",
+          "priorResults": {
+            "apk": {
+              "applicable": true,
+              "status": "passed",
+              "evidence": [
+                "android-implementation.md",
+                "../../../apps/android/app/build/evidence/project-components/preview-code16-return-a-draft-confirmed-ui.xml"
+              ],
+              "actual": "原生项目菜单实际从B返回A，恢复A草稿；不把网络延迟和跨设备并发算作通过。",
+              "note": "Real execution and read-back required."
+            },
+            "exe": {
+              "applicable": false,
+              "status": "not_run",
+              "evidence": [],
+              "actual": "",
+              "note": "This entry inventories a different surface; requirement-level coverage is tracked separately. Not an accepted scope exclusion."
+            },
+            "web": {
+              "applicable": false,
+              "status": "not_run",
+              "evidence": [],
+              "actual": "",
+              "note": "This entry inventories a different surface; requirement-level coverage is tracked separately. Not an accepted scope exclusion."
+            },
+            "http": {
+              "applicable": false,
+              "status": "not_run",
+              "evidence": [],
+              "actual": "",
+              "note": "This entry inventories a different surface; requirement-level coverage is tracked separately. Not an accepted scope exclusion."
+            },
+            "server_mcp": {
+              "applicable": false,
+              "status": "not_run",
+              "evidence": [],
+              "actual": "",
+              "note": "This entry inventories a different surface; requirement-level coverage is tracked separately. Not an accepted scope exclusion."
+            },
+            "local_mcp": {
+              "applicable": false,
+              "status": "not_run",
+              "evidence": [],
+              "actual": "",
+              "note": "This entry inventories a different surface; requirement-level coverage is tracked separately. Not an accepted scope exclusion."
+            }
+          },
+          "scope": "Historical results remain retained; this is a revalidation requirement, not new execution evidence."
+        }
       },
-      "needsRevalidation": false,
+      "needsRevalidation": true,
+      "generated": true
+    },
+    {
+      "id": "android_control-e1a7c907c41e18",
+      "kind": "android_control",
+      "title": "onClick = { val destination = AuthenticatedSurface( page = foundationViewModel.uiState.value.page,",
+      "group": "relay.production",
+      "baselineIds": [
+        16,
+        18,
+        19,
+        20
+      ],
+      "source": {
+        "file": "apps/android/app/src/main/kotlin/com/relayqahub/android/ui/QaHubRoot.kt",
+        "line": 143
+      },
+      "sourceHash": "97e370e0e6e041eda95ceb0044a94959537f3b4b010f96239cc4893480e913cf",
+      "prerequisites": "Dedicated preview instance; projects A/B; A-only, B-only and shared employee; unique GM. External components require independent test targets.",
+      "steps": [
+        "Prepare a fresh project-scoped test record and record its version.",
+        "Invoke this actual runtime entry with its valid parameters; inspect the visible result.",
+        "Read back persisted project, actor, state/version, events, attachments or final artifact as applicable.",
+        "Repeat applicable error cases (wrong project/membership, stale version, repeat request, deleted record, disabled component)."
+      ],
+      "expected": "Behavior and persisted result match the design and current business contract; no cross-project or production writes.",
+      "status": "not_run",
+      "results": {
+        "apk": {
+          "applicable": true,
+          "status": "not_run",
+          "evidence": [],
+          "actual": "",
+          "note": "Real execution and read-back required."
+        },
+        "exe": {
+          "applicable": false,
+          "status": "not_run",
+          "evidence": [],
+          "actual": "",
+          "note": "This entry inventories a different surface; requirement-level coverage is tracked separately. Not an accepted scope exclusion."
+        },
+        "web": {
+          "applicable": false,
+          "status": "not_run",
+          "evidence": [],
+          "actual": "",
+          "note": "This entry inventories a different surface; requirement-level coverage is tracked separately. Not an accepted scope exclusion."
+        },
+        "http": {
+          "applicable": false,
+          "status": "not_run",
+          "evidence": [],
+          "actual": "",
+          "note": "This entry inventories a different surface; requirement-level coverage is tracked separately. Not an accepted scope exclusion."
+        },
+        "server_mcp": {
+          "applicable": false,
+          "status": "not_run",
+          "evidence": [],
+          "actual": "",
+          "note": "This entry inventories a different surface; requirement-level coverage is tracked separately. Not an accepted scope exclusion."
+        },
+        "local_mcp": {
+          "applicable": false,
+          "status": "not_run",
+          "evidence": [],
+          "actual": "",
+          "note": "This entry inventories a different surface; requirement-level coverage is tracked separately. Not an accepted scope exclusion."
+        }
+      },
+      "manual": {
+        "sourceEvidenceReview": {
+          "nodeId": "android_control-e1a7c907c41e18",
+          "sourceFile": "apps/android/app/src/main/kotlin/com/relayqahub/android/ui/QaHubRoot.kt",
+          "previousSourceHash": null,
+          "firstChangedSourceHash": "97e370e0e6e041eda95ceb0044a94959537f3b4b010f96239cc4893480e913cf",
+          "reason": "new_source_node",
+          "priorResults": null,
+          "scope": "Historical results remain retained; this is a revalidation requirement, not new execution evidence."
+        }
+      },
+      "needsRevalidation": true,
       "generated": true
     },
     {
@@ -101314,9 +101798,9 @@
       ],
       "source": {
         "file": "apps/android/app/src/main/kotlin/com/relayqahub/android/ui/QaHubRoot.kt",
-        "line": 131
+        "line": 155
       },
-      "sourceHash": "d15e19fb95b9fece7c486f37e6039a4682569b6403e360f0c041a1ef726d874c",
+      "sourceHash": "97e370e0e6e041eda95ceb0044a94959537f3b4b010f96239cc4893480e913cf",
       "prerequisites": "Dedicated preview instance; projects A/B; A-only, B-only and shared employee; unique GM. External components require independent test targets.",
       "steps": [
         "Prepare a fresh project-scoped test record and record its version.",
@@ -101375,9 +101859,65 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T21:54:12.375Z"
+        "evidenceMappedAt": "2026-09-08T21:54:12.375Z",
+        "sourceEvidenceReview": {
+          "nodeId": "android_control-331c1002d7728f",
+          "sourceFile": "apps/android/app/src/main/kotlin/com/relayqahub/android/ui/QaHubRoot.kt",
+          "previousSourceHash": "d15e19fb95b9fece7c486f37e6039a4682569b6403e360f0c041a1ef726d874c",
+          "firstChangedSourceHash": "97e370e0e6e041eda95ceb0044a94959537f3b4b010f96239cc4893480e913cf",
+          "reason": "source_changed",
+          "priorResults": {
+            "apk": {
+              "applicable": true,
+              "status": "passed",
+              "evidence": [
+                "android-implementation.md",
+                "../../../apps/android/app/build/evidence/project-components/preview-code19-linked-readback.json",
+                "../../../apps/android/app/build/evidence/project-components/preview-code19-personnel-final-readback.json"
+              ],
+              "actual": "原生项目人员页面真实打开、选择关联对象、确认关联、解除、停用/恢复，随后服务端读回；只覆盖所列控件的实际正常场景。",
+              "note": "Real execution and read-back required."
+            },
+            "exe": {
+              "applicable": false,
+              "status": "not_run",
+              "evidence": [],
+              "actual": "",
+              "note": "This entry inventories a different surface; requirement-level coverage is tracked separately. Not an accepted scope exclusion."
+            },
+            "web": {
+              "applicable": false,
+              "status": "not_run",
+              "evidence": [],
+              "actual": "",
+              "note": "This entry inventories a different surface; requirement-level coverage is tracked separately. Not an accepted scope exclusion."
+            },
+            "http": {
+              "applicable": false,
+              "status": "not_run",
+              "evidence": [],
+              "actual": "",
+              "note": "This entry inventories a different surface; requirement-level coverage is tracked separately. Not an accepted scope exclusion."
+            },
+            "server_mcp": {
+              "applicable": false,
+              "status": "not_run",
+              "evidence": [],
+              "actual": "",
+              "note": "This entry inventories a different surface; requirement-level coverage is tracked separately. Not an accepted scope exclusion."
+            },
+            "local_mcp": {
+              "applicable": false,
+              "status": "not_run",
+              "evidence": [],
+              "actual": "",
+              "note": "This entry inventories a different surface; requirement-level coverage is tracked separately. Not an accepted scope exclusion."
+            }
+          },
+          "scope": "Historical results remain retained; this is a revalidation requirement, not new execution evidence."
+        }
       },
-      "needsRevalidation": false,
+      "needsRevalidation": true,
       "generated": true
     },
     {
@@ -101393,9 +101933,9 @@
       ],
       "source": {
         "file": "apps/android/app/src/main/kotlin/com/relayqahub/android/ui/QaHubRoot.kt",
-        "line": 164
+        "line": 189
       },
-      "sourceHash": "d15e19fb95b9fece7c486f37e6039a4682569b6403e360f0c041a1ef726d874c",
+      "sourceHash": "97e370e0e6e041eda95ceb0044a94959537f3b4b010f96239cc4893480e913cf",
       "prerequisites": "Dedicated preview instance; projects A/B; A-only, B-only and shared employee; unique GM. External components require independent test targets.",
       "steps": [
         "Prepare a fresh project-scoped test record and record its version.",
@@ -101449,8 +101989,61 @@
           "note": "This entry inventories a different surface; requirement-level coverage is tracked separately. Not an accepted scope exclusion."
         }
       },
-      "manual": {},
-      "needsRevalidation": false,
+      "manual": {
+        "sourceEvidenceReview": {
+          "nodeId": "android_page_component-2373e9cd9452a2",
+          "sourceFile": "apps/android/app/src/main/kotlin/com/relayqahub/android/ui/QaHubRoot.kt",
+          "previousSourceHash": "d15e19fb95b9fece7c486f37e6039a4682569b6403e360f0c041a1ef726d874c",
+          "firstChangedSourceHash": "97e370e0e6e041eda95ceb0044a94959537f3b4b010f96239cc4893480e913cf",
+          "reason": "source_changed",
+          "priorResults": {
+            "apk": {
+              "applicable": true,
+              "status": "not_run",
+              "evidence": [],
+              "actual": "",
+              "note": "Real execution and read-back required."
+            },
+            "exe": {
+              "applicable": false,
+              "status": "not_run",
+              "evidence": [],
+              "actual": "",
+              "note": "This entry inventories a different surface; requirement-level coverage is tracked separately. Not an accepted scope exclusion."
+            },
+            "web": {
+              "applicable": false,
+              "status": "not_run",
+              "evidence": [],
+              "actual": "",
+              "note": "This entry inventories a different surface; requirement-level coverage is tracked separately. Not an accepted scope exclusion."
+            },
+            "http": {
+              "applicable": false,
+              "status": "not_run",
+              "evidence": [],
+              "actual": "",
+              "note": "This entry inventories a different surface; requirement-level coverage is tracked separately. Not an accepted scope exclusion."
+            },
+            "server_mcp": {
+              "applicable": false,
+              "status": "not_run",
+              "evidence": [],
+              "actual": "",
+              "note": "This entry inventories a different surface; requirement-level coverage is tracked separately. Not an accepted scope exclusion."
+            },
+            "local_mcp": {
+              "applicable": false,
+              "status": "not_run",
+              "evidence": [],
+              "actual": "",
+              "note": "This entry inventories a different surface; requirement-level coverage is tracked separately. Not an accepted scope exclusion."
+            }
+          },
+          "scope": "Historical results remain retained; this is a revalidation requirement, not new execution evidence."
+        }
+      },
+      "needsRevalidation": true,
       "generated": true
     },
     {
@@ -101466,9 +102059,9 @@
       ],
       "source": {
         "file": "apps/android/app/src/main/kotlin/com/relayqahub/android/ui/QaHubRoot.kt",
-        "line": 186
+        "line": 211
       },
-      "sourceHash": "d15e19fb95b9fece7c486f37e6039a4682569b6403e360f0c041a1ef726d874c",
+      "sourceHash": "97e370e0e6e041eda95ceb0044a94959537f3b4b010f96239cc4893480e913cf",
       "prerequisites": "Dedicated preview instance; projects A/B; A-only, B-only and shared employee; unique GM. External components require independent test targets.",
       "steps": [
         "Prepare a fresh project-scoped test record and record its version.",
@@ -101526,9 +102119,64 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T21:54:12.375Z"
+        "evidenceMappedAt": "2026-09-08T21:54:12.375Z",
+        "sourceEvidenceReview": {
+          "nodeId": "android_control-3eacdab8beec11",
+          "sourceFile": "apps/android/app/src/main/kotlin/com/relayqahub/android/ui/QaHubRoot.kt",
+          "previousSourceHash": "d15e19fb95b9fece7c486f37e6039a4682569b6403e360f0c041a1ef726d874c",
+          "firstChangedSourceHash": "97e370e0e6e041eda95ceb0044a94959537f3b4b010f96239cc4893480e913cf",
+          "reason": "source_changed",
+          "priorResults": {
+            "apk": {
+              "applicable": true,
+              "status": "passed",
+              "evidence": [
+                "android-implementation.md",
+                "../../../apps/android/app/build/evidence/project-components/bug-closed-readback.json"
+              ],
+              "actual": "此原生控件在实际模拟器姓名登录/新建内容与提交/Bug详情/评论/人工完成/验收退回或关闭过程中操作；HTTP读回 closed/v11 与事件。未把旁边未操作的开始修复、代码交付、编辑、删除或其它入口记通过。",
+              "note": "Real execution and read-back required."
+            },
+            "exe": {
+              "applicable": false,
+              "status": "not_run",
+              "evidence": [],
+              "actual": "",
+              "note": "This entry inventories a different surface; requirement-level coverage is tracked separately. Not an accepted scope exclusion."
+            },
+            "web": {
+              "applicable": false,
+              "status": "not_run",
+              "evidence": [],
+              "actual": "",
+              "note": "This entry inventories a different surface; requirement-level coverage is tracked separately. Not an accepted scope exclusion."
+            },
+            "http": {
+              "applicable": false,
+              "status": "not_run",
+              "evidence": [],
+              "actual": "",
+              "note": "This entry inventories a different surface; requirement-level coverage is tracked separately. Not an accepted scope exclusion."
+            },
+            "server_mcp": {
+              "applicable": false,
+              "status": "not_run",
+              "evidence": [],
+              "actual": "",
+              "note": "This entry inventories a different surface; requirement-level coverage is tracked separately. Not an accepted scope exclusion."
+            },
+            "local_mcp": {
+              "applicable": false,
+              "status": "not_run",
+              "evidence": [],
+              "actual": "",
+              "note": "This entry inventories a different surface; requirement-level coverage is tracked separately. Not an accepted scope exclusion."
+            }
+          },
+          "scope": "Historical results remain retained; this is a revalidation requirement, not new execution evidence."
+        }
       },
-      "needsRevalidation": false,
+      "needsRevalidation": true,
       "generated": true
     },
     {
@@ -116545,6 +117193,91 @@
       "needsRevalidation": true,
       "generated": true,
       "retiredFromStaticInventoryAt": "2026-09-10T05:18:57.150Z",
+      "reviewRequired": true
+    },
+    {
+      "id": "android_control-97abd53fe0f3fe",
+      "kind": "android_control",
+      "title": "onValueChange = { captureBundleIdInput = it.trim() }, enabled = mayEditVerification && !busy && verificationCaptureCanChange(pendingVerification),",
+      "group": "relay.production",
+      "baselineIds": [
+        16,
+        18,
+        19,
+        20
+      ],
+      "source": {
+        "file": "apps/android/app/src/main/kotlin/com/relayqahub/android/ui/BugLifecyclePanel.kt",
+        "line": 526
+      },
+      "sourceHash": "a43581d983b96480ac8166f4ce322f28af683bd30b2bef9babd678930d9c5bdb",
+      "prerequisites": "Dedicated preview instance; projects A/B; A-only, B-only and shared employee; unique GM. External components require independent test targets.",
+      "steps": [
+        "Prepare a fresh project-scoped test record and record its version.",
+        "Invoke this actual runtime entry with its valid parameters; inspect the visible result.",
+        "Read back persisted project, actor, state/version, events, attachments or final artifact as applicable.",
+        "Repeat applicable error cases (wrong project/membership, stale version, repeat request, deleted record, disabled component)."
+      ],
+      "expected": "Behavior and persisted result match the design and current business contract; no cross-project or production writes.",
+      "status": "not_run",
+      "results": {
+        "apk": {
+          "applicable": true,
+          "status": "not_run",
+          "evidence": [],
+          "actual": "",
+          "note": "Real execution and read-back required."
+        },
+        "exe": {
+          "applicable": false,
+          "status": "not_run",
+          "evidence": [],
+          "actual": "",
+          "note": "This entry inventories a different surface; requirement-level coverage is tracked separately. Not an accepted scope exclusion."
+        },
+        "web": {
+          "applicable": false,
+          "status": "not_run",
+          "evidence": [],
+          "actual": "",
+          "note": "This entry inventories a different surface; requirement-level coverage is tracked separately. Not an accepted scope exclusion."
+        },
+        "http": {
+          "applicable": false,
+          "status": "not_run",
+          "evidence": [],
+          "actual": "",
+          "note": "This entry inventories a different surface; requirement-level coverage is tracked separately. Not an accepted scope exclusion."
+        },
+        "server_mcp": {
+          "applicable": false,
+          "status": "not_run",
+          "evidence": [],
+          "actual": "",
+          "note": "This entry inventories a different surface; requirement-level coverage is tracked separately. Not an accepted scope exclusion."
+        },
+        "local_mcp": {
+          "applicable": false,
+          "status": "not_run",
+          "evidence": [],
+          "actual": "",
+          "note": "This entry inventories a different surface; requirement-level coverage is tracked separately. Not an accepted scope exclusion."
+        }
+      },
+      "manual": {
+        "sourceEvidenceReview": {
+          "nodeId": "android_control-97abd53fe0f3fe",
+          "sourceFile": "apps/android/app/src/main/kotlin/com/relayqahub/android/ui/BugLifecyclePanel.kt",
+          "previousSourceHash": null,
+          "firstChangedSourceHash": "a43581d983b96480ac8166f4ce322f28af683bd30b2bef9babd678930d9c5bdb",
+          "reason": "new_source_node",
+          "priorResults": null,
+          "scope": "Historical results remain retained; this is a revalidation requirement, not new execution evidence."
+        }
+      },
+      "needsRevalidation": true,
+      "generated": true,
+      "retiredFromStaticInventoryAt": "2026-09-10T08:10:52.960Z",
       "reviewRequired": true
     }
   ]

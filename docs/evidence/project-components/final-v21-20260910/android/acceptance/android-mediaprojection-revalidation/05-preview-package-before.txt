@@ -1,0 +1,180 @@
+Activity Resolver Table:
+  Schemes:
+      qahub-preview:
+        8cf49ef com.relayqahub.android.preview.debug/com.relayqahub.android.MainActivity filter a992f85
+          Action: "android.intent.action.VIEW"
+          Category: "android.intent.category.DEFAULT"
+          Category: "android.intent.category.BROWSABLE"
+          Scheme: "qahub-preview"
+          Authority: "project": -1
+
+  Non-Data Actions:
+      android.intent.action.MAIN:
+        8cf49ef com.relayqahub.android.preview.debug/com.relayqahub.android.MainActivity filter 6a37cfc
+          Action: "android.intent.action.MAIN"
+          Category: "android.intent.category.LAUNCHER"
+
+Receiver Resolver Table:
+  Non-Data Actions:
+      androidx.profileinstaller.action.SAVE_PROFILE:
+        32d51a6 com.relayqahub.android.preview.debug/androidx.profileinstaller.ProfileInstallReceiver filter c12ca3d
+          Action: "androidx.profileinstaller.action.SAVE_PROFILE"
+      androidx.profileinstaller.action.INSTALL_PROFILE:
+        32d51a6 com.relayqahub.android.preview.debug/androidx.profileinstaller.ProfileInstallReceiver filter 59087e7
+          Action: "androidx.profileinstaller.action.INSTALL_PROFILE"
+      androidx.profileinstaller.action.SKIP_FILE:
+        32d51a6 com.relayqahub.android.preview.debug/androidx.profileinstaller.ProfileInstallReceiver filter b9c6f94
+          Action: "androidx.profileinstaller.action.SKIP_FILE"
+      androidx.profileinstaller.action.BENCHMARK_OPERATION:
+        32d51a6 com.relayqahub.android.preview.debug/androidx.profileinstaller.ProfileInstallReceiver filter 5cce232
+          Action: "androidx.profileinstaller.action.BENCHMARK_OPERATION"
+      android.intent.action.BOOT_COMPLETED:
+        591f1da com.relayqahub.android.preview.debug/androidx.work.impl.background.systemalarm.RescheduleReceiver filter f70960b
+          Action: "android.intent.action.BOOT_COMPLETED"
+      androidx.work.diagnostics.REQUEST_DIAGNOSTICS:
+        8296ce8 com.relayqahub.android.preview.debug/androidx.work.impl.diagnostics.DiagnosticsReceiver filter c423f01
+          Action: "androidx.work.diagnostics.REQUEST_DIAGNOSTICS"
+
+Domain verification status:
+
+Permissions:
+  Permission [com.relayqahub.android.preview.debug.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION] (30d7902):
+    sourcePackage=com.relayqahub.android.preview.debug
+    uid=10051 gids=[] type=0 prot=signature
+    perm=PermissionInfo{bfa7f23 com.relayqahub.android.preview.debug.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION}
+    flags=0x0
+
+Registered ContentProviders:
+  com.relayqahub.android.preview.debug/androidx.core.content.FileProvider:
+    Provider{476fc20 com.relayqahub.android.preview.debug/androidx.core.content.FileProvider}
+  com.relayqahub.android.preview.debug/androidx.startup.InitializationProvider:
+    Provider{83b49d9 com.relayqahub.android.preview.debug/androidx.startup.InitializationProvider}
+
+ContentProvider Authorities:
+  [com.relayqahub.android.preview.debug.apk-files]:
+    Provider{476fc20 com.relayqahub.android.preview.debug/androidx.core.content.FileProvider}
+      applicationInfo=ApplicationInfo{1275213 com.relayqahub.android.preview.debug}
+  [com.relayqahub.android.preview.debug.androidx-startup]:
+    Provider{83b49d9 com.relayqahub.android.preview.debug/androidx.startup.InitializationProvider}
+      applicationInfo=ApplicationInfo{671ec50 com.relayqahub.android.preview.debug}
+
+Key Set Manager:
+  [com.relayqahub.android.preview.debug]
+      Signing KeySets: 37
+
+Packages:
+  Package [com.relayqahub.android.preview.debug] (daffa12):
+    appId=10051
+    pkg=Package{21fba4c com.relayqahub.android.preview.debug}
+    codePath=/data/app/~~9q1A_NfnIRLW3kJpzZEDjg==/com.relayqahub.android.preview.debug-YSMO5yL3bMuFiVY_73qvcw==
+    resourcePath=/data/app/~~9q1A_NfnIRLW3kJpzZEDjg==/com.relayqahub.android.preview.debug-YSMO5yL3bMuFiVY_73qvcw==
+    legacyNativeLibraryDir=/data/app/~~9q1A_NfnIRLW3kJpzZEDjg==/com.relayqahub.android.preview.debug-YSMO5yL3bMuFiVY_73qvcw==/lib
+    extractNativeLibs=false
+    primaryCpuAbi=x86_64
+    secondaryCpuAbi=null
+    cpuAbiOverride=null
+    versionCode=26 minSdk=29 targetSdk=37
+    minExtensionVersions=[]
+    versionName=0.2.0-preview.13
+    hiddenApiEnforcementPolicy=2
+    usesNonSdkApi=false
+    splits=[base]
+    apkSigningVersion=2
+    flags=[ DEBUGGABLE HAS_CODE ALLOW_CLEAR_USER_DATA ]
+    privateFlags=[ PRIVATE_FLAG_ACTIVITIES_RESIZE_MODE_RESIZEABLE_VIA_SDK_VERSION ALLOW_AUDIO_PLAYBACK_CAPTURE PARTIALLY_DIRECT_BOOT_AWARE PRIVATE_FLAG_ALLOW_NATIVE_HEAP_POINTER_TAGGING ]
+    forceQueryable=false
+    pageSizeCompat=0
+    scannedAsStoppedSystemApp=false
+    supportsScreens=[small, medium, large, xlarge, resizeable, anyDensity]
+    usesOptionalLibraries:
+      androidx.window.extensions
+      androidx.window.sidecar
+    usesLibraryFiles:
+      /system_ext/framework/androidx.window.extensions.jar
+      /system_ext/framework/androidx.window.sidecar.jar
+    timeStamp=2026-09-10 12:42:00
+    lastUpdateTime=2026-09-10 12:42:00
+    installerPackageName=null
+    installerPackageUid=-1
+    initiatingPackageName=com.android.shell
+    originatingPackageName=null
+    packageSource=1
+    appMetadataFilePath=null
+    appMetadataSource=0
+    signatures=PackageSignatures{9ae6937 version:2, signatures:[b982ef55], past signatures:[]}
+    installPermissionsFixed=false
+    pkgFlags=[ DEBUGGABLE HAS_CODE ALLOW_CLEAR_USER_DATA ]
+    privatePkgFlags=[ PRIVATE_FLAG_ACTIVITIES_RESIZE_MODE_RESIZEABLE_VIA_SDK_VERSION ALLOW_AUDIO_PLAYBACK_CAPTURE PARTIALLY_DIRECT_BOOT_AWARE PRIVATE_FLAG_ALLOW_NATIVE_HEAP_POINTER_TAGGING ]
+    apexModuleName=null
+    declared permissions:
+      com.relayqahub.android.preview.debug.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION: prot=signature
+    requested permissions:
+      android.permission.POST_NOTIFICATIONS
+      android.permission.ACCESS_LOCAL_NETWORK
+      android.permission.SYSTEM_ALERT_WINDOW
+      android.permission.FOREGROUND_SERVICE
+      android.permission.RECEIVE_BOOT_COMPLETED
+      android.permission.INTERNET
+      android.permission.ACCESS_NETWORK_STATE
+      android.permission.FOREGROUND_SERVICE_MEDIA_PROJECTION
+      com.relayqahub.android.preview.debug.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
+      android.permission.REQUEST_INSTALL_PACKAGES
+      android.permission.WAKE_LOCK
+    install permissions:
+      android.permission.SYSTEM_ALERT_WINDOW: granted=false, flags=[ USER_SET]
+      android.permission.FOREGROUND_SERVICE: granted=true
+      android.permission.RECEIVE_BOOT_COMPLETED: granted=true
+      android.permission.INTERNET: granted=true
+      android.permission.ACCESS_NETWORK_STATE: granted=true
+      android.permission.FOREGROUND_SERVICE_MEDIA_PROJECTION: granted=true
+      com.relayqahub.android.preview.debug.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION: granted=true
+      android.permission.WAKE_LOCK: granted=true
+    User 0: ceDataInode=3801722 deDataInode=8257719 installed=true hidden=false suspended=false distractionFlags=0 stopped=false notLaunched=false enabled=0 instant=false virtual=false quarantined=false
+      installReason=0
+      dataDir=/data/user/0/com.relayqahub.android.preview.debug
+      firstInstallTime=2026-09-09 00:42:56
+      uninstallReason=0
+      overlay paths:
+        /data/resource-cache/com.android.systemui-neutral-M1af.frro
+        /data/resource-cache/com.android.systemui-accent-NGaF.frro
+        /data/resource-cache/com.android.systemui-dynamic-ThMR.frro
+      gids=[3003]
+      runtime permissions:
+        android.permission.POST_NOTIFICATIONS: granted=true, flags=[ USER_SET|USER_SENSITIVE_WHEN_GRANTED|USER_SENSITIVE_WHEN_DENIED]
+      disabledComponents:
+        androidx.work.impl.background.systemalarm.RescheduleReceiver
+      enabledComponents:
+        androidx.work.impl.background.systemjob.SystemJobService
+
+Queries:
+  system apps queryable: false
+  queries via forceQueryable:
+  queries via package name:
+  queries via component:
+    com.android.settings.intelligence:
+      com.relayqahub.android.preview.debug
+    com.chuyao.baloots:
+      com.relayqahub.android.preview.debug
+  queryable via interaction:
+    User 0:
+      [com.android.localtransport,com.android.packageinstaller,com.mumu.store,com.android.location.fused,com.android.settings,com.android.server.telecom,com.sohu.inputmethod.sogou.chuizi,com.android.documentsui,com.mumu.shared.sdk,com.netease.mumu.cloner,com.android.providers.settings,com.android.keychain,android]:
+        com.relayqahub.android.preview.debug
+      com.android.systemui:
+        com.relayqahub.android.preview.debug
+      android.ext.services:
+        com.relayqahub.android.preview.debug
+      com.relayqahub.android.preview.debug:
+        [com.android.localtransport,com.android.packageinstaller,com.mumu.store,com.android.location.fused,com.android.settings,com.android.server.telecom,com.sohu.inputmethod.sogou.chuizi,com.android.documentsui,com.mumu.shared.sdk,com.netease.mumu.cloner,com.android.providers.settings,com.android.keychain,android]
+      com.relayqahub.android.preview.debug:
+        com.android.providers.media.module
+  queryable via uses-library:
+
+Dexopt state:
+  [com.relayqahub.android.preview.debug]
+    path: /data/app/~~9q1A_NfnIRLW3kJpzZEDjg==/com.relayqahub.android.preview.debug-YSMO5yL3bMuFiVY_73qvcw==/base.apk
+      x86_64: [status=run-from-apk] [reason=unknown] [primary-abi]
+        [location is error]
+
+Compiler stats:
+  [com.relayqahub.android.preview.debug]
+    (No recorded stats)

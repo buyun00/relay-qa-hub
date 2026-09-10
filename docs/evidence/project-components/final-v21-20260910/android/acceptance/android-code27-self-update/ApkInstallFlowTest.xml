@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.relayqahub.android.ApkInstallFlowTest" tests="4" skipped="0" failures="0" errors="0" timestamp="2026-09-10T05:54:43.113Z" hostname="WIN11-LIN-MAIN" time="0.035">
+  <properties/>
+  <testcase name="app update entry leaves project detail and opens its visible update surface" classname="com.relayqahub.android.ApkInstallFlowTest" time="0.004"/>
+  <testcase name="newer self update is returned for immediate download" classname="com.relayqahub.android.ApkInstallFlowTest" time="0.024"/>
+  <testcase name="current self update does not start another download" classname="com.relayqahub.android.ApkInstallFlowTest" time="0.001"/>
+  <testcase name="installer launch resets only its completed handoff" classname="com.relayqahub.android.ApkInstallFlowTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

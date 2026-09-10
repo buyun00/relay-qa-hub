@@ -1,0 +1,82 @@
+✔ workflow MCP preserves actual HTTP pages and current project authority (1285.5476ms)
+ℹ retained C:\Users\lin0\AppData\Local\Temp\qa-mcp-workflow-iJXH3F; schema 20; 31 real loopback HTTP requests; registered compiled MCP, app and worker
+✔ exact queue and completed fresh ZIP hand off once with frozen defaults after restart (73.0712ms)
+✔ preflight failure prevents Jenkins submission and double submission coalesces (16.6152ms)
+✔ lost submission acknowledgement and submitting crash never replay build POST (34.2904ms)
+✔ lost upload acknowledgement recovers the same stable job ID (38.951ms)
+✔ a Jenkins run waiting on the shared lock keeps its automatic upload pending (29.0134ms)
+✔ failed build or ZIP never starts automatic upload (20.6496ms)
+✔ cancelled build or ZIP never starts automatic upload (20.9516ms)
+✔ stale build or ZIP never starts automatic upload (22.9143ms)
+✔ newer build or ZIP never starts automatic upload (24.7715ms)
+✔ nozip build or ZIP never starts automatic upload (17.6202ms)
+✔ wrongqueue build or ZIP never starts automatic upload (32.0049ms)
+✔ overlap build or ZIP never starts automatic upload (22.6529ms)
+✔ owner switch pauses automation and cancellation retains Jenkins build (25.5216ms)
+✔ platform account switch pauses before upload and allows cancelling the pending handoff (33.4799ms)
+✔ candidate real HTTP: planned/running fail retains summary/reason and immutable replay (745.6886ms)
+ℹ retained isolated fixture C:\Users\lin0\AppData\Local\Temp\qa-terminal-c-CtZxfX
+ℹ retained 6 candidate HTTP request/response records; SHA256 32ca08d0c2e4e36efaa2eb737525b5e33ae7f7379a06481a07baf44c00500648
+✔ candidate real HTTP: legacy supersede has no successor; vendor successor is atomic and schema-valid (401.1003ms)
+ℹ retained isolated fixture C:\Users\lin0\AppData\Local\Temp\qa-terminal-c-Cl5SU2
+ℹ retained 5 candidate HTTP request/response records; SHA256 d930f52fced951d16651502c08cc8730bff0ffc2a8877f1cc1173cae7e1af0da
+✔ candidate real HTTP: rejected successors and old versions rollback every fact (261.9017ms)
+ℹ retained isolated fixture C:\Users\lin0\AppData\Local\Temp\qa-terminal-c-lsoz52
+ℹ retained 5 candidate HTTP request/response records; SHA256 adcfe7b5cbf0a2371128628f7cbf4e8251b29cff87e6df1d1d2e65ad56e5b663
+✔ candidate real HTTP: concurrent same key replays once; opposite actions have one winner (296.2689ms)
+ℹ retained isolated fixture C:\Users\lin0\AppData\Local\Temp\qa-terminal-c-dqrNfJ
+ℹ retained 4 candidate HTTP request/response records; SHA256 3da57bfc2c5e4df77bb2799f6a66b4da6fc1fbb5f7f37678c050ff43d3b59ea3
+✔ candidate real HTTP: replay reauthorizes revoked membership, wrong project and deleted Bug (242.9992ms)
+ℹ retained isolated fixture C:\Users\lin0\AppData\Local\Temp\qa-terminal-c-MQDv3M
+ℹ retained 6 candidate HTTP request/response records; SHA256 7b87d93bb51353f0fd1f0c58de4a04303c857c9a9444a90ff348fbe8df4e6b12
+✔ candidate immutable snapshot exceeds 64KiB with maximum multibyte reason/two summaries and complete Bug (243.0168ms)
+ℹ retained isolated fixture C:\Users\lin0\AppData\Local\Temp\qa-terminal-c-ukPSNv
+ℹ retained 2 candidate HTTP request/response records; SHA256 55aba1c2719e759b4e5438b459b2cbdeca6d618d2981a393cc3293124c07b303
+✔ candidate legacy two-step HTTP requires latest exact parent, preserves original receipt and never dispatches (508.8528ms)
+ℹ retained isolated fixture C:\Users\lin0\AppData\Local\Temp\qa-terminal-c-2mayFL
+ℹ retained 18 candidate HTTP request/response records; SHA256 a712222cf6cea4684248c30ed2d8936b6440642d53b99a19540e75cf512df04d
+✔ candidate human Cookie+CSRF is required for legacy session writes and GM authorization is transaction-scoped (307.2638ms)
+ℹ retained isolated fixture C:\Users\lin0\AppData\Local\Temp\qa-terminal-c-XNDN0Z
+ℹ retained 1 candidate HTTP request/response records; SHA256 eddb3d922a87422544ef85e87f2ce3251007e2437f2101523a9523a7f2f69fc4
+✔ candidate immutable snapshot rejects insertion with copied metadata and forged facts (220.5578ms)
+ℹ retained isolated fixture C:\Users\lin0\AppData\Local\Temp\qa-terminal-c-E68NDs
+ℹ retained 1 candidate HTTP request/response records; SHA256 817bf79345588e2438488bc5cae38cd9ff96253d9877e06a0e6f738038e523e0
+✔ candidate late snapshot failure rolls back Attempt/Bug/successor/audit/outbox/receipt, then original request succeeds (247.1839ms)
+ℹ retained isolated fixture C:\Users\lin0\AppData\Local\Temp\qa-terminal-c-GaXdkd
+ℹ retained 2 candidate HTTP request/response records; SHA256 10a8565722fa661d7ffc7d6678a7c8c6e998ed54a88059e8670eb8ee44dd6155
+✔ candidate delivered and already-terminal history refuses fresh mutations (300.6994ms)
+ℹ retained isolated fixture C:\Users\lin0\AppData\Local\Temp\qa-terminal-c-GjOgmQ
+ℹ retained 4 candidate HTTP request/response records; SHA256 4f0e086a74c57901a65ada8f2a3811cbde41ec863283d2f4bb332b4f0a7b1cbd
+✔ candidate explicit JSON/vendor media preference is separate from successor command semantics (518.8723ms)
+ℹ retained isolated fixture C:\Users\lin0\AppData\Local\Temp\qa-terminal-c-vBbmvf
+ℹ retained 6 candidate HTTP request/response records; SHA256 e30ce4c4596e76dcc95f664333ef1d8974e1eaa91a9c4b0ab53d3ab4a0ae3f7f
+✔ candidate replay preserves the originally negotiated HTTP receipt across later Accept headers (217.5834ms)
+ℹ retained isolated fixture C:\Users\lin0\AppData\Local\Temp\qa-terminal-c-CdbNJP
+ℹ retained 2 candidate HTTP request/response records; SHA256 54c788f04b717e8507400dd6c244adcd63ed9ed9ed1c71ee8aace2b3dc8911d6
+✔ iOS selects the newest ZIP by modification time and pins matching HEAD identity (25.2134ms)
+✔ empty, invalid and changing iOS sources stop before dispatch (2.873ms)
+✔ iOS jobs retain the selected ZIP through acknowledgement loss, prelaunch retry and resume (613.7483ms)
+✔ upload inputs exclude arbitrary paths, commands and historical version IDs (0.4566ms)
+✔ event projection tolerates partial JSONL and never returns tokens or raw error text (0.2021ms)
+✔ email login matches handover contract, validates access, saves compatible cache, keeps secrets out of snapshot (11.3595ms)
+✔ failed access check preserves previous login and exposes no server text (43.3892ms)
+✔ subaccount redirects accept only the recorded origins and one token (14.024ms)
+✔ bad local auth does not hide job history and can be repaired through login (26.8418ms)
+✔ restart reads progress from disk, and only a verified published state is successful (23.7025ms)
+✔ live jobs prevent changing account and launching duplicate tasks; expired heartbeat is interrupted (26.2185ms)
+✔ recovery locks testing identity once status changes started; arbitrary job paths are rejected (106.2119ms)
+✔ supervised start and resume preserve the job target and original work directory (350.9011ms)
+✔ tampered executable is rejected before creating a task (5.8915ms)
+✔ build handoff persists source identity and returns one existing job after a lost acknowledgement (140.9185ms)
+✔ new jobs default to recorded parameters and persist version-only text behavior (167.061ms)
+✔ final confirmation requires the persisted boundary and uses its own command exactly once (349.4097ms)
+✔ unreadable jobs remain present and are reported rather than silently discarded (4.3705ms)
+✔ a persisted job from another project is retained and cannot be resumed (15.8613ms)
+ℹ tests 47
+ℹ suites 0
+ℹ pass 47
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 5147.394
