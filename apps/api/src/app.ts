@@ -683,9 +683,11 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
         );
         try {
           const query = parseMobileBugCommentsQuery(request.query);
-          return await options.projectManagementService!.execute(actor, {
-            operation: "comments",
+          return await options.projectManagementService!.options.worker.listMobileBugComments({
+            accountId: actor.accountId,
             projectId: context.projectId,
+            authorizationProjectId: context.projectId,
+            actorId: actor.userId,
             bugId: request.params.bugId,
             limit: query.limit,
             ...(query.cursor === undefined ? {} : { cursor: query.cursor }),

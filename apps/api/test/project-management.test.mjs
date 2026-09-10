@@ -343,6 +343,42 @@ test("actual API isolates concurrent users, explicit project headers and record-
     assert.equal(bBugs.data.items.length, 8);
     assert.ok(aBugs.data.items.every((item) => item.projectId === aId));
     assert.ok(bBugs.data.items.every((item) => item.projectId === bId));
+    const commentSubmissionId = randomUUID();
+    const comment = await request(
+      `/api/v1/bugs/${creations[0].id}/comments`,
+      a,
+      { clientSubmissionId: commentSubmissionId, body: "project-scoped Android history" },
+      {
+        "idempotency-key": `comment:${creations[0].id}:${commentSubmissionId}`,
+        "x-correlation-id": commentSubmissionId,
+      },
+    );
+    assert.equal(comment.status, 201, JSON.stringify(comment.data));
+    const comments = await request(
+      `/api/v1/projects/${aId}/bugs/${creations[0].id}/comments?limit=100`,
+      a,
+    );
+    assert.equal(comments.status, 200, JSON.stringify(comments.data));
+    assert.deepEqual(Object.keys(comments.data).sort(), [
+      "bugId",
+      "items",
+      "nextCursor",
+      "projectId",
+      "snapshotSequence",
+    ]);
+    assert.ok(comments.data.snapshotSequence > aBugs.data.snapshotSequence);
+    assert.equal(comments.data.items.length, 1);
+    assert.deepEqual(Object.keys(comments.data.items[0]).sort(), [
+      "attachmentIds",
+      "authorId",
+      "body",
+      "bugId",
+      "createdAt",
+      "id",
+      "projectId",
+      "version",
+    ]);
+    assert.equal(comments.data.items[0].body, "project-scoped Android history");
     assert.equal((await request(`/api/v1/bugs/${creations[1].id}`, a)).status, 403);
     assert.equal(
       (await request(`/api/v1/bugs/${creations[1].id}`, b, undefined, { "x-qa-project-id": aId }))
