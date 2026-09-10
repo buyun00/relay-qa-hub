@@ -48,6 +48,39 @@ public static class SelfTest
             Assert(f.ReceivedSha==identity.Sha256,"transferred bytes SHA256");
             var count=f.Writes;await e.Run(ct);Assert(f.Writes==count,"completed job wrote again");
         }));
+        await Case("zero_temporary_unzip_row_with_exact_test_directory_finishes",()=>Scenario("empty-unzip",async(f,c,s,j,e)=>{
+            f.TempUnzip=new JsonObject{["id"]=0,["version_id"]=0,["status"]=0,["path"]="",["rely_path"]=""};
+            await e.Run(ct);Assert(s.Stage=="PUBLISHED"&&f.PublishWrites==1,"empty unzip sentinel stalled workflow");
+        }));
+        await Case("active_or_unknown_unzip_rows_never_skip_processing",()=>Scenario("active-unzip",async(f,c,s,j,e)=>{
+            foreach(var row in new[]{new JsonObject{["id"]=17,["version_id"]=42,["status"]=0,["path"]=""},new JsonObject(),new JsonObject{["id"]=0,["version_id"]=0,["status"]=0,["path"]="other"},new JsonObject{["id"]=0,["version_id"]=0,["status"]=0,["path"]="",["err_msg"]="failed"}})
+            {
+                f.TempUnzip=row;await Expect("PROCESSING_TIMEOUT",()=>e.Run(ct));
+                Assert(s.Stage=="WAIT_TEST_ASSETS"&&!f.Actions.Contains("update:40"),"pending unzip accepted");
+            }
+        }));
+        await Case("manual_publication_during_unzip_poll_is_read_only_reconciled",()=>Scenario("manual-poll",async(f,c,s,j,e)=>{
+            f.PublishWhileUnzipping=true;await e.Run(ct);
+            Assert(s.Stage=="PUBLISHED"&&s.FinalRemoteStatus==100,"manual completion not detected");
+            Assert(f.Actions.Last()=="bind"&&f.PublishWrites==0&&!f.Actions.Contains("start"),"manual workflow replayed writes");
+            Assert(s.PendingAction==null&&s.ReleaseDir=="release/dir/fixture/","reconciled identity incomplete");
+        }));
+        await Case("resume_after_manual_publication_never_repeats_upload_or_testing",()=>Scenario("manual-resume",async(f,c,s,j,e)=>{
+            f.TempUnzip=new JsonObject{["id"]=17};await Expect("PROCESSING_TIMEOUT",()=>e.Run(ct));
+            f.ManualPublish();var count=f.Writes;await e.Run(ct);
+            Assert(s.Stage=="PUBLISHED"&&f.Writes==count&&f.PublishWrites==0,"resume repeated a manual step");
+        }));
+        await Case("manual_publication_cannot_adopt_different_resource_or_identity",()=>Scenario("manual-conflict",async(f,c,s,j,e)=>{
+            f.TempUnzip=new JsonObject{["id"]=17};await Expect("PROCESSING_TIMEOUT",()=>e.Run(ct));
+            f.ManualPublish();f.ChangeReleaseDirectory();var count=f.Writes;
+            await Expect("VERSION_CONFLICT",()=>e.Run(ct));Assert(f.Writes==count&&s.RunStatus!="SUCCEEDED","unrelated publication adopted");
+            f.ManualPublish();f.ChangeVersionIdentity();await Expect("VERSION_CONFLICT",()=>e.Run(ct));Assert(f.Writes==count,"identity conflict wrote remotely");
+        }));
+        await Case("manual_publication_requires_valid_publish_time",()=>Scenario("manual-time",async(f,c,s,j,e)=>{
+            f.TempUnzip=new JsonObject{["id"]=17};await Expect("PROCESSING_TIMEOUT",()=>e.Run(ct));
+            f.ManualPublish();f.InvalidPublishTime=true;var count=f.Writes;
+            await Expect("VERSION_CONFLICT",()=>e.Run(ct));Assert(f.Writes==count&&s.RunStatus!="SUCCEEDED","invalid publish time accepted");
+        }));
         await Case("md5_hit_skips_object_transfer",()=>Scenario("reuse",async(f,c,s,j,e)=>{
             f.Md5Hit=true;await e.Run(ct);Assert(s.Reused&&f.Uploads==0&&f.Registers==0&&s.Stage=="PUBLISHED","dedup branch");
         }));
@@ -141,7 +174,7 @@ public static class SelfTest
             } finally { Environment.SetEnvironmentVariable("OZDQP_AUTH_FILE",prior); }
             return Task.CompletedTask;
         });
-        var report=new{version="0.4.4",verification="local-loopback-and-handler-fixtures",passed=results.Count,failed=0,realPlatformTested=false,realAccountLoginTested=false,tencentSdkTransferTested=false,fixture=identity,tests=results,at=DateTimeOffset.UtcNow};
+        var report=new{version="0.4.5",verification="local-loopback-and-handler-fixtures",passed=results.Count,failed=0,realPlatformTested=false,realAccountLoginTested=false,tencentSdkTransferTested=false,fixture=identity,tests=results,at=DateTimeOffset.UtcNow};
         string reportPath=Path.Combine(root,"report.json");await File.WriteAllTextAsync(reportPath,JsonSerializer.Serialize(report,Json.Options),ct);
         Console.WriteLine(JsonSerializer.Serialize(new{type="selfTestResult",passed=results.Count,failed=0,reportPath,realPlatformTested=false}));
     }
@@ -160,6 +193,9 @@ public static class SelfTest
         readonly HttpListener listener=new();readonly Task loop;readonly CancellationTokenSource stop=new();readonly FileIdentity file;
         public string Origin{get;}public int Status;public int Uploads,Registers,CreateCount,PrepareWrites,PublishWrites,Writes;public string ReceivedSha="";public string CreatedSummary="",CreatedDescription="";
         public void ChangeReleaseDirectory(){detail!["url"]="release/dir/other/";}
+        public void ChangeVersionIdentity(){detail!["channel_id"]="2004";}
+        public void ManualPublish(){Status=100;detail!["url"]=ReleaseDir;}
+        public JsonNode? TempUnzip;public bool PublishWhileUnzipping,InvalidPublishTime;
         public bool Md5Hit,LoseUpdateAck,LoseCreateAck,LoseRegisterAck,HoldPublish,ReleaseError,Unauthorized,InvalidCode;
         public List<string> Actions{get;}=[];JsonObject? detail;bool started;
         const string Key="test/pkg/fixture.zip",TestDir="test/dir/fixture/",ReleaseDir="release/dir/fixture/";
@@ -202,7 +238,7 @@ public static class SelfTest
                         else data=new JsonObject{["list"]=detail==null?new JsonArray():new JsonArray(detail.DeepClone()),["total"]=detail==null?0:1};break;
                     case "detail":
                         if(Status==99&&!HoldPublish)Status=100;
-                        detail!["status"]=Status;detail["publish_time"]=Status==100?"2026-01-01 00:01:00":"";data=detail.DeepClone();break;
+                        detail!["status"]=Status;detail["publish_time"]=Status==100?(InvalidPublishTime?"0000-00-00 00:00:00":"2026-01-01 00:01:00"):"";data=detail.DeepClone();break;
                     case "update":
                         Assert(Json.Int(body?["id"])==42,"wrong update ID");
                         if(body!.ContainsKey("update_status"))
@@ -218,7 +254,7 @@ public static class SelfTest
                     case "check_files_by_md5":data=Md5Hit?new JsonObject{["md5"]=file.Md5,["oss_provider"]="tencent",["url"]="https://fixture.invalid/"+Key}:new JsonObject{["url"]=""};break;
                     case "versionpath":data=new JsonObject{["path"]="test/pkg/",["file_name"]="fixture.zip"};break;
                     case "add_files_url":Assert(Json.Text(body?["md5"])==file.Md5,"register md5");Registers++;Actions.Add("register");Md5Hit=true;if(LoseRegisterAck){LoseRegisterAck=false;x.Response.StatusCode=500;return;}break;
-                    case "tmpunziplog":break;
+                    case "tmpunziplog":data=TempUnzip?.DeepClone();if(PublishWhileUnzipping){ManualPublish();data=new JsonObject{["id"]=0,["version_id"]=0,["status"]=0,["path"]=""};}break;
                     case "start":started=true;Actions.Add("start");break;
                     case "pass":Assert(started,"pass without start");Status=50;detail!["url"]=ReleaseDir;Actions.Add("pass");break;
                     case "filecopystatus":data=JsonValue.Create(true);break;

@@ -16,7 +16,7 @@ public static class Program
             string ApiArg()=>args.Contains("--api-base")?Arg("--api-base"):new JobConfig().ApiBase;
             if(args.Length==0||args[0] is "help" or "--help")
             {
-                Console.WriteLine("OZDQP Uploader 0.4.4 / 固定地址下载 + 账号密码登录\n\n  login [--kind email|subaccount]   登录并保存账号密码，默认邮箱\n  auth-check                       只读检查已保存的登录状态\n  logout                           清除本工具本地登录缓存\n  download --work <目录>            仅从固定地址下载并校验 ZIP\n  preflight --file <ZIP>            本地检查\n  self-test                        本地测试，不访问业务平台\n  run --config <job.json>           登录、下载、执行完整流程\n  resume --config <job.json>        恢复本任务的相同 ZIP\n  confirm-publish --config <job.json> 最终确认发布（prepare_publish 等待后）\n  status --work <任务目录>          读取当前结果\n\nZIP 固定来源："+PackageDownload.SourceUrl+"\n账号密码保存在本地 JSON；后续自动登录。兼容 OZDQP_AUTHORIZATION。\nCtrl+C 保留断点；下载中断后从头下载，已完成下载的旧任务不会取新包。");return 0;
+                Console.WriteLine("OZDQP Uploader 0.4.5 / 固定地址下载 + 账号密码登录\n\n  login [--kind email|subaccount]   登录并保存账号密码，默认邮箱\n  auth-check                       只读检查已保存的登录状态\n  logout                           清除本工具本地登录缓存\n  download --work <目录>            仅从固定地址下载并校验 ZIP\n  preflight --file <ZIP>            本地检查\n  self-test                        本地测试，不访问业务平台\n  run --config <job.json>           登录、下载、执行完整流程\n  resume --config <job.json>        恢复本任务的相同 ZIP\n  confirm-publish --config <job.json> 最终确认发布（prepare_publish 等待后）\n  status --work <任务目录>          读取当前结果\n\nZIP 固定来源："+PackageDownload.SourceUrl+"\n账号密码保存在本地 JSON；后续自动登录。兼容 OZDQP_AUTHORIZATION。\nCtrl+C 保留断点；下载中断后从头下载，已完成下载的旧任务不会取新包。");return 0;
             }
             if(args[0]=="login")
             {

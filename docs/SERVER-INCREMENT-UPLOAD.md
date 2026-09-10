@@ -1,4 +1,4 @@
-# Server incremental upload (3.3.6)
+# Server incremental upload (3.3.8)
 
 The API server owns uploads and the external-build/upload workflow. Web and EXE
 submit authenticated requests and display persistent server snapshots. Closing the
@@ -66,7 +66,7 @@ identity and reads the original worker result instead of repeating launches. A
 machine restart leaves interrupted work recoverable with the original ZIP. Unknown
 writes are reconciled only on explicit recovery, never blindly replayed.
 
-Worker 0.4.4 reads explicit server-owned `OZDQP_AUTH_FILE` and `OZDQP_LOCK_ROOT`.
+Worker 0.4.5 reads explicit server-owned `OZDQP_AUTH_FILE` and `OZDQP_LOCK_ROOT`.
 The API does not accept client-selected paths, executables, origins or historical
 version IDs. Eight 5 MiB COS parts run concurrently, with serialized STS renewal and
 checkpoint writes; recovery sends only missing verified parts. The SDK's synchronous
