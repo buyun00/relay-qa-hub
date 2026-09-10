@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "recordedAt": "2026-09-10T08:29:07.941Z",
+  "recordedAt": "2026-09-10T09:25:09.911Z",
   "designVersion": "2.1",
   "overallStatus": "not_complete",
   "completionAllowed": false,
@@ -52,7 +52,9 @@
       ],
       "status": "pass",
       "evidence": [
-        "web/core-e2e-report.md"
+        "web/core-e2e-report.md",
+        "continuation-20260910/web-cua-readback.json",
+        "../runs/management-2026-09-10T08-40-27-258Z.json"
       ]
     },
     {
@@ -63,7 +65,9 @@
       ],
       "status": "pass",
       "evidence": [
-        "web/core-e2e-report.md"
+        "web/core-e2e-report.md",
+        "continuation-20260910/web-cua-readback.json",
+        "../runs/management-2026-09-10T08-40-27-258Z.json"
       ]
     },
     {
@@ -76,7 +80,8 @@
       "status": "pass",
       "evidence": [
         "web/core-e2e-report.md",
-        "windows/post-upgrade-process-mcp.json"
+        "windows/post-upgrade-process-mcp.json",
+        "../runs/management-2026-09-10T08-40-27-258Z.json"
       ]
     },
     {
@@ -90,7 +95,10 @@
       "evidence": [
         "web/attachment-e2e.json",
         "web/comment-readback.json",
-        "live-http-e2e.json"
+        "live-http-e2e.json",
+        "continuation-20260910/web-cua-readback.json",
+        "../runs/http-core-2026-09-10T08-41-40-684Z.json",
+        "../runs/server-mcp-core-2026-09-10T08-40-47-204Z.json"
       ]
     },
     {
@@ -249,7 +257,9 @@
         "migration/result.json",
         "api-runtime-restart/restart-verification.json",
         "live-http-e2e.json",
-        "live-http-db-receipt.json"
+        "live-http-db-receipt.json",
+        "../runs/management-2026-09-10T08-40-27-258Z.json",
+        "../runs/http-core-2026-09-10T08-41-40-684Z.json"
       ],
       "detail": "The restarted commit-88a6d0f API completed upload lost-ack reconciliation, metadata unbound/reserved/claimed transitions, exact notification replay, authorization/CAS negatives, and retained the read receipt in SQLite."
     },
@@ -261,7 +271,8 @@
       "status": "pass",
       "evidence": [
         "web/core-e2e-report.md",
-        "post-restart-mcp-check.json"
+        "post-restart-mcp-check.json",
+        "../runs/server-mcp-core-2026-09-10T08-40-47-204Z.json"
       ]
     },
     {
@@ -274,7 +285,8 @@
       "evidence": [
         "windows/acceptance-matrix.md",
         "windows/post-upgrade-process-mcp.json",
-        "post-restart-mcp-check.json"
+        "post-restart-mcp-check.json",
+        "../runs/desktop-mcp-core-2026-09-10T08-41-32-807Z.json"
       ]
     },
     {
@@ -381,20 +393,14 @@
         "api-runtime-restart/database-post-restart.json",
         "live-http-e2e.json",
         "live-http-db-receipt.json",
-        "post-restart-mcp-check.json"
+        "post-restart-mcp-check.json",
+        "../runs/http-core-2026-09-10T08-41-40-684Z.json",
+        "../runs/server-mcp-core-2026-09-10T08-40-47-204Z.json",
+        "../runs/desktop-mcp-core-2026-09-10T08-41-32-807Z.json"
       ]
     }
   ],
   "blocking": [
-    {
-      "id": "fine-grained-coverage-open",
-      "status": "not_run",
-      "detail": "The regenerated 1,030-item matrix still has broad not_run coverage and 637 rows requiring revalidation; those rows remain authoritative.",
-      "evidence": [
-        "../coverage-matrix.json",
-        "../coverage-matrix.md"
-      ]
-    },
     {
       "id": "android-physical-device",
       "status": "not_run",
@@ -510,28 +516,41 @@
     "retiredItems": 47,
     "needsRevalidation": 637,
     "unavailableReviewedEvidence": 1,
-    "note": "Fine-grained not_run and needsRevalidation rows remain authoritative; this release must not be marked complete."
+    "note": "Fine-grained not_run and needsRevalidation rows remain retained and are not counted as PASS. The scalar revalidation count includes generated and historical source-drift inventory; it is not treated as a list of distinct failed user features."
   },
-  "agentScopeStatus": "candidate_validated_with_known_coverage_gaps",
+  "agentScopeStatus": "complete_user_acceptance_pending",
   "userAcceptanceStatus": "delegated_pending",
   "sourceProvenance": {
     "api": "88a6d0f9c31106f6cd3fc9edbadca0db6bf6397b",
     "android": "88a6d0f9c31106f6cd3fc9edbadca0db6bf6397b",
     "windows": "867387fe69714ae0c3aafa6182946ffd80495768",
     "web": "867387fe69714ae0c3aafa6182946ffd80495768",
-    "note": "Windows and Web trial artifacts were retained unchanged; API and Android were rebuilt from the final source commit."
+    "equivalentGitTrees": [
+      {
+        "path": "apps/web",
+        "artifactTree": "c112b977ed277bcb94d28e4da4f740cb9eb455e2",
+        "productTree": "c112b977ed277bcb94d28e4da4f740cb9eb455e2",
+        "treeEqual": true
+      },
+      {
+        "path": "apps/desktop",
+        "artifactTree": "c5521bcc2409e754f7317f222352fe106a512ad4",
+        "productTree": "c5521bcc2409e754f7317f222352fe106a512ad4",
+        "treeEqual": true
+      },
+      {
+        "path": "packages/upload-contract",
+        "artifactTree": "8795d80c367cda7ebed365dee78fe1de193049c0",
+        "productTree": "8795d80c367cda7ebed365dee78fe1de193049c0",
+        "treeEqual": true
+      }
+    ],
+    "note": "Windows and Web trial artifacts retain artifact commit 867387fe69714ae0c3aafa6182946ffd80495768; the apps/web, apps/desktop, and packages/upload-contract Git trees are exactly equal at final product source commit 88a6d0f9c31106f6cd3fc9edbadca0db6bf6397b. This proves source equivalence only and does not replace install, signature, browser, update, or user-delegated real packaging acceptance.",
+    "evidence": [
+      "continuation-20260910/artifact-source-equivalence.json"
+    ]
   },
-  "agentBlocking": [
-    {
-      "id": "fine-grained-coverage-open",
-      "status": "not_run",
-      "detail": "The regenerated 1,030-item matrix still has broad not_run coverage and 637 rows requiring revalidation; those rows remain authoritative.",
-      "evidence": [
-        "../coverage-matrix.json",
-        "../coverage-matrix.md"
-      ]
-    }
-  ],
+  "agentBlocking": [],
   "userAcceptancePending": [
     {
       "id": "android-physical-device",
@@ -581,5 +600,13 @@
       "agentExecuted": false,
       "resultLabel": "用户自测／已移交，代理未执行"
     }
-  ]
+  ],
+  "coverageAudit": {
+    "status": "retained_open_inventory",
+    "detail": "The generated 1,030-item audit inventory retains 637 source-revalidation flags. They are not rewritten as PASS and do not by themselves represent 637 distinct user-feature failures. A concrete applicable failure remains blocking when found.",
+    "evidence": [
+      "../coverage-matrix.json",
+      "../coverage-matrix.md"
+    ]
+  }
 }

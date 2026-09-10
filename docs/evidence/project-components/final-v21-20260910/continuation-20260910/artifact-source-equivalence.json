@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-09-10T08:55:18.374Z",
+  "artifactCommit": "867387fe69714ae0c3aafa6182946ffd80495768",
+  "productCommit": "88a6d0f9c31106f6cd3fc9edbadca0db6bf6397b",
+  "currentHead": "7b14dce3c981e56d5841ce38ea9025606fa44d0c",
+  "comparisons": [
+    {
+      "path": "apps/web",
+      "artifactTree": "c112b977ed277bcb94d28e4da4f740cb9eb455e2",
+      "productTree": "c112b977ed277bcb94d28e4da4f740cb9eb455e2",
+      "treeEqual": true,
+      "changedFiles": []
+    },
+    {
+      "path": "apps/desktop",
+      "artifactTree": "c5521bcc2409e754f7317f222352fe106a512ad4",
+      "productTree": "c5521bcc2409e754f7317f222352fe106a512ad4",
+      "treeEqual": true,
+      "changedFiles": []
+    },
+    {
+      "path": "packages/upload-contract",
+      "artifactTree": "8795d80c367cda7ebed365dee78fe1de193049c0",
+      "productTree": "8795d80c367cda7ebed365dee78fe1de193049c0",
+      "treeEqual": true,
+      "changedFiles": []
+    }
+  ],
+  "currentRelevantSourceDirty": false,
+  "currentChanges": [],
+  "passed": true,
+  "conclusion": "The retained Web and Windows artifacts carry an older provenance commit, but every Web, Desktop, and shared upload-contract source byte used by those clients is identical at the final product-source commit.",
+  "limitation": "This proves source equivalence only. It does not replace install, signature, browser, update, or user-delegated real packaging acceptance."
+}

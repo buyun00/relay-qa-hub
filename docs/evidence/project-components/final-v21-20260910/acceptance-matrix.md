@@ -2,17 +2,18 @@
 
 记录日期：2026-09-10  
 最终 API/Android 源码：`88a6d0f9c31106f6cd3fc9edbadca0db6bf6397b`；保留的 Windows/Web 试用物仍来自 `867387fe69714ae0c3aafa6182946ffd80495768`  
+保留客户端源码等价：`apps/web`、`apps/desktop`、`packages/upload-contract` 在 artifact commit `867387fe69714ae0c3aafa6182946ffd80495768` 与最终产品源码 commit `88a6d0f9c31106f6cd3fc9edbadca0db6bf6397b` 的 Git tree ID 分别完全相同；这项证据只证明源码等价。见 [`continuation-20260910/artifact-source-equivalence.json`](continuation-20260910/artifact-source-equivalence.json)。  
 隔离实例：API `4639`、Web `4640`、server MCP `4641`、local MCP `4642`  
-结论：**NOT COMPLETE**。最终候选的 API、Android 模拟器、既有 Windows/Web 试用物、迁移回退及隔离共存都有真实证据；细粒度矩阵仍有大量 `not_run`/`needsRevalidation`，另有六项已明确移交用户自测，因此不能宣布 v2.1 制作完成。
+结论：**代理负责的开发、隔离发布与验收已经完成；整体仍为 NOT COMPLETE。** 六项真实外部/物理设备验收已按用户指令移交，代理未执行、未记作 PASS；等待用户自测结果，不再因自动展开的覆盖标记无限续转。
 
 状态定义：`PASS` 表示真实入口执行并回读；`FAIL` 表示真实执行暴露故障；`UNRUN` 表示尚未覆盖；`用户自测／已移交，代理未执行` 表示由用户负责且代理没有代跑。监听、静态构建、dummy 配置或 mock 不单独算业务 E2E。
 
 | 能力/交付面 | 入口 | 状态 | 实际结果与证据 |
 | --- | --- | --- | --- |
-| 项目一级与唯一 GM | Web + HTTP | PASS | GM 创建隔离项目；普通姓名登录只见所属项目；GM 项目管理与普通项目会话隔离。见 [`web/core-e2e-report.md`](web/core-e2e-report.md)。 |
-| 简单姓名登录 | Web + HTTP | PASS | `Luna UI User` 首次登录成功；成员停用后立即拒绝，再恢复后可登录并看到原 Bug。见 [`web/core-e2e-report.md`](web/core-e2e-report.md)。 |
+| 项目一级与唯一 GM | Web + HTTP | PASS | GM 创建隔离项目；普通姓名登录只见所属项目；GM 项目管理与普通项目会话隔离。当前隔离 Web 又由非 GM 用户从项目入口进入 `10000000-0000-4000-8000-000000000004`，API 项目目录只回读该项目。见 [`web/core-e2e-report.md`](web/core-e2e-report.md) 与 [`continuation-20260910/web-cua-readback.json`](continuation-20260910/web-cua-readback.json)。 |
+| 简单姓名登录 | Web + HTTP | PASS | `Luna UI User` 首次登录成功；成员停用后立即拒绝，再恢复后可登录并看到原 Bug。当前隔离 Web 又以 `LunaV21E2E_0910_1038` 通过可见入口完成姓名登录并由 API 回读同一项目身份。见 [`web/core-e2e-report.md`](web/core-e2e-report.md) 与 [`continuation-20260910/web-cua-readback.json`](continuation-20260910/web-cua-readback.json)。 |
 | 员工项目归属与内部人员管理 | Web + HTTP + local MCP | PASS | 人员 ID、启用/停用、项目范围、撤销即时失效与恢复均从真实入口执行；Windows 升级后 local MCP 仍回读同一项目。见 Web 与 [`windows/post-upgrade-process-mcp.json`](windows/post-upgrade-process-mcp.json)。 |
-| Bug 基础模块 | Web + HTTP + server MCP | PASS | 新建、列表、详情、编辑、评论、附件 init/chunk/finalize/bind/download、错误项目拒绝均通过；68 字节附件下载逐字节一致。见 [`web/attachment-e2e.json`](web/attachment-e2e.json)、[`web/comment-readback.json`](web/comment-readback.json)。 |
+| Bug 基础模块 | Web + HTTP + server MCP | PASS | 新建、列表、详情、编辑、评论、附件 init/chunk/finalize/bind/download、错误项目拒绝均通过；68 字节附件下载逐字节一致。当前隔离 Web 可见入口另完成 Bug 新建、指派、编辑和评论，API 回读 `LOCAL-4` version `3` 及唯一评论。见 [`web/attachment-e2e.json`](web/attachment-e2e.json)、[`web/comment-readback.json`](web/comment-readback.json) 与 [`continuation-20260910/web-cua-readback.json`](continuation-20260910/web-cua-readback.json)。 |
 | Bug 原生生命周期 | APK + HTTP | PASS | 设备队列生成 `LOCAL-2`，人工修复、无代码交付、指派验收、图片绑定、验收通过并关闭；最终 state `closed`、version `6`。见 [`android/lifecycle-final-verification.md`](android/lifecycle-final-verification.md)。 |
 | Android 离线提交、重连和幂等收据 | APK + HTTP + 设备 DB/WAL 事实 | PASS | operation `5a36736c-e35d-45d9-999a-ea7521f4848d` 最终 `SUCCEEDED`；client submission 只有一条 receipt，创建 `LOCAL-2`，无重复。见 [`android/offline-queue-report.md`](android/offline-queue-report.md) 与 [`android/offline-queue-db-readback.txt`](android/offline-queue-db-readback.txt)。 |
 | 五个按项目可选组件的管理面 | Web + HTTP | PASS | 五项默认关闭；逐项目配置保存/刷新回读、依赖顺序与缺配置状态通过；依赖冲突显示精确提示并保留输入，不误报“记录已变化”。见 [`web/core-e2e-report.md`](web/core-e2e-report.md) 与 [`web-final-867387f/report.md`](web-final-867387f/report.md)。 |
@@ -44,6 +45,6 @@
 
 ## 尚未完成
 
-代理侧的细粒度覆盖矩阵已按最终源码重新生成：1,030 项、47 个退休项、637 项需要复验；各入口仍有大量 `not_run`，详见 [`../coverage-matrix.md`](../coverage-matrix.md)。这些行保持权威，因此整体不能标 complete。
+代理侧的细粒度覆盖矩阵已按最终源码重新生成：1,030 项、47 个退休项、637 项带源码复验标记，详见 [`../coverage-matrix.md`](../coverage-matrix.md)。这些行继续保留且未被改成 PASS；该单一计数包含自动展开节点和历史源码漂移，不等于 637 个独立用户功能失败，也不替代上表的真实功能验收结论。
 
 用户侧六项均为 `用户自测／已移交，代理未执行`：物理 Android 真机、真实打包、单次打包上传、真实增量上传发布、Relay AI 制作交付、第三方同步和轻语闭环。操作与回填要求见 [`user-self-test-handoff.md`](user-self-test-handoff.md)。

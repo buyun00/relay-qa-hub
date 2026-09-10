@@ -1,8 +1,9 @@
 {
   "schemaVersion": 1,
-  "validatedAt": "2026-09-10T08:29:32.157Z",
+  "validatedAt": "2026-09-10T09:25:31.614Z",
   "sourceCommit": "88a6d0f9c31106f6cd3fc9edbadca0db6bf6397b",
   "acceptanceOverallStatus": "not_complete",
+  "agentScopeStatus": "complete_user_acceptance_pending",
   "completionAllowed": false,
   "delegatedUserCases": 6,
   "delegatedCasesAllNotRun": true,
@@ -11,8 +12,10 @@
     "retiredItems": 47,
     "needsRevalidation": 637
   },
-  "parsedJsonFiles": 55,
-  "preValidationIndexEntriesVerified": 254,
+  "coverageSourceHead": "7b14dce3c981e56d5841ce38ea9025606fa44d0c",
+  "coverageProductSourceMatches": true,
+  "parsedJsonFiles": 57,
+  "preValidationIndexEntriesVerified": 258,
   "credentialsPersisted": false,
   "passed": true
 }

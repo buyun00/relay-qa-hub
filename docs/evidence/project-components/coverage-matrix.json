@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-09-10T08:10:55.091Z",
+  "generatedAt": "2026-09-10T08:42:42.140Z",
   "evidenceMapping": {
-    "at": "2026-09-10T08:10:53.393Z",
+    "at": "2026-09-10T09:23:06.064Z",
     "scope": "Only explicit real HTTP/MCP/browser observations. Unit/build results never mark external E2E or broad untested baselines passed.",
     "sourceReports": [
       "redaction-corrections/index.json",
@@ -22,14 +22,18 @@
       "redaction-corrections/server-mcp-core-2026-09-08T18-19-05-946Z.json",
       "runs/server-mcp-core-2026-09-08T18-22-11-243Z.json",
       "redaction-corrections/server-mcp-core-2026-09-08T18-22-11-243Z.json",
+      "runs/desktop-mcp-core-2026-09-10T08-41-32-807Z.json",
       "runs/http-core-2026-09-08T16-26-25-703Z.json",
       "runs/http-core-2026-09-08T16-29-10-430Z.json",
       "runs/http-core-2026-09-08T16-29-27-868Z.json",
       "runs/http-core-2026-09-08T16-31-18-569Z.json",
       "runs/http-core-2026-09-08T18-19-04-805Z.json",
+      "runs/http-core-2026-09-10T08-41-40-684Z.json",
       "runs/management-2026-09-08T17-13-45-912Z.json",
       "runs/management-2026-09-08T17-53-20-441Z.json",
+      "runs/management-2026-09-10T08-40-27-258Z.json",
       "runs/mcp-core-2026-09-08T17-03-46-193Z.json",
+      "runs/server-mcp-core-2026-09-10T08-40-47-204Z.json",
       "web-browser/results.json",
       "web-browser/dual-window-results.json",
       "web-browser/gm-results.json",
@@ -183,14 +187,18 @@
       "redaction-corrections/server-mcp-core-2026-09-08T18-19-05-946Z.json": "6781abcab01b8a5dee46df382bd5cea3e5663b82b01616892f10d98b6a2b9c10",
       "runs/server-mcp-core-2026-09-08T18-22-11-243Z.json": "54ac2396d2adb626274a3423d7e05103878a59877952bbf4a4b481d3f7af9fe7",
       "redaction-corrections/server-mcp-core-2026-09-08T18-22-11-243Z.json": "57dc9eef5db29627c82e139c937eb06cfdf34058a8ae4f360c576ae5f2a98546",
+      "runs/desktop-mcp-core-2026-09-10T08-41-32-807Z.json": "12a752ea5f0a119922c16cdaa18cd7c5bbaf3a84c854c584c5a2a758a6f7f317",
       "runs/http-core-2026-09-08T16-26-25-703Z.json": "f8da152f5fa8de37d47b8f4366c3ac9853c37202eb8a01ceaf1675d5b880f7b0",
       "runs/http-core-2026-09-08T16-29-10-430Z.json": "ad340d64ca9c024579568fa1f168a297c0063fd99124786e9ae857f347ef2353",
       "runs/http-core-2026-09-08T16-29-27-868Z.json": "c9489c2a8e063abf76a5bde01d33ee4156d342dce13ecdaedd83e97a30a88660",
       "runs/http-core-2026-09-08T16-31-18-569Z.json": "35e43089bd467d583e4015907ed368ec5b8a819b310b564f82c59ec8114530e7",
       "runs/http-core-2026-09-08T18-19-04-805Z.json": "22473303f29dcbb98bf3549dff25f4dd02ec14702f39edbbe756860d52833aa6",
+      "runs/http-core-2026-09-10T08-41-40-684Z.json": "e1f517dd18742b4dbf4a3f66ccc913dbe0380f6e508ab09461ea1ce095300f89",
       "runs/management-2026-09-08T17-13-45-912Z.json": "dcb1ab845f58180c3d62d505043d97bf099c01f080924c25d4d83c1f142b9362",
       "runs/management-2026-09-08T17-53-20-441Z.json": "028a1ef5a7605893f78c0279e8acc889aea7e4a4548a1a1dfa9d733530ea71a6",
+      "runs/management-2026-09-10T08-40-27-258Z.json": "c6bd9ac5457d9c607dc15bf9bd2ff9bc81f52ced2b333be988267d68f20b60ad",
       "runs/mcp-core-2026-09-08T17-03-46-193Z.json": "779329638124ca10d803a8b47e13092a4c72a0621b6cfd400e91a1b8a0234381",
+      "runs/server-mcp-core-2026-09-10T08-40-47-204Z.json": "cbeacae88718f9bd6af79185501645b7c2bc4e778450ac97799ab3076c1b0326",
       "web-browser/results.json": "c670989f6d6afd70c35fdbd84633e540b3272a22e95fe9be328b40a830158cf1",
       "web-browser/dual-window-results.json": "90d042a62fa85c4bfd5f07161800378aebcbff0929f6a81fc9f7acf6fe17321a",
       "web-browser/gm-results.json": "618fd3037030c218e3ddb9ee4064777068ca7619581464a492bf3621cdeef290",
@@ -1736,7 +1744,7 @@
       }
     ]
   },
-  "sourceHead": "88a6d0f9c31106f6cd3fc9edbadca0db6bf6397b",
+  "sourceHead": "7b14dce3c981e56d5841ce38ea9025606fa44d0c",
   "sourceRoots": [
     "apps/api/src",
     "apps/web/src",
@@ -2153,17 +2161,16 @@
           "applicable": true,
           "status": "passed",
           "evidence": [
-            "runs/management-2026-09-08T17-53-20-441Z.json"
+            "runs/management-2026-09-10T08-40-27-258Z.json"
           ],
           "actual": "实际首登仅A，原姓名跨A/B保持相同稳定userId；短码解析稳定项目，撤销关系不会被同名登录复活。",
-          "note": "Real execution and read-back required."
+          "note": "Status describes the explicitly recorded cases. Other guards and complete cross-surface baselines remain independently required."
         },
         "server_mcp": {
           "applicable": true,
           "status": "not_run",
           "evidence": [
-            "runs/server-mcp-core-2026-09-08T18-22-11-243Z.json",
-            "redaction-corrections/server-mcp-core-2026-09-08T18-22-11-243Z.json",
+            "runs/server-mcp-core-2026-09-10T08-40-47-204Z.json",
             "server-mcp-membership-live/e21431f0-e927-4a3f-8275-167accb1eaef/proof.json"
           ],
           "actual": "已实测：实际项目姓名登录与项目目录、后续操作人读回；服务端4421实际35次JSON-RPC/59检查：新姓名首登与重复/跨项目ID稳定，单项目直接选A、目录只含有效所属项目；A停用后重新姓名登录及旧token读A均403，B登录/读回和会员字段不变，恢复A同原ID。。仍缺：完整首次成员登记/已有姓名稳定ID/多项目组合未逐项覆盖；旧导入姓名/别名完整组合、原生客户端和本地EXE MCP独立验收；此运行不代表当前变更后的API源码已部署。。",
@@ -2173,16 +2180,15 @@
           "applicable": true,
           "status": "not_run",
           "evidence": [
-            "runs/desktop-mcp-core-2026-09-08T17-52-57-495Z.json",
-            "redaction-corrections/desktop-mcp-core-2026-09-08T17-52-57-495Z.json"
+            "runs/desktop-mcp-core-2026-09-10T08-41-32-807Z.json"
           ],
           "actual": "已实测：实际项目姓名登录与项目目录、后续操作人读回。仍缺：完整首次成员登记/已有姓名稳定ID/多项目组合未逐项覆盖。",
-          "note": "Real execution and read-back required."
+          "note": "Status describes the explicitly recorded cases. Other guards and complete cross-surface baselines remain independently required."
         }
       },
       "manual": {
         "inventoryNote": "Design v2.1 section 13 baseline. Generator retention verified without marking any product test passed.",
-        "evidenceMappedAt": "2026-09-10T08:10:53.379Z",
+        "evidenceMappedAt": "2026-09-10T09:23:06.048Z",
         "surfaceProgress": {
           "apk": {
             "completed": [
@@ -2208,8 +2214,7 @@
               "旧导入姓名/别名完整组合、原生客户端和本地EXE MCP独立验收；此运行不代表当前变更后的API源码已部署。"
             ],
             "evidence": [
-              "runs/server-mcp-core-2026-09-08T18-22-11-243Z.json",
-              "redaction-corrections/server-mcp-core-2026-09-08T18-22-11-243Z.json",
+              "runs/server-mcp-core-2026-09-10T08-40-47-204Z.json",
               "server-mcp-membership-live/e21431f0-e927-4a3f-8275-167accb1eaef/proof.json"
             ],
             "status": "partial"
@@ -2222,7 +2227,7 @@
               "完整首次成员登记/已有姓名稳定ID/多项目组合未逐项覆盖"
             ],
             "evidence": [
-              "runs/desktop-mcp-core-2026-09-08T17-52-57-495Z.json"
+              "runs/desktop-mcp-core-2026-09-10T08-41-32-807Z.json"
             ],
             "status": "partial"
           },
@@ -2393,10 +2398,10 @@
           "applicable": true,
           "status": "passed",
           "evidence": [
-            "runs/management-2026-09-08T17-53-20-441Z.json"
+            "runs/management-2026-09-10T08-40-27-258Z.json"
           ],
           "actual": "实际单项目员工只见A；同人A/B登记及撤销/恢复后目录和跨项目权限读回，非所属B列表/人员拒绝。",
-          "note": "Real execution and read-back required."
+          "note": "Status describes the explicitly recorded cases. Other guards and complete cross-surface baselines remain independently required."
         },
         "server_mcp": {
           "applicable": true,
@@ -2411,15 +2416,14 @@
           "applicable": true,
           "status": "not_run",
           "evidence": [
-            "runs/desktop-mcp-core-2026-09-08T17-52-57-495Z.json",
-            "redaction-corrections/desktop-mcp-core-2026-09-08T17-52-57-495Z.json"
+            "runs/desktop-mcp-core-2026-09-10T08-41-32-807Z.json"
           ],
           "actual": "已实测：实际列出当前员工所属项目。仍缺：单项目/多项目/撤销关系的完整目录组合未在该MCP入口覆盖。",
-          "note": "Real execution and read-back required."
+          "note": "Status describes the explicitly recorded cases. Other guards and complete cross-surface baselines remain independently required."
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-10T08:10:53.379Z",
+        "evidenceMappedAt": "2026-09-10T09:23:06.048Z",
         "surfaceProgress": {
           "apk": {
             "completed": [
@@ -2443,7 +2447,7 @@
               "单项目/多项目/撤销关系的完整目录组合未在该MCP入口覆盖"
             ],
             "evidence": [
-              "runs/desktop-mcp-core-2026-09-08T17-52-57-495Z.json"
+              "runs/desktop-mcp-core-2026-09-10T08-41-32-807Z.json"
             ],
             "status": "partial"
           }
@@ -2524,10 +2528,10 @@
           "applicable": true,
           "status": "passed",
           "evidence": [
-            "runs/management-2026-09-08T17-53-20-441Z.json"
+            "runs/management-2026-09-10T08-40-27-258Z.json"
           ],
           "actual": "独立 GM 口令、唯一 UUID、普通姓名 gm 无特权、管理多个项目，以及没有普通 membership 的 GM 创建编辑和完整人工闭环均已实际通过。",
-          "note": "Real execution and read-back required."
+          "note": "Status describes the explicitly recorded cases. Other guards and complete cross-surface baselines remain independently required."
         },
         "server_mcp": {
           "applicable": true,
@@ -2545,7 +2549,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T21:54:12.371Z"
+        "evidenceMappedAt": "2026-09-10T08:42:40.266Z"
       },
       "needsRevalidation": false,
       "generated": true
@@ -2615,10 +2619,10 @@
           "applicable": true,
           "status": "passed",
           "evidence": [
-            "runs/management-2026-09-08T17-53-20-441Z.json"
+            "runs/management-2026-09-10T08-40-27-258Z.json"
           ],
           "actual": "HTTP 实际验证项目 A 成员停用与版本恢复；B 保持可用，同名登录不能恢复显式停用成员。",
-          "note": "Real execution and read-back required."
+          "note": "Status describes the explicitly recorded cases. Other guards and complete cross-surface baselines remain independently required."
         },
         "server_mcp": {
           "applicable": true,
@@ -2638,7 +2642,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-09T03:31:49.466Z",
+        "evidenceMappedAt": "2026-09-10T08:42:40.266Z",
         "surfaceProgress": {
           "apk": {
             "completed": [
@@ -3094,7 +3098,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-10T08:10:53.238Z",
+        "evidenceMappedAt": "2026-09-10T09:23:05.887Z",
         "surfaceProgress": {
           "apk": {
             "completed": [
@@ -3434,36 +3438,34 @@
           "applicable": true,
           "status": "passed",
           "evidence": [
-            "runs/management-2026-09-08T17-53-20-441Z.json"
+            "runs/management-2026-09-10T08-40-27-258Z.json"
           ],
           "actual": "实际GM非成员以HTTP创建/修改/评论/人工完成/退回/再次完成/验收关闭MA1788890000532-1，closed/v12；五组件关闭，外部见证器0请求。",
-          "note": "Real execution and read-back required."
+          "note": "Status describes the explicitly recorded cases. Other guards and complete cross-surface baselines remain independently required."
         },
         "server_mcp": {
           "applicable": true,
           "status": "passed",
           "evidence": [
-            "runs/server-mcp-core-2026-09-08T18-22-11-243Z.json",
-            "redaction-corrections/server-mcp-core-2026-09-08T18-22-11-243Z.json",
+            "runs/server-mcp-core-2026-09-10T08-40-47-204Z.json",
             "runs/server-mcp-real-resource-20260909.json"
           ],
-          "actual": "此MCP入口真实姓名登录、创建、评论/读回、人工完成、创建/开始验收、关闭并取回 TA1788885078625-12 closed/v6；项目五组件关闭。未映射到EXE/Web/Android UI，编辑/删除/退回等未在该核心脚本覆盖。",
-          "note": "Real execution and read-back required."
+          "actual": "此MCP入口真实姓名登录、创建、评论/读回、人工完成、创建/开始验收、关闭并取回 LOCAL-3 closed/v6；项目五组件关闭。未映射到EXE/Web/Android UI，编辑/删除/退回等未在该核心脚本覆盖。",
+          "note": "Status describes the explicitly recorded cases. Other guards and complete cross-surface baselines remain independently required."
         },
         "local_mcp": {
           "applicable": true,
           "status": "passed",
           "evidence": [
-            "runs/desktop-mcp-core-2026-09-08T17-52-57-495Z.json",
-            "redaction-corrections/desktop-mcp-core-2026-09-08T17-52-57-495Z.json",
+            "runs/desktop-mcp-core-2026-09-10T08-41-32-807Z.json",
             "runs/server-mcp-real-resource-20260909.json"
           ],
-          "actual": "此MCP入口真实姓名登录、创建、评论/读回、人工完成、创建/开始验收、关闭并取回 TA1788885078625-10 closed/v6；项目五组件关闭。未映射到EXE/Web/Android UI，编辑/删除/退回等未在该核心脚本覆盖。",
-          "note": "Real execution and read-back required."
+          "actual": "此MCP入口真实姓名登录、创建、评论/读回、人工完成、创建/开始验收、关闭并取回 LUNAEXE246-2 closed/v6；项目五组件关闭。未映射到EXE/Web/Android UI，编辑/删除/退回等未在该核心脚本覆盖。",
+          "note": "Status describes the explicitly recorded cases. Other guards and complete cross-surface baselines remain independently required."
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-09T03:31:53.110Z",
+        "evidenceMappedAt": "2026-09-10T08:42:40.284Z",
         "reviewedEvidence": {
           "proofHashes": {
             "android-code22-no-code.json": "6a0490da68634961121ec1a7582d3fa43abc22a8c7be8f2a4907f1b4b22d77e2"
@@ -3771,7 +3773,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-10T08:10:53.242Z",
+        "evidenceMappedAt": "2026-09-10T09:23:05.892Z",
         "surfaceProgress": {},
         "baselineCriterionReview": {
           "at": "2026-09-08T21:26:59.617Z",
@@ -3934,7 +3936,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-10T08:10:53.244Z",
+        "evidenceMappedAt": "2026-09-10T09:23:05.893Z",
         "surfaceProgress": {},
         "baselineCriterionReview": {
           "at": "2026-09-08T21:26:59.617Z",
@@ -4131,7 +4133,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-10T08:10:53.246Z",
+        "evidenceMappedAt": "2026-09-10T09:23:05.896Z",
         "surfaceProgress": {
           "local_mcp": {
             "completed": [
@@ -4923,7 +4925,7 @@
             }
           }
         ],
-        "evidenceMappedAt": "2026-09-10T08:10:53.366Z",
+        "evidenceMappedAt": "2026-09-10T09:23:06.034Z",
         "workflowConcurrencyRuns": [
           {
             "runId": "e94223b3-82c5-469d-b7ca-eea306ba0aab",
@@ -5280,10 +5282,10 @@
           "applicable": true,
           "status": "not_run",
           "evidence": [
-            "runs/management-2026-09-08T17-53-20-441Z.json"
+            "runs/management-2026-09-10T08-40-27-258Z.json"
           ],
           "actual": "已实测：A配置开关不影响B；依赖级联关闭；普通员工禁止组件配置。仍缺：旧HTTP/MCP和后台创建任务的全组合禁止仍只部分fixture覆盖，没有真实外部任务验证。",
-          "note": "Real execution and read-back required."
+          "note": "Status describes the explicitly recorded cases. Other guards and complete cross-surface baselines remain independently required."
         },
         "server_mcp": {
           "applicable": true,
@@ -5301,7 +5303,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T21:54:12.390Z",
+        "evidenceMappedAt": "2026-09-10T08:42:40.284Z",
         "surfaceProgress": {
           "http": {
             "completed": [
@@ -5313,7 +5315,7 @@
               "旧HTTP/MCP和后台创建任务的全组合禁止仍只部分fixture覆盖，没有真实外部任务验证"
             ],
             "evidence": [
-              "runs/management-2026-09-08T17-53-20-441Z.json"
+              "runs/management-2026-09-10T08-40-27-258Z.json"
             ],
             "status": "partial"
           }
@@ -5368,10 +5370,10 @@
           "applicable": true,
           "status": "not_run",
           "evidence": [
-            "runs/management-2026-09-08T17-53-20-441Z.json"
+            "runs/management-2026-09-10T08-40-27-258Z.json"
           ],
           "actual": "已实测：缺配置为needs_configuration；single依赖检查和级联关闭；基础人工闭环可用。仍缺：所有客户端可见配置引导及实际独立外部资源尚未全面验证。",
-          "note": "Real execution and read-back required."
+          "note": "Status describes the explicitly recorded cases. Other guards and complete cross-surface baselines remain independently required."
         },
         "server_mcp": {
           "applicable": true,
@@ -5389,7 +5391,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T21:54:12.390Z",
+        "evidenceMappedAt": "2026-09-10T08:42:40.284Z",
         "surfaceProgress": {
           "http": {
             "completed": [
@@ -5401,7 +5403,7 @@
               "所有客户端可见配置引导及实际独立外部资源尚未全面验证"
             ],
             "evidence": [
-              "runs/management-2026-09-08T17-53-20-441Z.json"
+              "runs/management-2026-09-10T08-40-27-258Z.json"
             ],
             "status": "partial"
           }
@@ -5874,7 +5876,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-10T08:10:53.250Z",
+        "evidenceMappedAt": "2026-09-10T09:23:05.900Z",
         "surfaceProgress": {
           "apk": {
             "completed": [
@@ -6514,7 +6516,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-10T08:10:53.373Z",
+        "evidenceMappedAt": "2026-09-10T09:23:06.042Z",
         "surfaceProgress": {
           "apk": {
             "completed": [
@@ -6677,7 +6679,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-10T08:10:53.251Z",
+        "evidenceMappedAt": "2026-09-10T09:23:05.902Z",
         "preview7Upgrade": {
           "at": "2026-09-08T19:54:02.443Z",
           "proof": "runs/exe-after-preview7-upgrade.json",
@@ -7200,7 +7202,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-10T08:10:53.254Z",
+        "evidenceMappedAt": "2026-09-10T09:23:05.905Z",
         "reviewedEvidence": {
           "proofHashes": {
             "runs/frozen-workflow-live-2026-09-08T20-40-57-088Z.json": "de8200288602407e53747505620241fc89247c896c2b32bb86cdc47006e3e387",
@@ -7361,12 +7363,12 @@
           "applicable": true,
           "status": "passed",
           "evidence": [
-            "runs/http-core-2026-09-08T18-19-04-805Z.json#checks[1]",
-            "runs/management-2026-09-08T17-53-20-441Z.json#checks[1]",
-            "runs/management-2026-09-08T17-53-20-441Z.json#checks[2]"
+            "runs/http-core-2026-09-10T08-41-40-684Z.json#checks[1]",
+            "runs/management-2026-09-10T08-40-27-258Z.json#checks[1]",
+            "runs/management-2026-09-10T08-40-27-258Z.json#checks[2]"
           ],
           "actual": "GM password login: HTTP 200 (expected 200); incorrect GM password rejected: HTTP 401 (expected 401); configured GM password login: HTTP 200 (expected 200)",
-          "note": "Real execution and read-back required."
+          "note": "Status describes the explicitly recorded cases. Other guards and complete cross-surface baselines remain independently required."
         },
         "server_mcp": {
           "applicable": false,
@@ -7384,7 +7386,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T21:54:12.361Z"
+        "evidenceMappedAt": "2026-09-10T08:42:40.256Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -8675,11 +8677,11 @@
           "applicable": true,
           "status": "passed",
           "evidence": [
-            "runs/management-2026-09-08T17-53-20-441Z.json#checks[5]",
-            "runs/management-2026-09-08T17-53-20-441Z.json#checks[89]"
+            "runs/management-2026-09-10T08-40-27-258Z.json#checks[5]",
+            "runs/management-2026-09-10T08-40-27-258Z.json#checks[89]"
           ],
           "actual": "project shortcode resolves stable ID: HTTP 200 (expected 200); disabled project entrance is unavailable: HTTP 403 (expected 403)",
-          "note": "Real execution and read-back required."
+          "note": "Status describes the explicitly recorded cases. Other guards and complete cross-surface baselines remain independently required."
         },
         "server_mcp": {
           "applicable": false,
@@ -8697,7 +8699,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T21:54:12.361Z"
+        "evidenceMappedAt": "2026-09-10T08:42:40.257Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -8762,10 +8764,10 @@
           "applicable": true,
           "status": "passed",
           "evidence": [
-            "runs/management-2026-09-08T17-53-20-441Z.json#checks[15]"
+            "runs/management-2026-09-10T08-40-27-258Z.json#checks[15]"
           ],
           "actual": "ordinary gm name denied project management: HTTP 403 (expected 403)",
-          "note": "Real execution and read-back required."
+          "note": "Status describes the explicitly recorded cases. Other guards and complete cross-surface baselines remain independently required."
         },
         "server_mcp": {
           "applicable": false,
@@ -8783,7 +8785,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T21:54:12.362Z"
+        "evidenceMappedAt": "2026-09-10T08:42:40.257Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -8848,13 +8850,13 @@
           "applicable": true,
           "status": "passed",
           "evidence": [
-            "runs/http-core-2026-09-08T18-19-04-805Z.json#checks[2]",
-            "runs/http-core-2026-09-08T18-19-04-805Z.json#checks[3]",
-            "runs/management-2026-09-08T17-53-20-441Z.json#checks[3]",
-            "runs/management-2026-09-08T17-53-20-441Z.json#checks[4]"
+            "runs/http-core-2026-09-10T08-41-40-684Z.json#checks[2]",
+            "runs/http-core-2026-09-10T08-41-40-684Z.json#checks[3]",
+            "runs/management-2026-09-10T08-40-27-258Z.json#checks[3]",
+            "runs/management-2026-09-10T08-40-27-258Z.json#checks[4]"
           ],
           "actual": "GM create A: HTTP 200 (expected 200); GM create B: HTTP 200 (expected 200); GM create isolated project A: HTTP 200 (expected 200); GM create isolated project B: HTTP 200 (expected 200)",
-          "note": "Real execution and read-back required."
+          "note": "Status describes the explicitly recorded cases. Other guards and complete cross-surface baselines remain independently required."
         },
         "server_mcp": {
           "applicable": false,
@@ -8872,7 +8874,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T21:54:12.362Z"
+        "evidenceMappedAt": "2026-09-10T08:42:40.257Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -8937,13 +8939,13 @@
           "applicable": true,
           "status": "passed",
           "evidence": [
-            "runs/management-2026-09-08T17-53-20-441Z.json#checks[85]",
-            "runs/management-2026-09-08T17-53-20-441Z.json#checks[86]",
-            "runs/management-2026-09-08T17-53-20-441Z.json#checks[88]",
-            "runs/management-2026-09-08T17-53-20-441Z.json#checks[92]"
+            "runs/management-2026-09-10T08-40-27-258Z.json#checks[85]",
+            "runs/management-2026-09-10T08-40-27-258Z.json#checks[86]",
+            "runs/management-2026-09-10T08-40-27-258Z.json#checks[88]",
+            "runs/management-2026-09-10T08-40-27-258Z.json#checks[92]"
           ],
           "actual": "GM without A membership can rename project: HTTP 200 (expected 200); stale project update rejected: HTTP 409 (expected 409); GM disables project with version: HTTP 200 (expected 200); GM restores project with version: HTTP 200 (expected 200)",
-          "note": "Real execution and read-back required."
+          "note": "Status describes the explicitly recorded cases. Other guards and complete cross-surface baselines remain independently required."
         },
         "server_mcp": {
           "applicable": false,
@@ -8961,7 +8963,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T21:54:12.362Z"
+        "evidenceMappedAt": "2026-09-10T08:42:40.257Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -9057,7 +9059,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-10T08:10:53.256Z",
+        "evidenceMappedAt": "2026-09-10T09:23:05.907Z",
         "reviewedEvidence": {
           "proofHashes": {
             "runs/frozen-workflow-live-2026-09-08T20-40-57-088Z.json": "de8200288602407e53747505620241fc89247c896c2b32bb86cdc47006e3e387",
@@ -9197,15 +9199,15 @@
           "applicable": true,
           "status": "passed",
           "evidence": [
-            "runs/management-2026-09-08T17-53-20-441Z.json#checks[22]",
-            "runs/management-2026-09-08T17-53-20-441Z.json#checks[29]",
-            "runs/management-2026-09-08T17-53-20-441Z.json#checks[40]",
-            "runs/management-2026-09-08T17-53-20-441Z.json#checks[28]",
-            "runs/management-2026-09-08T17-53-20-441Z.json#checks[36]",
-            "runs/management-2026-09-08T17-53-20-441Z.json#checks[39]"
+            "runs/management-2026-09-10T08-40-27-258Z.json#checks[22]",
+            "runs/management-2026-09-10T08-40-27-258Z.json#checks[29]",
+            "runs/management-2026-09-10T08-40-27-258Z.json#checks[40]",
+            "runs/management-2026-09-10T08-40-27-258Z.json#checks[28]",
+            "runs/management-2026-09-10T08-40-27-258Z.json#checks[36]",
+            "runs/management-2026-09-10T08-40-27-258Z.json#checks[39]"
           ],
           "actual": "employee cannot configure components: HTTP 403 (expected 403); GM enable build_upload.single: HTTP 200 (expected 200); GM enable build: HTTP 409 (expected 409); GM enable upload.incremental: HTTP 200 (expected 200); GM disable build: HTTP 200 (expected 200); GM disable upload.incremental: HTTP 200 (expected 200)",
-          "note": "Real execution and read-back required."
+          "note": "Status describes the explicitly recorded cases. Other guards and complete cross-surface baselines remain independently required."
         },
         "server_mcp": {
           "applicable": false,
@@ -9223,7 +9225,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T21:54:12.362Z"
+        "evidenceMappedAt": "2026-09-10T08:42:40.257Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -9288,11 +9290,11 @@
           "applicable": true,
           "status": "passed",
           "evidence": [
-            "runs/management-2026-09-08T17-53-20-441Z.json#checks[62]",
-            "runs/management-2026-09-08T17-53-20-441Z.json#checks[87]"
+            "runs/management-2026-09-10T08-40-27-258Z.json#checks[62]",
+            "runs/management-2026-09-10T08-40-27-258Z.json#checks[87]"
           ],
           "actual": "GM removes own ordinary A membership for non-member test: HTTP 200 (expected 200); GM restores own ordinary membership after proof: HTTP 200 (expected 200)",
-          "note": "Real execution and read-back required."
+          "note": "Status describes the explicitly recorded cases. Other guards and complete cross-surface baselines remain independently required."
         },
         "server_mcp": {
           "applicable": false,
@@ -9310,7 +9312,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T21:54:12.362Z"
+        "evidenceMappedAt": "2026-09-10T08:42:40.257Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -9375,12 +9377,12 @@
           "applicable": true,
           "status": "passed",
           "evidence": [
-            "runs/management-2026-09-08T17-53-20-441Z.json#checks[43]",
-            "runs/management-2026-09-08T17-53-20-441Z.json#checks[49]",
-            "runs/management-2026-09-08T17-53-20-441Z.json#checks[51]"
+            "runs/management-2026-09-10T08-40-27-258Z.json#checks[43]",
+            "runs/management-2026-09-10T08-40-27-258Z.json#checks[49]",
+            "runs/management-2026-09-10T08-40-27-258Z.json#checks[51]"
           ],
           "actual": "employee disables shared employee only in A: HTTP 200 (expected 200); stale member restoration is refused: HTTP 409 (expected 409); employee restores A membership with current version: HTTP 200 (expected 200)",
-          "note": "Real execution and read-back required."
+          "note": "Status describes the explicitly recorded cases. Other guards and complete cross-surface baselines remain independently required."
         },
         "server_mcp": {
           "applicable": false,
@@ -9398,7 +9400,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T21:54:12.362Z"
+        "evidenceMappedAt": "2026-09-10T08:42:40.257Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -9463,10 +9465,10 @@
           "applicable": true,
           "status": "passed",
           "evidence": [
-            "runs/management-2026-09-08T17-53-20-441Z.json#checks[93]"
+            "runs/management-2026-09-10T08-40-27-258Z.json#checks[93]"
           ],
           "actual": "management events readable with stable actor attribution: HTTP 200 (expected 200)",
-          "note": "Real execution and read-back required."
+          "note": "Status describes the explicitly recorded cases. Other guards and complete cross-surface baselines remain independently required."
         },
         "server_mcp": {
           "applicable": false,
@@ -9484,7 +9486,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T21:54:12.362Z"
+        "evidenceMappedAt": "2026-09-10T08:42:40.257Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -9628,14 +9630,14 @@
           "applicable": true,
           "status": "passed",
           "evidence": [
-            "runs/management-2026-09-08T17-53-20-441Z.json#checks[75]",
-            "runs/management-2026-09-08T17-53-20-441Z.json#checks[77]",
-            "runs/management-2026-09-08T17-53-20-441Z.json#checks[78]",
-            "runs/management-2026-09-08T17-53-20-441Z.json#checks[74]",
-            "runs/management-2026-09-08T17-53-20-441Z.json#checks[79]"
+            "runs/management-2026-09-10T08-40-27-258Z.json#checks[75]",
+            "runs/management-2026-09-10T08-40-27-258Z.json#checks[77]",
+            "runs/management-2026-09-10T08-40-27-258Z.json#checks[78]",
+            "runs/management-2026-09-10T08-40-27-258Z.json#checks[74]",
+            "runs/management-2026-09-10T08-40-27-258Z.json#checks[79]"
           ],
           "actual": "non-member GM manually completes: HTTP 200 (expected 200); non-member GM creates verification: HTTP 200 (expected 200); non-member GM starts verification: HTTP 200 (expected 200); non-member GM rejects verification: HTTP 200 (expected 200); non-member GM accepts and closes: HTTP 200 (expected 200)",
-          "note": "Real execution and read-back required."
+          "note": "Status describes the explicitly recorded cases. Other guards and complete cross-surface baselines remain independently required."
         },
         "server_mcp": {
           "applicable": false,
@@ -9653,7 +9655,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T21:54:12.362Z"
+        "evidenceMappedAt": "2026-09-10T08:42:40.257Z"
       },
       "needsRevalidation": false,
       "generated": true
@@ -19785,14 +19787,15 @@
             "runs/desktop-mcp-core-2026-09-08T17-18-02-431Z.json#checks[2]",
             "redaction-corrections/desktop-mcp-core-2026-09-08T17-18-02-431Z.json#checks[2]",
             "runs/desktop-mcp-core-2026-09-08T17-52-57-495Z.json#checks[2]",
-            "redaction-corrections/desktop-mcp-core-2026-09-08T17-52-57-495Z.json#checks[2]"
+            "redaction-corrections/desktop-mcp-core-2026-09-08T17-52-57-495Z.json#checks[2]",
+            "runs/desktop-mcp-core-2026-09-10T08-41-32-807Z.json#checks[2]"
           ],
           "actual": "Real MCP calls completed and their returned records were retained in the referenced successful run. This does not cover every action/negative input of a generic tool.",
-          "note": "Real execution and read-back required."
+          "note": "Status describes the explicitly recorded cases. Other guards and complete cross-surface baselines remain independently required."
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-10T08:10:53.258Z",
+        "evidenceMappedAt": "2026-09-10T09:23:05.909Z",
         "retainedReviewNotes": [
           {
             "surface": "server_mcp",
@@ -20032,14 +20035,15 @@
             "runs/desktop-mcp-core-2026-09-08T17-18-02-431Z.json#checks[3]",
             "redaction-corrections/desktop-mcp-core-2026-09-08T17-18-02-431Z.json#checks[3]",
             "runs/desktop-mcp-core-2026-09-08T17-52-57-495Z.json#checks[3]",
-            "redaction-corrections/desktop-mcp-core-2026-09-08T17-52-57-495Z.json#checks[3]"
+            "redaction-corrections/desktop-mcp-core-2026-09-08T17-52-57-495Z.json#checks[3]",
+            "runs/desktop-mcp-core-2026-09-10T08-41-32-807Z.json#checks[3]"
           ],
           "actual": "Real MCP calls completed and their returned records were retained in the referenced successful run. This does not cover every action/negative input of a generic tool.",
-          "note": "Real execution and read-back required."
+          "note": "Status describes the explicitly recorded cases. Other guards and complete cross-surface baselines remain independently required."
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-10T08:10:53.259Z",
+        "evidenceMappedAt": "2026-09-10T09:23:05.911Z",
         "retainedReviewNotes": [
           {
             "surface": "server_mcp",
@@ -20333,7 +20337,7 @@
           "at": "2026-09-08T21:26:59.617Z",
           "reason": "Actual EXE-absent direct HTTP and server JSON-RPC cases; preserve remaining full-function requirements."
         },
-        "evidenceMappedAt": "2026-09-10T08:10:53.354Z",
+        "evidenceMappedAt": "2026-09-10T09:23:06.022Z",
         "projectIsolationRuns": [
           {
             "runId": "789bd648-e5df-43d7-b5b1-283327f83b07",
@@ -20538,14 +20542,16 @@
             "runs/desktop-mcp-core-2026-09-08T17-52-57-495Z.json#checks[8]",
             "redaction-corrections/desktop-mcp-core-2026-09-08T17-52-57-495Z.json#checks[8]",
             "runs/desktop-mcp-core-2026-09-08T17-52-57-495Z.json#checks[12]",
-            "redaction-corrections/desktop-mcp-core-2026-09-08T17-52-57-495Z.json#checks[12]"
+            "redaction-corrections/desktop-mcp-core-2026-09-08T17-52-57-495Z.json#checks[12]",
+            "runs/desktop-mcp-core-2026-09-10T08-41-32-807Z.json#checks[8]",
+            "runs/desktop-mcp-core-2026-09-10T08-41-32-807Z.json#checks[12]"
           ],
           "actual": "Real MCP calls completed and their returned records were retained in the referenced successful run. This does not cover every action/negative input of a generic tool.",
-          "note": "Real execution and read-back required."
+          "note": "Status describes the explicitly recorded cases. Other guards and complete cross-surface baselines remain independently required."
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-10T08:10:53.355Z",
+        "evidenceMappedAt": "2026-09-10T09:23:06.023Z",
         "retainedReviewNotes": [
           {
             "surface": "server_mcp",
@@ -20862,14 +20868,15 @@
             "runs/desktop-mcp-core-2026-09-08T17-18-02-431Z.json#checks[4]",
             "redaction-corrections/desktop-mcp-core-2026-09-08T17-18-02-431Z.json#checks[4]",
             "runs/desktop-mcp-core-2026-09-08T17-52-57-495Z.json#checks[4]",
-            "redaction-corrections/desktop-mcp-core-2026-09-08T17-52-57-495Z.json#checks[4]"
+            "redaction-corrections/desktop-mcp-core-2026-09-08T17-52-57-495Z.json#checks[4]",
+            "runs/desktop-mcp-core-2026-09-10T08-41-32-807Z.json#checks[4]"
           ],
           "actual": "Real MCP calls completed and their returned records were retained in the referenced successful run. This does not cover every action/negative input of a generic tool.",
-          "note": "Real execution and read-back required."
+          "note": "Status describes the explicitly recorded cases. Other guards and complete cross-surface baselines remain independently required."
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-10T08:10:53.264Z",
+        "evidenceMappedAt": "2026-09-10T09:23:05.916Z",
         "retainedReviewNotes": [
           {
             "surface": "server_mcp",
@@ -21155,7 +21162,7 @@
           "at": "2026-09-08T21:26:59.617Z",
           "reason": "Actual EXE-absent direct HTTP and server JSON-RPC cases; preserve remaining full-function requirements."
         },
-        "evidenceMappedAt": "2026-09-10T08:10:53.357Z",
+        "evidenceMappedAt": "2026-09-10T09:23:06.023Z",
         "projectIsolationRuns": [
           {
             "runId": "789bd648-e5df-43d7-b5b1-283327f83b07",
@@ -21417,7 +21424,7 @@
             "progress": null
           }
         ],
-        "evidenceMappedAt": "2026-09-10T08:10:53.357Z",
+        "evidenceMappedAt": "2026-09-10T09:23:06.024Z",
         "projectIsolationRuns": [
           {
             "runId": "789bd648-e5df-43d7-b5b1-283327f83b07",
@@ -21653,14 +21660,18 @@
             "runs/desktop-mcp-core-2026-09-08T17-52-57-495Z.json#checks[10]",
             "redaction-corrections/desktop-mcp-core-2026-09-08T17-52-57-495Z.json#checks[10]",
             "runs/desktop-mcp-core-2026-09-08T17-52-57-495Z.json#checks[11]",
-            "redaction-corrections/desktop-mcp-core-2026-09-08T17-52-57-495Z.json#checks[11]"
+            "redaction-corrections/desktop-mcp-core-2026-09-08T17-52-57-495Z.json#checks[11]",
+            "runs/desktop-mcp-core-2026-09-10T08-41-32-807Z.json#checks[7]",
+            "runs/desktop-mcp-core-2026-09-10T08-41-32-807Z.json#checks[9]",
+            "runs/desktop-mcp-core-2026-09-10T08-41-32-807Z.json#checks[10]",
+            "runs/desktop-mcp-core-2026-09-10T08-41-32-807Z.json#checks[11]"
           ],
           "actual": "Real MCP calls completed and their returned records were retained in the referenced successful run. This does not cover every action/negative input of a generic tool.",
-          "note": "Real execution and read-back required."
+          "note": "Status describes the explicitly recorded cases. Other guards and complete cross-surface baselines remain independently required."
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-10T08:10:53.364Z",
+        "evidenceMappedAt": "2026-09-10T09:23:06.031Z",
         "retainedReviewNotes": [
           {
             "surface": "server_mcp",
@@ -22095,14 +22106,15 @@
             "runs/desktop-mcp-core-2026-09-08T17-18-02-431Z.json#checks[5]",
             "redaction-corrections/desktop-mcp-core-2026-09-08T17-18-02-431Z.json#checks[5]",
             "runs/desktop-mcp-core-2026-09-08T17-52-57-495Z.json#checks[5]",
-            "redaction-corrections/desktop-mcp-core-2026-09-08T17-52-57-495Z.json#checks[5]"
+            "redaction-corrections/desktop-mcp-core-2026-09-08T17-52-57-495Z.json#checks[5]",
+            "runs/desktop-mcp-core-2026-09-10T08-41-32-807Z.json#checks[5]"
           ],
           "actual": "Real MCP calls completed and their returned records were retained in the referenced successful run. This does not cover every action/negative input of a generic tool.",
-          "note": "Real execution and read-back required."
+          "note": "Status describes the explicitly recorded cases. Other guards and complete cross-surface baselines remain independently required."
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-10T08:10:53.357Z",
+        "evidenceMappedAt": "2026-09-10T09:23:06.023Z",
         "retainedReviewNotes": [
           {
             "surface": "server_mcp",
@@ -22381,14 +22393,15 @@
             "runs/desktop-mcp-core-2026-09-08T17-18-02-431Z.json#checks[6]",
             "redaction-corrections/desktop-mcp-core-2026-09-08T17-18-02-431Z.json#checks[6]",
             "runs/desktop-mcp-core-2026-09-08T17-52-57-495Z.json#checks[6]",
-            "redaction-corrections/desktop-mcp-core-2026-09-08T17-52-57-495Z.json#checks[6]"
+            "redaction-corrections/desktop-mcp-core-2026-09-08T17-52-57-495Z.json#checks[6]",
+            "runs/desktop-mcp-core-2026-09-10T08-41-32-807Z.json#checks[6]"
           ],
           "actual": "Real MCP calls completed and their returned records were retained in the referenced successful run. This does not cover every action/negative input of a generic tool.",
-          "note": "Real execution and read-back required."
+          "note": "Status describes the explicitly recorded cases. Other guards and complete cross-surface baselines remain independently required."
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-10T08:10:53.355Z",
+        "evidenceMappedAt": "2026-09-10T09:23:06.023Z",
         "retainedReviewNotes": [
           {
             "surface": "server_mcp",
@@ -22700,7 +22713,7 @@
           "at": "2026-09-08T21:26:59.617Z",
           "reason": "Actual EXE-absent direct HTTP and server JSON-RPC cases; preserve remaining full-function requirements."
         },
-        "evidenceMappedAt": "2026-09-10T08:10:53.355Z",
+        "evidenceMappedAt": "2026-09-10T09:23:06.023Z",
         "projectIsolationRuns": [
           {
             "runId": "789bd648-e5df-43d7-b5b1-283327f83b07",
@@ -23294,7 +23307,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-10T08:10:53.276Z",
+        "evidenceMappedAt": "2026-09-10T09:23:05.931Z",
         "retainedReviewNotes": [
           {
             "surface": "server_mcp",
@@ -24194,7 +24207,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-10T08:10:53.357Z",
+        "evidenceMappedAt": "2026-09-10T09:23:06.023Z",
         "projectIsolationRuns": [
           {
             "runId": "789bd648-e5df-43d7-b5b1-283327f83b07",
@@ -36166,7 +36179,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-10T08:10:53.278Z",
+        "evidenceMappedAt": "2026-09-10T09:23:05.933Z",
         "reviewedEvidence": {
           "proofHashes": {
             "runs/frozen-workflow-live-2026-09-08T20-40-57-088Z.json": "de8200288602407e53747505620241fc89247c896c2b32bb86cdc47006e3e387",
@@ -36501,7 +36514,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-10T08:10:53.280Z",
+        "evidenceMappedAt": "2026-09-10T09:23:05.935Z",
         "retainedReviewNotes": [
           {
             "surface": "http",
@@ -36808,12 +36821,12 @@
           "applicable": true,
           "status": "passed",
           "evidence": [
-            "runs/management-2026-09-08T17-53-20-441Z.json#checks[19]",
-            "runs/management-2026-09-08T17-53-20-441Z.json#checks[83]",
-            "runs/management-2026-09-08T17-53-20-441Z.json#checks[64]"
+            "runs/management-2026-09-10T08-40-27-258Z.json#checks[19]",
+            "runs/management-2026-09-10T08-40-27-258Z.json#checks[83]",
+            "runs/management-2026-09-10T08-40-27-258Z.json#checks[64]"
           ],
           "actual": "non-member personnel directory denied: HTTP 403 (expected 403); read current project A personnel: HTTP 200 (expected 200); GM without A membership still lists personnel: HTTP 200 (expected 200)",
-          "note": "Real execution and read-back required."
+          "note": "Status describes the explicitly recorded cases. Other guards and complete cross-surface baselines remain independently required."
         },
         "server_mcp": {
           "applicable": false,
@@ -36831,7 +36844,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T21:54:12.366Z",
+        "evidenceMappedAt": "2026-09-10T08:42:40.261Z",
         "sourceEvidenceReview": {
           "nodeId": "http_route-070fd3ccaaef52",
           "sourceFile": "apps/api/src/app.ts",
@@ -36952,10 +36965,10 @@
           "applicable": true,
           "status": "passed",
           "evidence": [
-            "runs/management-2026-09-08T17-53-20-441Z.json#checks[54]"
+            "runs/management-2026-09-10T08-40-27-258Z.json#checks[54]"
           ],
           "actual": "employee links duplicate name only in A: HTTP 200 (expected 200)",
-          "note": "Real execution and read-back required."
+          "note": "Status describes the explicitly recorded cases. Other guards and complete cross-surface baselines remain independently required."
         },
         "server_mcp": {
           "applicable": false,
@@ -36973,7 +36986,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T21:54:12.366Z",
+        "evidenceMappedAt": "2026-09-10T08:42:40.261Z",
         "sourceEvidenceReview": {
           "nodeId": "http_route-59983f06154358",
           "sourceFile": "apps/api/src/app.ts",
@@ -37092,10 +37105,10 @@
           "applicable": true,
           "status": "passed",
           "evidence": [
-            "runs/management-2026-09-08T17-53-20-441Z.json#checks[58]"
+            "runs/management-2026-09-10T08-40-27-258Z.json#checks[58]"
           ],
           "actual": "employee unlinks duplicate name in A: HTTP 200 (expected 200)",
-          "note": "Real execution and read-back required."
+          "note": "Status describes the explicitly recorded cases. Other guards and complete cross-surface baselines remain independently required."
         },
         "server_mcp": {
           "applicable": false,
@@ -37113,7 +37126,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T21:54:12.366Z",
+        "evidenceMappedAt": "2026-09-10T08:42:40.261Z",
         "sourceEvidenceReview": {
           "nodeId": "http_route-9ffe2403f950fe",
           "sourceFile": "apps/api/src/app.ts",
@@ -38285,7 +38298,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-10T08:10:53.364Z",
+        "evidenceMappedAt": "2026-09-10T09:23:06.031Z",
         "reviewedEvidence": {
           "proofHashes": {
             "runs/frozen-workflow-live-2026-09-08T20-40-57-088Z.json": "de8200288602407e53747505620241fc89247c896c2b32bb86cdc47006e3e387",
@@ -38767,7 +38780,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-10T08:10:53.349Z",
+        "evidenceMappedAt": "2026-09-10T09:23:06.014Z",
         "retainedReviewNotes": [
           {
             "surface": "http",
@@ -39269,7 +39282,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-10T08:10:53.350Z",
+        "evidenceMappedAt": "2026-09-10T09:23:06.015Z",
         "reviewedEvidence": {
           "proofHashes": {
             "runs/frozen-workflow-live-2026-09-08T20-40-57-088Z.json": "de8200288602407e53747505620241fc89247c896c2b32bb86cdc47006e3e387",
@@ -39725,7 +39738,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-10T08:10:53.352Z",
+        "evidenceMappedAt": "2026-09-10T09:23:06.017Z",
         "sourceEvidenceReview": {
           "nodeId": "http_route-662ac1e4f068be",
           "sourceFile": "apps/api/src/app.ts",
@@ -40111,7 +40124,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-10T08:10:53.352Z",
+        "evidenceMappedAt": "2026-09-10T09:23:06.019Z",
         "sourceEvidenceReview": {
           "nodeId": "http_route-f2b76a8f2d3bd2",
           "sourceFile": "apps/api/src/app.ts",
@@ -40412,7 +40425,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-10T08:10:53.354Z",
+        "evidenceMappedAt": "2026-09-10T09:23:06.022Z",
         "retainedReviewNotes": [
           {
             "surface": "http",
@@ -40672,7 +40685,7 @@
           "at": "2026-09-08T21:26:59.617Z",
           "reason": "Actual EXE-absent direct HTTP and server JSON-RPC cases; preserve remaining full-function requirements."
         },
-        "evidenceMappedAt": "2026-09-10T08:10:53.354Z",
+        "evidenceMappedAt": "2026-09-10T09:23:06.022Z",
         "sourceEvidenceReview": {
           "nodeId": "http_route-3f8b6d79c3ec5a",
           "sourceFile": "apps/api/src/app.ts",
@@ -41309,7 +41322,7 @@
             "progress": null
           }
         ],
-        "evidenceMappedAt": "2026-09-10T08:10:53.364Z",
+        "evidenceMappedAt": "2026-09-10T09:23:06.031Z",
         "sourceEvidenceReview": {
           "nodeId": "http_route-280fa057c65980",
           "sourceFile": "apps/api/src/app.ts",
@@ -41663,7 +41676,7 @@
           "at": "2026-09-08T21:26:59.617Z",
           "reason": "Actual EXE-absent direct HTTP and server JSON-RPC cases; preserve remaining full-function requirements."
         },
-        "evidenceMappedAt": "2026-09-10T08:10:53.354Z",
+        "evidenceMappedAt": "2026-09-10T09:23:06.022Z",
         "sourceEvidenceReview": {
           "nodeId": "http_route-91587d5ccb9fcd",
           "sourceFile": "apps/api/src/app.ts",
@@ -41860,7 +41873,7 @@
             "progress": null
           }
         ],
-        "evidenceMappedAt": "2026-09-10T08:10:53.364Z",
+        "evidenceMappedAt": "2026-09-10T09:23:06.031Z",
         "sourceEvidenceReview": {
           "nodeId": "http_route-133e8410ae7ef7",
           "sourceFile": "apps/api/src/app.ts",
@@ -42062,7 +42075,7 @@
             "progress": null
           }
         ],
-        "evidenceMappedAt": "2026-09-10T08:10:53.364Z",
+        "evidenceMappedAt": "2026-09-10T09:23:06.031Z",
         "sourceEvidenceReview": {
           "nodeId": "http_route-45735bc8af628d",
           "sourceFile": "apps/api/src/app.ts",
@@ -42440,7 +42453,7 @@
             "progress": null
           }
         ],
-        "evidenceMappedAt": "2026-09-10T08:10:53.364Z",
+        "evidenceMappedAt": "2026-09-10T09:23:06.031Z",
         "sourceEvidenceReview": {
           "nodeId": "http_route-144efd0c9334b8",
           "sourceFile": "apps/api/src/app.ts",
@@ -43129,7 +43142,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-10T08:10:53.294Z",
+        "evidenceMappedAt": "2026-09-10T09:23:05.951Z",
         "retainedReviewNotes": [
           {
             "surface": "http",
@@ -43554,7 +43567,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-10T08:10:53.351Z",
+        "evidenceMappedAt": "2026-09-10T09:23:06.015Z",
         "retainedReviewNotes": [
           {
             "surface": "http",
@@ -43775,7 +43788,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-10T08:10:53.354Z",
+        "evidenceMappedAt": "2026-09-10T09:23:06.022Z",
         "retainedReviewNotes": [
           {
             "surface": "http",
@@ -44253,7 +44266,7 @@
           "at": "2026-09-08T21:26:59.617Z",
           "reason": "Actual EXE-absent direct HTTP and server JSON-RPC cases; preserve remaining full-function requirements."
         },
-        "evidenceMappedAt": "2026-09-10T08:10:53.351Z",
+        "evidenceMappedAt": "2026-09-10T09:23:06.016Z",
         "sourceEvidenceReview": {
           "nodeId": "http_route-c72542c420f961",
           "sourceFile": "apps/api/src/app.ts",
@@ -44979,7 +44992,7 @@
             "progress": null
           }
         ],
-        "evidenceMappedAt": "2026-09-10T08:10:53.364Z",
+        "evidenceMappedAt": "2026-09-10T09:23:06.031Z",
         "sourceEvidenceReview": {
           "nodeId": "http_route-8d683a24515c8d",
           "sourceFile": "apps/api/src/app.ts",
@@ -45399,7 +45412,7 @@
             "progress": null
           }
         ],
-        "evidenceMappedAt": "2026-09-10T08:10:53.364Z",
+        "evidenceMappedAt": "2026-09-10T09:23:06.031Z",
         "sourceEvidenceReview": {
           "nodeId": "http_route-d250196281a746",
           "sourceFile": "apps/api/src/app.ts",
@@ -48220,14 +48233,15 @@
             "runs/desktop-mcp-core-2026-09-08T17-18-02-431Z.json#checks[3]",
             "redaction-corrections/desktop-mcp-core-2026-09-08T17-18-02-431Z.json#checks[3]",
             "runs/desktop-mcp-core-2026-09-08T17-52-57-495Z.json#checks[3]",
-            "redaction-corrections/desktop-mcp-core-2026-09-08T17-52-57-495Z.json#checks[3]"
+            "redaction-corrections/desktop-mcp-core-2026-09-08T17-52-57-495Z.json#checks[3]",
+            "runs/desktop-mcp-core-2026-09-10T08-41-32-807Z.json#checks[3]"
           ],
           "actual": "已实测：已安装预览的90工具共享目录中同名工具有真实调用，结果映射在对应API目录行。仍缺：该源码行属于保留的18工具fallback目录；未以sharedApi=false实测，不计重复通过。",
-          "note": "Real execution and read-back required."
+          "note": "Status describes the explicitly recorded cases. Other guards and complete cross-surface baselines remain independently required."
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-10T08:10:53.224Z",
+        "evidenceMappedAt": "2026-09-10T09:23:05.872Z",
         "surfaceProgress": {
           "local_mcp": {
             "completed": [
@@ -48240,7 +48254,8 @@
               "runs/desktop-mcp-core-2026-09-08T17-18-02-431Z.json#checks[3]",
               "redaction-corrections/desktop-mcp-core-2026-09-08T17-18-02-431Z.json#checks[3]",
               "runs/desktop-mcp-core-2026-09-08T17-52-57-495Z.json#checks[3]",
-              "redaction-corrections/desktop-mcp-core-2026-09-08T17-52-57-495Z.json#checks[3]"
+              "redaction-corrections/desktop-mcp-core-2026-09-08T17-52-57-495Z.json#checks[3]",
+              "runs/desktop-mcp-core-2026-09-10T08-41-32-807Z.json#checks[3]"
             ],
             "status": "partial"
           }
@@ -48402,14 +48417,16 @@
             "runs/desktop-mcp-core-2026-09-08T17-52-57-495Z.json#checks[8]",
             "redaction-corrections/desktop-mcp-core-2026-09-08T17-52-57-495Z.json#checks[8]",
             "runs/desktop-mcp-core-2026-09-08T17-52-57-495Z.json#checks[12]",
-            "redaction-corrections/desktop-mcp-core-2026-09-08T17-52-57-495Z.json#checks[12]"
+            "redaction-corrections/desktop-mcp-core-2026-09-08T17-52-57-495Z.json#checks[12]",
+            "runs/desktop-mcp-core-2026-09-10T08-41-32-807Z.json#checks[8]",
+            "runs/desktop-mcp-core-2026-09-10T08-41-32-807Z.json#checks[12]"
           ],
           "actual": "已实测：已安装预览的90工具共享目录中同名工具有真实调用，结果映射在对应API目录行。仍缺：该源码行属于保留的18工具fallback目录；未以sharedApi=false实测，不计重复通过。",
-          "note": "Real execution and read-back required."
+          "note": "Status describes the explicitly recorded cases. Other guards and complete cross-surface baselines remain independently required."
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-10T08:10:53.224Z",
+        "evidenceMappedAt": "2026-09-10T09:23:05.872Z",
         "surfaceProgress": {
           "local_mcp": {
             "completed": [
@@ -48426,7 +48443,9 @@
               "runs/desktop-mcp-core-2026-09-08T17-52-57-495Z.json#checks[8]",
               "redaction-corrections/desktop-mcp-core-2026-09-08T17-52-57-495Z.json#checks[8]",
               "runs/desktop-mcp-core-2026-09-08T17-52-57-495Z.json#checks[12]",
-              "redaction-corrections/desktop-mcp-core-2026-09-08T17-52-57-495Z.json#checks[12]"
+              "redaction-corrections/desktop-mcp-core-2026-09-08T17-52-57-495Z.json#checks[12]",
+              "runs/desktop-mcp-core-2026-09-10T08-41-32-807Z.json#checks[8]",
+              "runs/desktop-mcp-core-2026-09-10T08-41-32-807Z.json#checks[12]"
             ],
             "status": "partial"
           }
@@ -48685,14 +48704,15 @@
             "runs/desktop-mcp-core-2026-09-08T17-18-02-431Z.json#checks[5]",
             "redaction-corrections/desktop-mcp-core-2026-09-08T17-18-02-431Z.json#checks[5]",
             "runs/desktop-mcp-core-2026-09-08T17-52-57-495Z.json#checks[5]",
-            "redaction-corrections/desktop-mcp-core-2026-09-08T17-52-57-495Z.json#checks[5]"
+            "redaction-corrections/desktop-mcp-core-2026-09-08T17-52-57-495Z.json#checks[5]",
+            "runs/desktop-mcp-core-2026-09-10T08-41-32-807Z.json#checks[5]"
           ],
           "actual": "已实测：已安装预览的90工具共享目录中同名工具有真实调用，结果映射在对应API目录行。仍缺：该源码行属于保留的18工具fallback目录；未以sharedApi=false实测，不计重复通过。",
-          "note": "Real execution and read-back required."
+          "note": "Status describes the explicitly recorded cases. Other guards and complete cross-surface baselines remain independently required."
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-10T08:10:53.224Z",
+        "evidenceMappedAt": "2026-09-10T09:23:05.872Z",
         "surfaceProgress": {
           "local_mcp": {
             "completed": [
@@ -48705,7 +48725,8 @@
               "runs/desktop-mcp-core-2026-09-08T17-18-02-431Z.json#checks[5]",
               "redaction-corrections/desktop-mcp-core-2026-09-08T17-18-02-431Z.json#checks[5]",
               "runs/desktop-mcp-core-2026-09-08T17-52-57-495Z.json#checks[5]",
-              "redaction-corrections/desktop-mcp-core-2026-09-08T17-52-57-495Z.json#checks[5]"
+              "redaction-corrections/desktop-mcp-core-2026-09-08T17-52-57-495Z.json#checks[5]",
+              "runs/desktop-mcp-core-2026-09-10T08-41-32-807Z.json#checks[5]"
             ],
             "status": "partial"
           }
@@ -50572,7 +50593,7 @@
             }
           }
         ],
-        "evidenceMappedAt": "2026-09-10T08:10:53.305Z",
+        "evidenceMappedAt": "2026-09-10T09:23:05.969Z",
         "sourceEvidenceReview": {
           "nodeId": "desktop_ipc_action-69b5a7dec2121d",
           "sourceFile": "apps/desktop/src/main.ts",
@@ -52032,7 +52053,7 @@
             }
           }
         ],
-        "evidenceMappedAt": "2026-09-10T08:10:53.374Z",
+        "evidenceMappedAt": "2026-09-10T09:23:06.043Z",
         "recentEvidenceObservations": [
           {
             "id": "exe-native-upgrade-7-to-8",
@@ -52316,7 +52337,7 @@
             }
           }
         ],
-        "evidenceMappedAt": "2026-09-10T08:10:53.374Z",
+        "evidenceMappedAt": "2026-09-10T09:23:06.043Z",
         "recentEvidenceObservations": [
           {
             "id": "exe-native-upgrade-7-to-8",
@@ -53101,7 +53122,7 @@
             }
           }
         ],
-        "evidenceMappedAt": "2026-09-10T08:10:53.306Z",
+        "evidenceMappedAt": "2026-09-10T09:23:05.969Z",
         "sourceEvidenceReview": {
           "nodeId": "desktop_event-66adc5b70ef413",
           "sourceFile": "apps/desktop/src/main.ts",
@@ -103933,25 +103954,23 @@
           "applicable": true,
           "status": "not_run",
           "evidence": [
-            "runs/server-mcp-core-2026-09-08T18-22-11-243Z.json",
-            "redaction-corrections/server-mcp-core-2026-09-08T18-22-11-243Z.json"
+            "runs/server-mcp-core-2026-09-10T08-40-47-204Z.json"
           ],
           "actual": "已实测：该实际MCP工具已有调用与项目/人员/状态读回。仍缺：同输入的HTTP/MCP版本、操作人、幂等及错误对等比较尚未完整执行。",
-          "note": "Real execution and read-back required."
+          "note": "Status describes the explicitly recorded cases. Other guards and complete cross-surface baselines remain independently required."
         },
         "local_mcp": {
           "applicable": true,
           "status": "not_run",
           "evidence": [
-            "runs/desktop-mcp-core-2026-09-08T17-52-57-495Z.json",
-            "redaction-corrections/desktop-mcp-core-2026-09-08T17-52-57-495Z.json"
+            "runs/desktop-mcp-core-2026-09-10T08-41-32-807Z.json"
           ],
           "actual": "已实测：该实际MCP工具已有调用与项目/人员/状态读回。仍缺：同输入的HTTP/MCP版本、操作人、幂等及错误对等比较尚未完整执行。",
-          "note": "Real execution and read-back required."
+          "note": "Status describes the explicitly recorded cases. Other guards and complete cross-surface baselines remain independently required."
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T21:54:12.389Z",
+        "evidenceMappedAt": "2026-09-10T08:42:40.283Z",
         "surfaceProgress": {
           "server_mcp": {
             "completed": [
@@ -103961,7 +103980,7 @@
               "同输入的HTTP/MCP版本、操作人、幂等及错误对等比较尚未完整执行"
             ],
             "evidence": [
-              "runs/server-mcp-core-2026-09-08T18-22-11-243Z.json"
+              "runs/server-mcp-core-2026-09-10T08-40-47-204Z.json"
             ],
             "status": "partial"
           },
@@ -103973,7 +103992,7 @@
               "同输入的HTTP/MCP版本、操作人、幂等及错误对等比较尚未完整执行"
             ],
             "evidence": [
-              "runs/desktop-mcp-core-2026-09-08T17-52-57-495Z.json"
+              "runs/desktop-mcp-core-2026-09-10T08-41-32-807Z.json"
             ],
             "status": "partial"
           }
@@ -104111,25 +104130,23 @@
           "applicable": true,
           "status": "not_run",
           "evidence": [
-            "runs/server-mcp-core-2026-09-08T18-22-11-243Z.json",
-            "redaction-corrections/server-mcp-core-2026-09-08T18-22-11-243Z.json"
+            "runs/server-mcp-core-2026-09-10T08-40-47-204Z.json"
           ],
           "actual": "已实测：该实际MCP工具已有调用与项目/人员/状态读回。仍缺：同输入的HTTP/MCP版本、操作人、幂等及错误对等比较尚未完整执行。",
-          "note": "Real execution and read-back required."
+          "note": "Status describes the explicitly recorded cases. Other guards and complete cross-surface baselines remain independently required."
         },
         "local_mcp": {
           "applicable": true,
           "status": "not_run",
           "evidence": [
-            "runs/desktop-mcp-core-2026-09-08T17-52-57-495Z.json",
-            "redaction-corrections/desktop-mcp-core-2026-09-08T17-52-57-495Z.json"
+            "runs/desktop-mcp-core-2026-09-10T08-41-32-807Z.json"
           ],
           "actual": "已实测：该实际MCP工具已有调用与项目/人员/状态读回。仍缺：同输入的HTTP/MCP版本、操作人、幂等及错误对等比较尚未完整执行。",
-          "note": "Real execution and read-back required."
+          "note": "Status describes the explicitly recorded cases. Other guards and complete cross-surface baselines remain independently required."
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T21:54:12.389Z",
+        "evidenceMappedAt": "2026-09-10T08:42:40.283Z",
         "surfaceProgress": {
           "server_mcp": {
             "completed": [
@@ -104139,7 +104156,7 @@
               "同输入的HTTP/MCP版本、操作人、幂等及错误对等比较尚未完整执行"
             ],
             "evidence": [
-              "runs/server-mcp-core-2026-09-08T18-22-11-243Z.json"
+              "runs/server-mcp-core-2026-09-10T08-40-47-204Z.json"
             ],
             "status": "partial"
           },
@@ -104151,7 +104168,7 @@
               "同输入的HTTP/MCP版本、操作人、幂等及错误对等比较尚未完整执行"
             ],
             "evidence": [
-              "runs/desktop-mcp-core-2026-09-08T17-52-57-495Z.json"
+              "runs/desktop-mcp-core-2026-09-10T08-41-32-807Z.json"
             ],
             "status": "partial"
           }
@@ -104217,25 +104234,23 @@
           "applicable": true,
           "status": "not_run",
           "evidence": [
-            "runs/server-mcp-core-2026-09-08T18-22-11-243Z.json",
-            "redaction-corrections/server-mcp-core-2026-09-08T18-22-11-243Z.json"
+            "runs/server-mcp-core-2026-09-10T08-40-47-204Z.json"
           ],
           "actual": "已实测：该实际MCP工具已有调用与项目/人员/状态读回。仍缺：同输入的HTTP/MCP版本、操作人、幂等及错误对等比较尚未完整执行。",
-          "note": "Real execution and read-back required."
+          "note": "Status describes the explicitly recorded cases. Other guards and complete cross-surface baselines remain independently required."
         },
         "local_mcp": {
           "applicable": true,
           "status": "not_run",
           "evidence": [
-            "runs/desktop-mcp-core-2026-09-08T17-52-57-495Z.json",
-            "redaction-corrections/desktop-mcp-core-2026-09-08T17-52-57-495Z.json"
+            "runs/desktop-mcp-core-2026-09-10T08-41-32-807Z.json"
           ],
           "actual": "已实测：该实际MCP工具已有调用与项目/人员/状态读回。仍缺：同输入的HTTP/MCP版本、操作人、幂等及错误对等比较尚未完整执行。",
-          "note": "Real execution and read-back required."
+          "note": "Status describes the explicitly recorded cases. Other guards and complete cross-surface baselines remain independently required."
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T21:54:12.389Z",
+        "evidenceMappedAt": "2026-09-10T08:42:40.283Z",
         "surfaceProgress": {
           "server_mcp": {
             "completed": [
@@ -104245,7 +104260,7 @@
               "同输入的HTTP/MCP版本、操作人、幂等及错误对等比较尚未完整执行"
             ],
             "evidence": [
-              "runs/server-mcp-core-2026-09-08T18-22-11-243Z.json"
+              "runs/server-mcp-core-2026-09-10T08-40-47-204Z.json"
             ],
             "status": "partial"
           },
@@ -104257,7 +104272,7 @@
               "同输入的HTTP/MCP版本、操作人、幂等及错误对等比较尚未完整执行"
             ],
             "evidence": [
-              "runs/desktop-mcp-core-2026-09-08T17-52-57-495Z.json"
+              "runs/desktop-mcp-core-2026-09-10T08-41-32-807Z.json"
             ],
             "status": "partial"
           }
@@ -104539,25 +104554,23 @@
           "applicable": true,
           "status": "not_run",
           "evidence": [
-            "runs/server-mcp-core-2026-09-08T18-22-11-243Z.json",
-            "redaction-corrections/server-mcp-core-2026-09-08T18-22-11-243Z.json"
+            "runs/server-mcp-core-2026-09-10T08-40-47-204Z.json"
           ],
           "actual": "已实测：该实际MCP工具已有调用与项目/人员/状态读回。仍缺：同输入的HTTP/MCP版本、操作人、幂等及错误对等比较尚未完整执行。",
-          "note": "Real execution and read-back required."
+          "note": "Status describes the explicitly recorded cases. Other guards and complete cross-surface baselines remain independently required."
         },
         "local_mcp": {
           "applicable": true,
           "status": "not_run",
           "evidence": [
-            "runs/desktop-mcp-core-2026-09-08T17-52-57-495Z.json",
-            "redaction-corrections/desktop-mcp-core-2026-09-08T17-52-57-495Z.json"
+            "runs/desktop-mcp-core-2026-09-10T08-41-32-807Z.json"
           ],
           "actual": "已实测：该实际MCP工具已有调用与项目/人员/状态读回。仍缺：同输入的HTTP/MCP版本、操作人、幂等及错误对等比较尚未完整执行。",
-          "note": "Real execution and read-back required."
+          "note": "Status describes the explicitly recorded cases. Other guards and complete cross-surface baselines remain independently required."
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T21:54:12.389Z",
+        "evidenceMappedAt": "2026-09-10T08:42:40.283Z",
         "surfaceProgress": {
           "server_mcp": {
             "completed": [
@@ -104567,7 +104580,7 @@
               "同输入的HTTP/MCP版本、操作人、幂等及错误对等比较尚未完整执行"
             ],
             "evidence": [
-              "runs/server-mcp-core-2026-09-08T18-22-11-243Z.json"
+              "runs/server-mcp-core-2026-09-10T08-40-47-204Z.json"
             ],
             "status": "partial"
           },
@@ -104579,7 +104592,7 @@
               "同输入的HTTP/MCP版本、操作人、幂等及错误对等比较尚未完整执行"
             ],
             "evidence": [
-              "runs/desktop-mcp-core-2026-09-08T17-52-57-495Z.json"
+              "runs/desktop-mcp-core-2026-09-10T08-41-32-807Z.json"
             ],
             "status": "partial"
           }
@@ -104645,25 +104658,23 @@
           "applicable": true,
           "status": "not_run",
           "evidence": [
-            "runs/server-mcp-core-2026-09-08T18-22-11-243Z.json",
-            "redaction-corrections/server-mcp-core-2026-09-08T18-22-11-243Z.json"
+            "runs/server-mcp-core-2026-09-10T08-40-47-204Z.json"
           ],
           "actual": "已实测：该实际MCP工具已有调用与项目/人员/状态读回。仍缺：同输入的HTTP/MCP版本、操作人、幂等及错误对等比较尚未完整执行。",
-          "note": "Real execution and read-back required."
+          "note": "Status describes the explicitly recorded cases. Other guards and complete cross-surface baselines remain independently required."
         },
         "local_mcp": {
           "applicable": true,
           "status": "not_run",
           "evidence": [
-            "runs/desktop-mcp-core-2026-09-08T17-52-57-495Z.json",
-            "redaction-corrections/desktop-mcp-core-2026-09-08T17-52-57-495Z.json"
+            "runs/desktop-mcp-core-2026-09-10T08-41-32-807Z.json"
           ],
           "actual": "已实测：该实际MCP工具已有调用与项目/人员/状态读回。仍缺：同输入的HTTP/MCP版本、操作人、幂等及错误对等比较尚未完整执行。",
-          "note": "Real execution and read-back required."
+          "note": "Status describes the explicitly recorded cases. Other guards and complete cross-surface baselines remain independently required."
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T21:54:12.389Z",
+        "evidenceMappedAt": "2026-09-10T08:42:40.283Z",
         "surfaceProgress": {
           "server_mcp": {
             "completed": [
@@ -104673,7 +104684,7 @@
               "同输入的HTTP/MCP版本、操作人、幂等及错误对等比较尚未完整执行"
             ],
             "evidence": [
-              "runs/server-mcp-core-2026-09-08T18-22-11-243Z.json"
+              "runs/server-mcp-core-2026-09-10T08-40-47-204Z.json"
             ],
             "status": "partial"
           },
@@ -104685,7 +104696,7 @@
               "同输入的HTTP/MCP版本、操作人、幂等及错误对等比较尚未完整执行"
             ],
             "evidence": [
-              "runs/desktop-mcp-core-2026-09-08T17-52-57-495Z.json"
+              "runs/desktop-mcp-core-2026-09-10T08-41-32-807Z.json"
             ],
             "status": "partial"
           }

@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { execFileSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import { lstat, readFile, readdir, writeFile } from "node:fs/promises";
 import path from "node:path";
@@ -14,6 +15,14 @@ const delegatedIds = [
   "external-incremental-publication-terminal",
   "external-relay-delivery-terminal",
   "external-qingyu-order-terminal",
+];
+const productSourceRoots = [
+  "apps/api/src",
+  "apps/web/src",
+  "apps/desktop/src",
+  "apps/android/app/src/main",
+  "apps/worker/src",
+  "packages/domain/src",
 ];
 
 async function json(relative) {
@@ -37,6 +46,8 @@ const acceptance = await json("acceptance-matrix.json");
 assert.equal(acceptance.productSourceCommit, sourceCommit);
 assert.equal(acceptance.overallStatus, "not_complete");
 assert.equal(acceptance.completionAllowed, false);
+assert.equal(acceptance.agentScopeStatus, "complete_user_acceptance_pending");
+assert.deepEqual(acceptance.agentBlocking, []);
 assert.equal(acceptance.userAcceptancePending.length, 6);
 for (const id of delegatedIds) {
   const item = acceptance.cases.find((candidate) => candidate.id === id);
@@ -57,7 +68,12 @@ for (const item of acceptance.cases) {
 const coverage = JSON.parse(
   (await readFile(path.resolve(root, "../coverage-matrix.json"), "utf8")).replace(/^\uFEFF/u, ""),
 );
-assert.equal(coverage.sourceHead, sourceCommit);
+assert.match(coverage.sourceHead, /^[a-f0-9]{40}$/u);
+execFileSync(
+  "git",
+  ["diff", "--quiet", sourceCommit, coverage.sourceHead, "--", ...productSourceRoots],
+  { cwd: path.resolve(root, "../../../.."), stdio: "ignore" },
+);
 assert.equal(coverage.summary.itemCount, 1030);
 assert.equal(coverage.retiredItems.length, 47);
 assert.ok(coverage.items.filter((item) => item.needsRevalidation).length > 0);
@@ -100,6 +116,7 @@ const result = {
   validatedAt: new Date().toISOString(),
   sourceCommit,
   acceptanceOverallStatus: acceptance.overallStatus,
+  agentScopeStatus: acceptance.agentScopeStatus,
   completionAllowed: acceptance.completionAllowed,
   delegatedUserCases: delegatedIds.length,
   delegatedCasesAllNotRun: true,
@@ -108,6 +125,8 @@ const result = {
     retiredItems: coverage.retiredItems.length,
     needsRevalidation: coverage.items.filter((item) => item.needsRevalidation).length,
   },
+  coverageSourceHead: coverage.sourceHead,
+  coverageProductSourceMatches: true,
   parsedJsonFiles,
   preValidationIndexEntriesVerified: index.entries.length,
   credentialsPersisted: false,

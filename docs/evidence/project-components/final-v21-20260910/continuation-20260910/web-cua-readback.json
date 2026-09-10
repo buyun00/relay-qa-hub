@@ -1,0 +1,466 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-09-10T08:52:46.302Z",
+  "passed": true,
+  "instance": {
+    "instanceId": "qa-hub-preview-v21-e2e-fresh-0910",
+    "apiOrigin": "http://127.0.0.1:4639",
+    "webOrigin": "http://127.0.0.1:4640",
+    "loopbackOnly": true
+  },
+  "source": {
+    "head": "7b14dce3c981e56d5841ce38ea9025606fa44d0c",
+    "productSourceCommit": "88a6d0f9c31106f6cd3fc9edbadca0db6bf6397b",
+    "productSourceDirty": false
+  },
+  "browserObservation": {
+    "driver": "Codex in-app browser",
+    "projectId": "10000000-0000-4000-8000-000000000004",
+    "actorName": "LunaV21E2E_0910_1038",
+    "actions": [
+      "resolved the OZDQP project entry and completed simple-name login",
+      "opened the real new-Bug dialog and submitted the unique marker",
+      "assigned the Bug through the detail dialog",
+      "edited the title and observed the success notification",
+      "expanded the event history and submitted the unique comment marker"
+    ],
+    "visibleReceipts": [
+      "Bug 已创建并同步到统一后端",
+      "分配已更新",
+      "LOCAL-4 的 Bug 详情已更新",
+      "处理记录已添加"
+    ]
+  },
+  "readback": {
+    "projectCount": 1,
+    "bug": {
+      "id": "262ae69e-f328-4254-8193-96e20e885fc9",
+      "key": "LOCAL-4",
+      "projectId": "10000000-0000-4000-8000-000000000004",
+      "title": "V21_CUA_CURRENT_SOURCE_0910 Web 创建与编辑回读通过",
+      "state": "reported",
+      "version": 3
+    },
+    "matchingCommentCount": 1,
+    "eventTypes": [
+      "occurrence.appended",
+      "bug.updated",
+      "bug.updated",
+      "comment.created"
+    ],
+    "componentCount": 5
+  },
+  "credentialsPersisted": false,
+  "ledger": [
+    {
+      "label": "same-name API readback login",
+      "method": "POST",
+      "path": "/api/v1/auth/login",
+      "projectId": null,
+      "expectedStatus": 200,
+      "status": 200,
+      "passed": true,
+      "response": {
+        "accountId": "10000000-0000-4000-8000-000000000020",
+        "userId": "8e082dee-8151-4b5b-8b98-47fa10c626b9",
+        "email": "qa-41c587c04b3338694d9d8336ee88036b957e30f1614a7132b4cd23adb0dce123@local.invalid",
+        "displayName": "LunaV21E2E_0910_1038",
+        "projectId": "10000000-0000-4000-8000-000000000004",
+        "isGm": false,
+        "expiresAt": "2094-09-28T12:06:53.137Z"
+      }
+    },
+    {
+      "label": "project directory readback",
+      "method": "GET",
+      "path": "/api/v1/projects",
+      "projectId": "10000000-0000-4000-8000-000000000004",
+      "expectedStatus": 200,
+      "status": 200,
+      "passed": true,
+      "response": {
+        "snapshotSequence": 1789030366145,
+        "items": [
+          {
+            "id": "10000000-0000-4000-8000-000000000004",
+            "key": "LOCAL",
+            "name": "OZDQP",
+            "active": true,
+            "roles": [
+              "developer",
+              "project_admin",
+              "release_manager",
+              "reporter",
+              "triager",
+              "verifier",
+              "viewer"
+            ]
+          }
+        ],
+        "nextCursor": null
+      }
+    },
+    {
+      "label": "UI-created Bug list readback",
+      "method": "GET",
+      "path": "/api/v1/bugs?projectId=10000000-0000-4000-8000-000000000004&limit=100",
+      "projectId": "10000000-0000-4000-8000-000000000004",
+      "expectedStatus": 200,
+      "status": 200,
+      "passed": true,
+      "response": {
+        "snapshotSequence": 85,
+        "items": [
+          {
+            "id": "262ae69e-f328-4254-8193-96e20e885fc9",
+            "projectId": "10000000-0000-4000-8000-000000000004",
+            "number": 4,
+            "key": "LOCAL-4",
+            "title": "V21_CUA_CURRENT_SOURCE_0910 Web 创建与编辑回读通过",
+            "description": "V21_CUA_CURRENT_SOURCE_0910 验证 Web 实际创建、项目归属与 API 回读",
+            "expectedBehavior": "问题修复后不再复现",
+            "moduleId": null,
+            "state": "reported",
+            "severity": "S2",
+            "priority": "P2",
+            "reporterId": "8e082dee-8151-4b5b-8b98-47fa10c626b9",
+            "ownerId": "edb087bf-92ef-4511-8158-c8e026dc5a7b",
+            "verificationOwnerId": "8e082dee-8151-4b5b-8b98-47fa10c626b9",
+            "duplicateOfBugId": null,
+            "occurrenceCount": 1,
+            "reopenCount": 0,
+            "version": 3,
+            "createdAt": "2026-09-10T08:45:50.458Z",
+            "updatedAt": "2026-09-10T08:46:53.854Z",
+            "closedAt": null
+          },
+          {
+            "id": "cce212ef-bd16-480f-b6be-b241a01c32fd",
+            "projectId": "10000000-0000-4000-8000-000000000004",
+            "number": 3,
+            "key": "LOCAL-3",
+            "title": "服务端MCP真实人工闭环",
+            "description": "不依赖新版EXE进程的真实MCP验收",
+            "expectedBehavior": "完整人工作业",
+            "moduleId": null,
+            "state": "closed",
+            "severity": "S3",
+            "priority": "P3",
+            "reporterId": "e424e9ba-0127-4ecb-8ba1-973b5071bf77",
+            "ownerId": null,
+            "verificationOwnerId": null,
+            "duplicateOfBugId": null,
+            "occurrenceCount": 1,
+            "reopenCount": 0,
+            "version": 6,
+            "createdAt": "2026-09-10T08:40:47.355Z",
+            "updatedAt": "2026-09-10T08:40:47.515Z",
+            "closedAt": "2026-09-10T08:40:47.515Z"
+          },
+          {
+            "id": "c5b37b84-85f5-416a-8d5c-6605d135de03",
+            "projectId": "10000000-0000-4000-8000-000000000004",
+            "number": 2,
+            "key": "LOCAL-2",
+            "title": "V21_OFFLINE_TEXT_ONV21_OFFLINE_TEXT_RETRY4LY_0910",
+            "description": "V21_OFFLINE_TEXT_ONV21_OFFLINE_TEXT_RETRY4LY_0910",
+            "expectedBehavior": "按测试步骤可稳定复现并符合项目预期行为。",
+            "moduleId": null,
+            "state": "closed",
+            "severity": "S3",
+            "priority": "P3",
+            "reporterId": "8e082dee-8151-4b5b-8b98-47fa10c626b9",
+            "ownerId": null,
+            "verificationOwnerId": "8e082dee-8151-4b5b-8b98-47fa10c626b9",
+            "duplicateOfBugId": null,
+            "occurrenceCount": 1,
+            "reopenCount": 0,
+            "version": 6,
+            "createdAt": "2026-09-10T03:36:30.135Z",
+            "updatedAt": "2026-09-10T04:18:17.031Z",
+            "closedAt": "2026-09-10T04:18:17.031Z"
+          },
+          {
+            "id": "15cc6704-4660-4b5c-8059-1c26d90afca0",
+            "projectId": "10000000-0000-4000-8000-000000000004",
+            "number": 1,
+            "key": "LOCAL-1",
+            "title": "V21_E2E_BUG_unique_offline_retry_0910_edited",
+            "description": "V21_E2E_BUG_unique_offline_retry_0910",
+            "expectedBehavior": "按测试步骤可稳定复现并符合项目预期行为。",
+            "moduleId": null,
+            "state": "reported",
+            "severity": "S3",
+            "priority": "P3",
+            "reporterId": "8e082dee-8151-4b5b-8b98-47fa10c626b9",
+            "ownerId": null,
+            "verificationOwnerId": "8e082dee-8151-4b5b-8b98-47fa10c626b9",
+            "duplicateOfBugId": null,
+            "occurrenceCount": 1,
+            "reopenCount": 0,
+            "version": 2,
+            "createdAt": "2026-09-10T02:37:59.267Z",
+            "updatedAt": "2026-09-10T03:02:59.532Z",
+            "closedAt": null
+          }
+        ],
+        "nextCursor": null
+      }
+    },
+    {
+      "label": "UI-edited Bug detail readback",
+      "method": "GET",
+      "path": "/api/v1/bugs/262ae69e-f328-4254-8193-96e20e885fc9",
+      "projectId": "10000000-0000-4000-8000-000000000004",
+      "expectedStatus": 200,
+      "status": 200,
+      "passed": true,
+      "response": {
+        "id": "262ae69e-f328-4254-8193-96e20e885fc9",
+        "projectId": "10000000-0000-4000-8000-000000000004",
+        "number": 4,
+        "key": "LOCAL-4",
+        "title": "V21_CUA_CURRENT_SOURCE_0910 Web 创建与编辑回读通过",
+        "description": "V21_CUA_CURRENT_SOURCE_0910 验证 Web 实际创建、项目归属与 API 回读",
+        "expectedBehavior": "问题修复后不再复现",
+        "moduleId": null,
+        "state": "reported",
+        "severity": "S2",
+        "priority": "P2",
+        "reporterId": "8e082dee-8151-4b5b-8b98-47fa10c626b9",
+        "ownerId": "edb087bf-92ef-4511-8158-c8e026dc5a7b",
+        "verificationOwnerId": "8e082dee-8151-4b5b-8b98-47fa10c626b9",
+        "duplicateOfBugId": null,
+        "occurrenceCount": 1,
+        "reopenCount": 0,
+        "version": 3,
+        "createdAt": "2026-09-10T08:45:50.458Z",
+        "updatedAt": "2026-09-10T08:46:53.854Z",
+        "closedAt": null
+      }
+    },
+    {
+      "label": "UI-created comment readback",
+      "method": "GET",
+      "path": "/api/v1/bugs/262ae69e-f328-4254-8193-96e20e885fc9/comments",
+      "projectId": "10000000-0000-4000-8000-000000000004",
+      "expectedStatus": 200,
+      "status": 200,
+      "passed": true,
+      "response": {
+        "bugId": "262ae69e-f328-4254-8193-96e20e885fc9",
+        "projectId": "10000000-0000-4000-8000-000000000004",
+        "snapshotSequence": 85,
+        "items": [
+          {
+            "id": "28a13c32-288a-4e1e-a32d-439fe2693446",
+            "bugId": "262ae69e-f328-4254-8193-96e20e885fc9",
+            "projectId": "10000000-0000-4000-8000-000000000004",
+            "authorId": "8e082dee-8151-4b5b-8b98-47fa10c626b9",
+            "body": "V21_CUA_CURRENT_SOURCE_0910_COMMENT 实际 UI 评论与后端读回",
+            "attachmentIds": [],
+            "createdAt": "2026-09-10T08:47:33.207Z",
+            "version": 1
+          }
+        ],
+        "nextCursor": null
+      }
+    },
+    {
+      "label": "UI event history readback",
+      "method": "GET",
+      "path": "/api/v1/bugs/262ae69e-f328-4254-8193-96e20e885fc9/events",
+      "projectId": "10000000-0000-4000-8000-000000000004",
+      "expectedStatus": 200,
+      "status": 200,
+      "passed": true,
+      "response": {
+        "projectId": "10000000-0000-4000-8000-000000000004",
+        "bugId": "262ae69e-f328-4254-8193-96e20e885fc9",
+        "snapshotSequence": 4,
+        "items": [
+          {
+            "projectionVersion": "1.1.0",
+            "redactionPolicyVersion": "1.0.0",
+            "id": "9e7b2aed-171a-4d79-b262-868dea9fc6a1",
+            "type": "occurrence.appended",
+            "source": "qa_hub",
+            "projectId": "10000000-0000-4000-8000-000000000004",
+            "bugId": "262ae69e-f328-4254-8193-96e20e885fc9",
+            "aggregate": {
+              "type": "bug",
+              "id": "262ae69e-f328-4254-8193-96e20e885fc9",
+              "version": 1
+            },
+            "sequence": 1,
+            "actor": {
+              "type": "user",
+              "id": "8e082dee-8151-4b5b-8b98-47fa10c626b9"
+            },
+            "correlationId": "7d5f0755-5dc3-4dde-bb46-3e4126ea0f45",
+            "causationId": null,
+            "occurredAt": "2026-09-10T08:45:50.458Z",
+            "fromState": null,
+            "toState": null,
+            "payload": {
+              "occurrenceId": "147f0a85-d1a1-4433-8c6f-8a05551c1e4f",
+              "fromVersion": 1,
+              "toVersion": 2
+            }
+          },
+          {
+            "projectionVersion": "1.1.0",
+            "redactionPolicyVersion": "1.0.0",
+            "id": "429afe32-9461-4c7c-9b97-24fe791c2746",
+            "type": "bug.updated",
+            "source": "qa_hub",
+            "projectId": "10000000-0000-4000-8000-000000000004",
+            "bugId": "262ae69e-f328-4254-8193-96e20e885fc9",
+            "aggregate": {
+              "type": "bug",
+              "id": "262ae69e-f328-4254-8193-96e20e885fc9",
+              "version": 2
+            },
+            "sequence": 2,
+            "actor": {
+              "type": "user",
+              "id": "8e082dee-8151-4b5b-8b98-47fa10c626b9"
+            },
+            "correlationId": "9258f5f6-962a-445d-981e-e3a4cf1125dd",
+            "causationId": null,
+            "occurredAt": "2026-09-10T08:46:32.390Z",
+            "fromState": null,
+            "toState": null,
+            "payload": {
+              "summary": "Bug fields updated; changedFields=owner_id,verification_owner_id; ownerId=edb087bf-92ef-4511-8158-c8e026dc5a7b; attachmentsAdded=0; attachmentsRemoved=0",
+              "fromVersion": 1,
+              "toVersion": 2
+            }
+          },
+          {
+            "projectionVersion": "1.1.0",
+            "redactionPolicyVersion": "1.0.0",
+            "id": "9c8580b8-2ecf-4dbd-82c8-424f7b2d7e2d",
+            "type": "bug.updated",
+            "source": "qa_hub",
+            "projectId": "10000000-0000-4000-8000-000000000004",
+            "bugId": "262ae69e-f328-4254-8193-96e20e885fc9",
+            "aggregate": {
+              "type": "bug",
+              "id": "262ae69e-f328-4254-8193-96e20e885fc9",
+              "version": 3
+            },
+            "sequence": 3,
+            "actor": {
+              "type": "user",
+              "id": "8e082dee-8151-4b5b-8b98-47fa10c626b9"
+            },
+            "correlationId": "cc0125f5-036c-492d-aef9-808d4cbf9f35",
+            "causationId": null,
+            "occurredAt": "2026-09-10T08:46:53.854Z",
+            "fromState": null,
+            "toState": null,
+            "payload": {
+              "summary": "Bug fields updated; changedFields=title; ownerId=edb087bf-92ef-4511-8158-c8e026dc5a7b; attachmentsAdded=0; attachmentsRemoved=0",
+              "fromVersion": 2,
+              "toVersion": 3
+            }
+          },
+          {
+            "projectionVersion": "1.1.0",
+            "redactionPolicyVersion": "1.0.0",
+            "id": "1555763d-fe0a-49e9-b909-6bda27aa4c7f",
+            "type": "comment.created",
+            "source": "qa_hub",
+            "projectId": "10000000-0000-4000-8000-000000000004",
+            "bugId": "262ae69e-f328-4254-8193-96e20e885fc9",
+            "aggregate": {
+              "type": "bug",
+              "id": "262ae69e-f328-4254-8193-96e20e885fc9",
+              "version": 1
+            },
+            "sequence": 4,
+            "actor": {
+              "type": "user",
+              "id": "8e082dee-8151-4b5b-8b98-47fa10c626b9"
+            },
+            "correlationId": "054df2fd-d55d-423f-97d1-1104d82a97fa",
+            "causationId": null,
+            "occurredAt": "2026-09-10T08:47:33.207Z",
+            "fromState": null,
+            "toState": null,
+            "payload": {
+              "commentId": "28a13c32-288a-4e1e-a32d-439fe2693446"
+            }
+          }
+        ],
+        "nextCursor": null
+      }
+    },
+    {
+      "label": "project component scope readback",
+      "method": "GET",
+      "path": "/api/v1/projects/10000000-0000-4000-8000-000000000004/components",
+      "projectId": "10000000-0000-4000-8000-000000000004",
+      "expectedStatus": 200,
+      "status": 200,
+      "passed": true,
+      "response": {
+        "projectId": "10000000-0000-4000-8000-000000000004",
+        "items": [
+          {
+            "key": "build",
+            "displayName": "打包",
+            "enabled": false,
+            "status": "disabled",
+            "version": 0,
+            "config": {},
+            "updatedBy": null,
+            "updatedAt": null
+          },
+          {
+            "key": "build_upload.single",
+            "displayName": "单次打包上传",
+            "enabled": false,
+            "status": "disabled",
+            "version": 0,
+            "config": {},
+            "updatedBy": null,
+            "updatedAt": null
+          },
+          {
+            "key": "upload.incremental",
+            "displayName": "增量上传",
+            "enabled": false,
+            "status": "disabled",
+            "version": 0,
+            "config": {},
+            "updatedBy": null,
+            "updatedAt": null
+          },
+          {
+            "key": "relay.production",
+            "displayName": "Relay AI 制作",
+            "enabled": false,
+            "status": "disabled",
+            "version": 0,
+            "config": {},
+            "updatedBy": null,
+            "updatedAt": null
+          },
+          {
+            "key": "qingyu.sync",
+            "displayName": "第三方订单同步",
+            "enabled": false,
+            "status": "disabled",
+            "version": 0,
+            "config": {},
+            "updatedBy": null,
+            "updatedAt": null
+          }
+        ]
+      }
+    }
+  ],
+  "sha256WithoutSelf": "53d2aafcd282221bfcdb021eca31f409e7d3a883c6bfc0eee1831f1a0e1b6b80"
+}

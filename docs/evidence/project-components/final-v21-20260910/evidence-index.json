@@ -1,21 +1,21 @@
 {
   "schemaVersion": 1,
-  "recordedAt": "2026-09-10T08:29:32.466Z",
+  "recordedAt": "2026-09-10T09:25:31.984Z",
   "root": "docs/evidence/project-components/final-v21-20260910",
   "sourceCommit": "88a6d0f9c31106f6cd3fc9edbadca0db6bf6397b",
-  "files": 254,
-  "totalBytes": 46049553,
-  "aggregateSha256": "f3bc40a14402c69131e84aafd2cbaf69ba7c48c41b682a153b0789600dcad324",
+  "files": 258,
+  "totalBytes": 46089633,
+  "aggregateSha256": "f81b338f0af64cbd2a917717f7550700af19d547626c62867b01328cd65b9c11",
   "entries": [
     {
       "path": "acceptance-matrix.json",
-      "bytes": 16749,
-      "sha256": "a382dac0ad0049f13f1bc0c757b93e702329b41a5b821fdb15b5f29e0885a767"
+      "bytes": 18559,
+      "sha256": "8148deb1d9c8286b05f12248f2576088826b0c1a64ef88c8199a8e89eac6088c"
     },
     {
       "path": "acceptance-matrix.md",
-      "bytes": 11123,
-      "sha256": "3afaeb66289588bbcd44d5221a47d0548fc8b54b21b0fb0751f0c2d7de524246"
+      "bytes": 12326,
+      "sha256": "82e2b5e8d2173c9624a0f10859cf02025c907c994434d0b6f8a15ae03deef1f3"
     },
     {
       "path": "android/acceptance/android-code27-self-update/aapt-code27-corrected.log",
@@ -1023,6 +1023,26 @@
       "sha256": "850a519aabbd59b574118cb54382b8eab4390a8ab9b4e35fa004a1ee6f602b46"
     },
     {
+      "path": "continuation-20260910/artifact-source-equivalence.json",
+      "bytes": 1425,
+      "sha256": "498313b382f7f0b6a7639d86fcc49182a73405a0a9dcfaa05cd88c2dffc8e234"
+    },
+    {
+      "path": "continuation-20260910/verify-artifact-source-equivalence.mjs",
+      "bytes": 2441,
+      "sha256": "4c80f5e9c6181a360518fad5a255fb2115cd290d20eeceac75bf5b88b900deb0"
+    },
+    {
+      "path": "continuation-20260910/web-cua-readback.json",
+      "bytes": 16626,
+      "sha256": "b586355ef908abf5f36e4a15328ec1bf3ba33130d775aad003ce394129fbe68f"
+    },
+    {
+      "path": "continuation-20260910/web-cua-readback.mjs",
+      "bytes": 7458,
+      "sha256": "efb9bd4cbaaa3a8ad2b2029451a9a46a039113e4223190be29764e79f26a586a"
+    },
+    {
       "path": "external/audit.json",
       "bytes": 2333,
       "sha256": "02a90bbc9e4feba11c5b8457a583c368054c3f6b014924286263292b8a40b346"
@@ -1034,8 +1054,8 @@
     },
     {
       "path": "final-validation.json",
-      "bytes": 493,
-      "sha256": "cc48b0085bee33dcc7fe38b0a5059daba6e622a10061fab455e18ab838a4cc3e"
+      "bytes": 659,
+      "sha256": "afdad419e6faa4f43993e8b5270f872efa25f5cf1706c0b174761697b7654465"
     },
     {
       "path": "generate-evidence-index.mjs",
@@ -1085,7 +1105,7 @@
     {
       "path": "secret-scan.json",
       "bytes": 404,
-      "sha256": "f7605096a0608d6ef8aae58075c81f71c9ac5cfb49f35c45788b0ee96ce624d4"
+      "sha256": "a7475e861c250533520021fb95f2546c97e74e189d973daa88e9cd9eb227f2a5"
     },
     {
       "path": "source-gate/02-project-components-tests.result.json",
@@ -1174,8 +1194,8 @@
     },
     {
       "path": "update-acceptance-matrix.mjs",
-      "bytes": 8160,
-      "sha256": "753dd98508c48165ed0f7d930cc1da9df20605d4509ead34396f6e4cb7c01299"
+      "bytes": 16455,
+      "sha256": "625981ab99d463e9c5550775ffce3374513e14d74813d0aeabb529b2da094f1b"
     },
     {
       "path": "user-self-test-handoff.md",
@@ -1184,8 +1204,8 @@
     },
     {
       "path": "validate-final-evidence.mjs",
-      "bytes": 4740,
-      "sha256": "410af6dd6daa70c2947e264a640e4a2ff5e6b7e019b4f3194914ff0abacbdd4b"
+      "bytes": 5396,
+      "sha256": "e93cf4c9c48e9871ea287acb0056686bc2c283a08eaa04179fd82e15c9f52cb6"
     },
     {
       "path": "verify-live-http-db-receipt.mjs",
