@@ -1,4 +1,5 @@
 import type { BuildPreset } from "./jenkins-builds.js";
+import { QUICK_BUILD_PRESETS } from "@relay-qa-hub/upload-contract";
 
 export interface JenkinsBuildRecord {
   number: number;
@@ -11,7 +12,7 @@ export interface JenkinsBuildRecord {
   result: string | null;
   actions?: {
     parameters?: { name: string; value?: unknown }[];
-    causes?: { userName?: string }[];
+    causes?: { userName?: string; upstreamProject?: string; upstreamBuild?: number }[];
   }[];
 }
 
@@ -66,6 +67,7 @@ export interface BuildStageProgress {
   alert: boolean;
 }
 export interface BuildProgress {
+  errorCode?: string;
   number: number;
   queueId: number | null;
   preset: BuildPreset | null;
@@ -94,6 +96,8 @@ export interface PackagingProgress {
   queues: { id: number; status: "QUEUED" | "CANCELLED" | "UNKNOWN"; reason: string }[];
 }
 export interface ParsedBuildLog {
+  downstream?: { job: string; number: number };
+  errorCode?: string;
   markers: Partial<Record<StageId, number | null>>;
   mode: BuildProgress["mode"];
   zip: boolean | null;
@@ -116,6 +120,21 @@ export function parseBuildLog(log: string): ParsedBuildLog {
         Number(timed[4])
       : null;
     const line = (timed ? timed[5]! : raw).trim();
+    const downstream =
+      /^Starting building: (01-【OZDQP】【Android】|02-【OZDQP】【iOS】) #(\d{1,10})$/.exec(line);
+    if (downstream) parsed.downstream = { job: downstream[1]!, number: Number(downstream[2]) };
+    if (/^\[JenkinsPlayerPolicy\] ERROR: Invalid Unity project path:/.test(line))
+      parsed.errorCode = "BUILD_PROJECT_PATH_INVALID";
+    if (/^Scheduling project: /u.test(line))
+      parsed.lockWait = { start: elapsed, end: null, acquired: false, blockingBuild: null };
+    if (/^Starting building: /u.test(line)) {
+      if (parsed.lockWait) {
+        parsed.lockWait.acquired = true;
+        parsed.lockWait.end = elapsed;
+      }
+      parsed.markers.unity = elapsed;
+    }
+    if (line === "[Pipeline] { (核对产物并提供下载)") parsed.markers.finalize = elapsed;
     // Actual script output only: an echoed command is not proof it has executed.
     if (/^\[lock\] 等待构建锁(?:\.{3}|…)?$/u.test(line) && !parsed.lockWait)
       parsed.lockWait = { start: elapsed, end: null, acquired: false, blockingBuild: null };
@@ -140,7 +159,8 @@ export function parseBuildLog(log: string): ParsedBuildLog {
         ((Number(gradle[1] ?? 0) * 60 + Number(gradle[2] ?? 0)) * 60 + Number(gradle[3])) * 1000;
     let stage: StageId | undefined;
     if (/^\+ notify_stage ['"].*Unity 导出中/u.test(line)) stage = "unity";
-    else if (/^\+ notify_stage ['"].*开始编译 APK/u.test(line)) stage = "apk";
+    else if (/^\+ notify_stage ['"].*(开始编译 APK|开始编译 IPA|Xcode 编译)/u.test(line))
+      stage = "apk";
     else if (/^\+ notify_stage ['"].*上传热更资源到 CDN/u.test(line)) stage = "publish";
     else if (/^\+ notify_stage ['"].*开始打整包 ZIP/u.test(line)) stage = "zip";
     else if (
@@ -157,6 +177,8 @@ export function buildPreset(build: JenkinsBuildRecord): BuildPreset | null {
   const params = Object.fromEntries(
     (build.actions ?? []).flatMap((a) => a.parameters ?? []).map((p) => [p.name, p.value]),
   );
+  const quick = QUICK_BUILD_PRESETS.find((p) => p.label === params["打包用途"]);
+  if (quick) return quick.id;
   return params["networkScope"] === "外网_保留原参数"
     ? "external"
     : params["networkScope"] === "内网_自动判断"
@@ -262,6 +284,7 @@ export function describeBuild(
     };
   });
   return {
+    ...(parsed.errorCode ? { errorCode: parsed.errorCode } : {}),
     number: build.number,
     queueId: build.queueId ?? null,
     preset: buildPreset(build),

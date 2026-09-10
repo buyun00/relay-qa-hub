@@ -2,8 +2,8 @@ import { createHash, randomUUID } from "node:crypto";
 import { createReadStream, promises as fs } from "node:fs";
 import path from "node:path";
 import { spawn } from "node:child_process";
-import { DEFAULT_UPLOAD_PARAMETERS, UPLOAD_TARGETS } from "./uploader-types.js";
-import { latestIosUploadSource } from "./upload-source.js";
+import { DEFAULT_UPLOAD_PARAMETERS } from "./uploader-types.js";
+import { resolveUploadBuild } from "./upload-source.js";
 import type {
   UploadEvent,
   UploadInput,
@@ -13,7 +13,7 @@ import type {
   UploadSourceIdentity,
 } from "./uploader-types.js";
 
-export const UPLOADER_SHA256 = "2197bf2d6210f49f00e5420bf85ced723afdcc50d3f974f63d0b95c903625871";
+export const UPLOADER_SHA256 = "86c3e80b74b6001b676cadc542eb40ff56ae5f2bddc099462779a95c5f740fbf";
 export const UPLOAD_SOURCE =
   "http://10.100.5.129:8000/pkg_zip/ozdqp/_pkg_cfg_2001_1002.zip?download=true";
 const API_BASE = "https://fq2ivi.ipwana.com";
@@ -307,7 +307,7 @@ export class UploaderHost {
     jobs.sort((a, b) => b.createdAt.localeCompare(a.createdAt));
     return {
       available,
-      toolVersion: "0.4.5",
+      toolVersion: "0.5.0",
       sourceUrl: UPLOAD_SOURCE,
       configured: !!auth,
       authError,
@@ -511,12 +511,15 @@ export class UploaderHost {
     source: UploadSourceIdentity,
     accountIdentity: string,
   ): Promise<string> {
-    if (record(value)["channelId"] === UPLOAD_TARGETS.ios.channelId)
-      throw new Error("BUILD_PLATFORM_UNSUPPORTED");
     if (
       !Number.isSafeInteger(source.size) ||
       source.size <= 0 ||
-      !Number.isFinite(Date.parse(source.lastModified))
+      !Number.isFinite(Date.parse(source.lastModified)) ||
+      (source.url !== undefined &&
+        (!/^http:\/\/10\.100\.5\.129:8000\/ozdqp\/(Android|iOS)\/(Debug|Release)\/\d+\.\d+\.\d+\/[1-9]\d*\/hot-update\/[A-Za-z0-9][A-Za-z0-9._-]+\.zip\?download=true$/.test(
+          source.url,
+        ) ||
+          !/^[a-f0-9]{64}$/.test(source.sha256 ?? "")))
     )
       throw new Error("INVALID_INPUT");
     return this.startJob(value, id, source, accountIdentity);
@@ -528,16 +531,18 @@ export class UploaderHost {
     accountIdentity?: string,
   ): Promise<string> {
     return this.exclusive(async () => {
-      const input = parseNewUploadInput(value);
+      let input = parseNewUploadInput(value);
+      const requestedInput = input;
       const directory = this.folder(id);
       const existing = await readJson(path.join(directory, "job.json"));
       if (existing) {
         if (
           (source && existing["buildChainId"] !== id) ||
-          ((source || input.channelId !== UPLOAD_TARGETS.ios.channelId) &&
+          ((source || !existing["requestedInput"]) &&
             JSON.stringify(existing["expectedSource"]) !== JSON.stringify(source)) ||
           JSON.stringify(
-            parseNewUploadInput({ ...existing, version: existing["version"] ?? "" }),
+            existing["requestedInput"] ??
+              parseNewUploadInput({ ...existing, version: existing["version"] ?? "" }),
           ) !== JSON.stringify(input)
         )
           throw new Error("LOCAL_STATE_INVALID");
@@ -551,9 +556,15 @@ export class UploaderHost {
       await this.verifiedExecutable();
       // Keep an already resolved source if dispatch was interrupted before spawn.
       // Resume and lost acknowledgements must never select a newer iOS ZIP.
-      if (!existing)
+      if (!existing) {
+        const resolved = source
+          ? { downloadUrl: source.url ?? UPLOAD_SOURCE, expectedSource: source }
+          : await resolveUploadBuild(input, this.options.fetch);
+        if ("version" in resolved)
+          input = parseNewUploadInput({ ...input, version: resolved.version });
         await writeJson(path.join(directory, "job.json"), {
           ...input,
+          requestedInput,
           useVersionText: true,
           recordedTestWorkflow: true,
           version: input.version || null,
@@ -564,11 +575,10 @@ export class UploaderHost {
           waitTimeoutSeconds: 1800,
           partSizeBytes: 5242880,
           uploadConcurrency: 8,
-          ...(input.channelId === UPLOAD_TARGETS.ios.channelId
-            ? await latestIosUploadSource(this.options.fetch)
-            : {}),
+          ...resolved,
           ...(source ? { buildChainId: id, expectedSource: source } : {}),
         });
+      }
       return this.launch(id, "run", new Date().toISOString());
     });
   }

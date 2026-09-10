@@ -1,11 +1,27 @@
 import { requestJson } from "./api";
+import { QUICK_BUILD_PRESETS, type QuickBuildPresetId } from "@relay-qa-hub/upload-contract";
 
-export const BUILD_PRESETS = [
-  { id: "internal-nosdk", label: "打不带 SDK 的内网包", packageLabel: "内网 · 不带 SDK" },
-  { id: "internal-sdk", label: "打带 SDK 的内网包", packageLabel: "内网 · 带 SDK" },
-  { id: "external", label: "打外网包", packageLabel: "外网包" },
-] as const;
-export type BuildPreset = (typeof BUILD_PRESETS)[number]["id"];
+export const BUILD_PRESETS = QUICK_BUILD_PRESETS;
+export type BuildPreset = QuickBuildPresetId | "internal-nosdk" | "internal-sdk" | "external";
+export interface BuildArtifactFile {
+  name: string;
+  url: string;
+  size: number;
+  sha256: string;
+  kind: "apk" | "aab" | "ipa" | "zip";
+}
+export interface BuildArtifactResult {
+  version: string;
+  buildNumber: number;
+  platform: "Android" | "iOS";
+  configuration: "Debug" | "Release";
+  productId: string;
+  channelId: string;
+  directory: string;
+  packages: BuildArtifactFile[];
+  hotUpdate: BuildArtifactFile;
+  hotUpdateMode: "full" | "incremental";
+}
 export interface BuildStageProgress {
   id: string;
   label: string;
@@ -22,6 +38,7 @@ export interface BuildStageProgress {
   alert: boolean;
 }
 export interface BuildProgress {
+  errorCode?: string;
   number: number;
   queueId: number | null;
   preset: BuildPreset | null;
@@ -58,6 +75,8 @@ export interface PackageFile {
   preset: BuildPreset | null;
 }
 export interface PackagingStatus {
+  artifacts?: BuildArtifactResult[];
+  artifactError?: string | null;
   checkedAt: string;
   jenkins: {
     buildable: boolean;

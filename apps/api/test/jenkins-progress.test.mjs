@@ -199,7 +199,7 @@ test("untimed running stages use lower-bound observation and initial alarms, nev
 });
 
 test("monitor follows the precise queue executable, handles canceled/expired queues and tolerates log loss", async () => {
-  const jobPath = `/job/${encodeURIComponent("01-【OZDQP】【Android】")}/`;
+  const jobPath = `/job/${encodeURIComponent("00-【OZDQP】【快捷打包】")}/`;
   const json = (body, status = 200) => new Response(JSON.stringify(body), { status });
   const seen = [];
   const service = new JenkinsBuildService(async (value) => {

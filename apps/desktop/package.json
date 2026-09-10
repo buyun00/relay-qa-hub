@@ -1,6 +1,6 @@
 {
   "name": "@relay-qa-hub/desktop",
-  "version": "3.3.8",
+  "version": "3.4.0",
   "private": true,
   "description": "Secure Windows Electron shell for the Relay QA Hub management Web.",
   "license": "UNLICENSED",
@@ -22,12 +22,14 @@
     "package:portable": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/package-windows.ps1",
     "package:win": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/build-installer.ps1"
   },
+  "dependencies": {
+    "@relay-qa-hub/upload-contract": "0.1.0"
+  },
   "devDependencies": {
     "@electron/packager": "18.3.1",
     "@types/node": "24.10.4",
     "electron": "43.4.1",
     "tsx": "4.23.12",
-    "typescript": "6.0.3",
-    "@relay-qa-hub/upload-contract": "0.1.0"
+    "typescript": "6.0.3"
   }
 }

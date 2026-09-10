@@ -4,6 +4,9 @@ import { mkdtemp, rm } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import test from "node:test";
+import { buildInfo } from "./quick-build-fixture.mjs";
+import { validateBuildResult } from "../src/build-artifacts.js";
+import { QUICK_BUILD_PRESETS } from "@relay-qa-hub/upload-contract";
 import { BuildUploadHost } from "../src/build-upload-host.js";
 import { readJson, writeJson } from "../src/uploader-host.js";
 import type { UploadInput, UploadSourceIdentity } from "../src/uploader-types.js";
@@ -34,18 +37,19 @@ async function fixture(t: Parameters<Parameters<typeof test>[1]>[0]) {
     authChecks: 0,
     starts: [] as { input: UploadInput; id: string; source: UploadSourceIdentity }[],
     heads: 0,
+    artifactError: false,
     authError: false,
     lostPost: false,
     lostHandoff: false,
     cancel: false,
     queueOnly: true,
     other: [] as unknown[],
-    size: 1000,
+    size: 1234,
     modified: new Date(start - 60000).toUTCString(),
     build: {
       number: 321,
       queueId: 42,
-      preset: "external",
+      preset: "android-release-app",
       status: "SUCCESS",
       startedAt: new Date(start).toISOString(),
       elapsedMs: 60000,
@@ -63,10 +67,14 @@ async function fixture(t: Parameters<Parameters<typeof test>[1]>[0]) {
         if (url === "/api/v1/packaging/builds") {
           state.posts++;
           assert.equal(request?.method, "POST");
-          assert.deepEqual(request.body, { preset: "external" });
+          assert.deepEqual(request.body, { preset: "android-release-app" });
           assert.ok(request.headers?.["idempotency-key"]);
           if (state.lostPost) throw new Error("REQUEST_TIMEOUT");
           return { queueId: 42 };
+        }
+        if (url.startsWith("/api/v1/packaging/build-result?")) {
+          if (state.artifactError) throw new Error("BUILD_ARTIFACT_MISMATCH");
+          return validateBuildResult(buildInfo(), QUICK_BUILD_PRESETS[2]!);
         }
         const query = new URL(url, "http://fixture.local").searchParams;
         assert.equal(query.get("queues"), "42");
@@ -140,6 +148,9 @@ test("exact queue and completed fresh ZIP hand off once with frozen defaults aft
   assert.equal(f.state.posts, 1);
   assert.equal(f.state.starts.length, 1);
   assert.equal(f.state.starts[0]?.id, chain.id);
+  assert.equal(f.state.starts[0]?.input.version, "2.4.37");
+  assert.equal(f.state.starts[0]?.input.summary, "2.4.37");
+  assert.equal(f.state.starts[0]?.source.sha256, "a".repeat(64));
   assert.equal(f.state.starts[0]?.input.testerId, 11562);
   assert.equal(f.state.starts[0]?.input.mode, "prepare_publish");
   assert.equal(f.state.starts[0]?.source.lastModified, f.state.modified);
@@ -207,15 +218,7 @@ test("a Jenkins run waiting on the shared lock keeps its automatic upload pendin
   await f.host.tick();
   assert.equal(f.state.starts.length, 1);
 });
-for (const scenario of [
-  "failed",
-  "cancelled",
-  "stale",
-  "newer",
-  "nozip",
-  "wrongqueue",
-  "overlap",
-]) {
+for (const scenario of ["failed", "cancelled", "artifact-mismatch", "wrongqueue"]) {
   test(`${scenario} build or ZIP never starts automatic upload`, async (t) => {
     const f = await fixture(t);
     await f.host.start(f.request);
@@ -225,10 +228,7 @@ for (const scenario of [
       f.state.queueOnly = true;
       f.state.cancel = true;
     }
-    if (scenario === "stale")
-      f.state.modified = new Date(Date.parse(f.state.build.startedAt) - 60000).toUTCString();
-    if (scenario === "newer") f.state.modified = new Date().toUTCString();
-    if (scenario === "nozip") f.state.build.includesZip = false;
+    if (scenario === "artifact-mismatch") f.state.artifactError = true;
     if (scenario === "wrongqueue") {
       await writeJson(path.join(f.root, `${f.request.requestId}.json`), {
         ...(await readJson(path.join(f.root, `${f.request.requestId}.json`))),
@@ -236,7 +236,7 @@ for (const scenario of [
       });
       f.state.build.queueId = 77;
     }
-    if (scenario === "overlap") f.state.other = [{ ...f.state.build, number: 322, queueId: 43 }];
+
     await f.host.tick();
     assert.equal(f.state.starts.length, 0);
     assert.ok(["failed", "cancelled"].includes((await f.host.list())[0]!.status));

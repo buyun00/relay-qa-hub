@@ -1,4 +1,5 @@
 import { QaHubMcpError, type McpToolDefinition, type QaHubApiTransport } from "./mcp-api.js";
+import { QUICK_BUILD_PRESETS, quickUploadInput } from "@relay-qa-hub/upload-contract";
 
 const uuidPattern = "^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$";
 const uuid = { type: "string", pattern: uuidPattern };
@@ -7,7 +8,7 @@ const requestId = {
   description: "本次操作的 UUID。超时或重试必须复用同一个值，不能重新生成。",
 };
 const modes = ["publish_workflow", "prepare_publish"] as const;
-const presets = ["external", "internal-nosdk", "internal-sdk"] as const;
+const presets = QUICK_BUILD_PRESETS.map((p) => p.id);
 // These public defaults are checked against upload-contract by the MCP tests.
 // The EXE sends commands only; all execution and platform credentials stay on the API host.
 const defaults = {
@@ -19,6 +20,7 @@ const defaults = {
 const uploadProperties = {
   requestId,
   platform: { type: "string", enum: ["android", "ios"], default: "android" },
+  configuration: { type: "string", enum: ["Debug", "Release"], default: "Release" },
   mode: {
     type: "string",
     enum: modes,
@@ -30,7 +32,8 @@ const uploadProperties = {
     maxLength: 80,
     pattern: "^([0-9A-Za-z][0-9A-Za-z._-]*)?$",
     default: "",
-    description: "留空自动使用下一个版本；更新说明只写最终版本号。",
+    description:
+      "留空选择该平台配置最新已核验构建；指定时选择该构建版本。瑞雪版本与构建版本完全一致。",
   },
   testerId: { type: "integer", minimum: 1, maximum: 2147483647, default: defaults.testerId },
 };
@@ -70,8 +73,8 @@ export const PACKAGING_MCP_TOOLS: readonly McpToolDefinition[] = [
   tool(
     "qa_start_build",
     "提交打包",
-    "提交现有 Android 构建预设：external 外网、internal-nosdk 内网无 SDK、internal-sdk 内网有 SDK。只打包；一键外网打包上传请用 qa_build_and_upload。返回排队回执，不能当作构建成功。重试复用 requestId；单独构建的去重缓存不跨 API 重启，未知结果或重启后先查询队列核对，不能自动重提。",
-    { requestId, preset: { type: "string", enum: presets, default: "external" } },
+    "提交统一快捷打包入口的 8 种预设：Android/iOS、Debug/Release、app 安装包与完整热更或 res 增量热更。只构建；自动上传用 qa_build_and_upload。返回排队回执；未知结果先查询，不得自动重提。单独构建的去重不跨 API 重启。",
+    { requestId, preset: { type: "string", enum: presets, default: "android-release-app" } },
     ["requestId"],
     true,
   ),
@@ -84,23 +87,20 @@ export const PACKAGING_MCP_TOOLS: readonly McpToolDefinition[] = [
   tool(
     "qa_start_increment_upload",
     "上传已有增量包",
-    "由后端获取增量 ZIP 并上传。Android 用渠道 1002；iOS 用渠道 2004 并取 iOS 目录最新 ZIP。产品 2002，默认测试人 11562、8 分片并发、自动版本号。复用当前登录用户的服务端上传账户。只提交任务，客户端关闭后后端继续执行；重试复用 requestId。",
+    "上传指定平台和配置已有的已核验构建 ZIP。Debug 产品 2001、Release 产品 2002；Android 渠道 1002、iOS 渠道 2004。版本取构建结果，校验 SHA-256，默认测试人 11562、8 分片并发。复用服务端账户，重试复用 requestId。",
     uploadProperties,
     ["requestId"],
     true,
   ),
   tool(
     "qa_build_and_upload",
-    "一键打外网包并上传增量",
-    "一个调用提交 Android 外网构建；后端等待该构建成功，校验其 ZIP 后自动上传、提测，按 mode 完成正式发布或等待最后确认。复用服务端上传账户及默认参数，关闭 EXE 也继续执行。返回持久化 chainId，用 qa_get_increment_upload_status 跟踪；重试复用 requestId。",
+    "一键构建并上传增量",
+    "提交 8 种快捷打包预设之一，后端等待该构建成功后读取本次产物清单，校验上下游构建、平台配置、产品渠道、版本、ZIP SHA-256，再自动上传。瑞雪版本与构建完全一致；按 mode 发布或等最终确认。关闭 EXE 继续执行，复用 requestId，用 chainId 跟踪。",
     {
-      ...uploadProperties,
-      platform: {
-        type: "string",
-        enum: ["android"],
-        default: "android",
-        description: "现有构建任务只支持 Android；iOS 已有 ZIP 请用 qa_start_increment_upload。",
-      },
+      requestId,
+      mode: uploadProperties.mode,
+      testerId: uploadProperties.testerId,
+      preset: { type: "string", enum: presets, default: "android-release-app" },
     },
     ["requestId"],
     true,
@@ -157,7 +157,8 @@ function choice<T extends string>(value: unknown, allowed: readonly T[], fallbac
   return value as T;
 }
 function uploadInput(input: Record<string, unknown>, build: boolean) {
-  const platform = choice(input["platform"], build ? ["android"] : ["android", "ios"], "android");
+  const platform = choice(input["platform"], ["android", "ios"], "android");
+  const configuration = choice(input["configuration"], ["Debug", "Release"], "Release");
   const mode = choice(input["mode"], modes, "publish_workflow");
   const version = input["version"] === undefined ? "" : input["version"];
   if (
@@ -169,9 +170,13 @@ function uploadInput(input: Record<string, unknown>, build: boolean) {
   const testerId = input["testerId"] === undefined ? defaults.testerId : input["testerId"];
   if (!Number.isSafeInteger(testerId) || Number(testerId) < 1 || Number(testerId) > 2147483647)
     invalid("测试人 ID 必须为正整数");
-  return {
+  const productId = configuration === "Debug" ? "2001" : "2002";
+  const channelId = platform === "ios" ? "2004" : "1002";
+  const upload = {
     ...defaults,
-    ...(platform === "ios" ? { channelId: "2004", belongName: "[2002]Baloot Go|[2004]iOS" } : {}),
+    productId,
+    channelId,
+    belongName: `[${productId}]Baloot Go|[${channelId}]${platform === "ios" ? "iOS" : "谷歌-国际正式"}`,
     testerId: Number(testerId),
     version,
     summary: version,
@@ -179,6 +184,9 @@ function uploadInput(input: Record<string, unknown>, build: boolean) {
     testResultReference: "",
     mode,
   };
+  return build
+    ? quickUploadInput(upload, choice(input["preset"], presets, "android-release-app"))
+    : upload;
 }
 function items(value: unknown): Record<string, unknown>[] {
   if (!Array.isArray(value))
@@ -260,7 +268,7 @@ export async function callPackagingTool(
     });
   if (name === "qa_start_build") {
     const key = id(input["requestId"]),
-      preset = choice(input["preset"], presets, "external");
+      preset = choice(input["preset"], presets, "android-release-app");
     const receipt = record(await post("/api/v1/packaging/builds", { preset }, key));
     return {
       accepted: true,
@@ -275,7 +283,13 @@ export async function callPackagingTool(
       build = name === "qa_build_and_upload",
       upload = uploadInput(input, build);
     if (build) {
-      const chain = record(await post(`${base}/build-chains`, { upload }, key));
+      const chain = record(
+        await post(
+          `${base}/build-chains`,
+          { upload, preset: choice(input["preset"], presets, "android-release-app") },
+          key,
+        ),
+      );
       return {
         accepted: true,
         execution: "server",

@@ -1,4 +1,3 @@
-import AppIcon from "./AppIcon";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { QRCodeSVG } from "qrcode.react";
 import PackagingProgressPanel from "./PackagingProgress";
@@ -11,7 +10,6 @@ import {
   getPackagingStatus,
   triggerJenkinsBuild,
   type BuildPreset,
-  type PackageFile,
   type PackagingStatus,
 } from "./packaging-api";
 import "./packaging.css";
@@ -23,15 +21,6 @@ function formatSize(bytes: number): string {
   return bytes >= 1024 ** 3
     ? `${(bytes / 1024 ** 3).toFixed(2)} GB`
     : `${(bytes / 1024 ** 2).toFixed(1)} MB`;
-}
-function formatTime(value: string): string {
-  return new Intl.DateTimeFormat("zh-CN", {
-    month: "2-digit",
-    day: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-    hour12: false,
-  }).format(new Date(value));
 }
 function submissionError(error: unknown): string {
   const code = error instanceof QaHubApiError ? error.code : null;
@@ -45,177 +34,87 @@ function submissionError(error: unknown): string {
   return "暂时无法连接打包服务，请稍后重试。";
 }
 export function PackageDownloads({ status }: { status: PackagingStatus }) {
-  const latest = BUILD_PRESETS.map((preset) => ({
-    ...preset,
-    file: status.apks.find((file) => file.preset === preset.id),
-  }));
-  const rows = (files: PackageFile[]) =>
-    files.map((file) => (
-      <div className="package-file-row" role="row" key={file.url}>
-        <span className="package-filename" role="cell">
-          <strong>{file.name}</strong>
-          <small>{packageLabel(file.preset)}</small>
-        </span>
-        <span role="cell">{formatSize(file.size)}</span>
-        <time role="cell" dateTime={file.modifiedAt}>
-          {formatTime(file.modifiedAt)}
-        </time>
-        <span className="package-file-actions" role="cell">
-          <a className="package-link" href={file.url} target="_blank" rel="noreferrer">
-            下载
-          </a>
-          <details className="package-qr-details">
-            <summary>二维码</summary>
-            <div className="package-qr-popover">
-              <QRCodeSVG
-                value={file.url}
-                size={148}
-                marginSize={2}
-                title={`${file.name} 下载二维码`}
-              />
-              <small>连接内网后扫码下载</small>
-            </div>
-          </details>
-        </span>
-      </div>
-    ));
+  const [target, setTarget] = useState("Android/Release");
+  const results = (status.artifacts ?? []).filter(
+    (r) => r.platform + "/" + r.configuration === target,
+  );
   return (
     <section aria-labelledby="package-download-title" className="package-downloads">
       <div className="package-section-heading">
-        <h2 id="package-download-title">APK 下载</h2>
-        <span>按生成时间排序 · {status.apks.length} 个文件</span>
+        <h2 id="package-download-title">安装包与热更下载</h2>
+        <span>按版本号与构建号排序</span>
       </div>
-      {status.apkError ? (
-        <p className="banner error-banner">APK 目录暂时无法读取，稍后自动重试。</p>
-      ) : (
-        <>
-          <div className="package-latest-grid">
-            {latest.map(({ id, packageLabel: label, file }) => (
-              <article className="package-latest-card" key={id}>
-                <div className="package-latest-copy">
-                  <span className="package-type">{label}</span>
-                  <strong>{file ? "最新 APK" : "暂无 APK"}</strong>
-                  {file ? (
-                    <>
-                      <p title={file.name}>{file.name}</p>
-                      <small>
-                        {formatSize(file.size)} · {formatTime(file.modifiedAt)}
-                      </small>
-                      <a
-                        className="package-download-button"
-                        href={file.url}
-                        target="_blank"
-                        rel="noreferrer"
-                      >
-                        <AppIcon name="download" /> 快速下载
-                      </a>
-                    </>
-                  ) : (
-                    <p>生成后会自动出现在这里</p>
-                  )}
-                </div>
-                {file ? (
-                  <div className="package-latest-qr">
-                    <QRCodeSVG
-                      value={file.url}
-                      size={104}
-                      marginSize={2}
-                      title={`${label} 最新 APK 下载二维码`}
-                    />
-                    <small>内网扫码下载</small>
-                  </div>
-                ) : null}
-              </article>
+      <div className="package-target-tabs" role="group" aria-label="下载平台与配置">
+        {["Android/Debug", "Android/Release", "iOS/Debug", "iOS/Release"].map((item) => (
+          <button
+            key={item}
+            type="button"
+            aria-pressed={target === item}
+            onClick={() => setTarget(item)}
+          >
+            {item.replace("/", " ")}
+          </button>
+        ))}
+      </div>
+      {status.artifactError ? (
+        <p className="banner error-banner">构建产物目录暂时无法读取，稍后自动重试。</p>
+      ) : results.length === 0 ? (
+        <p className="package-hint">此配置还没有核验完成的构建产物。</p>
+      ) : null}
+      {results.map((result) => (
+        <article className="package-artifact-build" key={result.directory}>
+          <div className="package-section-heading">
+            <h3>
+              {result.platform} {result.configuration} · {result.version}
+            </h3>
+            <span>
+              构建 #{result.buildNumber} · 产品 {result.productId} / 渠道 {result.channelId}
+            </span>
+          </div>
+          <div
+            className="package-file-table"
+            role="table"
+            aria-label={`版本 ${result.version} 构建 ${result.buildNumber} 产物`}
+          >
+            {[...result.packages, result.hotUpdate].map((file) => (
+              <div className="package-file-row" role="row" key={file.url}>
+                <span className="package-filename" role="cell">
+                  <strong>{file.name}</strong>
+                  <small>
+                    {file.kind === "zip"
+                      ? result.hotUpdateMode === "full"
+                        ? "完整热更 ZIP"
+                        : "增量热更 ZIP"
+                      : file.kind.toUpperCase()}
+                  </small>
+                </span>
+                <span role="cell">{formatSize(file.size)}</span>
+                <span role="cell">{result.version}</span>
+                <span className="package-file-actions" role="cell">
+                  <a className="package-link" href={file.url} target="_blank" rel="noreferrer">
+                    下载
+                  </a>
+                  <details className="package-qr-details">
+                    <summary>二维码</summary>
+                    <div className="package-qr-popover">
+                      <QRCodeSVG
+                        value={file.url}
+                        size={148}
+                        marginSize={2}
+                        title={`${file.name} 下载二维码`}
+                      />
+                      <small>连接内网后扫码下载</small>
+                    </div>
+                  </details>
+                </span>
+              </div>
             ))}
           </div>
-          {status.apks.length > 0 ? (
-            <div className="package-file-table" role="table" aria-label="可下载的 APK">
-              <div className="package-file-row package-file-header" role="row">
-                <span role="columnheader">文件</span>
-                <span role="columnheader">大小</span>
-                <span role="columnheader">生成时间</span>
-                <span role="columnheader">下载</span>
-              </div>
-              {rows(status.apks.slice(0, 10))}
-              {status.apks.length > 10 ? (
-                <details className="package-older">
-                  <summary>更早的 APK（{status.apks.length - 10}）</summary>
-                  {rows(status.apks.slice(10))}
-                </details>
-              ) : null}
-            </div>
-          ) : null}
-        </>
-      )}
-      <div className="package-other-downloads">
-        <article className="package-zip-card">
-          <div>
-            <h2>增量 ZIP</h2>
-            <p>_pkg_cfg_2001_1002.zip</p>
-            {status.zip ? (
-              <>
-                <small>
-                  {formatSize(status.zip.size)}
-                  {status.zip.modifiedAt ? ` · ${formatTime(status.zip.modifiedAt)}` : ""}
-                </small>
-                <a
-                  className="package-download-button"
-                  href={status.zip.url}
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  <AppIcon name="download" /> 下载增量 ZIP
-                </a>
-              </>
-            ) : (
-              <small>暂时无法读取增量 ZIP，稍后自动重试。</small>
-            )}
-          </div>
-          {status.zip ? (
-            <QRCodeSVG
-              value={status.zip.url}
-              size={104}
-              marginSize={2}
-              title="增量 ZIP 下载二维码"
-            />
-          ) : null}
         </article>
-        <article className="package-ipa-card">
-          <h2>IPA 下载</h2>
-          <p>iOS 包从 IPA 目录下载</p>
-          <a
-            className="package-link"
-            href="http://10.100.5.129:8000/ipa/"
-            target="_blank"
-            rel="noreferrer"
-          >
-            打开 IPA 下载目录 <AppIcon name="external" />
-          </a>
-          {status.ipaError ? (
-            <small>IPA 目录暂时无法读取</small>
-          ) : status.ipas[0] ? (
-            <>
-              <a
-                className="package-link package-ipa-file"
-                href={status.ipas[0].url}
-                target="_blank"
-                rel="noreferrer"
-              >
-                <AppIcon name="download" /> {status.ipas[0].name}
-              </a>
-              <small>
-                {formatSize(status.ipas[0].size)} · {formatTime(status.ipas[0].modifiedAt)}
-              </small>
-            </>
-          ) : (
-            <small>暂无 IPA</small>
-          )}
-        </article>
-      </div>
+      ))}
     </section>
   );
 }
-
 export default function PackagingPage({
   active,
   refreshRevision,
@@ -295,7 +194,7 @@ export default function PackagingPage({
         <section className="package-build-panel" aria-labelledby="packaging-title">
           <div className="package-section-heading">
             <div>
-              <p className="eyebrow">OZDQP / ANDROID</p>
+              <p className="eyebrow">OZDQP / ANDROID &amp; iOS</p>
               <h1 id="packaging-title">打包与下载</h1>
             </div>
             <span
@@ -308,35 +207,18 @@ export default function PackagingPage({
                   : "正在连接 Jenkins…"}
             </span>
           </div>
-          <div className="package-build-buttons">
-            {BUILD_PRESETS.map(({ id, label }) =>
-              id === "external" ? (
-                <BuildUploadControls
-                  key={id}
-                  userId={userId}
-                  disabled={pending !== null || !status?.jenkins?.buildable || error !== null}
-                  onBuildOnly={() => void build(id)}
-                  onSubmitted={(queueId) => {
-                    monitor.watch(queueId);
-                    void refresh();
-                  }}
-                  onOpenUpload={onOpenUpload}
-                />
-              ) : (
-                <button
-                  className="package-build-button"
-                  type="button"
-                  key={id}
-                  disabled={pending !== null || !status?.jenkins?.buildable || error !== null}
-                  onClick={() => void build(id)}
-                >
-                  {pending === id ? "正在提交…" : label}
-                </button>
-              ),
-            )}
-          </div>
+          <BuildUploadControls
+            userId={userId}
+            disabled={pending !== null || !status?.jenkins?.buildable || error !== null}
+            onBuildOnly={(id) => void build(id)}
+            onSubmitted={(queueId) => {
+              monitor.watch(queueId);
+              void refresh();
+            }}
+            onOpenUpload={onOpenUpload}
+          />
           <p className="package-hint">
-            使用 Jenkins 当前默认参数。内网会自动判断资源更新或整包；下载区展示已生成的文件。
+            选择打包用途，再选择只构建或自动上传。安装包附带完整热更；增量缺少兼容基线时由构建机生成完整热更。
           </p>
           {notice ? (
             <p className="banner pending-banner" role="status">

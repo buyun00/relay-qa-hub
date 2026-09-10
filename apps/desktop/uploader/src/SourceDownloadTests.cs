@@ -7,6 +7,26 @@ public static class SourceDownloadTests
     {
         byte[] bytes;using(var memory=new MemoryStream()){using(var zip=new ZipArchive(memory,ZipArchiveMode.Create,true)){using var writer=new StreamWriter(zip.CreateEntry("fixture.txt").Open());writer.Write("build fixture");}bytes=memory.ToArray();}
         string modified="Tue, 08 Sep 2026 05:00:00 GMT";var source=new SourceIdentity(bytes.Length,modified);
+        await test("versioned_sources_check_all_four_targets_before_remote_writes",()=>{
+            foreach(string platform in new[]{"Android","iOS"})foreach(string configuration in new[]{"Debug","Release"}){
+                string url=$"http://10.100.5.129:8000/ozdqp/{platform}/{configuration}/2.4.37/46/hot-update/build.zip?download=true";
+                var config=new JobConfig{DownloadUrl=url,ProductId=configuration=="Debug"?"2001":"2002",ChannelId=platform=="Android"?"1002":"2004",Version="2.4.37",ExpectedSource=new SourceIdentity(bytes.Length,modified,new string('a',64))};
+                PackageDownload.ValidateTarget(config,PackageDownload.ValidateSource(url));
+                config.Version="2.4.38";
+                try{PackageDownload.ValidateTarget(config,url);throw new Exception("wrong version accepted");}catch(UploadException e)when(e.Code=="BUILD_ARTIFACT_MISMATCH"){}
+            }
+            return Task.CompletedTask;
+        });
+        await test("versioned_zip_checks_hash_even_for_an_existing_download",async()=>{
+            string url="http://10.100.5.129:8000/ozdqp/Android/Debug/2.4.37/46/hot-update/build.zip?download=true",work=Path.Combine(root,"quick-hash");
+            var pinned=new SourceIdentity(bytes.Length,modified,Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(bytes)).ToLowerInvariant());
+            using var handler=new Handler(request=>{
+                var response=new HttpResponseMessage(HttpStatusCode.OK){Content=new ByteArrayContent(request.Method==HttpMethod.Head?Array.Empty<byte>():bytes)};
+                response.Content.Headers.ContentLength=bytes.Length;response.Content.Headers.LastModified=DateTimeOffset.Parse(modified);return response;
+            });
+            await PackageDownload.Get(work,ct,testHandler:handler,expectedSource:pinned,sourceUrl:url);
+            try{await PackageDownload.Get(work,ct,testHandler:handler,expectedSource:pinned with{Sha256=new string('0',64)},sourceUrl:url);throw new Exception("cached hash ignored");}catch(UploadException e)when(e.Code=="BUILD_ARTIFACT_MISMATCH"){}
+        });
         await test("ios_pinned_source_download_and_completed_snapshot_reuse",async()=>{
             string work=Path.Combine(root,"ios-source"),url="http://10.100.5.129:8000/pkg_zip/ozdqp/ios/ozdqp_ios_latest.zip?download=true";
             int calls=0;

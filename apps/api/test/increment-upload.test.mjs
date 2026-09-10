@@ -1,5 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import { buildInfo, QUICK_BUILD_PRESETS } from "./quick-build-fixture.mjs";
+import { validateBuildResult } from "../dist/build-artifacts.js";
 import { randomUUID } from "node:crypto";
 import { mkdtemp, mkdir, writeFile, rm, readFile } from "node:fs/promises";
 import os from "node:os";
@@ -150,7 +152,7 @@ test("submission is durable, idempotent, actor-bound and does not launch in the 
   assert.equal(f.launches.length, 1);
   assert.equal((await f.service.snapshot(f.owner)).execution, "server");
 });
-test("iOS persists channel 2004 through queue restart and cannot use the Android build button", async (t) => {
+test("iOS persists channel 2004 through queue restart and supports its explicit quick-build preset", async (t) => {
   const f = await fixture(t),
     id = randomUUID();
   const ios = { ...input, channelId: "2004", belongName: "iOS fixture" };
@@ -159,10 +161,12 @@ test("iOS persists channel 2004 through queue restart and cannot use the Android
   await f.service.tick();
   assert.equal(f.launches[0].input.channelId, "2004");
   assert.equal(f.launches[0].input.testerId, 11562);
-  await assert.rejects(
-    f.service.enqueue(f.owner, randomUUID(), ios, "build"),
-    /BUILD_PLATFORM_UNSUPPORTED/,
-  );
+  const chainId = randomUUID();
+  await f.service.enqueue(f.owner, chainId, ios, "build", "ios-debug-res");
+  const chain = (await f.service.buildChains(f.owner)).find((c) => c.id === chainId);
+  assert.equal(chain.preset, "ios-debug-res");
+  assert.equal(chain.input.productId, "2001");
+  assert.equal(chain.input.channelId, "2004");
 });
 
 test("all users see existing upload progress and diagnostics without sharing account configuration", async (t) => {
@@ -463,19 +467,17 @@ test("completed build hands off to upload before the next queued build can overw
   const f = await fixture(t),
     first = randomUUID(),
     second = randomUUID();
-  let reads = 0;
   const modified = new Date().toUTCString();
+  f.jenkins.buildResult = async () => validateBuildResult(buildInfo(), QUICK_BUILD_PRESETS[2]);
   f.options.fetch = async () =>
-    ++reads === 1
-      ? new Response(null, { status: 404 })
-      : new Response(null, { headers: { "content-length": "100", "last-modified": modified } });
+    new Response(null, { headers: { "content-length": "1234", "last-modified": modified } });
   f.jenkins.progress = async () => ({
     queues: [],
     builds: [
       {
         number: 10159,
         queueId: 760,
-        preset: "external",
+        preset: "android-release-app",
         status: "SUCCESS",
         startedAt: new Date(Date.parse(modified) - 1000).toISOString(),
         elapsedMs: 2000,

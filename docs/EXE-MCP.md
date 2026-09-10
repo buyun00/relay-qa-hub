@@ -34,14 +34,14 @@ MCP 负责回写修复和真实验证证据；代码交付仍需精确构建证�
 
 如果历史单据或异常重试只需要补做轻语同步，可调用 `qa_resolve_qingyu_bug`。该工具会回传命中的 QA Hub 单号、轻语 defect ID、最终外部状态和是否原本就已解决；它不会代替人工验收，也不会修改 QA Hub 状态。
 
-## 打包和上传增量（Windows 3.3.7 起）
+## 打包和上传增量（Windows 3.4.0）
 
 | MCP 工具 | 用途 |
 | --- | --- |
 | `qa_get_packaging_status` | 查询排队原因、构建阶段、结果及下载地址；可传 `queueIds`、`buildNumbers` |
-| `qa_start_build` | 单独打包，`preset` 支持 `external`、`internal-nosdk`、`internal-sdk` |
-| `qa_build_and_upload` | 一键 Android 外网打包，后端自动检测本次 ZIP 并上传、提测及发布 |
-| `qa_start_increment_upload` | 上传已有 ZIP，`platform` 支持 `android`、`ios` |
+| `qa_start_build` | 单独打包，`preset` 支持下表 8 项 |
+| `qa_build_and_upload` | 一键 Android / iOS 打包，按本次构建清单上传、提测及发布 |
+| `qa_start_increment_upload` | 上传已有已核验 ZIP，支持 `platform: android/ios` 和 `configuration: Debug/Release` |
 | `qa_get_increment_upload_status` | 查看所有人的记录，或用 `chainId` / `jobId` 查询单个任务；`includeLogs:true` 附带脱敏记录 |
 | `qa_resume_increment_upload` | 恢复本人失败或中断的原上传，保留原版本、ZIP、测试人和分片 |
 | `qa_confirm_increment_publish` | 对本人 `awaiting_publish` 任务执行最后一步正式发布 |
@@ -54,12 +54,22 @@ MCP 负责回写修复和真实验证证据；代码交付仍需精确构建证�
 {
   "name": "qa_build_and_upload",
   "arguments": {
-    "requestId": "bca850fa-c4d1-4d96-802a-e4c23c0c631c"
+    "requestId": "bca850fa-c4d1-4d96-802a-e4c23c0c631c",
+    "preset": "ios-release-res"
   }
 }
 ```
 
-默认产品 ID `2002`、Android 渠道 `1002`、测试人 `11562`、8 分片并发、自动版本号，更新说明只填最终版本号。`mode` 只有两个选项：默认 `publish_workflow` 完成正式发布；`prepare_publish` 停在最后确认前。可显式指定 `version` 和 `testerId`。iOS 上传使用 `qa_start_increment_upload` 并传 `platform:"ios"`，后端从固定 iOS 目录选最新 ZIP，渠道为 `2004`。现有构建预设是 Android，一键构建不接受 iOS。
+| 平台配置 | App preset | Res preset | 产品 / 渠道 |
+| --- | --- | --- | --- |
+| Android Debug | android-debug-app | android-debug-res | 2001 / 1002 |
+| Android Release | android-release-app | android-release-res | 2002 / 1002 |
+| iOS Debug | ios-debug-app | ios-debug-res | 2001 / 2004 |
+| iOS Release | ios-release-app | ios-release-res | 2002 / 2004 |
+
+默认 preset 为 `android-release-app`，测试人 `11562`、8 分片并发。构建并上传的版本号及更新说明只取本次构建结果，不接受版本覆盖；`testerId` 可显式指定。`mode` 默认 `publish_workflow` 完成正式发布，`prepare_publish` 停在最后确认前。
+
+`qa_start_increment_upload` 单独上传默认 Android Release；可传 `platform:"ios"`、`configuration:"Debug"`。可选 `version` 用来查找已有构建版本；留空选该平台配置最新已核验构建，瑞雪版本仍与所选构建完全一致。详情参见 [打包与下载](JENKINS-PACKAGING.md)。
 
 返回 `accepted:true` 只表示任务已提交。保留返回的 `chainId`，通过 `qa_get_increment_upload_status` 跟踪；`chain.status=upload_started` 仍需继续查看关联 `job`。正式发布完成应同时核对 `job.published=true`、`job.remoteStatus=100`。不要把提测、上传完成或提交成功当成正式发布完成。
 

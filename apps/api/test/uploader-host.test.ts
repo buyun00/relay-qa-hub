@@ -4,6 +4,7 @@ import { mkdtemp, readFile, rm, writeFile, mkdir, unlink } from "node:fs/promise
 import os from "node:os";
 import path from "node:path";
 import test from "node:test";
+import { catalogFetch } from "./quick-build-fixture.mjs";
 import {
   UploaderHost,
   parseUploadInput,
@@ -30,11 +31,7 @@ test("iOS jobs retain the selected ZIP through acknowledgement loss, prelaunch r
   const mtime = Date.parse("2026-09-08T09:16:23Z");
   const { host, options } = await fixture(t, async (url, init) => {
     requests.push(String(url));
-    if (init?.method === "HEAD")
-      return new Response(null, {
-        headers: { "content-length": "12345", "last-modified": new Date(mtime).toUTCString() },
-      });
-    return Response.json({ files: [{ name: "ios_latest.zip", type: "file", size: 12345, mtime }] });
+    return catalogFetch(url, init);
   });
   await writeJson(options.authFile, { account: "fixture" });
   await writeFile(
@@ -56,18 +53,23 @@ test("iOS jobs retain the selected ZIP through acknowledgement loss, prelaunch r
   const original = await readJson(configPath);
   assert.equal(
     original?.["downloadUrl"],
-    "http://10.100.5.129:8000/pkg_zip/ozdqp/ios/ios_latest.zip?download=true",
+    "http://10.100.5.129:8000/ozdqp/iOS/Release/2.4.37/46/hot-update/ozdqp_ios_release_2.4.37_46.zip?download=true",
   );
   assert.equal(original?.["uploadConcurrency"], 8);
-  assert.equal((await host.snapshot()).jobs[0]?.sourceFileName, "ios_latest.zip");
+  assert.equal((await host.snapshot()).jobs[0]?.sourceFileName, "ozdqp_ios_release_2.4.37_46.zip");
+  const originalRequestCount = requests.length;
   await host.startWithId(ios, id);
-  assert.equal(requests.length, 2);
+  assert.equal(requests.length, originalRequestCount);
   await unlink(path.join(host.folder(id), "desktop.json")); // Simulate persisted intent before launch.
   await host.startWithId(ios, id);
   await wait();
   await host.resume({ id, testerId: ios.testerId, testResultReference: "" });
   await wait();
-  assert.equal(requests.length, 2, "Original directory selection is never repeated");
+  assert.equal(
+    requests.length,
+    originalRequestCount,
+    "Original directory selection is never repeated",
+  );
   assert.deepEqual(await readJson(configPath), original);
   await assert.rejects(
     host.startForBuild(
@@ -76,7 +78,7 @@ test("iOS jobs retain the selected ZIP through acknowledgement loss, prelaunch r
       { size: 10, lastModified: new Date(mtime).toUTCString() },
       "fixture",
     ),
-    /BUILD_PLATFORM_UNSUPPORTED/,
+    /UPLOAD_ACCOUNT_CHANGED/,
   );
 });
 async function fixture(t: Parameters<Parameters<typeof test>[1]>[0], fetcher?: typeof fetch) {
@@ -88,7 +90,7 @@ async function fixture(t: Parameters<Parameters<typeof test>[1]>[0], fetcher?: t
     executable,
     runner: path.join(root, "runner.mjs"),
     nodeExecutable: process.execPath,
-    ...(fetcher ? { fetch: fetcher } : {}),
+    fetch: fetcher ?? (catalogFetch as typeof fetch),
   };
   return { root, options, host: new UploaderHost(options) };
 }
@@ -398,7 +400,7 @@ test("new jobs default to recorded parameters and persist version-only text beha
     await assert.rejects(host.start({ ...input, mode }), /INVALID_INPUT/);
   const id = await host.start({
     mode: "prepare_publish",
-    version: "2.4.28",
+    version: "2.4.37",
     summary: "ignore",
     description: "ignore",
   });
@@ -408,13 +410,13 @@ test("new jobs default to recorded parameters and persist version-only text beha
   assert.equal(config?.["productId"], "2002");
   assert.equal(config?.["channelId"], "1002");
   assert.equal(config?.["testerId"], 11562);
-  assert.equal(config?.["summary"], "2.4.28");
-  assert.equal(config?.["description"], "2.4.28");
+  assert.equal(config?.["summary"], "2.4.37");
+  assert.equal(config?.["description"], "2.4.37");
   assert.equal(config?.["useVersionText"], true);
   assert.equal(config?.["recordedTestWorkflow"], true);
   assert.equal(config?.["testResultReference"], "");
-  await writeJson(path.join(host.folder(id), "state.json"), { version: "2.4.29" });
-  assert.equal((await host.snapshot()).jobs[0]?.input.summary, "2.4.29");
+  await writeJson(path.join(host.folder(id), "state.json"), { version: "2.4.38" });
+  assert.equal((await host.snapshot()).jobs[0]?.input.summary, "2.4.38");
 });
 test("final confirmation requires the persisted boundary and uses its own command exactly once", async (t) => {
   const { host, options } = await fixture(t);

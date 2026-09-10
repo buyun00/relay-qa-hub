@@ -1,5 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import { buildInfo, QUICK_BUILD_PRESETS } from "./quick-build-fixture.mjs";
+import { validateBuildResult } from "../dist/build-artifacts.js";
 import { randomUUID } from "node:crypto";
 import { mkdtemp, mkdir, writeFile, rm } from "node:fs/promises";
 import os from "node:os";
@@ -13,7 +15,8 @@ import { DesktopBrowserSessionCookieStore } from "../../desktop/dist/network.js"
 
 // Exercise real MCP HTTP, desktop authentication transport, API routes, SQLite
 // queue and build-to-upload handoff. Only Jenkins and the platform worker are fixtures.
-async function fixture(t) {
+async function fixture(t, presetId = "android-release-app") {
+  const selected = QUICK_BUILD_PRESETS.find((p) => p.id === presetId);
   const root = await mkdtemp(path.join(os.tmpdir(), "qa-mcp-upload-"));
   const owner = randomUUID(),
     other = randomUUID(),
@@ -26,7 +29,12 @@ async function fixture(t) {
     service,
     mcp;
   const startedAt = new Date(Math.floor(Date.now() / 1000) * 1000 - 10000).toISOString();
-  const source = { size: 1234, lastModified: new Date(Date.parse(startedAt) + 5000).toUTCString() };
+  const source = {
+    url: validateBuildResult(buildInfo(selected), selected).hotUpdate.url + "?download=true",
+    sha256: "a".repeat(64),
+    size: 1234,
+    lastModified: new Date(Date.parse(startedAt) + 5000).toUTCString(),
+  };
   const hostFactory = (actor) => {
     if (hosts.has(actor)) return hosts.get(actor);
     const jobs = [],
@@ -100,12 +108,13 @@ async function fixture(t) {
     return host;
   };
   const jenkins = {
+    buildResult: async () => validateBuildResult(buildInfo(selected), selected),
     trigger: async (preset, key) => {
       builds.push({ preset, key });
       return { queueId: 760, preset };
     },
     status: async () => ({
-      queue: [{ id: 760, reason: "等待执行器", preset: "external" }],
+      queue: [{ id: 760, reason: "等待执行器", preset: presetId }],
       builds: [],
     }),
     progress: async () => ({
@@ -115,7 +124,7 @@ async function fixture(t) {
             {
               number: 10170,
               queueId: 760,
-              preset: "external",
+              preset: presetId,
               status: "SUCCESS",
               includesZip: true,
               stages: [{ id: "zip", state: "complete" }],
@@ -245,7 +254,7 @@ test("one MCP call persists one build, survives API/MCP restart and hands the ex
   await f.stopMcp();
   await f.service.tick(); // worker progress is independent of the client
   assert.equal(f.builds.length, 1);
-  assert.equal(f.builds[0].preset, "external");
+  assert.equal(f.builds[0].preset, "android-release-app");
   await f.restart();
   await f.ok("qa_build_and_upload", { requestId, mode: "prepare_publish" });
   const conflict = await f.call("qa_build_and_upload", { requestId, mode: "publish_workflow" });
@@ -320,12 +329,36 @@ test("MCP authentication, upload account, iOS channel and cancellation use backe
   await f.ok("qa_cancel_build_upload", { chainId });
   await f.service.tick();
   assert.equal(f.builds.length, 0);
-  for (const preset of ["external", "internal-sdk", "internal-nosdk"]) {
+  for (const preset of QUICK_BUILD_PRESETS.map((p) => p.id)) {
     const build = await f.ok("qa_start_build", { requestId: randomUUID(), preset });
     assert.equal(build.queueId, 760);
   }
   assert.deepEqual(
     f.builds.map((b) => b.preset),
-    ["external", "internal-sdk", "internal-nosdk"],
+    QUICK_BUILD_PRESETS.map((p) => p.id),
   );
 });
+for (const preset of QUICK_BUILD_PRESETS)
+  test(`MCP one-click ${preset.id} freezes exact build version and channel`, async (t) => {
+    const f = await fixture(t, preset.id),
+      requestId = randomUUID();
+    await f.ok("qa_build_and_upload", { requestId, preset: preset.id, mode: "prepare_publish" });
+    await f.service.tick();
+    f.setReady();
+    await f.service.tick();
+    assert.equal(f.builds.length, 1);
+    assert.equal(f.builds[0].preset, preset.id);
+    assert.equal(f.launches.length, 1);
+    const upload = f.launches[0];
+    assert.equal(upload.input.productId, preset.productId);
+    assert.equal(upload.input.channelId, preset.channelId);
+    assert.equal(upload.input.version, "2.4.37");
+    assert.equal(upload.input.summary, "2.4.37");
+    assert.equal(upload.input.testerId, 11562);
+    assert.equal(upload.pinned.sha256, "a".repeat(64));
+    assert.ok(
+      upload.pinned.url.includes(
+        `/ozdqp/${preset.platform}/${preset.configuration}/2.4.37/46/hot-update/`,
+      ),
+    );
+  });

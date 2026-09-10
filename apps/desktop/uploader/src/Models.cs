@@ -37,7 +37,8 @@ public sealed class JobConfig
     public int? ConfirmedTestUnzipStatus { get; set; }
     public string WorkDirectory { get; set; } = "";
 }
-public sealed record SourceIdentity(long Size, string LastModified);
+public sealed record SourceIdentity(long Size, string LastModified,
+    [property:System.Text.Json.Serialization.JsonIgnore(Condition=System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)] string? Sha256=null);
 public sealed class JobState
 {
     public string JobId { get; set; } = Guid.NewGuid().ToString();

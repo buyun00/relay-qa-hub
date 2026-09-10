@@ -1,7 +1,11 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { randomUUID } from "node:crypto";
-import { DEFAULT_UPLOAD_PARAMETERS, UPLOAD_TARGETS } from "@relay-qa-hub/upload-contract";
+import {
+  DEFAULT_UPLOAD_PARAMETERS,
+  UPLOAD_TARGETS,
+  QUICK_BUILD_PRESETS,
+} from "@relay-qa-hub/upload-contract";
 import {
   QaHubMcpTools,
   QaHubMcpError,
@@ -38,6 +42,7 @@ test("one-click command uses shared defaults and reuses request ID without waiti
   assert.equal(f.calls[0]!.request?.headers?.["idempotency-key"], requestId);
   assert.deepEqual(f.calls[0], f.calls[1]);
   assert.deepEqual(f.calls[0]!.request?.body, {
+    preset: "android-release-app",
     upload: {
       ...DEFAULT_UPLOAD_PARAMETERS,
       version: "",
@@ -68,7 +73,7 @@ test("iOS source, final-confirmation mode and version-only notes are explicit", 
 });
 test("all build presets and selected queue progress use the authenticated API", async () => {
   const f = fixture(() => ({ queueId: 123 }));
-  for (const preset of ["external", "internal-sdk", "internal-nosdk"]) {
+  for (const preset of QUICK_BUILD_PRESETS.map((p) => p.id)) {
     await f.tools.call("qa_start_build", { requestId: randomUUID(), preset });
     assert.deepEqual(f.calls.at(-1)!.request!.body, { preset });
   }

@@ -1,14 +1,11 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import { QUICK_BUILD_PRESETS, QUICK_JOB_NAME, catalogFetch } from "./quick-build-fixture.mjs";
 import { JenkinsBuildService, packageFiles } from "../dist/jenkins-builds.js";
 import { createApiApp } from "../dist/app.js";
 
-const jobPath = `/job/${encodeURIComponent("01-【OZDQP】【Android】")}/`;
-const definitions = [
-  { name: "networkScope", choices: ["内网_自动判断", "外网_保留原参数"] },
-  { name: "internalUseSdk", choices: ["不接入SDK", "接入SDK"] },
-  { name: "buildMode", choices: ["Auto_自动判断", "App_资源和包体"] },
-];
+const jobPath = `/job/${encodeURIComponent(QUICK_JOB_NAME)}/`;
+const definitions = [{ name: "打包用途" }];
 const job = {
   buildable: true,
   property: [{ parameterDefinitions: definitions }],
@@ -37,7 +34,7 @@ function fixture({ post, overrideJob, failJenkins = false } = {}) {
   const service = new JenkinsBuildService(async (value, init = {}) => {
     const url = new URL(value);
     const headers = new Headers(init.headers);
-    assert.equal(init.redirect, "manual");
+    assert.ok(["manual", "error"].includes(init.redirect));
     assert.ok(init.signal);
     if (url.port === "8000") {
       assert.equal(
@@ -46,20 +43,12 @@ function fixture({ post, overrideJob, failJenkins = false } = {}) {
         "never send Jenkins credentials to downloads",
       );
       assert.equal(headers.has("cookie"), false);
-      if (url.pathname === "/apk/") return json({ files: [apk] });
-      if (url.pathname === "/ipa/") return json({ files: [{ ...apk, name: "ios.ipa" }] });
-      if (url.pathname === "/pkg_zip/ozdqp/_pkg_cfg_2001_1002.zip") {
-        assert.equal(init.method, "HEAD");
-        return new Response(null, {
-          headers: {
-            "content-length": "741036214",
-            "last-modified": "Fri, 04 Sep 2026 07:51:44 GMT",
-          },
-        });
-      }
+      return catalogFetch(value, init);
     }
     assert.ok(headers.get("authorization")?.startsWith("Basic "));
     if (failJenkins) throw new Error("offline");
+    if (url.pathname === `${jobPath}config.xml`)
+      return new Response(QUICK_BUILD_PRESETS.map((p) => p.label).join("\n"));
     if (url.pathname === `${jobPath}api/json`) {
       reads++;
       return json(overrideJob ?? job);
@@ -95,20 +84,17 @@ function fixture({ post, overrideJob, failJenkins = false } = {}) {
   return { service, posts, crumbs: () => crumbs, reads: () => reads };
 }
 
-test("the three presets match Jenkins UI and leave all unrelated defaults unset", async () => {
+test("all eight presets submit only the visible quick-build purpose", async () => {
   const { service, posts } = fixture();
-  for (const preset of ["internal-nosdk", "internal-sdk", "external"]) {
-    assert.deepEqual(await service.trigger(preset, preset), { preset, queueId: 17 });
-  }
-  assert.deepEqual(posts, [
-    { networkScope: "内网_自动判断", internalUseSdk: "不接入SDK", buildMode: "Auto_自动判断" },
-    { networkScope: "内网_自动判断", internalUseSdk: "接入SDK", buildMode: "Auto_自动判断" },
-    { networkScope: "外网_保留原参数", internalUseSdk: "不接入SDK", buildMode: "App_资源和包体" },
-  ]);
-  for (const parameters of posts) {
-    assert.equal("BuildParam" in parameters, false);
-    assert.equal("version" in parameters, false);
-  }
+  for (const preset of QUICK_BUILD_PRESETS)
+    assert.deepEqual(await service.trigger(preset.id, preset.id), {
+      preset: preset.id,
+      queueId: 17,
+    });
+  assert.deepEqual(
+    posts,
+    QUICK_BUILD_PRESETS.map((p) => ({ 打包用途: p.label })),
+  );
 });
 
 test("expired crumb/session reauthenticates once, then submits with the new cookie", async () => {
@@ -118,7 +104,7 @@ test("expired crumb/session reauthenticates once, then submits with the new cook
         ? new Response(null, { status: 403 })
         : new Response(null, { status: 201, headers: { location: "/queue/item/18/" } }),
   });
-  assert.equal((await f.service.trigger("internal-sdk", "retry")).queueId, 18);
+  assert.equal((await f.service.trigger("ios-release-res", "retry")).queueId, 18);
   assert.equal(f.crumbs(), 2);
   assert.equal(f.posts.length, 2);
 });
@@ -176,9 +162,12 @@ test("status uses actual directories, scopes queue to this job and coalesces pol
     status.jenkins.queue.map((q) => q.id),
     [10],
   );
-  assert.equal(status.apks[0].url, `http://10.100.5.129:8000/apk/${apk.name}`);
-  assert.equal(status.ipas[0].url, "http://10.100.5.129:8000/ipa/ios.ipa");
-  assert.equal(status.zip.url, "http://10.100.5.129:8000/pkg_zip/ozdqp/_pkg_cfg_2001_1002.zip");
+  assert.equal(status.artifacts.length, 4);
+  assert.ok(
+    status.artifacts.every(
+      (r) => r.hotUpdate.url.includes("/ozdqp/") && r.hotUpdate.sha256.length === 64,
+    ),
+  );
   assert.equal(JSON.stringify(status).includes("Basic "), false);
 });
 
@@ -186,9 +175,9 @@ test("Jenkins outage does not hide available APK/IPA/ZIP files", async () => {
   const f = fixture({ failJenkins: true });
   const status = await f.service.status();
   assert.equal(status.jenkins, null);
-  assert.equal(status.apks.length, 1);
-  assert.equal(status.ipas.length, 1);
-  assert.ok(status.zip);
+  assert.equal(status.apks.length, 2);
+  assert.equal(status.ipas.length, 2);
+  assert.equal(status.artifacts.length, 4);
 });
 
 test("download list rejects directories, traversal and empty files; classifies names independently", () => {

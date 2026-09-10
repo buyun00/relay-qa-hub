@@ -60,6 +60,11 @@ function ProgressMeter({
 export function BuildStages({ build }: { build: BuildProgress }) {
   return (
     <div className="package-stage-list">
+      {build.errorCode === "BUILD_PROJECT_PATH_INVALID" ? (
+        <p className="banner error-banner">
+          打包机的 Unity 项目路径配置无效，构建未完成，没有触发上传。
+        </p>
+      ) : null}
       {build.logError ? (
         <p className="package-progress-warning" role="status">
           阶段日志暂时无法读取，正在重试；构建状态来自 Jenkins。
