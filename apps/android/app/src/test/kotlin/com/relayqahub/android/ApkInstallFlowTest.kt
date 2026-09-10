@@ -2,7 +2,10 @@ package com.relayqahub.android
 
 import com.relayqahub.android.network.AndroidUpdateRelease
 import com.relayqahub.android.network.ApkArtifactKind
+import com.relayqahub.android.ui.AuthenticatedSurface
+import com.relayqahub.android.ui.openAppUpdate
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertSame
 import org.junit.Test
@@ -51,6 +54,17 @@ class ApkInstallFlowTest {
         assertEquals(ApkDownloadUiState(), completeInstallerHandoff(installing, "game-apk"))
         assertSame(installing, completeInstallerHandoff(installing, "another-apk"))
         assertSame(downloading, completeInstallerHandoff(downloading, "game-apk"))
+    }
+
+    @Test
+    fun `app update entry leaves project detail and opens its visible update surface`() {
+        val destination = AuthenticatedSurface(
+            page = QaHubPage.BUG_LIST,
+            projectToolsOpen = true,
+        ).openAppUpdate()
+
+        assertEquals(QaHubPage.CAPTURE_SETTINGS, destination.page)
+        assertFalse(destination.projectToolsOpen)
     }
 
     private fun release(versionCode: Long) = AndroidUpdateRelease(

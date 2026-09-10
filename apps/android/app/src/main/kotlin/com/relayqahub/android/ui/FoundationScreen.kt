@@ -484,6 +484,13 @@ private fun CaptureSettingsPage(
                 )
             }
             item {
+                SelfUpdateSection(
+                    state = state,
+                    onCheck = onCheckForUpdate,
+                    onDownload = onDownloadSelfUpdate,
+                )
+            }
+            item {
                 Card(
                     colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primary),
                     shape = RoundedCornerShape(24.dp),
@@ -601,13 +608,6 @@ private fun CaptureSettingsPage(
                     UsageNote("拖动", "移动悬浮球位置；截图时它会自动隐藏")
                     UsageNote("测试结束", "回到此页关闭悬浮球，停止屏幕采集")
                 }
-            }
-            item {
-                SelfUpdateSection(
-                    state = state,
-                    onCheck = onCheckForUpdate,
-                    onDownload = onDownloadSelfUpdate,
-                )
             }
             if (!com.relayqahub.android.BuildConfig.QA_HUB_GAME_APK_DIRECTORY_URL.contains("qa-hub.invalid")) item {
                 GameApkSection(

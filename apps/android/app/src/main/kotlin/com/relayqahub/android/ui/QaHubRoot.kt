@@ -20,6 +20,16 @@ import com.relayqahub.android.network.*
 import com.relayqahub.android.security.*
 import kotlinx.coroutines.launch
 
+internal data class AuthenticatedSurface(
+    val page: QaHubPage,
+    val projectToolsOpen: Boolean,
+)
+
+internal fun AuthenticatedSurface.openAppUpdate(): AuthenticatedSurface = copy(
+    page = QaHubPage.CAPTURE_SETTINGS,
+    projectToolsOpen = false,
+)
+
 @Composable
 fun QaHubRoot(
     onViewModelActive: (FoundationViewModel?) -> Unit,
@@ -128,8 +138,23 @@ fun QaHubRoot(
                         }) }
                     }
                 }
-                TextButton(onClick = { toolsOpen = !toolsOpen }, modifier = Modifier.testTag("project-tools")) {
-                    Text(if (toolsOpen) "Bug 工作台" else "项目与组件")
+                Row {
+                    TextButton(
+                        onClick = {
+                            val destination = AuthenticatedSurface(
+                                page = foundationViewModel.uiState.value.page,
+                                projectToolsOpen = toolsOpen,
+                            ).openAppUpdate()
+                            toolsOpen = destination.projectToolsOpen
+                            foundationViewModel.navigateTo(destination.page)
+                        },
+                        modifier = Modifier.testTag("app-update-entry"),
+                    ) {
+                        Text("检查更新")
+                    }
+                    TextButton(onClick = { toolsOpen = !toolsOpen }, modifier = Modifier.testTag("project-tools")) {
+                        Text(if (toolsOpen) "Bug 工作台" else "项目与组件")
+                    }
                 }
             }
         }
