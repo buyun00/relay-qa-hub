@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "capturedAt": "2026-09-10T04:52:00Z",
+  "base": "http://127.0.0.1:4640",
+  "manifest": {"status": 200, "bytes": 480, "sha256": "e4c09d3da283753cd0a97e6e08b7223d08649ed1cb595a6a340106d26cf91675", "ed25519Verified": true},
+  "installer": {"status": 200, "bytes": 108296156, "sha256": "7610c92fd39d4485d78e3d8ee7618d79d5e8ed9f3d6ce096c2922c72e5388ab0"},
+  "authenticode": "NotSigned (reported separately from valid Ed25519 manifest signature)",
+  "sourceCommit": "867387fe69714ae0c3aafa6182946ffd80495768"
+}

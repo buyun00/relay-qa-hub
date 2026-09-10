@@ -1,0 +1,20 @@
+{
+  "endpoint": "http://127.0.0.1:4639/api/v1/projects/62a2f031-c436-402b-ba7d-57488c83450d/comments",
+  "httpStatus": 200,
+  "bugId": "f78c11d1-a904-4a21-b643-96b29ece37fc",
+  "bugKey": "LUI0910-1",
+  "projectId": "62a2f031-c436-402b-ba7d-57488c83450d",
+  "snapshotSequence": 38,
+  "items": [
+    {
+      "id": "37e56846-ef15-4676-be81-de40dd9b97f5",
+      "bugId": "f78c11d1-a904-4a21-b643-96b29ece37fc",
+      "projectId": "62a2f031-c436-402b-ba7d-57488c83450d",
+      "authorId": "0ba915e7-b316-444a-8a48-3341d2f45ee2",
+      "body": "Luna UI comment 0910 unique-4f7c",
+      "attachmentIds": [],
+      "version": 1
+    }
+  ],
+  "nextCursor": null
+}

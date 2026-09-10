@@ -1,0 +1,293 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-09-10T05:31:42.277Z",
+  "root": "docs/evidence/project-components/final-v21-20260910",
+  "files": 57,
+  "entries": [
+    {
+      "path": "acceptance-matrix.json",
+      "bytes": 8568,
+      "sha256": "d175f17319165e55859b3742d536fc4a61c5f54fdf3898ea04250b7237f35f91"
+    },
+    {
+      "path": "acceptance-matrix.md",
+      "bytes": 9034,
+      "sha256": "2cebdecc65d1b1175a41840c09726ce280aa1eda94579d25c98ce556259c4c93"
+    },
+    {
+      "path": "android/capture-after-click.png",
+      "bytes": 175391,
+      "sha256": "8a54b5b01771158fa8e7de423eec0ae013ae0777e1238ca479618fd13906b0c7"
+    },
+    {
+      "path": "android/capture-after-click.xml",
+      "bytes": 17316,
+      "sha256": "c86013142d1f6f929ba4722426dc22ca61f1c8488004b4da3a4ff8f4f957cfc5"
+    },
+    {
+      "path": "android/capture-before-version.txt",
+      "bytes": 81,
+      "sha256": "1dff6a0802d79a2b851b96f4757a55a3cdfd236358b410d73684bd847e2f3acf"
+    },
+    {
+      "path": "android/capture-files-readonly.txt",
+      "bytes": 2032,
+      "sha256": "7ae6dd2dd073ca7398a0dfeaa9f588920bd66f7e110f5eb8943b2994a0da670e"
+    },
+    {
+      "path": "android/capture-final-activities.txt",
+      "bytes": 34791,
+      "sha256": "ac5ccf0b913ba288688112633bf40864fcdb39f53dcebb3484bbba9373db883a"
+    },
+    {
+      "path": "android/capture-final-daily-pid.txt",
+      "bytes": 6,
+      "sha256": "591f6b4021386d86e5661d22bb571d8336a11e9a6a33a5c295b8f5e53eba804c"
+    },
+    {
+      "path": "android/capture-final-logcat.txt",
+      "bytes": 64670,
+      "sha256": "d2114986bc4c71b69ae95e0095558b4ab6c419ceec473bd0ca6c26596e15a8d0"
+    },
+    {
+      "path": "android/capture-final-package.txt",
+      "bytes": 81,
+      "sha256": "1dff6a0802d79a2b851b96f4757a55a3cdfd236358b410d73684bd847e2f3acf"
+    },
+    {
+      "path": "android/capture-final-preview-pid.txt",
+      "bytes": 7,
+      "sha256": "9d54e90c071bb887702a53aa95fbfe23fcf39ded6a0b5229030dc79883c9bd90"
+    },
+    {
+      "path": "android/capture-final-reverse.txt",
+      "bytes": 56,
+      "sha256": "0d73f5af5927ca12c8d35e5a0550fc42b8fbdf39edc3fb7aa87087e9599308b8"
+    },
+    {
+      "path": "android/code26-result.md",
+      "bytes": 2749,
+      "sha256": "bbce76cc6b69b62c6e39a9763119f9a12247a956c5c4de3c587960f1667aa186"
+    },
+    {
+      "path": "android/lifecycle-final-verification.md",
+      "bytes": 862,
+      "sha256": "c256132ec648a7858c17ddd3b64218d2e7a3ca32c26ef0a52c7e1be591552901"
+    },
+    {
+      "path": "android/local2-attachments.json",
+      "bytes": 609,
+      "sha256": "4b03cb6ebed02ad2cc232abb028bffdca0b72776dce3cfeee4419a4433213f05"
+    },
+    {
+      "path": "android/local2-closed-workflow.json",
+      "bytes": 527,
+      "sha256": "70a33b86940ef54fabf910d7e0dbc5f9a98a1612324e1d9c7fba0c0c5bf061d4"
+    },
+    {
+      "path": "android/local2-closed.json",
+      "bytes": 712,
+      "sha256": "19fccb2ba91b9313e4ec6cacca34156f2271e2711287e7be4cad4e2b9bda1ed5"
+    },
+    {
+      "path": "android/offline-queue-api-bugs.json",
+      "bytes": 1420,
+      "sha256": "14b500f1cb54b1996480f1423aeb72c2012a586f858405454afe5f45d0996ba9"
+    },
+    {
+      "path": "android/offline-queue-db-readback.txt",
+      "bytes": 4444,
+      "sha256": "134bcbfc0805b8dcf678818c1a7e2131356ac24b4ec0ceb33ac687d04916c7d4"
+    },
+    {
+      "path": "android/offline-queue-report.md",
+      "bytes": 1436,
+      "sha256": "567435235dfa925888c810dc3f7de172fdbc00be731a507e93b75970fb71be84"
+    },
+    {
+      "path": "builds/android-code26-artifact.json",
+      "bytes": 1394,
+      "sha256": "d8fb939c1e3690ccd53433b1eda311c9734163eb54f06f3f6848d4612c11fac1"
+    },
+    {
+      "path": "builds/android-code26-feed-http.json",
+      "bytes": 2820,
+      "sha256": "3b88fbffb0ef9551352a48226971911abb42bf71edae9ef88a625e06a9cb65e6"
+    },
+    {
+      "path": "builds/source.json",
+      "bytes": 432,
+      "sha256": "28984cc6990fb3546e56c89cd7a70a296e43b4ee642b990215b0861f78c952e3"
+    },
+    {
+      "path": "builds/windows-build13-preinstall.json",
+      "bytes": 1824,
+      "sha256": "2ce5d052e6ce60e9d0533b0036dfccff089457a30deb81e25d95d717ed0f9039"
+    },
+    {
+      "path": "builds/windows-build13-signatures.json",
+      "bytes": 903,
+      "sha256": "5a02841e5772355d0b045596b59dc19c6cf5b87c46ff1f1318e2956660729501"
+    },
+    {
+      "path": "coexistence-final.json",
+      "bytes": 9285,
+      "sha256": "3ad5d0f95132410f0ea2d4e8e855eaa6b635785d4108c27dfb66ad7d31f0e19a"
+    },
+    {
+      "path": "external/README.md",
+      "bytes": 5421,
+      "sha256": "b5780833682bc955db00265d8150fb6309d4a7ad348833a4009872556c5f8a4e"
+    },
+    {
+      "path": "external/audit.json",
+      "bytes": 2333,
+      "sha256": "02a90bbc9e4feba11c5b8457a583c368054c3f6b014924286263292b8a40b346"
+    },
+    {
+      "path": "migration/README.md",
+      "bytes": 766,
+      "sha256": "9d763fd3c9cc90d7bec93d2f999d0d9f022d6a7cc8fca203cc8ea7466021d3b4"
+    },
+    {
+      "path": "migration/result.json",
+      "bytes": 10057,
+      "sha256": "2f3b9c244b98ddcf96603a1788c90341b13335e6cae479273f8e35a5b307541e"
+    },
+    {
+      "path": "source-gate/02-project-components-tests.result.json",
+      "bytes": 1994,
+      "sha256": "42c469c37874d321efc5e2421d67037eadbfbd86306cb7ac02897b739d14de99"
+    },
+    {
+      "path": "source-gate/02-project-components-tests.stdout.log",
+      "bytes": 15440,
+      "sha256": "f182f9040c22f2a8ae5572c268c2563b7b6671f367089d0dc774522b5799b23c"
+    },
+    {
+      "path": "source-gate/corr-30-test-api-mjs.result.json",
+      "bytes": 4280,
+      "sha256": "8817c6c214f8c84dcf1dd220366541e550d759aceed00be454e331c95655b3ed"
+    },
+    {
+      "path": "source-gate/corr-32b-test-web-isolated-env.result.json",
+      "bytes": 568,
+      "sha256": "410ed2841b1cb5dd2339dc3c1b7e64c5500d4cc4f9ffc1540b793366d530b9b4"
+    },
+    {
+      "path": "source-gate/corr-32b-test-web-isolated-env.stdout.log",
+      "bytes": 249,
+      "sha256": "5f43bf36523c18f1aa9a578dfab138bec476b454c6aeb70a29bc8cf4bb119ffa"
+    },
+    {
+      "path": "source-gate/corr-38-git-diff-check.result.json",
+      "bytes": 372,
+      "sha256": "4a1497f0d16d0f022965c615317cbcdce1224fe38106d4e787c4ed33d89e9d9a"
+    },
+    {
+      "path": "source-gate/corr2-37-android-final.result.json",
+      "bytes": 445,
+      "sha256": "5e2ca1f8934503d8352b6e322b2f74f481cddccae54a919df39342ccda45109d"
+    },
+    {
+      "path": "source-gate/corr2-37-android-final.stderr.log",
+      "bytes": 251,
+      "sha256": "7947f20a02b8249ee4ac57e08b051987df95393d087248b86ba68192263b665b"
+    },
+    {
+      "path": "source-gate/corr2-37-android-final.stdout.log",
+      "bytes": 3589,
+      "sha256": "96d72c0431b65a8e20500527ec6b81e560bd92e339a9cec1a885877f3d0d66f3"
+    },
+    {
+      "path": "source-gate/final-summary.json",
+      "bytes": 3628,
+      "sha256": "93cfe18c9c9697f46c1b71f4d925ebbde90a96e8a17785153e1307c26cfe39ce"
+    },
+    {
+      "path": "web-final-867387f/asset-sha256.json",
+      "bytes": 288,
+      "sha256": "d1f39e109c44a3447bb891d48dc3beda688a7e378f68b7863aae17857d8f56f6"
+    },
+    {
+      "path": "web-final-867387f/browser-ui.json",
+      "bytes": 770,
+      "sha256": "bf3a098a1373f5e688e9e2e289f9c6609c4a1f9d9079c83af9f84938d58758df"
+    },
+    {
+      "path": "web-final-867387f/http-component-readback.json",
+      "bytes": 732,
+      "sha256": "b712d2514a3d020ee9dde6fbc08bb2b975f5fc9c7f18cd3028837c0034c1cd58"
+    },
+    {
+      "path": "web-final-867387f/report.md",
+      "bytes": 1454,
+      "sha256": "d7059bc14a77c84b5aa9513a08bb37261828cb4a7d75bb2052221232884fa03d"
+    },
+    {
+      "path": "web/attachment-e2e.json",
+      "bytes": 1644,
+      "sha256": "06bc1ce522b5bef8eed495b265b37dfd0c4ac30b9c20fb3b38c9f808d8e16c82"
+    },
+    {
+      "path": "web/comment-readback.json",
+      "bytes": 654,
+      "sha256": "1f17d59fcb0fd054de6a4bf501d41ab1969f1a813cc184beb54e6150cccb1525"
+    },
+    {
+      "path": "web/component-readback.json",
+      "bytes": 871,
+      "sha256": "4468eedf83c8c0762934c433c66965e5d2a5de4cd217be32968d8dadda01eafb"
+    },
+    {
+      "path": "web/core-e2e-report.md",
+      "bytes": 4403,
+      "sha256": "e66c2d61c717d7a9df83b60c086064bbb22e0a44bd7ead5a1fdac6cd31ef98ea"
+    },
+    {
+      "path": "web/ui-observations.json",
+      "bytes": 2116,
+      "sha256": "2f52f61f350f7d4ef8baab5f1336e648b524ddbc2f1c67c0ce69b1d4a9f31ff9"
+    },
+    {
+      "path": "windows/acceptance-matrix.md",
+      "bytes": 1882,
+      "sha256": "d14f863dabe89d618a33ebb09242c346c396058810842445a794e7a903a1a2eb"
+    },
+    {
+      "path": "windows/baseline-before-ui-upgrade.json",
+      "bytes": 1930,
+      "sha256": "3f17a31063012f6799b5e90fdfc46f3fc86c6fc4f76e680612b9ce5bca5d5fd9"
+    },
+    {
+      "path": "windows/coexistence-after.json",
+      "bytes": 822,
+      "sha256": "e054973f6b3313de6f962ec1c7fe83650a9f6e67019e2954b2c708f3e609e1aa"
+    },
+    {
+      "path": "windows/http-artifact-readback.json",
+      "bytes": 531,
+      "sha256": "403391d901f4eee74fcfb17c4740033b74ac8ead3d8286c9bbc7a0ed3d7c7529"
+    },
+    {
+      "path": "windows/install-click.json",
+      "bytes": 1116,
+      "sha256": "b9116125340716fcf8b55f040e552e813d9b307254780d4ee5a7aa8e24e2a4a3"
+    },
+    {
+      "path": "windows/post-upgrade-process-mcp.json",
+      "bytes": 2003,
+      "sha256": "f84a4b0648fd0ead99296bf940b40cf31713e5df9be3692cee8b613138a648b8"
+    },
+    {
+      "path": "windows/snapshot-build12-before.json",
+      "bytes": 1131,
+      "sha256": "bc2dbe3074758c5a71def0f715dbd5eb5ac23c4e888eed5f7309733974e91492"
+    },
+    {
+      "path": "windows/update-status-menu.json",
+      "bytes": 1163,
+      "sha256": "4cc18fc697d0915d1c80bd9d3859180488289bc90f372194d56a2dfec7a5dd76"
+    }
+  ]
+}

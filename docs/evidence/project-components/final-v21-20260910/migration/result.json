@@ -1,0 +1,352 @@
+{
+  "schemaVersion": 1,
+  "status": "passed",
+  "completedAt": "2026-09-10T04:31:08.182Z",
+  "sourceCanonical": {
+    "bytes": 2023424,
+    "sha256": "d860506b3a9e6de28fda1d301edc8d23af2b53221046e375d1c6619acf467567"
+  },
+  "schemaSequence": [
+    19,
+    20,
+    19
+  ],
+  "toolCountSequence": [
+    94,
+    96,
+    94
+  ],
+  "projectId": "4f804e54-134a-4fce-b312-29cfc77c4a28",
+  "userId": "c9064463-8b41-4e95-8427-4e24f3e2228b",
+  "bugIds": [
+    "36ad7296-c356-4580-9030-fb5d643bf035",
+    "4692e8c7-6651-4c8b-9f80-1fce363b58be",
+    "874e2c2d-4ed5-48cd-8fa8-43fe5208623e",
+    "a16ce639-d729-4df4-8f76-ca6cb8ba4e84",
+    "de5bf267-d266-4b1c-af1a-bb419cd9d95f"
+  ],
+  "counts": {
+    "accounts": 1,
+    "projects": 2,
+    "users": 2,
+    "memberships": 3,
+    "bugs": 5,
+    "comments": 0,
+    "attachments": 3,
+    "attachment_bindings": 3,
+    "events": 35,
+    "repair_attempts": 6,
+    "verifications": 3,
+    "verification_attachments": 2,
+    "project_components": 0
+  },
+  "attachmentContentFiles": [
+    {
+      "path": "evidence/sha256/6b/6b1048f8a6d40bac0b2954c18fefa40c4ea7a96120fc2e54b7317c0e43c2bbec",
+      "bytes": 68,
+      "sha256": "6b1048f8a6d40bac0b2954c18fefa40c4ea7a96120fc2e54b7317c0e43c2bbec"
+    },
+    {
+      "path": "evidence/sha256/ce/ce4c75b1bcfffb5bb6e766bd12f9c532dee2c317bec452305ea20dfcbe4cec61",
+      "bytes": 69,
+      "sha256": "ce4c75b1bcfffb5bb6e766bd12f9c532dee2c317bec452305ea20dfcbe4cec61"
+    },
+    {
+      "path": "quarantine/uploads/5ba6f30f-c304-4599-b6bd-b4101475597b/1/0.bin",
+      "bytes": 69,
+      "sha256": "ce4c75b1bcfffb5bb6e766bd12f9c532dee2c317bec452305ea20dfcbe4cec61"
+    },
+    {
+      "path": "quarantine/uploads/62efb3a0-0c27-49ab-bae2-638bb46af004/1/0.bin",
+      "bytes": 68,
+      "sha256": "6b1048f8a6d40bac0b2954c18fefa40c4ea7a96120fc2e54b7317c0e43c2bbec"
+    },
+    {
+      "path": "quarantine/uploads/d188d949-3ee1-462e-bbdb-c9013c056462/1/0.bin",
+      "bytes": 68,
+      "sha256": "6b1048f8a6d40bac0b2954c18fefa40c4ea7a96120fc2e54b7317c0e43c2bbec"
+    }
+  ],
+  "migrationBackup": {
+    "relative": "data\\db\\migration-backups\\qa-hub.sqlite.v19-to-v20.13a5b900-e2d0-47c6-bda1-34878b212cdf.sqlite",
+    "bytes": 2023424,
+    "sha256": "d860506b3a9e6de28fda1d301edc8d23af2b53221046e375d1c6619acf467567",
+    "lastWriteTime": "2026-09-10T04:24:58.5817258Z"
+  },
+  "comparisons": [
+    {
+      "label": "baseline-schema19 business probe",
+      "passed": true,
+      "detail": {
+        "status": "passed"
+      }
+    },
+    {
+      "label": "baseline-schema19 SQLite quick_check",
+      "passed": true,
+      "detail": {
+        "quickCheck": [
+          "ok"
+        ]
+      }
+    },
+    {
+      "label": "baseline-schema19 exact owned processes stopped",
+      "passed": true,
+      "detail": {
+        "pids": [
+          6164,
+          15392
+        ]
+      }
+    },
+    {
+      "label": "upgrade-schema20 business probe",
+      "passed": true,
+      "detail": {
+        "status": "passed"
+      }
+    },
+    {
+      "label": "upgrade-schema20 SQLite quick_check",
+      "passed": true,
+      "detail": {
+        "quickCheck": [
+          "ok"
+        ]
+      }
+    },
+    {
+      "label": "upgrade-schema20 exact owned processes stopped",
+      "passed": true,
+      "detail": {
+        "pids": [
+          19796,
+          15784
+        ]
+      }
+    },
+    {
+      "label": "rollback-schema19 business probe",
+      "passed": true,
+      "detail": {
+        "status": "passed"
+      }
+    },
+    {
+      "label": "rollback-schema19 SQLite quick_check",
+      "passed": true,
+      "detail": {
+        "quickCheck": [
+          "ok"
+        ]
+      }
+    },
+    {
+      "label": "rollback-schema19 exact owned processes stopped",
+      "passed": true,
+      "detail": {
+        "pids": [
+          14404,
+          19952
+        ]
+      }
+    },
+    {
+      "label": "schema sequence is 19 to 20 to 19",
+      "passed": true,
+      "detail": {
+        "versions": [
+          19,
+          20,
+          19
+        ]
+      }
+    },
+    {
+      "label": "API health schema sequence matches DB",
+      "passed": true,
+      "detail": {
+        "versions": [
+          "19",
+          "20",
+          "19"
+        ]
+      }
+    },
+    {
+      "label": "MCP catalog changes only with schema20 binary",
+      "passed": true,
+      "detail": {
+        "toolCounts": [
+          94,
+          96,
+          94
+        ]
+      }
+    },
+    {
+      "label": "upgrade-schema20 HTTP/MCP business projection preserved",
+      "passed": true,
+      "detail": {
+        "projectId": "4f804e54-134a-4fce-b312-29cfc77c4a28",
+        "userId": "c9064463-8b41-4e95-8427-4e24f3e2228b",
+        "bugIds": [
+          "36ad7296-c356-4580-9030-fb5d643bf035",
+          "4692e8c7-6651-4c8b-9f80-1fce363b58be",
+          "874e2c2d-4ed5-48cd-8fa8-43fe5208623e",
+          "a16ce639-d729-4df4-8f76-ca6cb8ba4e84",
+          "de5bf267-d266-4b1c-af1a-bb419cd9d95f"
+        ]
+      }
+    },
+    {
+      "label": "rollback-schema19 HTTP/MCP business projection preserved",
+      "passed": true,
+      "detail": {
+        "projectId": "4f804e54-134a-4fce-b312-29cfc77c4a28",
+        "userId": "c9064463-8b41-4e95-8427-4e24f3e2228b",
+        "bugIds": [
+          "36ad7296-c356-4580-9030-fb5d643bf035",
+          "4692e8c7-6651-4c8b-9f80-1fce363b58be",
+          "874e2c2d-4ed5-48cd-8fa8-43fe5208623e",
+          "a16ce639-d729-4df4-8f76-ca6cb8ba4e84",
+          "de5bf267-d266-4b1c-af1a-bb419cd9d95f"
+        ]
+      }
+    },
+    {
+      "label": "upgrade-schema20 logical rows and counts preserved",
+      "passed": true,
+      "detail": {
+        "counts": {
+          "accounts": 1,
+          "projects": 2,
+          "users": 2,
+          "memberships": 3,
+          "bugs": 5,
+          "comments": 0,
+          "attachments": 3,
+          "attachment_bindings": 3,
+          "events": 35,
+          "repair_attempts": 6,
+          "verifications": 3,
+          "verification_attachments": 2,
+          "project_components": 0
+        }
+      }
+    },
+    {
+      "label": "rollback-schema19 logical rows and counts preserved",
+      "passed": true,
+      "detail": {
+        "counts": {
+          "accounts": 1,
+          "projects": 2,
+          "users": 2,
+          "memberships": 3,
+          "bugs": 5,
+          "comments": 0,
+          "attachments": 3,
+          "attachment_bindings": 3,
+          "events": 35,
+          "repair_attempts": 6,
+          "verifications": 3,
+          "verification_attachments": 2,
+          "project_components": 0
+        }
+      }
+    },
+    {
+      "label": "upgrade-schema20 evidence and quarantine bytes preserved",
+      "passed": true,
+      "detail": {
+        "files": [
+          {
+            "path": "evidence/sha256/6b/6b1048f8a6d40bac0b2954c18fefa40c4ea7a96120fc2e54b7317c0e43c2bbec",
+            "bytes": 68,
+            "sha256": "6b1048f8a6d40bac0b2954c18fefa40c4ea7a96120fc2e54b7317c0e43c2bbec"
+          },
+          {
+            "path": "evidence/sha256/ce/ce4c75b1bcfffb5bb6e766bd12f9c532dee2c317bec452305ea20dfcbe4cec61",
+            "bytes": 69,
+            "sha256": "ce4c75b1bcfffb5bb6e766bd12f9c532dee2c317bec452305ea20dfcbe4cec61"
+          },
+          {
+            "path": "quarantine/uploads/5ba6f30f-c304-4599-b6bd-b4101475597b/1/0.bin",
+            "bytes": 69,
+            "sha256": "ce4c75b1bcfffb5bb6e766bd12f9c532dee2c317bec452305ea20dfcbe4cec61"
+          },
+          {
+            "path": "quarantine/uploads/62efb3a0-0c27-49ab-bae2-638bb46af004/1/0.bin",
+            "bytes": 68,
+            "sha256": "6b1048f8a6d40bac0b2954c18fefa40c4ea7a96120fc2e54b7317c0e43c2bbec"
+          },
+          {
+            "path": "quarantine/uploads/d188d949-3ee1-462e-bbdb-c9013c056462/1/0.bin",
+            "bytes": 68,
+            "sha256": "6b1048f8a6d40bac0b2954c18fefa40c4ea7a96120fc2e54b7317c0e43c2bbec"
+          }
+        ]
+      }
+    },
+    {
+      "label": "rollback-schema19 evidence and quarantine bytes preserved",
+      "passed": true,
+      "detail": {
+        "files": [
+          {
+            "path": "evidence/sha256/6b/6b1048f8a6d40bac0b2954c18fefa40c4ea7a96120fc2e54b7317c0e43c2bbec",
+            "bytes": 68,
+            "sha256": "6b1048f8a6d40bac0b2954c18fefa40c4ea7a96120fc2e54b7317c0e43c2bbec"
+          },
+          {
+            "path": "evidence/sha256/ce/ce4c75b1bcfffb5bb6e766bd12f9c532dee2c317bec452305ea20dfcbe4cec61",
+            "bytes": 69,
+            "sha256": "ce4c75b1bcfffb5bb6e766bd12f9c532dee2c317bec452305ea20dfcbe4cec61"
+          },
+          {
+            "path": "quarantine/uploads/5ba6f30f-c304-4599-b6bd-b4101475597b/1/0.bin",
+            "bytes": 69,
+            "sha256": "ce4c75b1bcfffb5bb6e766bd12f9c532dee2c317bec452305ea20dfcbe4cec61"
+          },
+          {
+            "path": "quarantine/uploads/62efb3a0-0c27-49ab-bae2-638bb46af004/1/0.bin",
+            "bytes": 68,
+            "sha256": "6b1048f8a6d40bac0b2954c18fefa40c4ea7a96120fc2e54b7317c0e43c2bbec"
+          },
+          {
+            "path": "quarantine/uploads/d188d949-3ee1-462e-bbdb-c9013c056462/1/0.bin",
+            "bytes": 68,
+            "sha256": "6b1048f8a6d40bac0b2954c18fefa40c4ea7a96120fc2e54b7317c0e43c2bbec"
+          }
+        ]
+      }
+    },
+    {
+      "label": "migration emitted one rollback database",
+      "passed": true,
+      "detail": {
+        "count": 1
+      }
+    },
+    {
+      "label": "migration rollback database is byte-identical to canonical schema19",
+      "passed": true,
+      "detail": {
+        "canonical": {
+          "bytes": 2023424,
+          "sha256": "d860506b3a9e6de28fda1d301edc8d23af2b53221046e375d1c6619acf467567"
+        },
+        "migrationBackup": {
+          "relative": "data\\db\\migration-backups\\qa-hub.sqlite.v19-to-v20.13a5b900-e2d0-47c6-bda1-34878b212cdf.sqlite",
+          "bytes": 2023424,
+          "sha256": "d860506b3a9e6de28fda1d301edc8d23af2b53221046e375d1c6619acf467567",
+          "lastWriteTime": "2026-09-10T04:24:58.5817258Z"
+        }
+      }
+    }
+  ],
+  "destructiveOperations": false,
+  "protectedInstancesModified": false
+}

@@ -1,0 +1,17 @@
+{
+  "name": "corr-38-git-diff-check",
+  "cwd": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub",
+  "executable": "git",
+  "args": [
+    "diff",
+    "--check"
+  ],
+  "startedAt": "2026-09-10T05:25:11.412Z",
+  "finishedAt": "2026-09-10T05:25:11.676Z",
+  "durationMs": 264,
+  "exitCode": 0,
+  "signal": null,
+  "error": null,
+  "stdoutBytes": 0,
+  "stderrBytes": 0
+}

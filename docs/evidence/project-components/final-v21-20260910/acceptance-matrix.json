@@ -1,0 +1,383 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-09-10T05:31:42.177Z",
+  "designVersion": "2.1",
+  "overallStatus": "blocked",
+  "completionAllowed": false,
+  "productSourceCommit": "867387fe69714ae0c3aafa6182946ffd80495768",
+  "coverageFixCommit": "04f22a5075fb6e534ab1303c8ff4e886296168ed",
+  "isolatedRuntime": {
+    "api": "http://127.0.0.1:4639",
+    "web": "http://127.0.0.1:4640",
+    "serverMcp": "http://127.0.0.1:4641/mcp",
+    "localMcp": "http://127.0.0.1:4642/mcp"
+  },
+  "statusVocabulary": {
+    "pass": "real entry executed and read back",
+    "fail": "real execution exposed a failure",
+    "unrun": "required resource or reachable entry unavailable",
+    "partial": "a subset passed and another mandatory aspect failed or was unrun"
+  },
+  "artifacts": {
+    "android": {
+      "versionCode": 26,
+      "versionName": "0.2.0-preview.13",
+      "bytes": 35913773,
+      "sha256": "63fb67774b0fed95f923f975a1e20956a7821a629157be965950379191953acb",
+      "signatureV2": true
+    },
+    "windows": {
+      "releaseId": "20260910T044149231Z",
+      "version": "0.2.0-preview.13",
+      "bytes": 108296156,
+      "sha256": "7610c92fd39d4485d78e3d8ee7618d79d5e8ed9f3d6ce096c2922c72e5388ab0",
+      "manifestEd25519": true,
+      "authenticode": "NotSigned"
+    },
+    "web": {
+      "asset": "/assets/index-BHhxArNW.js",
+      "sha256": "296935b38f898f33f49f28a262cd7cff929ac5d5aae3353819d3744659dfb907"
+    }
+  },
+  "cases": [
+    {
+      "id": "project-and-unique-gm",
+      "surfaces": [
+        "web",
+        "http"
+      ],
+      "status": "pass",
+      "evidence": [
+        "web/core-e2e-report.md"
+      ]
+    },
+    {
+      "id": "simple-name-login",
+      "surfaces": [
+        "web",
+        "http"
+      ],
+      "status": "pass",
+      "evidence": [
+        "web/core-e2e-report.md"
+      ]
+    },
+    {
+      "id": "employee-membership-and-internal-management",
+      "surfaces": [
+        "web",
+        "http",
+        "local_mcp"
+      ],
+      "status": "pass",
+      "evidence": [
+        "web/core-e2e-report.md",
+        "windows/post-upgrade-process-mcp.json"
+      ]
+    },
+    {
+      "id": "bug-core-crud-comments-attachments",
+      "surfaces": [
+        "web",
+        "http",
+        "server_mcp"
+      ],
+      "status": "pass",
+      "evidence": [
+        "web/attachment-e2e.json",
+        "web/comment-readback.json"
+      ]
+    },
+    {
+      "id": "android-offline-retry-exact-receipt",
+      "surfaces": [
+        "apk",
+        "http"
+      ],
+      "status": "pass",
+      "evidence": [
+        "android/offline-queue-report.md",
+        "android/offline-queue-db-readback.txt"
+      ]
+    },
+    {
+      "id": "android-human-lifecycle-verification-close",
+      "surfaces": [
+        "apk",
+        "http"
+      ],
+      "status": "pass",
+      "evidence": [
+        "android/lifecycle-final-verification.md"
+      ]
+    },
+    {
+      "id": "project-component-management-and-dependencies",
+      "surfaces": [
+        "web",
+        "http"
+      ],
+      "status": "pass",
+      "evidence": [
+        "web/core-e2e-report.md",
+        "web-final-867387f/report.md"
+      ]
+    },
+    {
+      "id": "external-build-terminal",
+      "surfaces": [
+        "apk",
+        "exe",
+        "web",
+        "http",
+        "server_mcp",
+        "local_mcp"
+      ],
+      "status": "unrun",
+      "evidence": [
+        "external/README.md"
+      ]
+    },
+    {
+      "id": "external-single-build-upload-terminal",
+      "surfaces": [
+        "apk",
+        "exe",
+        "web",
+        "http",
+        "server_mcp",
+        "local_mcp"
+      ],
+      "status": "unrun",
+      "evidence": [
+        "external/README.md"
+      ]
+    },
+    {
+      "id": "external-incremental-publication-terminal",
+      "surfaces": [
+        "apk",
+        "exe",
+        "web",
+        "http",
+        "server_mcp",
+        "local_mcp"
+      ],
+      "status": "unrun",
+      "evidence": [
+        "external/README.md"
+      ]
+    },
+    {
+      "id": "external-relay-delivery-terminal",
+      "surfaces": [
+        "apk",
+        "exe",
+        "web",
+        "http",
+        "server_mcp",
+        "local_mcp"
+      ],
+      "status": "unrun",
+      "evidence": [
+        "external/audit.json"
+      ]
+    },
+    {
+      "id": "external-qingyu-order-terminal",
+      "surfaces": [
+        "apk",
+        "exe",
+        "web",
+        "http",
+        "server_mcp",
+        "local_mcp"
+      ],
+      "status": "unrun",
+      "evidence": [
+        "external/README.md"
+      ]
+    },
+    {
+      "id": "web-final-asset-and-dependency-error",
+      "surfaces": [
+        "web"
+      ],
+      "status": "pass",
+      "evidence": [
+        "web-final-867387f/report.md"
+      ]
+    },
+    {
+      "id": "http-api-schema20-business",
+      "surfaces": [
+        "http"
+      ],
+      "status": "pass",
+      "evidence": [
+        "web/core-e2e-report.md",
+        "migration/result.json"
+      ]
+    },
+    {
+      "id": "server-mcp-96-tools-business",
+      "surfaces": [
+        "server_mcp"
+      ],
+      "status": "pass",
+      "evidence": [
+        "web/core-e2e-report.md"
+      ]
+    },
+    {
+      "id": "windows-built-in-update-and-local-mcp",
+      "surfaces": [
+        "exe",
+        "local_mcp"
+      ],
+      "status": "pass",
+      "evidence": [
+        "windows/acceptance-matrix.md",
+        "windows/post-upgrade-process-mcp.json"
+      ]
+    },
+    {
+      "id": "android-build-feed-install",
+      "surfaces": [
+        "apk"
+      ],
+      "status": "pass",
+      "evidence": [
+        "builds/android-code26-artifact.json",
+        "builds/android-code26-feed-http.json",
+        "android/code26-result.md"
+      ]
+    },
+    {
+      "id": "android-native-self-update",
+      "surfaces": [
+        "apk"
+      ],
+      "status": "unrun",
+      "evidence": [
+        "android/code26-result.md"
+      ]
+    },
+    {
+      "id": "android-mediaprojection-draft",
+      "surfaces": [
+        "apk"
+      ],
+      "status": "partial",
+      "evidence": [
+        "android/code26-result.md",
+        "android/capture-after-click.png",
+        "android/capture-final-logcat.txt"
+      ]
+    },
+    {
+      "id": "android-physical-device",
+      "surfaces": [
+        "apk"
+      ],
+      "status": "unrun",
+      "evidence": []
+    },
+    {
+      "id": "schema19-20-19-migration-rollback",
+      "surfaces": [
+        "http",
+        "server_mcp"
+      ],
+      "status": "pass",
+      "evidence": [
+        "migration/result.json"
+      ]
+    },
+    {
+      "id": "production-and-preview-coexistence",
+      "surfaces": [
+        "exe",
+        "web",
+        "http",
+        "server_mcp",
+        "local_mcp"
+      ],
+      "status": "pass",
+      "evidence": [
+        "coexistence-final.json"
+      ]
+    },
+    {
+      "id": "final-source-gate",
+      "surfaces": [
+        "source"
+      ],
+      "status": "pass",
+      "evidence": [
+        "source-gate/final-summary.json"
+      ]
+    }
+  ],
+  "blocking": [
+    {
+      "id": "android-mumu-native-stability",
+      "status": "fail",
+      "detail": "MediaProjection created a visible draft, then MuMu emitted Fatal signal 7 (SIGBUS)."
+    },
+    {
+      "id": "android-native-self-update",
+      "status": "unrun",
+      "detail": "The preview detail surface exposed no reachable native self-update entry."
+    },
+    {
+      "id": "android-physical-device",
+      "status": "unrun",
+      "detail": "No physical Android device was available."
+    },
+    {
+      "id": "external-build",
+      "status": "unrun",
+      "detail": "No isolated real Jenkins job/executor/artifact target."
+    },
+    {
+      "id": "external-upload",
+      "status": "unrun",
+      "detail": "No isolated real upload account/product/channel/object prefix."
+    },
+    {
+      "id": "external-relay",
+      "status": "unrun",
+      "detail": "No isolated real Relay project/workspace/executor/callback."
+    },
+    {
+      "id": "external-qingyu",
+      "status": "unrun",
+      "detail": "No isolated Qingyu identity/project/order."
+    }
+  ],
+  "sourceGate": {
+    "effectiveStages": {
+      "total": 37,
+      "passed": 37,
+      "failed": 0
+    },
+    "tests": {
+      "total": 1122,
+      "passed": 1121,
+      "failed": 0,
+      "skipped": 1
+    },
+    "androidLint": {
+      "errors": 0,
+      "warnings": 40
+    }
+  },
+  "fineGrainedCoverage": {
+    "items": 1027,
+    "retiredItems": 46,
+    "needsRevalidation": 627,
+    "unavailableReviewedEvidence": 1,
+    "note": "Fine-grained not_run and needsRevalidation rows remain authoritative; this release must not be marked complete."
+  }
+}

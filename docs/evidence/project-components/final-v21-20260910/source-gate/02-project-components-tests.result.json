@@ -1,0 +1,28 @@
+{
+  "name": "02-project-components-tests",
+  "cwd": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub",
+  "executable": "C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+  "args": [
+    "--test",
+    "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\scripts\\project-components\\android-recovery-proxy-audit.test.mjs",
+    "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\scripts\\project-components\\android-recovery-proxy.test.mjs",
+    "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\scripts\\project-components\\coverage-generation-chain.test.mjs",
+    "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\scripts\\project-components\\local-mcp-membership-live.test.mjs",
+    "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\scripts\\project-components\\package-preview-isolation.test.mjs",
+    "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\scripts\\project-components\\publish-preview-android-code23.test.mjs",
+    "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\scripts\\project-components\\publish-preview-web-detail-fix.test.mjs",
+    "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\scripts\\project-components\\redaction.test.mjs",
+    "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\scripts\\project-components\\retain-preview-android-update-state.test.mjs",
+    "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\scripts\\project-components\\server-mcp-membership-live.test.mjs",
+    "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\scripts\\project-components\\web-detail-loading-live.test.mjs",
+    "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\scripts\\project-components\\web-project-switch-draft-live.test.mjs"
+  ],
+  "startedAt": "2026-09-10T05:20:26.962Z",
+  "finishedAt": "2026-09-10T05:20:36.694Z",
+  "durationMs": 9732,
+  "exitCode": 0,
+  "signal": null,
+  "error": null,
+  "stdoutBytes": 15440,
+  "stderrBytes": 0
+}

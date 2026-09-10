@@ -1,0 +1,13 @@
+{
+  "readbackUrl": "http://127.0.0.1:4639/api/v1/projects/3f6e5980-0ced-4030-b544-a8204e2a8be0/components",
+  "loginStatus": 200,
+  "readbackStatus": 200,
+  "projectId": "3f6e5980-0ced-4030-b544-a8204e2a8be0",
+  "items": [
+    { "key": "build", "enabled": false, "status": "disabled", "version": 0, "config": {} },
+    { "key": "build_upload.single", "enabled": false, "status": "disabled", "version": 0, "config": {} },
+    { "key": "upload.incremental", "enabled": false, "status": "disabled", "version": 0, "config": {} },
+    { "key": "relay.production", "enabled": false, "status": "disabled", "version": 0, "config": {} },
+    { "key": "qingyu.sync", "enabled": false, "status": "disabled", "version": 0, "config": {} }
+  ]
+}

@@ -1,0 +1,47 @@
+{
+  "fixture": {
+    "path": "C:/Users/lin0/.codex/parallel-runtimes/qa-hub-preview-v21-e2e-fresh-0910/acceptance/web-luna-thread/fixture-1x1.png",
+    "size": 68,
+    "sha256": "6b1048f8a6d40bac0b2954c18fefa40c4ea7a96120fc2e54b7317c0e43c2bbec"
+  },
+  "projectId": "62a2f031-c436-402b-ba7d-57488c83450d",
+  "upload": {
+    "initStatus": 201,
+    "chunkStatus": 204,
+    "finalizeStatus": 200,
+    "attachmentId": "e85ac361-3913-48e3-9cc9-89f49910a650",
+    "finalizeSha256": "6b1048f8a6d40bac0b2954c18fefa40c4ea7a96120fc2e54b7317c0e43c2bbec",
+    "scanStatus": "clean",
+    "readyToBind": true
+  },
+  "bind": {
+    "status": 200,
+    "intent": "bug_create",
+    "bindingId": "e14eeae5-5930-4136-97d5-9723b7e18de0",
+    "version": 4
+  },
+  "mcpCreatedBug": {
+    "key": "LUI0910-2",
+    "bugId": "e78122c6-2bf7-454d-b013-16b80699a1c0",
+    "attachmentIds": ["e85ac361-3913-48e3-9cc9-89f49910a650"]
+  },
+  "download": {
+    "status": 200,
+    "size": 68,
+    "headerSha256": "6b1048f8a6d40bac0b2954c18fefa40c4ea7a96120fc2e54b7317c0e43c2bbec",
+    "downloadSha256": "6b1048f8a6d40bac0b2954c18fefa40c4ea7a96120fc2e54b7317c0e43c2bbec",
+    "byteEqual": true
+  },
+  "httpBugAttachmentList": {
+    "status": 200,
+    "snapshotSequence": 40,
+    "itemBindingStatus": "claimed",
+    "itemSha256MatchesFixture": true
+  },
+  "serverMcp": {
+    "qa_list_attachments": "PASS; metadata, projectId, claimed binding, size and sha256 read back",
+    "qa_materialize_attachment": "PASS; returned authenticated downloadUrl and qa-hub resource_link",
+    "wrongProjectList": "REJECTED with NOT_FOUND; no cross-project item exposed"
+  },
+  "externalCalls": false
+}

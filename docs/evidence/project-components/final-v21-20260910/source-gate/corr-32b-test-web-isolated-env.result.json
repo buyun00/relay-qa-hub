@@ -1,0 +1,17 @@
+{
+  "name": "corr-32b-test-web-isolated-env",
+  "cwd": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\apps\\web",
+  "executable": "C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+  "args": [
+    "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\node_modules\\vitest\\vitest.mjs",
+    "run"
+  ],
+  "startedAt": "2026-09-10T05:24:33.479Z",
+  "finishedAt": "2026-09-10T05:24:37.500Z",
+  "durationMs": 4021,
+  "exitCode": 0,
+  "signal": null,
+  "error": null,
+  "stdoutBytes": 249,
+  "stderrBytes": 0
+}

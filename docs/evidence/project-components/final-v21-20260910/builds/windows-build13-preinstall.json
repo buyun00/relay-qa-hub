@@ -1,0 +1,39 @@
+{
+  "schemaVersion": 1,
+  "status": "passed",
+  "completedAt": "2026-09-10T04:49:59.391Z",
+  "releaseId": "20260910T044149231Z",
+  "version": "0.2.0-preview.13",
+  "sourceCommit": "867387fe69714ae0c3aafa6182946ffd80495768",
+  "installer": {
+    "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-v21-e2e-fresh-0910\\downloads\\qa-hub-preview-v21-e2e-fresh-0910-windows-0.2.0-preview.13-20260910T044149231Z.exe",
+    "bytes": 108296156,
+    "sha256": "7610c92fd39d4485d78e3d8ee7618d79d5e8ed9f3d6ce096c2922c72e5388ab0"
+  },
+  "manifest": {
+    "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-v21-e2e-fresh-0910\\downloads\\qa-hub-preview-v21-e2e-fresh-0910-windows-latest.json",
+    "bytes": 480,
+    "sha256": "e4c09d3da283753cd0a97e6e08b7223d08649ed1cb595a6a340106d26cf91675",
+    "ed25519Verified": true
+  },
+  "packageDirectory": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-v21-e2e-fresh-0910\\packages\\20260910T044149231Z\\portable\\RelayQaHubPreview-v21-e2e-fresh-0910-win32-x64",
+  "appAsar": {
+    "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-v21-e2e-fresh-0910\\packages\\20260910T044149231Z\\portable\\RelayQaHubPreview-v21-e2e-fresh-0910-win32-x64\\resources\\app.asar",
+    "bytes": 3419736,
+    "sha256": "be71a2a59c35d66e3cacd52b5f421b9d92f98e32c37c7765ec4e4eb7307382e2"
+  },
+  "sourceTrees": {
+    "webFiles": 8,
+    "desktopFiles": 80,
+    "exactHashMatch": true
+  },
+  "http": {
+    "manifestStatus": 200,
+    "manifestSha256": "e4c09d3da283753cd0a97e6e08b7223d08649ed1cb595a6a340106d26cf91675",
+    "installerHeadStatus": 200,
+    "installerHeadLength": 108296156,
+    "installerGetStatus": 200,
+    "installerGetBytes": 108296156,
+    "installerGetSha256": "7610c92fd39d4485d78e3d8ee7618d79d5e8ed9f3d6ce096c2922c72e5388ab0"
+  }
+}

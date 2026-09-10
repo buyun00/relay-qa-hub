@@ -1,0 +1,8 @@
+{
+  "schemaVersion": 1,
+  "capturedAt": "2026-09-10T05:01:00Z",
+  "preview": {"port": 4642, "pid": 19564, "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview-v21-e2e-fresh-0910\\RelayQaHubPreview-v21-e2e-fresh-0910.exe"},
+  "productionDailyObserved": [{"port": 4320, "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHub\\RelayQaHub.exe"}, {"port": 4319, "status": "listening"}],
+  "oldPreviewObserved": [{"port": 4420, "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview\\RelayQaHubPreview.exe"}, {"port": 4419, "status": "listening"}, {"port": 4274, "status": "listening"}, {"port": 4174, "status": "listening"}, {"port": 4539, "status": "listening"}, {"port": 4541, "status": "listening"}],
+  "mutation": "No production/daily/old-preview process was stopped or modified."
+}

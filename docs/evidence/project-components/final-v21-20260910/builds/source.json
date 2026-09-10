@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "capturedAt": "2026-09-10T04:35:01.5720514Z",
+  "head": "867387fe69714ae0c3aafa6182946ffd80495768",
+  "sourceClean": true,
+  "android": {
+    "versionCode": 26,
+    "versionName": "0.2.0-preview.13",
+    "apiBaseUrl": "http://127.0.0.1:4639/api/v1/",
+    "projectId": "10000000-0000-4000-8000-000000000004"
+  },
+  "windows": {
+    "buildNumber": 13,
+    "version": "0.2.0-preview.13"
+  }
+}

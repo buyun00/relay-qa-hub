@@ -1,6 +1,6 @@
 # 实测证据映射审查
 
-生成时点：2026-09-09T03:31:53.248Z。只读已有证据，没有操作 UI、API 或生产。
+生成时点：2026-09-10T05:18:57.595Z。只读已有证据，没有操作 UI、API 或生产。
 
 `passed` 只代表该行明确注明的实际入口与输入。细目控件/路由通过不代表全部负向分支或上层基线通过；HTTP 15项、MCP 13项不称全部动作。未使用源码存在、共享实现、编译、单元或外部合同 fixture 代替真实外部执行。
 
@@ -184,6 +184,10 @@ code22同一已验收APK已发布为不可变预览下载：[下载Android code2
 
 ## 可重放与审计
 
+以下历史 `reviewedEvidence` 指向的 Git-ignored Android build proof 当前缺失；对应行已标记 `needsRevalidation`，本次没有重放或提升这些结果。其它 tracked/public proof 缺失仍会在写入前拒绝：
+
+- baseline-bf491c9fd4acc9：../../../apps/android/app/build/evidence/project-components/preview-code17-capture-bug-readback.json、../../../apps/android/app/build/evidence/project-components/preview-code17-capture-isolation-readback.json
+
 - 人工流程幂等修复API MJS206/206：已有成功输出，见[workflow-concurrency-live/api-regression.txt](workflow-concurrency-live/api-regression.txt)。local verification; does not mark unexecuted native UI/external baseline passed。
 - 人工流程幂等修复API TS33/33（合计239/239）：已有成功输出，见[workflow-concurrency-live/api-regression.txt](workflow-concurrency-live/api-regression.txt)。local verification; does not mark unexecuted native UI/external baseline passed。
 - 人工流程幂等修复Storage117/117：已有成功输出，见[workflow-concurrency-live/storage-regression.txt](workflow-concurrency-live/storage-regression.txt)。local verification; does not mark unexecuted native UI/external baseline passed。
@@ -207,7 +211,7 @@ code22同一已验收APK已发布为不可变预览下载：[下载Android code2
 - 独立app-first breaking检查通过：已有成功输出，见[runs/contracts-breaking-app-first.txt](runs/contracts-breaking-app-first.txt)。local verification; does not mark unexecuted native UI/external baseline passed。
 - 冻结共享Web源码99/99、双noEmit/lint/format；严格持久提交与明确拒绝恢复的本地回归：已有成功输出，见[web-pending-submission-source.json](web-pending-submission-source.json)。fetch替身、受控IndexedDB事件与串行存储适配器；不证明真实浏览器/EXE重启或基线14客户端恢复。
 - 7904e2c Web独立构建发布、3个实际HTTP下载SHA匹配、旧dist及全部旧assets保留：已有成功输出，见[runs/web-pending-submission-publication.json](runs/web-pending-submission-publication.json)。该发布记录仅证明构建和静态下载，无服务重启/安装版EXE更新；后续浏览器故障注入单独映射，不由发布提升客户端通过项。
-- Android 115/115、lint 0 error；严格核对提交fb2eca7的10份当前源码SHA：已有成功输出，见[android-offline-create-recovery.json](android-offline-create-recovery.json)。BugDraftPreferences测试原始SHA与提交canonical SHA分别保留，仅1个CRLF→LF、未重跑测试。OkHttp回环/受控DAO及偏好存储夹具，不是已安装APK、Compose/物理设备故障注入；不提升任何客户端结果。。
+- Android 115/115、lint 0 error；严格核对提交fb2eca7的10份冻结源码SHA：已有成功输出，见[android-offline-create-recovery.json](android-offline-create-recovery.json)。当前源码SHA已漂移，needs revalidation；该记录只保留为历史验证，不映射为当前通过。这是历史验证记录。BugDraftPreferences测试原始SHA与提交canonical SHA分别保留，仅1个CRLF→LF、未重跑测试。OkHttp回环/受控DAO及偏好存储夹具，不是已安装APK、Compose/物理设备故障注入；不提升任何客户端结果。。
 - 原始NSIS .onInit隔离native guard6/6：已有成功输出，见[runs/native-installer-guards.json](runs/native-installer-guards.json)。仅首建Programs、marker、junction与越界目录守卫；未执行真实用户完整首装或卸载。
 - .6 native helper以故意无效空配置实际返回failed并验证UTC序列化：已有成功输出，见[runs/native-updater-utc.json](runs/native-updater-utc.json)。预期失败仅验证UTC；没有调用installer，不计更新成功。
 - Web61/61+typecheck/lint/build；outbox真实临时API/SQLite、外部请求0：已有成功输出，见[runs/web-outbox-verification.json](runs/web-outbox-verification.json)。React静态渲染及隔离API实测；浏览器暂停条目点击未测。
@@ -240,4 +244,4 @@ code22同一已验收APK已发布为不可变预览下载：[下载Android code2
 
 所有proof的SHA-256均按原始文件字节计算，见coverage-matrix.json的evidenceMapping.proofHashes。仅JSON解析或日志/正文文本断言使用UTF-8解码；JPG等二进制hash检查不解码。旧/修正公开proof与原生tree/截图均保留各自hash；缺少optional proof时不新增通过。所有凭据均不参与读取和输出。
 
-当前细目计数：991。设计明确的必要入口均满足而整行 passed 的基线：09 关闭所有组件的基础全流程、10 项目人员管理一致、11 HTTP API 独立使用、12 服务端 MCP 独立使用、15 附件三种读取、23 EXE 共存与升级、24 回退演练。其余基线不能称整体完成。
+当前细目计数：1027。设计明确的必要入口均满足而整行 passed 的基线：09 关闭所有组件的基础全流程、10 项目人员管理一致、11 HTTP API 独立使用、12 服务端 MCP 独立使用、15 附件三种读取、23 EXE 共存与升级、24 回退演练。其余基线不能称整体完成。

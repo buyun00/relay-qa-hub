@@ -1,0 +1,12 @@
+{
+  "action": "snapshot",
+  "at": "2026-09-10T04:58:43.899Z",
+  "value": {
+    "app": true,
+    "bugRows": 0,
+    "login": false,
+    "text": "QA Hub 0.2.0-preview.13 已下载并通过签名校验\n安装并重启\nQ\nQA Hub\n项目\nLuna EXE UI 20260910 0246\n预览\nCtrl K\n\n工作区\n\n工作台\n0\n总览\n全部\n组件历史\n用户管理\n2 位项目成员\nMCP 设置\n运行中 · 4642\n新\n当前状态\nv0.2.0-preview.12\n6\nLuna Worker 246\n点击退出登录\n\n2026年9月10日\n\n你好，Luna Worker 246\n\n先完成需要你动作的 Bug，其他进度会自动留在工作台里。\n\n 新建 Bug\n已选中\n0\n待处理\n待分配、需补充或等待开始处理\n0\n处理中\n修复人正在处理\n1\n已完成待验收\n修复已完成，等待人工验收\n0\n关闭\n已验收并关闭\n人员范围\n我 · Luna Worker 246\n整个团队\nPreview GM\n0 个事项\n事项\n当前动作人\n进度\n最后更新\n当前筛选下没有事项\n\n换一个人员或状态，或清空搜索关键词。",
+    "title": "Relay QA Hub",
+    "url": "qa-hub-preview-v21-e2e-fresh-0910://app/index.html"
+  }
+}

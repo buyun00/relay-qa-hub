@@ -1,0 +1,507 @@
+ACTIVITY MANAGER ACTIVITIES (dumpsys activity activities)
+Display #0 (activities from top to bottom):
+  * Task{703a260 #152 type=standard A=10051:com.relayqahub.android.preview.debug U=0 visible=true visibleRequested=true mode=fullscreen translucent=false sz=1}
+    mLastPausedActivity: ActivityRecord{58117303 u0 com.android.systemui/.mediaprojection.permission.MediaProjectionPermissionActivity t-1 f}}
+    mLastNonFullscreenBounds=Rect(939, 115 - 1622, 1379)
+    isSleeping=false
+    topResumedActivity=ActivityRecord{240440931 u0 com.relayqahub.android.preview.debug/com.relayqahub.android.MainActivity t152}
+    * Hist  #0: ActivityRecord{240440931 u0 com.relayqahub.android.preview.debug/com.relayqahub.android.MainActivity t152}
+      packageName=com.relayqahub.android.preview.debug processName=com.relayqahub.android.preview.debug
+      launchedFromUid=2000 launchedFromPackage=com.android.shell launchedFromFeature=null userId=0
+      app=ProcessRecord{2cd8c51 52177:com.relayqahub.android.preview.debug/u0a51}
+      Intent { act=android.intent.action.MAIN cat=[android.intent.category.LAUNCHER] flg=0x10200000 cmp=com.relayqahub.android.preview.debug/com.relayqahub.android.MainActivity }
+      rootOfTask=true task=Task{703a260 #152 type=standard A=10051:com.relayqahub.android.preview.debug}
+      taskAffinity=10051:com.relayqahub.android.preview.debug
+      mActivityComponent=com.relayqahub.android.preview.debug/com.relayqahub.android.MainActivity
+      baseDir=/data/app/~~9q1A_NfnIRLW3kJpzZEDjg==/com.relayqahub.android.preview.debug-YSMO5yL3bMuFiVY_73qvcw==/base.apk
+      dataDir=/data/user/0/com.relayqahub.android.preview.debug
+      stateNotNeeded=false componentSpecified=true mActivityType=standard
+      compat={360dpi always-compat} theme=0x7f0a0009
+      mLastReportedConfigurations:
+        mGlobalConfig={1.0 460mcc?mnc [zh_CN_#Hans] ldltr sw640dp w1138dp h640dp 360dpi lrg long land finger -keyb/v/v dpad/v winConfig={ mBounds=Rect(0, 0 - 2560, 1440) mAppBounds=Rect(0, 0 - 2560, 1440) mMaxBounds=Rect(0, 0 - 2560, 1440) mDisplayRotation=ROTATION_90 mWindowingMode=fullscreen mActivityType=undefined mAlwaysOnTop=undefined mRotation=ROTATION_90} s.166 fontWeightAdjustment=0}
+        mOverrideConfig={1.0 460mcc?mnc [zh_CN_#Hans] ldltr sw640dp w1138dp h640dp 360dpi lrg long land finger -keyb/v/v dpad/v winConfig={ mBounds=Rect(0, 0 - 2560, 1440) mAppBounds=Rect(0, 0 - 2560, 1440) mMaxBounds=Rect(0, 0 - 2560, 1440) mDisplayRotation=ROTATION_90 mWindowingMode=fullscreen mActivityType=standard mAlwaysOnTop=undefined mRotation=ROTATION_90} s.2 fontWeightAdjustment=0}
+      mLastReportedActivityWindowInfo=ActivityWindowInfo{isEmbedded=false, taskBounds=Rect(0, 0 - 2560, 1440), taskFragmentBounds=Rect(0, 0 - 2560, 1440)}
+      CurrentConfiguration={1.0 460mcc?mnc [zh_CN_#Hans] ldltr sw640dp w1138dp h640dp 360dpi lrg long land finger -keyb/v/v dpad/v winConfig={ mBounds=Rect(0, 0 - 2560, 1440) mAppBounds=Rect(0, 0 - 2560, 1440) mMaxBounds=Rect(0, 0 - 2560, 1440) mDisplayRotation=ROTATION_90 mWindowingMode=fullscreen mActivityType=standard mAlwaysOnTop=undefined mRotation=ROTATION_90} s.2 fontWeightAdjustment=0}
+      RequestedOverrideConfiguration={0.0 ?mcc0mnc ?localeList ?layoutDir ?swdp ?wdp ?hdp ?density ?lsize ?long ?ldr ?wideColorGamut ?orien ?uimode ?night ?touch ?keyb/?/? ?nav/? winConfig={ mBounds=Rect(0, 0 - 0, 0) mAppBounds=null mMaxBounds=Rect(0, 0 - 0, 0) mDisplayRotation=undefined mWindowingMode=undefined mActivityType=standard mAlwaysOnTop=undefined mRotation=undefined} ?fontWeightAdjustment}
+      ResolvedOverrideConfiguration={0.0 ?mcc0mnc ?localeList ?layoutDir ?swdp ?wdp ?hdp ?density ?lsize ?long ?ldr ?wideColorGamut ?orien ?uimode ?night ?touch ?keyb/?/? ?nav/? winConfig={ mBounds=Rect(0, 0 - 0, 0) mAppBounds=null mMaxBounds=Rect(0, 0 - 0, 0) mDisplayRotation=undefined mWindowingMode=undefined mActivityType=undefined mAlwaysOnTop=undefined mRotation=undefined} s.2 ?fontWeightAdjustment}
+      taskDescription: label="null" icon=null iconResource=/0 iconFilename=null primaryColor=fff5f5f5
+        backgroundColor=fffafafa statusBarColor=fff7f8fc navigationBarColor=fff7f8fc
+       backgroundColorFloating=ffffffff
+      launchFailed=false launchCount=1 lastLaunchTime=-13m4s97ms
+      mHaveState=false mIcicle=null
+      state=RESUMED delayedResume=false finishing=false
+      keysPaused=false inHistory=true idle=true
+      occludesParent=true mNoDisplay=false immersive=false launchMode=1
+      mActivityType=standard
+      mImeInsetsFrozenUntilStartInput=false
+      windows=[Window{f002050 u0 com.relayqahub.android.preview.debug/com.relayqahub.android.MainActivity}]
+      windowType=2
+      mOccludesParent=true
+      overrideOrientation=SCREEN_ORIENTATION_UNSPECIFIED
+      requestedOrientation=SCREEN_ORIENTATION_UNSPECIFIED
+      mVisibleRequested=true mVisible=true mClientVisible=true reportedDrawn=true reportedVisible=true
+      mNumInterestingWindows=1 mNumDrawnWindows=1 allDrawn=true lastAllDrawn=false)
+      startingData=null firstWindowDrawn=true
+      nowVisible=true lastVisibleTime=-13m3s539ms
+      resizeMode=RESIZE_MODE_RESIZEABLE_VIA_SDK_VERSION
+      mLastReportedMultiWindowMode=false mLastReportedPictureInPictureMode=false
+      supportsSizeChanges=SIZE_CHANGES_UNSUPPORTED_METADATA
+      configChanges=0xc83
+      neverSandboxDisplayApis=false
+      alwaysSandboxDisplayApis=false
+      isTransparentPolicyRunning=false
+      areBoundsLetterboxed=false
+      isLetterboxRunning=false
+
+  * Task{a28e636 #1 type=home U=0 visible=false visibleRequested=false mode=fullscreen translucent=true sz=1}
+    * Task{62c2d15 #2 type=home I=app.lawnchair/.LawnchairLauncher U=0 rootTaskId=1 visible=false visibleRequested=false mode=fullscreen translucent=true sz=1}
+      mLastPausedActivity: ActivityRecord{6501915 u0 app.lawnchair/.LawnchairLauncher t2}
+      mLastNonFullscreenBounds=Rect(910, 61 - 1651, 1379)
+      isSleeping=false
+      * Hist  #0: ActivityRecord{6501915 u0 app.lawnchair/.LawnchairLauncher t2}
+        packageName=app.lawnchair processName=app.lawnchair
+        launchedFromUid=-1 launchedFromPackage=null launchedFromFeature=null userId=0
+        app=ProcessRecord{a4185c1 1065:app.lawnchair/u0a16}
+        Intent { act=android.intent.action.MAIN cat=[android.intent.category.HOME] flg=0x10000100 cmp=app.lawnchair/.LawnchairLauncher (has extras) }
+        rootOfTask=true task=Task{62c2d15 #2 type=home I=app.lawnchair/.LawnchairLauncher}
+        taskAffinity=null
+        mActivityComponent=app.lawnchair/.LawnchairLauncher
+        baseDir=/system/priv-app/Lawnchair/Lawnchair.apk
+        dataDir=/data/user/0/app.lawnchair
+        stateNotNeeded=true componentSpecified=true mActivityType=home
+        compat={360dpi always-compat} theme=0x7f130018
+        mLastReportedConfigurations:
+          mGlobalConfig={1.0 ?mcc0mnc [zh_CN_#Hans] ldltr sw640dp w1138dp h640dp 360dpi lrg long land finger -keyb/v/v dpad/v winConfig={ mBounds=Rect(0, 0 - 2560, 1440) mAppBounds=Rect(0, 0 - 2560, 1440) mMaxBounds=Rect(0, 0 - 2560, 1440) mDisplayRotation=ROTATION_90 mWindowingMode=fullscreen mActivityType=undefined mAlwaysOnTop=undefined mRotation=ROTATION_90} s.6 fontWeightAdjustment=0}
+          mOverrideConfig={1.0 460mcc?mnc [zh_CN_#Hans] ldltr sw640dp w1138dp h640dp 360dpi lrg long land finger -keyb/v/v dpad/v winConfig={ mBounds=Rect(0, 0 - 2560, 1440) mAppBounds=Rect(0, 0 - 2560, 1440) mMaxBounds=Rect(0, 0 - 2560, 1440) mDisplayRotation=ROTATION_90 mWindowingMode=fullscreen mActivityType=home mAlwaysOnTop=undefined mRotation=ROTATION_90} s.3 fontWeightAdjustment=0}
+        mLastReportedActivityWindowInfo=ActivityWindowInfo{isEmbedded=false, taskBounds=Rect(0, 0 - 2560, 1440), taskFragmentBounds=Rect(0, 0 - 2560, 1440)}
+        CurrentConfiguration={1.0 460mcc?mnc [zh_CN_#Hans] ldltr sw640dp w1138dp h640dp 360dpi lrg long land finger -keyb/v/v dpad/v winConfig={ mBounds=Rect(0, 0 - 2560, 1440) mAppBounds=Rect(0, 0 - 2560, 1440) mMaxBounds=Rect(0, 0 - 2560, 1440) mDisplayRotation=ROTATION_90 mWindowingMode=fullscreen mActivityType=home mAlwaysOnTop=undefined mRotation=ROTATION_90} s.12 fontWeightAdjustment=0}
+        RequestedOverrideConfiguration={0.0 ?mcc0mnc ?localeList ?layoutDir ?swdp ?wdp ?hdp ?density ?lsize ?long ?ldr ?wideColorGamut ?orien ?uimode ?night ?touch ?keyb/?/? ?nav/? winConfig={ mBounds=Rect(0, 0 - 0, 0) mAppBounds=null mMaxBounds=Rect(0, 0 - 0, 0) mDisplayRotation=undefined mWindowingMode=undefined mActivityType=home mAlwaysOnTop=undefined mRotation=undefined} ?fontWeightAdjustment}
+        taskDescription: label="null" icon=null iconResource=/0 iconFilename=null primaryColor=fff5f5f5
+          backgroundColor=ffeff0f7 statusBarColor=0 navigationBarColor=0
+         backgroundColorFloating=ffedf1f9
+        launchFailed=false launchCount=0 lastLaunchTime=-1d20h14m47s874ms
+        mHaveState=true mIcicle=Bundle[mParcelledData.dataSize=13036]
+        state=STOPPED delayedResume=false finishing=false
+        keysPaused=false inHistory=true idle=true
+        occludesParent=true mNoDisplay=false immersive=false launchMode=2
+        mActivityType=home
+        mImeInsetsFrozenUntilStartInput=true
+        windows=[Window{7d04877 u0 app.lawnchair/app.lawnchair.LawnchairLauncher}]
+        windowType=2
+        mOccludesParent=true
+        overrideOrientation=SCREEN_ORIENTATION_LANDSCAPE
+        requestedOrientation=SCREEN_ORIENTATION_LANDSCAPE
+        mVisibleRequested=false mVisible=false mClientVisible=false reportedDrawn=false reportedVisible=false
+        mAppStopped=true
+        mNumInterestingWindows=1 mNumDrawnWindows=1 allDrawn=false lastAllDrawn=false)
+        nowVisible=false lastVisibleTime=-13m5s373ms
+        connections={ConnectionRecord{2f1f1e2 u0 app.lawnchair/com.android.quickstep.TouchInteractionService:@7488aad flags=0x0}}
+        resizeMode=RESIZE_MODE_RESIZEABLE
+        mLastReportedMultiWindowMode=false mLastReportedPictureInPictureMode=false
+        supportsSizeChanges=SIZE_CHANGES_UNSUPPORTED_METADATA
+        configChanges=0xffb
+        neverSandboxDisplayApis=false
+        alwaysSandboxDisplayApis=false
+        isTransparentPolicyRunning=false
+        areBoundsLetterboxed=false
+        isLetterboxRunning=false
+
+  * Task{9d9d5b9 #3 type=undefined U=0 visible=false visibleRequested=false mode=fullscreen translucent=true sz=2}
+    mCreatedByOrganizer=true
+    * Task{2511fac #5 type=undefined U=0 rootTaskId=3 visible=false visibleRequested=false mode=multi-window translucent=true sz=0}
+      mBounds=Rect(2560, 0 - 3840, 1440)
+      mCreatedByOrganizer=true
+      isSleeping=false
+    * Task{9d8095f #4 type=undefined U=0 rootTaskId=3 visible=false visibleRequested=false mode=multi-window translucent=true sz=0}
+      mCreatedByOrganizer=true
+      isSleeping=false
+
+  Resumed activities in task display areas (from top to bottom):
+    Resumed: ActivityRecord{240440931 u0 com.relayqahub.android.preview.debug/com.relayqahub.android.MainActivity t152}
+
+Display #9 (activities from top to bottom):
+
+  ResumedActivity: ActivityRecord{240440931 u0 com.relayqahub.android.preview.debug/com.relayqahub.android.MainActivity t152}
+
+ActivityTaskSupervisor state:
+  topDisplayFocusedRootTask=Task{703a260 #152 type=standard A=10051:com.relayqahub.android.preview.debug}
+  Display: mDisplayId=0 (organized)
+    init=1440x2560 360dpi mMinSizeOfResizeableTaskDp=220 noscale
+ cur=2560x1440 app=2560x1440 rng=1440x1440-2560x2560
+    deferred=false mLayoutNeeded=false
+  mLastOrientationSource=WindowedMagnification:0:31@228731640
+  deepestLastOrientationSource=ActivityRecord{240440931 u0 com.relayqahub.android.preview.debug/com.relayqahub.android.MainActivity t152}
+  overrideConfig={1.0 460mcc?mnc [zh_CN_#Hans] ldltr sw640dp w1138dp h640dp 360dpi lrg long land finger -keyb/v/v dpad/v winConfig={ mBounds=Rect(0, 0 - 2560, 1440) mAppBounds=Rect(0, 0 - 2560, 1440) mMaxBounds=Rect(0, 0 - 2560, 1440) mDisplayRotation=ROTATION_90 mWindowingMode=fullscreen mActivityType=undefined mAlwaysOnTop=undefined mRotation=ROTATION_90} s.144 fontWeightAdjustment=0}
+  mLayoutSeq=1473
+  mCurrentFocus=Window{f002050 u0 com.relayqahub.android.preview.debug/com.relayqahub.android.MainActivity}
+  mFocusedApp=ActivityRecord{240440931 u0 com.relayqahub.android.preview.debug/com.relayqahub.android.MainActivity t152}
+
+  mHoldScreenWindow=null
+  mObscuringWindow=Window{f002050 u0 com.relayqahub.android.preview.debug/com.relayqahub.android.MainActivity}
+  mLastWakeLockHoldingWindow=null
+  mLastWakeLockObscuringWindow=Window{6ad3a6c u0 com.relayqahub.android.preview.debug/com.relayqahub.android.MainActivity EXITING}
+
+  displayId=0
+  mWallpaperTarget=null
+  mLastWallpaperZoomOut=0.0
+  token WallpaperWindowToken{7b5b075 token=android.os.Binder@aaeabac}:
+    canShowWhenLocked=true
+    mWallpaperX=NA
+    mWallpaperY=NA
+    mWallpaperXStep=NA
+    mWallpaperYStep=NA
+    mWallpaperDisplayOffsetX=NA
+    mWallpaperDisplayOffsetY=NA
+
+  mSystemGestureExclusion=SkRegion()
+
+  Display areas in top down Z order:
+    * Leaf:36:36
+    * HideDisplayCutout:32:35
+      * OneHanded:34:35
+        * FullscreenMagnification:34:35
+          * Leaf:34:35
+      * FullscreenMagnification:33:33
+        * Leaf:33:33
+      * OneHanded:32:32
+        * Leaf:32:32
+    * WindowedMagnification:0:31
+      * HideDisplayCutout:26:31
+        * OneHanded:26:31
+          * FullscreenMagnification:29:31
+            * Leaf:29:31
+          * Leaf:28:28
+          * FullscreenMagnification:26:27
+            * Leaf:26:27
+      * Leaf:24:25
+      * HideDisplayCutout:18:23
+        * OneHanded:18:23
+          * FullscreenMagnification:18:23
+            * Leaf:18:23
+      * OneHanded:17:17
+        * FullscreenMagnification:17:17
+          * Leaf:17:17
+      * HideDisplayCutout:16:16
+        * OneHanded:16:16
+          * FullscreenMagnification:16:16
+            * Leaf:16:16
+      * OneHanded:15:15
+        * FullscreenMagnification:15:15
+          * Leaf:15:15
+      * HideDisplayCutout:0:14
+        * OneHanded:0:14
+          * ImePlaceholder:13:14
+            * ImeContainer
+          * FullscreenMagnification:0:12
+            * Leaf:3:12
+            * DefaultTaskDisplayArea (organized)
+            * Leaf:0:1
+
+  Task display areas in top down Z order:
+    TaskDisplayArea DefaultTaskDisplayArea
+      mPreferredTopFocusableRootTask=Task{703a260 #152 type=standard A=10051:com.relayqahub.android.preview.debug}
+      mLastFocusedRootTask=Task{703a260 #152 type=standard A=10051:com.relayqahub.android.preview.debug}
+      Application tokens in top down Z order:
+      * Task{703a260 #152 type=standard A=10051:com.relayqahub.android.preview.debug U=0 visible=true visibleRequested=true mode=fullscreen translucent=false sz=1}
+        bounds=[0,0][2560,1440]
+        * ActivityRecord{240440931 u0 com.relayqahub.android.preview.debug/com.relayqahub.android.MainActivity t152}
+      * Task{a28e636 #1 type=home U=0 visible=false visibleRequested=false mode=fullscreen translucent=true sz=1}
+        bounds=[0,0][2560,1440]
+        * Task{62c2d15 #2 type=home I=app.lawnchair/.LawnchairLauncher U=0 rootTaskId=1 visible=false visibleRequested=false mode=fullscreen translucent=true sz=1}
+          bounds=[0,0][2560,1440]
+          * ActivityRecord{6501915 u0 app.lawnchair/.LawnchairLauncher t2}
+      * Task{9d9d5b9 #3 type=undefined U=0 visible=false visibleRequested=false mode=fullscreen translucent=true sz=2}
+        bounds=[0,0][2560,1440]
+        * Task{2511fac #5 type=undefined U=0 rootTaskId=3 visible=false visibleRequested=false mode=multi-window translucent=true sz=0}
+          bounds=[2560,0][3840,1440]
+        * Task{9d8095f #4 type=undefined U=0 rootTaskId=3 visible=false visibleRequested=false mode=multi-window translucent=true sz=0}
+          bounds=[0,0][2560,1440]
+
+  no ScreenRotationAnimation 
+
+  rootHomeTask=Task=1
+
+  PinnedTaskController
+    mIsImeShowing=false
+    mImeHeight=0
+    mMinAspectRatio=0.41841003
+    mMaxAspectRatio=2.39
+
+  DisplayFrames w=2560 h=1440 r=1
+
+  DisplayPolicy
+    mCarDockEnablesAccelerometer=true mDeskDockEnablesAccelerometer=true
+    mDockMode=EXTRA_DOCK_STATE_UNDOCKED mLidState=LID_ABSENT
+    mAwake=true mScreenOnEarly=true mScreenOnFully=true
+    mKeyguardDrawComplete=true mWindowManagerDrawComplete=true
+    mHdmiPlugged=false
+    mLastAppearance=LIGHT_STATUS_BARS
+    mLastBehavior=DEFAULT
+    mShowingDream=false mDreamingLockscreen=false
+    mStatusBar=Window{a6fa835 u0 StatusBar}
+    mExpandedPanel=Window{429fa27 u0 NotificationShade}
+    isKeyguardShowing=false
+    mTopGestureHost=Window{a6fa835 u0 StatusBar}
+    mFocusedWindow=Window{f002050 u0 com.relayqahub.android.preview.debug/com.relayqahub.android.MainActivity}
+    mTopFullscreenOpaqueWindowState=Window{f002050 u0 com.relayqahub.android.preview.debug/com.relayqahub.android.MainActivity}
+    mSystemBarColorApps={ActivityRecord{240440931 u0 com.relayqahub.android.preview.debug/com.relayqahub.android.MainActivity t152}}
+    mLastStatusBarAppearanceRegions=
+      AppearanceRegion{LIGHT_STATUS_BARS bounds=[0,0][2560,1440]}
+    mLastLetterboxDetails=
+    mStatusBarBackgroundWindows=
+      Window{f002050 u0 com.relayqahub.android.preview.debug/com.relayqahub.android.MainActivity}
+    mTopIsFullscreen=false
+    mImeInsetsConsumed=false
+    mForceShowNavigationBarEnabled=false mAllowLockscreenWhenOn=false
+    mRemoteInsetsControllerControlsSystemBars=false
+    mDecorInsetsInfo:
+      ROTATION_0={nonDecorInsets=[0,0][0,0], overrideNonDecorInsets=[0,0][0,0], configInsets=[0,0][0,0], overrideConfigInsets=[0,54][0,0], nonDecorFrame=[0,0][1440,2560], overrideNonDecorFrame=[0,0][1440,2560], configFrame=[0,0][1440,2560], overrideConfigFrame=[0,54][1440,2560]}
+      ROTATION_90={nonDecorInsets=[0,0][0,0], overrideNonDecorInsets=[0,0][0,0], configInsets=[0,0][0,0], overrideConfigInsets=[0,54][0,0], nonDecorFrame=[0,0][2560,1440], overrideNonDecorFrame=[0,0][2560,1440], configFrame=[0,0][2560,1440], overrideConfigFrame=[0,54][2560,1440]}
+      ROTATION_180={nonDecorInsets=[0,0][0,0], overrideNonDecorInsets=[0,0][0,0], configInsets=[0,0][0,0], overrideConfigInsets=[0,54][0,0], nonDecorFrame=[0,0][1440,2560], overrideNonDecorFrame=[0,0][1440,2560], configFrame=[0,0][1440,2560], overrideConfigFrame=[0,54][1440,2560]}
+      ROTATION_270={nonDecorInsets=[0,0][0,0], overrideNonDecorInsets=[0,0][0,0], configInsets=[0,0][0,0], overrideConfigInsets=[0,54][0,0], nonDecorFrame=[0,0][2560,1440], overrideNonDecorFrame=[0,0][2560,1440], configFrame=[0,0][2560,1440], overrideConfigFrame=[0,54][2560,1440]}
+    SystemGestures:
+      mDisplayCutoutTouchableRegionSize=0
+      mSwipeStartThreshold=Rect(54, 54 - 54, 54)
+      mSwipeDistanceThreshold=54
+
+  DisplayRotation
+    mCurrentAppOrientation=SCREEN_ORIENTATION_UNSPECIFIED
+    mLastOrientation=-1
+    mRotation=1 mDeferredRotationPauseCount=0
+    mLandscapeRotation=ROTATION_90 mSeascapeRotation=ROTATION_270
+    mPortraitRotation=ROTATION_0 mUpsideDownRotation=ROTATION_180
+    mSupportAutoRotation=true
+    WindowOrientationListener
+      mEnabled=true
+      mCurrentRotation=ROTATION_90
+      mSensorType=null
+      mSensor={Sensor name="3-axis Accelerometer", vendor="STMicro", version=1, type=1, maxRange=39.300102, resolution=2.480159E-4, power=3.0, minDelay=10000}
+      mRate=2
+      AccelSensorJudge
+        mProposedRotation=1
+        mPredictedRotation=1
+        mLastFilteredX=9.809988
+        mLastFilteredY=0.19999382
+        mLastFilteredZ=0.100012414
+        mLastFilteredTimestampNanos=159297918831312 (37.32745ms ago)
+        mTiltHistory={last: 1.0}
+        mFlat=false
+        mSwinging=false
+        mAccelerating=false
+        mOverhead=false
+        mTouched=false
+        mTiltToleranceConfig=[[-25, 70], [-25, 65], [-25, 60], [-25, 65]]
+
+    mCarDockRotation=-1 mDeskDockRotation=-1
+    mUserRotationMode=USER_ROTATION_FREE mUserRotation=ROTATION_0 mCameraRotationMode=0 mAllowAllRotations=unknown
+    mDemoHdmiRotation=ROTATION_90 mDemoHdmiRotationLock=false mUndockedHdmiRotation=-1
+    mLidOpenRotation=-1
+    mFixedToUserRotation=false
+
+    RotationHistory
+      09-10 11:25:54.279 ROTATION_90 to ROTATION_0
+        source=ActivityRecord{113284527 u0 com.relayqahub.android.preview.debug/com.relayqahub.android.MainActivity t150} SCREEN_ORIENTATION_UNSPECIFIED
+        mode=USER_ROTATION_LOCKED user=ROTATION_0 sensor=ROTATION_90
+      09-10 11:31:15.024 ROTATION_0 to ROTATION_90
+        source=ActivityRecord{6501915 u0 app.lawnchair/.LawnchairLauncher t2} SCREEN_ORIENTATION_LANDSCAPE
+        mode=USER_ROTATION_FREE user=ROTATION_0 sensor=-1
+      09-10 11:41:39.283 ROTATION_90 to ROTATION_0
+        source=ActivityRecord{234738123 u0 com.relayqahub.android.preview.debug/com.relayqahub.android.MainActivity t151} SCREEN_ORIENTATION_UNSPECIFIED
+        mode=USER_ROTATION_LOCKED user=ROTATION_0 sensor=ROTATION_90
+      09-10 11:41:39.399 ROTATION_0 to ROTATION_90
+        source=ActivityRecord{234738123 u0 com.relayqahub.android.preview.debug/com.relayqahub.android.MainActivity t151} SCREEN_ORIENTATION_UNSPECIFIED
+        mode=USER_ROTATION_FREE user=ROTATION_0 sensor=ROTATION_90
+      09-10 12:41:44.853 ROTATION_90 to ROTATION_0
+        source=ActivityRecord{234738123 u0 com.relayqahub.android.preview.debug/com.relayqahub.android.MainActivity t151} SCREEN_ORIENTATION_UNSPECIFIED
+        mode=USER_ROTATION_FREE user=ROTATION_0 sensor=ROTATION_90
+      09-10 12:42:00.596 ROTATION_0 to ROTATION_90
+        source=ActivityRecord{6501915 u0 app.lawnchair/.LawnchairLauncher t2} SCREEN_ORIENTATION_LANDSCAPE
+        mode=USER_ROTATION_FREE user=ROTATION_0 sensor=-1
+
+        RotationLockHistory
+          09-10 12:42:03.304: mode=USER_ROTATION_FREE, rotation=ROTATION_0, caller=UiAutomationConnection#restoreRotationStateLocked
+          09-10 12:42:15.142: mode=USER_ROTATION_FREE, rotation=ROTATION_0, caller=UiAutomationConnection#restoreRotationStateLocked
+          09-10 12:52:34.266: mode=USER_ROTATION_FREE, rotation=ROTATION_0, caller=UiAutomationConnection#restoreRotationStateLocked
+          09-10 12:52:46.317: mode=USER_ROTATION_FREE, rotation=ROTATION_0, caller=UiAutomationConnection#restoreRotationStateLocked
+          09-10 12:53:09.539: mode=USER_ROTATION_FREE, rotation=ROTATION_0, caller=UiAutomationConnection#restoreRotationStateLocked
+          09-10 12:53:21.365: mode=USER_ROTATION_FREE, rotation=ROTATION_0, caller=UiAutomationConnection#restoreRotationStateLocked
+          09-10 12:53:39.318: mode=USER_ROTATION_FREE, rotation=ROTATION_0, caller=UiAutomationConnection#restoreRotationStateLocked
+          09-10 12:55:04.634: mode=USER_ROTATION_FREE, rotation=ROTATION_0, caller=UiAutomationConnection#restoreRotationStateLocked
+
+  InputConsumers:
+    name=recents_animation_input_consumer pid=1065 user=UserHandle{0}
+
+  WindowInsetsStateController
+    InsetsState
+      mDisplayFrame=Rect(0, 0 - 2560, 1440)
+      mDisplayCutout=DisplayCutout{insets=Rect(0, 0 - 0, 0) waterfall=Insets{left=0, top=0, right=0, bottom=0} boundingRect={Bounds=[Rect(0, 0 - 0, 0), Rect(0, 0 - 0, 0), Rect(0, 0 - 0, 0), Rect(0, 0 - 0, 0)]} cutoutPathParserInfo={CutoutPathParserInfo{displayWidth=0 displayHeight=0 physicalDisplayWidth=0 physicalDisplayHeight=0 density={0.0} cutoutSpec={} rotation={0} scale={0.0} physicalPixelDisplaySizeRatio={0.0}}} sideOverrides=null}
+      mRoundedCorners=RoundedCorners{[RoundedCorner{position=TopLeft, radius=0, center=Point(0, 0)}, RoundedCorner{position=TopRight, radius=0, center=Point(0, 0)}, RoundedCorner{position=BottomRight, radius=0, center=Point(0, 0)}, RoundedCorner{position=BottomLeft, radius=0, center=Point(0, 0)}]}
+      mRoundedCornerFrame=Rect(0, 0 - 0, 0)
+      mPrivacyIndicatorBounds=PrivacyIndicatorBounds {static bounds=Rect(2344, 0 - 2529, 54) rotation=1}
+      mDisplayShape=DisplayShape{ spec=1914694087 displayWidth=1440 displayHeight=2560 physicalPixelDisplaySizeRatio=1.0 rotation=1 offsetX=0 offsetY=0 scale=1.0}
+        InsetsSource id=c3900000 type=statusBars frame=[0,0][2560,54] visible=true flags= sideHint=TOP boundingRects=null
+        InsetsSource id=c3900005 type=mandatorySystemGestures frame=[0,0][2560,54] visible=true flags= sideHint=TOP boundingRects=null
+        InsetsSource id=c3900006 type=tappableElement frame=[0,0][2560,54] visible=true flags= sideHint=TOP boundingRects=null
+        InsetsSource id=3 type=ime frame=[0,0][0,0] visible=false flags= sideHint=NONE boundingRects=null
+    Control map:
+      Window{f002050 u0 com.relayqahub.android.preview.debug/com.relayqahub.android.MainActivity}:
+        InsetsSourceControl: {c3900000 mType=statusBars initiallyVisible mSurfacePosition=Point(0, 0) mInsetsHint=Insets{left=0, top=54, right=0, bottom=0}}
+        InsetsSourceControl: {3 mType=ime mSurfacePosition=Point(0, 1440) mInsetsHint=Insets{left=0, top=0, right=0, bottom=0}}
+    InsetsSourceProviders:
+      ImeInsetsSourceProvider
+        mSource=InsetsSource id=3 type=ime frame=[0,0][0,0] visible=false flags= sideHint=NONE boundingRects=null
+        mSourceFrame=Rect(0, 1440 - 2560, 1440)
+        mControl=InsetsSourceControl mId=3 mType=ime mLeash=Surface(name=Surface(name=b973d7c InputMethod)/@0x58e65a - animation-leash of insets_animation)/@0xb354b1e mInitiallyVisible=false mSurfacePosition=Point(0, 1440) mInsetsHint=Insets{left=0, top=0, right=0, bottom=0} mSkipAnimationOnce=false mImeStatsToken=null
+        mInsetsHint=Insets{left=0, top=0, right=0, bottom=0} stale
+        mIsLeashInitialized=true mHasPendingPosition=false
+        mWindowContainer=Window{b973d7c u0 InputMethod}
+        mAdapter=ControlAdapter mCapturedLeash=Surface(name=Surface(name=b973d7c InputMethod)/@0x58e65a - animation-leash of insets_animation)/@0xb354b1e
+        mControlTarget=Window{f002050 u0 com.relayqahub.android.preview.debug/com.relayqahub.android.MainActivity}
+        mImeShowing=false        showImePostLayout not scheduled, mImeRequester=null
+
+      InsetsSourceProvider
+        mSource=InsetsSource id=c3900006 type=tappableElement frame=[0,0][2560,54] visible=true flags= sideHint=TOP boundingRects=null
+        mSourceFrame=Rect(0, 0 - 2560, 54)
+        mIsLeashInitialized=false mHasPendingPosition=false
+        mWindowContainer=Window{a6fa835 u0 StatusBar}
+      InsetsSourceProvider
+        mSource=InsetsSource id=c3900005 type=mandatorySystemGestures frame=[0,0][2560,54] visible=true flags= sideHint=TOP boundingRects=null
+        mSourceFrame=Rect(0, 0 - 2560, 54)
+        mIsLeashInitialized=false mHasPendingPosition=false
+        mWindowContainer=Window{a6fa835 u0 StatusBar}
+      InsetsSourceProvider
+        mSource=InsetsSource id=c3900000 type=statusBars frame=[0,0][2560,54] visible=true flags= sideHint=TOP boundingRects=null
+        mSourceFrame=Rect(0, 0 - 2560, 54)
+        mControl=InsetsSourceControl mId=c3900000 mType=statusBars mLeash=Surface(name=Surface(name=a6fa835 StatusBar)/@0x3f6f513 - animation-leash of insets_animation)/@0x9c84fff mInitiallyVisible=true mSurfacePosition=Point(0, 0) mInsetsHint=Insets{left=0, top=54, right=0, bottom=0} mSkipAnimationOnce=false mImeStatsToken=null
+        mInsetsHint=Insets{left=0, top=54, right=0, bottom=0}
+        mIsLeashInitialized=true mHasPendingPosition=false
+        mWindowContainer=Window{a6fa835 u0 StatusBar}
+        mAdapter=ControlAdapter mCapturedLeash=Surface(name=Surface(name=a6fa835 StatusBar)/@0x3f6f513 - animation-leash of insets_animation)/@0x9c84fff
+        mControlTarget=Window{f002050 u0 com.relayqahub.android.preview.debug/com.relayqahub.android.MainActivity}
+  InsetsPolicy
+    status: WINDOW_STATE_SHOWING
+    nav: WINDOW_STATE_SHOWING
+
+  Display: mDisplayId=9
+    init=2560x1440 360dpi mMinSizeOfResizeableTaskDp=220 noscale
+ cur=2560x1440 app=2560x1440 rng=1440x1440-2560x2560
+    deferred=false mLayoutNeeded=false
+  overrideConfig={0.0 ?mcc0mnc ?localeList ?layoutDir sw640dp w1138dp h640dp 360dpi lrg long land ?uimode ?night -touch -keyb/v/v -nav/h winConfig={ mBounds=Rect(0, 0 - 2560, 1440) mAppBounds=Rect(0, 0 - 2560, 1440) mMaxBounds=Rect(0, 0 - 2560, 1440) mDisplayRotation=ROTATION_0 mWindowingMode=fullscreen mActivityType=undefined mAlwaysOnTop=undefined mRotation=ROTATION_0} ?fontWeightAdjustment}
+  mLayoutSeq=1
+  mCurrentFocus=null
+  mFocusedApp=null
+
+  mHoldScreenWindow=null
+  mObscuringWindow=null
+  mLastWakeLockHoldingWindow=null
+  mLastWakeLockObscuringWindow=null
+
+  displayId=9
+  mWallpaperTarget=null
+  mLastWallpaperZoomOut=0.0
+
+  Display areas in top down Z order:
+    * WindowingLayer:0:36
+      * Leaf:15:36
+      * ImeContainer
+      * Leaf:3:12
+      * DefaultTaskDisplayArea
+      * Leaf:0:1
+
+  Task display areas in top down Z order:
+    TaskDisplayArea DefaultTaskDisplayArea
+      overrideConfig={0.0 ?mcc0mnc ?localeList ?layoutDir ?swdp ?wdp ?hdp ?density ?lsize ?long ?ldr ?wideColorGamut ?orien ?uimode ?night ?touch ?keyb/?/? ?nav/? winConfig={ mBounds=Rect(0, 0 - 0, 0) mAppBounds=null mMaxBounds=Rect(0, 0 - 0, 0) mDisplayRotation=undefined mWindowingMode=fullscreen mActivityType=undefined mAlwaysOnTop=undefined mRotation=undefined} ?fontWeightAdjustment}
+      Application tokens in top down Z order:
+
+  no ScreenRotationAnimation 
+
+
+  PinnedTaskController
+    mIsImeShowing=false
+    mImeHeight=0
+    mMinAspectRatio=0.41841003
+    mMaxAspectRatio=2.39
+
+  DisplayFrames w=2560 h=1440 r=0
+
+  DisplayPolicy
+    mCarDockEnablesAccelerometer=true mDeskDockEnablesAccelerometer=true
+    mDockMode=EXTRA_DOCK_STATE_UNDOCKED mLidState=LID_ABSENT
+    mAwake=true mScreenOnEarly=true mScreenOnFully=true
+    mKeyguardDrawComplete=false mWindowManagerDrawComplete=false
+    mHdmiPlugged=false
+    mShowingDream=false mDreamingLockscreen=false
+    isKeyguardShowing=false
+    mTopIsFullscreen=false
+    mImeInsetsConsumed=false
+    mForceShowNavigationBarEnabled=false mAllowLockscreenWhenOn=false
+    mRemoteInsetsControllerControlsSystemBars=false
+    mDecorInsetsInfo:
+      ROTATION_0={nonDecorInsets=[0,0][0,0], overrideNonDecorInsets=[0,0][0,0], configInsets=[0,0][0,0], overrideConfigInsets=[0,0][0,0], nonDecorFrame=[0,0][2560,1440], overrideNonDecorFrame=[0,0][2560,1440], configFrame=[0,0][2560,1440], overrideConfigFrame=[0,0][2560,1440]}
+      ROTATION_90={nonDecorInsets=[0,0][0,0], overrideNonDecorInsets=[0,0][0,0], configInsets=[0,0][0,0], overrideConfigInsets=[0,0][0,0], nonDecorFrame=[0,0][1440,2560], overrideNonDecorFrame=[0,0][1440,2560], configFrame=[0,0][1440,2560], overrideConfigFrame=[0,0][1440,2560]}
+      ROTATION_180={nonDecorInsets=[0,0][0,0], overrideNonDecorInsets=[0,0][0,0], configInsets=[0,0][0,0], overrideConfigInsets=[0,0][0,0], nonDecorFrame=[0,0][2560,1440], overrideNonDecorFrame=[0,0][2560,1440], configFrame=[0,0][2560,1440], overrideConfigFrame=[0,0][2560,1440]}
+      ROTATION_270={nonDecorInsets=[0,0][0,0], overrideNonDecorInsets=[0,0][0,0], configInsets=[0,0][0,0], overrideConfigInsets=[0,0][0,0], nonDecorFrame=[0,0][1440,2560], overrideNonDecorFrame=[0,0][1440,2560], configFrame=[0,0][1440,2560], overrideConfigFrame=[0,0][1440,2560]}
+    SystemGestures:
+      mDisplayCutoutTouchableRegionSize=0
+      mSwipeStartThreshold=Rect(54, 54 - 54, 54)
+      mSwipeDistanceThreshold=54
+
+  DisplayRotation
+    mCurrentAppOrientation=SCREEN_ORIENTATION_UNSPECIFIED
+    mLastOrientation=-1
+    mRotation=0 mDeferredRotationPauseCount=0
+    mLandscapeRotation=ROTATION_0 mSeascapeRotation=ROTATION_180
+    mPortraitRotation=ROTATION_270 mUpsideDownRotation=ROTATION_90
+    mSupportAutoRotation=true
+
+    mCarDockRotation=-1 mDeskDockRotation=-1
+    mUserRotationMode=USER_ROTATION_FREE mUserRotation=ROTATION_0 mCameraRotationMode=0 mAllowAllRotations=unknown
+    mDemoHdmiRotation=ROTATION_0 mDemoHdmiRotationLock=false mUndockedHdmiRotation=-1
+    mLidOpenRotation=-1
+    mFixedToUserRotation=true
+
+
+  WindowInsetsStateController
+    InsetsState
+      mDisplayFrame=Rect(0, 0 - 2560, 1440)
+      mDisplayCutout=DisplayCutout{insets=Rect(0, 0 - 0, 0) waterfall=Insets{left=0, top=0, right=0, bottom=0} boundingRect={Bounds=[Rect(0, 0 - 0, 0), Rect(0, 0 - 0, 0), Rect(0, 0 - 0, 0), Rect(0, 0 - 0, 0)]} cutoutPathParserInfo={CutoutPathParserInfo{displayWidth=0 displayHeight=0 physicalDisplayWidth=0 physicalDisplayHeight=0 density={0.0} cutoutSpec={} rotation={0} scale={0.0} physicalPixelDisplaySizeRatio={0.0}}} sideOverrides=null}
+      mRoundedCorners=RoundedCorners{[RoundedCorner{position=TopLeft, radius=0, center=Point(0, 0)}, RoundedCorner{position=TopRight, radius=0, center=Point(0, 0)}, RoundedCorner{position=BottomRight, radius=0, center=Point(0, 0)}, RoundedCorner{position=BottomLeft, radius=0, center=Point(0, 0)}]}
+      mRoundedCornerFrame=Rect(0, 0 - 0, 0)
+      mPrivacyIndicatorBounds=PrivacyIndicatorBounds {static bounds=null rotation=0}
+      mDisplayShape=DisplayShape{ spec=129168335 displayWidth=2560 displayHeight=1440 physicalPixelDisplaySizeRatio=1.0 rotation=0 offsetX=0 offsetY=0 scale=1.0}
+    Control map:
+      none    InsetsSourceProviders:
+  InsetsPolicy
+    status: WINDOW_STATE_SHOWING
+    nav: WINDOW_STATE_SHOWING
+
+  KeyguardController:
+    mKeyguardShowing=false
+    mAodShowing=false
+    mKeyguardGoingAway=false
+   KeyguardShowing=false AodShowing=false KeyguardGoingAway=false DismissalRequested=false  Occluded=false DismissingKeyguardActivity=null TurnScreenOnActivity=null at display=0
+   KeyguardShowing=false AodShowing=false KeyguardGoingAway=false DismissalRequested=false  Occluded=false DismissingKeyguardActivity=null TurnScreenOnActivity=null at display=9
+    mDismissalRequested=false
+
+  LockTaskController:
+    mLockTaskModeState=NONE
+    mLockTaskModeTasks=
+    mLockTaskPackages (userId:packages)=
+
+  mCurTaskIdForUser={0=152}
+  mUserRootTaskInFront={}
+  mVisibilityTransactionDepth=0
+  isHomeRecentsComponent=true
+  mNoHistoryActivities=[]
+
+  TaskOrganizerController:
+      android.window.ITaskOrganizer$Stub$Proxy@45fb2f3 uid=10032 (active):
+        (fullscreen) Task{a28e636 #1 type=home}
+        (fullscreen) Task{9d9d5b9 #3 type=undefined}
+        (multi-window) Task{9d8095f #4 type=undefined}
+        (multi-window) Task{2511fac #5 type=undefined}
+        (fullscreen) Task{703a260 #152 type=standard A=10051:com.relayqahub.android.preview.debug}
+
+  VisibleActivityProcess:[ ProcessRecord{2cd8c51 52177:com.relayqahub.android.preview.debug/u0a51}]
+  NumNonAppVisibleWindowUidMap:[ 10051:1 10032:1]
+  SleepTokens={}

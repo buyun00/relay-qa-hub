@@ -1,0 +1,71 @@
+{
+  "schemaVersion": 1,
+  "checkedAt": "2026-09-10T12:00:00+08:00",
+  "scope": "read_only_external_component_fixture_audit",
+  "source": {
+    "root": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub",
+    "head": "867387fe69714ae0c3aafa6182946ffd80495768",
+    "worktreeClean": true
+  },
+  "runtime": {
+    "root": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-v21-e2e-fresh-0910",
+    "designatedPorts": {
+      "api": 4639,
+      "web": 4640,
+      "serverMcp": 4641,
+      "localMcp": 4642
+    },
+    "preparedSourceHead": "7df05e5035958b4243ae70d4cd0107d5eb883fb1",
+    "priorBusinessDataPresent": true,
+    "freshComponentProjectCreated": false
+  },
+  "fixtureInventory": {
+    "jenkins": {
+      "repositoryFixture": false,
+      "contractTests": true,
+      "realTerminalProof": false,
+      "reason": "Injected fetch in apps/api/test/jenkins-builds.test.mjs; no Jenkins test server or independent artifact."
+    },
+    "incrementalUpload": {
+      "repositoryFixture": false,
+      "contractTests": true,
+      "realTerminalProof": false,
+      "reason": "Mocked/injected transport and disposable host tests; docs explicitly retain platform acceptance as unverified."
+    },
+    "singleBuildUpload": {
+      "repositoryFixture": false,
+      "contractTests": true,
+      "realTerminalProof": false,
+      "reason": "project-components-runtime.test.mjs asserts that build-upload performs no external execution."
+    },
+    "relay": {
+      "repositoryFixture": "fake_only",
+      "contractTests": true,
+      "realTerminalProof": false,
+      "reason": "apps/fake-relay/server.mjs is a repository fake and prior P5 evidence explicitly excludes real Relay."
+    },
+    "qingyu": {
+      "repositoryFixture": false,
+      "contractTests": true,
+      "realTerminalProof": false,
+      "reason": "Qingyu integration tests inject fake client responses; no independent identity/project/order server."
+    }
+  },
+  "matrixStatus": {
+    "externalFullChain": "not_run",
+    "resourceGaps": [
+      "external-build",
+      "external-upload",
+      "external-relay",
+      "external-qingyu"
+    ]
+  },
+  "execution": {
+    "componentsEnabled": false,
+    "externalRequests": 0,
+    "sourceModified": false,
+    "productionTouched": false,
+    "oldPreviewTouched": false,
+    "evidenceOnlyWrittenHere": true
+  }
+}

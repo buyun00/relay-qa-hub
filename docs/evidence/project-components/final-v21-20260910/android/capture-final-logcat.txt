@@ -1,0 +1,479 @@
+--------- beginning of crash
+09-10 12:53:10.417 F/DEBUG   (52595):       #01 pc 000000000005846f  /apex/com.android.runtime/lib64/bionic/libc.so (__cxa_finalize+287) (BuildId: 52bc34193ef6f6311bbb44f2305d1b1d)
+09-10 12:53:10.417 F/DEBUG   (52595):       #02 pc 000000000005c83f  /apex/com.android.runtime/lib64/bionic/libc.so (exit+31) (BuildId: 52bc34193ef6f6311bbb44f2305d1b1d)
+09-10 12:53:10.417 F/DEBUG   (52595):       #03 pc 00000000000520dc  /apex/com.android.runtime/lib64/bionic/libc.so (__libc_init+124) (BuildId: 52bc34193ef6f6311bbb44f2305d1b1d)
+--------- beginning of system
+09-10 12:53:10.420 W/NativeCrashListener(  835): Couldn't find ProcessRecord for pid 52580
+--------- beginning of main
+09-10 12:53:10.420 E/crash_dump64(52595): AM data write failed: Broken pipe
+09-10 12:53:10.420 E/tombstoned(  513): Tombstone written to: tombstone_09
+09-10 12:53:10.420 E/NativeTombstoneManager(  835): Tombstone's UID (2000) not an app, ignoring
+09-10 12:53:10.421 E/NativeTombstoneManager(  835): Tombstone's UID (2000) not an app, ignoring
+09-10 12:53:10.916 W/libc    (    1): Rewrite len too long for denied property "init.svc.serial_console", len = 7, oldlen = 0
+09-10 12:53:10.920 I/init    (52600): type=1400 audit(0.0:2654): avc:  denied  { transition } for  path="/system/xbin/serial_console" dev="sda6" ino=3974 scontext=u:r:init:s0 tcontext=u:r:su:s0 tclass=process permissive=1
+09-10 12:53:10.920 I/init    (52600): type=1400 audit(0.0:2655): avc:  denied  { noatsecure } for  scontext=u:r:init:s0 tcontext=u:r:su:s0 tclass=process permissive=1
+09-10 12:53:10.942 W/libc    (    1): Rewrite len too long for denied property "init.svc.serial_console", len = 10, oldlen = 0
+09-10 12:53:10.920 I/serial_console(52600): type=1400 audit(0.0:2656): avc:  denied  { rlimitinh } for  scontext=u:r:init:s0 tcontext=u:r:su:s0 tclass=process permissive=1
+09-10 12:53:10.920 I/serial_console(52600): type=1400 audit(0.0:2657): avc:  denied  { siginh } for  scontext=u:r:init:s0 tcontext=u:r:su:s0 tclass=process permissive=1
+09-10 12:53:13.196 D/PowerUI ( 1103): can't show warning due to - plugged: true status unknown: false
+09-10 12:53:15.924 W/libc    (    1): Rewrite len too long for denied property "init.svc.serial_console", len = 7, oldlen = 0
+09-10 12:53:15.933 W/libc    (    1): Rewrite len too long for denied property "init.svc.serial_console", len = 10, oldlen = 0
+09-10 12:53:19.794 D/CoreBackPreview(  835): Window{170f5a1 u0 PopupWindow:3e91413}: Setting back callback OnBackInvokedCallbackInfo{mCallback=android.window.IOnBackInvokedCallback$Stub$Proxy@8864add, mPriority=0, mIsAnimationCallback=false, mOverrideBehavior=0}
+09-10 12:53:19.796 D/gralloc_kona( 1103): gralloc_alloc: Creating ashmem region of size 2056192
+09-10 12:53:19.797 D/HWUI    ( 1103): HOOK FAILED! Expected 3 got = 2
+09-10 12:53:19.798 D/gralloc_kona( 1103): gralloc_alloc: Creating ashmem region of size 2056192
+09-10 12:53:20.279 D/AndroidRuntime(52608): >>>>>> START com.android.internal.os.RuntimeInit uid 2000 <<<<<<
+09-10 12:53:20.281 I/AndroidRuntime(52608): Using default boot image
+09-10 12:53:20.281 I/AndroidRuntime(52608): Leaving lock profiling enabled
+09-10 12:53:20.282 W/app_process(52608): ART APEX data files are untrusted.
+09-10 12:53:20.283 I/app_process(52608): Using CollectorTypeCMC GC.
+09-10 12:53:20.325 D/nativeloader(52608): InitDefaultPublicLibraries for_preload=1: libandroid.so:libaaudio.so:libamidi.so:libbinder_ndk.so:libc.so:libcamera2ndk.so:libdl.so:libEGL.so:libGLESv1_CM.so:libGLESv2.so:libGLESv3.so:libicu.so:libicui18n.so:libicuuc.so:libjnigraphics.so:liblog.so:libmediandk.so:libm.so:libnativehelper.so:libnativewindow.so:libOpenMAXAL.so:libOpenSLES.so:libRS.so:libstdc++.so:libsync.so:libvulkan.so:libwebviewchromium_plat_support.so:libz.so:libcallhost.so
+09-10 12:53:20.331 D/nativeloader(52608): Load libicu_jni.so using APEX ns com_android_art for caller /apex/com.android.art/javalib/core-oj.jar: ok
+09-10 12:53:20.331 D/app_process(52608): u_setTimeZoneFilesDirectory("/apex/com.android.tzdata/etc/tz/versioned/8/icu") succeeded. 
+09-10 12:53:20.331 D/app_process(52608): I18n APEX ICU file found: /apex/com.android.i18n/etc/icu/icudt75l.dat
+09-10 12:53:20.332 D/nativeloader(52608): Load libjavacore.so using APEX ns com_android_art for caller /apex/com.android.art/javalib/core-oj.jar: ok
+09-10 12:53:20.332 D/nativeloader(52608): Load libopenjdk.so using APEX ns com_android_art for caller /apex/com.android.art/javalib/core-oj.jar: ok
+09-10 12:53:20.333 W/app_process(52608): Unexpected CPU variant for x86: x86_64.
+09-10 12:53:20.333 W/app_process(52608): Known variants: atom, sandybridge, silvermont, goldmont, goldmont-plus, goldmont-without-sha-xsaves, tremont, kabylake, alderlake, default
+09-10 12:53:20.334 W/app_process(52608): ClassLoaderContext shared library size mismatch. Expected=2, found=0 (PCL[]{PCL[/system/framework/android.test.base.jar*2643221532]#PCL[/system/framework/android.test.mock.jar*4236284042]} | PCL[])
+09-10 12:53:20.334 W/app_process(52608): ClassLoaderContext classpath size mismatch. expected=0, found=1 (PCL[]{PCL[/system/framework/android.test.runner.jar*760235463]#PCL[/system/framework/android.test.base.jar*2643221532]} | PCL[/system/framework/android.test.runner.jar*760235463])
+09-10 12:53:20.334 W/app_process(52608): Could not create mount namespace.
+09-10 12:53:20.334 W/nativebridge(52608): Failed to bind-mount /system/etc/cpuinfo.x86_64.txt as /proc/cpuinfo: Operation not permitted
+09-10 12:53:20.334 W/nativebridge(52608): Failed to bind-mount /system/lib64/x86_64/cpuinfo as /proc/cpuinfo: Operation not permitted
+09-10 12:53:20.334 W/nativebridge(52608): Cannot create code cache directory ./code_cache: Read-only file system.
+09-10 12:53:20.334 V/libnb   (52608): enter native_bridge2_initialize (null) x86_64
+09-10 12:53:20.335 E/libnb   (52608): The translator implementation library has not been set.
+09-10 12:53:20.340 E/libnb   (52608): get_callbacks native_handle 0x85ee1ca8c0648c73: 1 libnb:/system/lib64/libhoudini.so
+09-10 12:53:20.340 I/libnb   (52608): Found /system/lib64/libhoudini.so version 7
+09-10 12:53:20.351 D/nativeloader(52608): Load libframework-connectivity-tiramisu-jni.so using APEX ns com_android_tethering for caller /apex/com.android.tethering/javalib/framework-connectivity-t.jar: ok
+09-10 12:53:20.351 D/AndroidRuntime(52608): Calling main entry com.android.commands.uiautomator.Launcher
+09-10 12:53:20.353 D/UiAutomationConnection(52608): Created on user UserHandle{0}
+09-10 12:53:20.353 I/UiAutomation(52608): Initialized for user 0 on display 0
+09-10 12:53:20.353 W/UiAutomation(52608): Created with deprecatead constructor, assumes DEFAULT_DISPLAY
+09-10 12:53:20.353 D/AccessibilityManagerService(  835): changeCurrentUserForTestAutomationIfNeededLocked(0): ignoring because device doesn't support visible background users
+09-10 12:53:20.353 I/UiAutomationManager(  835): Registering UiTestAutomationService (id=com.android.server.accessibility/UiAutomation, flags=0x0) when called by user 0
+09-10 12:53:20.354 W/MagnificationConnectionManager(  835): requestConnection duplicated request: connect=false, mConnectionState=DISCONNECTED
+09-10 12:53:20.354 D/BatterySaverPolicy(  835): accessibility changed to true, updating policy.
+09-10 12:53:20.356 W/MagnificationConnectionManager(  835): requestConnection duplicated request: connect=false, mConnectionState=DISCONNECTED
+09-10 12:53:20.939 W/libc    (    1): Rewrite len too long for denied property "init.svc.serial_console", len = 7, oldlen = 0
+09-10 12:53:20.949 W/libc    (    1): Rewrite len too long for denied property "init.svc.serial_console", len = 10, oldlen = 0
+09-10 12:53:21.360 W/MediaProvider( 1643): isAppCloneUserPair for user 0: false
+09-10 12:53:21.363 E/StorageManager( 1643): Failed to set extended attributes for /storage/emulated/0/c26-dropdown.xml to set project id.: Operation not supported on transport endpoint
+09-10 12:53:21.363 W/MediaProvider( 1643): Failed to update quota type for /storage/emulated/0/c26-dropdown.xml
+09-10 12:53:21.363 W/MediaProvider( 1643): java.io.IOException: Failed to update quota type for /storage/emulated/0/c26-dropdown.xml
+09-10 12:53:21.363 W/MediaProvider( 1643): 	at android.os.storage.StorageManager.updateExternalStorageFileQuotaType(StorageManager.java:2598)
+09-10 12:53:21.363 W/MediaProvider( 1643): 	at com.android.providers.media.MediaProvider.updateQuotaTypeForFileInternal(MediaProvider.java:1024)
+09-10 12:53:21.363 W/MediaProvider( 1643): 	at com.android.providers.media.MediaProvider.lambda$onFileCreatedForFuse$16(MediaProvider.java:2290)
+09-10 12:53:21.363 W/MediaProvider( 1643): 	at com.android.providers.media.MediaProvider.$r8$lambda$QvobK0mrOcF7YLdAJMtFTbarHSw(MediaProvider.java:0)
+09-10 12:53:21.363 W/MediaProvider( 1643): 	at com.android.providers.media.MediaProvider$$ExternalSyntheticLambda18.run(R8$$SyntheticClass:0)
+09-10 12:53:21.363 W/MediaProvider( 1643): 	at android.os.Handler.handleCallback(Handler.java:991)
+09-10 12:53:21.363 W/MediaProvider( 1643): 	at android.os.Handler.dispatchMessage(Handler.java:102)
+09-10 12:53:21.363 W/MediaProvider( 1643): 	at android.os.Looper.loopOnce(Looper.java:232)
+09-10 12:53:21.363 W/MediaProvider( 1643): 	at android.os.Looper.loop(Looper.java:317)
+09-10 12:53:21.363 W/MediaProvider( 1643): 	at android.os.HandlerThread.run(HandlerThread.java:85)
+09-10 12:53:21.363 E/StorageManager( 1643): Failed to set extended attributes for /storage/emulated/0/c26-dropdown.xml to set project id.: Operation not supported on transport endpoint
+09-10 12:53:21.363 W/MediaProvider( 1643): Failed to update quota type for /storage/emulated/0/c26-dropdown.xml
+09-10 12:53:21.363 W/MediaProvider( 1643): java.io.IOException: Failed to update quota type for /storage/emulated/0/c26-dropdown.xml
+09-10 12:53:21.363 W/MediaProvider( 1643): 	at android.os.storage.StorageManager.updateExternalStorageFileQuotaType(StorageManager.java:2598)
+09-10 12:53:21.363 W/MediaProvider( 1643): 	at com.android.providers.media.MediaProvider.updateQuotaTypeForFileInternal(MediaProvider.java:1024)
+09-10 12:53:21.363 W/MediaProvider( 1643): 	at com.android.providers.media.MediaProvider.updateQuotaTypeForUri(MediaProvider.java:999)
+09-10 12:53:21.363 W/MediaProvider( 1643): 	at com.android.providers.media.MediaProvider$5.lambda$onInsert$0(MediaProvider.java:1058)
+09-10 12:53:21.363 W/MediaProvider( 1643): 	at com.android.providers.media.MediaProvider$5.$r8$lambda$4KU7YPdO1inr9tOLVzprJ5YcfCE(MediaProvider.java:0)
+09-10 12:53:21.363 W/MediaProvider( 1643): 	at com.android.providers.media.MediaProvider$5$$ExternalSyntheticLambda2.run(R8$$SyntheticClass:0)
+09-10 12:53:21.363 W/MediaProvider( 1643): 	at android.os.Handler.handleCallback(Handler.java:991)
+09-10 12:53:21.363 W/MediaProvider( 1643): 	at android.os.Handler.dispatchMessage(Handler.java:102)
+09-10 12:53:21.363 W/MediaProvider( 1643): 	at android.os.Looper.loopOnce(Looper.java:232)
+09-10 12:53:21.363 W/MediaProvider( 1643): 	at android.os.Looper.loop(Looper.java:317)
+09-10 12:53:21.363 W/MediaProvider( 1643): 	at android.os.HandlerThread.run(HandlerThread.java:85)
+09-10 12:53:21.364 W/AccessibilityNodeInfoDumper(52608): Fetch time: 5ms
+09-10 12:53:21.364 W/MagnificationConnectionManager(  835): requestConnection duplicated request: connect=false, mConnectionState=DISCONNECTED
+09-10 12:53:21.364 D/AccessibilityManagerService(  835): restoreCurrentUserForTestAutomationIfNeededLocked(): ignoring because device doesn't support visible background users
+09-10 12:53:21.365 D/BatterySaverPolicy(  835): accessibility changed to false, updating policy.
+09-10 12:53:21.365 D/AndroidRuntime(52608): Shutting down VM
+09-10 12:53:22.173 F/libc    (52608): Fatal signal 11 (SIGSEGV), code 1 (SEGV_MAPERR), fault addr 0x7c1b0a121be0 in tid 52608 (Shutdown thread), pid 52608 (Shutdown thread)
+09-10 12:53:22.189 I/crash_dump64(52625): obtaining output fd from tombstoned, type: kDebuggerdTombstoneProto
+09-10 12:53:22.189 I/tombstoned(  513): received crash request for pid 52608
+09-10 12:53:22.190 I/crash_dump64(52625): performing dump of process 52608 (target tid = 52608)
+09-10 12:53:22.209 D/WifiNl80211Manager(  835): Scan result ready event
+09-10 12:53:22.209 D/WifiNative(  835): Scan result ready event
+09-10 12:53:22.253 F/DEBUG   (52625): *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** ***
+09-10 12:53:22.253 F/DEBUG   (52625): Build fingerprint: 'Redmi/rubens/rubens:15/V417IR/861:user/release-keys'
+09-10 12:53:22.253 F/DEBUG   (52625): Revision: '0'
+09-10 12:53:22.253 F/DEBUG   (52625): ABI: 'x86_64'
+09-10 12:53:22.253 F/DEBUG   (52625): Timestamp: 2026-09-10 12:53:22.197143029+0800
+09-10 12:53:22.253 F/DEBUG   (52625): Process uptime: 3s
+09-10 12:53:22.253 F/DEBUG   (52625): Cmdline: uiautomator
+09-10 12:53:22.253 F/DEBUG   (52625): pid: 52608, tid: 52608, name: Shutdown thread  >>> uiautomator <<<
+09-10 12:53:22.253 F/DEBUG   (52625): uid: 2000
+09-10 12:53:22.253 F/DEBUG   (52625): signal 11 (SIGSEGV), code 1 (SEGV_MAPERR), fault addr 0x00007c1b0a121be0
+09-10 12:53:22.253 F/DEBUG   (52625):     rax 0000000000000000  rbx 00007c1dedf6c89c  rcx 0000000000000001  rdx 0000000000000002
+09-10 12:53:22.253 F/DEBUG   (52625):     r8  0000000000000020  r9  0000000000020002  r10 0000000000000001  r11 0000000000000206
+09-10 12:53:22.253 F/DEBUG   (52625):     r12 0000000000001000  r13 00000000000005b7  r14 00007c1b0a121be0  r15 0000000000008928
+09-10 12:53:22.253 F/DEBUG   (52625):     rdi 00007c1b0a4e7ee8  rsi 0000000000001000
+09-10 12:53:22.253 F/DEBUG   (52625):     rbp 00007ffc18da6910  rsp 00007ffc18da68a8  rip 00007c1b0a121be0
+09-10 12:53:22.253 F/DEBUG   (52625): 4 total frames
+09-10 12:53:22.253 F/DEBUG   (52625): backtrace:
+09-10 12:53:22.253 F/DEBUG   (52625):       #00 pc 00007c1b0a121be0  <unknown>
+09-10 12:53:22.253 F/DEBUG   (52625):       #01 pc 000000000005846f  /apex/com.android.runtime/lib64/bionic/libc.so (__cxa_finalize+287) (BuildId: 52bc34193ef6f6311bbb44f2305d1b1d)
+09-10 12:53:22.253 F/DEBUG   (52625):       #02 pc 000000000005c83f  /apex/com.android.runtime/lib64/bionic/libc.so (exit+31) (BuildId: 52bc34193ef6f6311bbb44f2305d1b1d)
+09-10 12:53:22.253 F/DEBUG   (52625):       #03 pc 00000000000520dc  /apex/com.android.runtime/lib64/bionic/libc.so (__libc_init+124) (BuildId: 52bc34193ef6f6311bbb44f2305d1b1d)
+09-10 12:53:22.256 W/NativeCrashListener(  835): Couldn't find ProcessRecord for pid 52608
+09-10 12:53:22.256 E/crash_dump64(52625): AM data write failed: Broken pipe
+09-10 12:53:22.256 E/tombstoned(  513): Tombstone written to: tombstone_10
+09-10 12:53:22.256 E/NativeTombstoneManager(  835): Tombstone's UID (2000) not an app, ignoring
+09-10 12:53:22.257 E/NativeTombstoneManager(  835): Tombstone's UID (2000) not an app, ignoring
+09-10 12:53:25.935 W/libc    (    1): Rewrite len too long for denied property "init.svc.serial_console", len = 7, oldlen = 0
+09-10 12:53:25.945 W/libc    (    1): Rewrite len too long for denied property "init.svc.serial_console", len = 10, oldlen = 0
+09-10 12:53:30.935 W/libc    (    1): Rewrite len too long for denied property "init.svc.serial_console", len = 7, oldlen = 0
+09-10 12:53:30.945 W/libc    (    1): Rewrite len too long for denied property "init.svc.serial_console", len = 10, oldlen = 0
+09-10 12:53:35.947 W/libc    (    1): Rewrite len too long for denied property "init.svc.serial_console", len = 7, oldlen = 0
+09-10 12:53:35.957 W/libc    (    1): Rewrite len too long for denied property "init.svc.serial_console", len = 10, oldlen = 0
+09-10 12:53:37.152 W/WindowOnBackDispatcher( 1103): sendCancelIfRunning: isInProgress=false callback=android.widget.PopupWindow$PopupDecorView$$ExternalSyntheticLambda1@2d44d4e
+09-10 12:53:37.152 D/CoreBackPreview(  835): Window{170f5a1 u0 PopupWindow:3e91413}: Setting back callback null
+09-10 12:53:37.513 V/WindowManagerShell( 1103): Transition requested (#100): android.os.BinderProxy@39e926b TransitionRequestInfo { type = CLOSE, triggerTask = null, pipChange = null, remoteTransition = null, displayChange = null, flags = 0, debugId = 100 }
+09-10 12:53:37.514 W/WindowOnBackDispatcher( 1103): sendCancelIfRunning: isInProgress=false callback=android.app.Dialog$$ExternalSyntheticLambda2@5e69463
+09-10 12:53:37.514 D/CoreBackPreview(  835): Window{2826b89 u0 com.android.systemui}: Setting back callback null
+09-10 12:53:37.527 I/BpBinder(  696): onLastStrongRef automatically unlinking death recipients: 
+09-10 12:53:37.528 D/HWUI    ( 1103): endAllActiveAnimators on 0x7f705f4a4070 (InsetDrawable) with handle 0x7f707f2edae0
+09-10 12:53:37.531 D/BackgroundInstallControlService(  835): Package event received: 0
+09-10 12:53:37.532 D/BackgroundInstallControlService(  835): Package event received: 0
+09-10 12:53:37.532 D/BackgroundInstallControlService(  835): Package event received: 0
+09-10 12:53:37.534 V/WindowManager(  835): Sent Transition (#100) createdAt=09-10 12:53:37.513 via request=TransitionRequestInfo { type = CLOSE, triggerTask = null, pipChange = null, remoteTransition = null, displayChange = null, flags = 0, debugId = 100 }
+09-10 12:53:37.534 V/WindowManager(  835):     startWCT=WindowContainerTransaction { changes= {} hops= [] errorCallbackToken=null taskFragmentOrganizer=null }
+09-10 12:53:37.534 V/WindowManager(  835):     info={id=100 t=CLOSE f=0x0 trk=0 r=[0@Point(0, 0)] c=[
+09-10 12:53:37.534 V/WindowManager(  835):         {m=CLOSE f=TRANSLUCENT|FILLS_TASK leash=Surface(name=ActivityRecord{58117303 u0 com.android.systemui/.mediaprojection.permission.MediaProjectionPermissionActivity)/@0xcf586f2 sb=Rect(0, 0 - 2560, 1440) eb=Rect(0, 0 - 2560, 1440) epz=Point(2560, 1440) d=0 bc=ffeceef4 component=com.android.systemui/.mediaprojection.permission.MediaProjectionPermissionActivity opt={t=FROM_STYLE mUserId=0}}
+09-10 12:53:37.534 V/WindowManager(  835):     ]}
+09-10 12:53:37.534 V/WindowManagerShell( 1103): onTransitionReady(transaction=3586297705089)
+09-10 12:53:37.535 V/WindowManagerShell( 1103): onTransitionReady (#100) android.os.BinderProxy@39e926b: {id=100 t=CLOSE f=0x0 trk=0 r=[0@Point(0, 0)] c=[
+09-10 12:53:37.535 V/WindowManagerShell( 1103):         {m=CLOSE f=TRANSLUCENT|FILLS_TASK leash=Surface(name=ActivityRecord{58117303 u0 com.android.systemui/.mediaprojection.permission.MediaProjectionPermissionActivity)/@0x7e74186 sb=Rect(0, 0 - 2560, 1440) eb=Rect(0, 0 - 2560, 1440) epz=Point(2560, 1440) d=0 bc=ffeceef4 component=com.android.systemui/.mediaprojection.permission.MediaProjectionPermissionActivity opt={t=FROM_STYLE mUserId=0}}
+09-10 12:53:37.535 V/WindowManagerShell( 1103):     ]}
+09-10 12:53:37.535 V/WindowManagerShell( 1103): Playing animation for (#100) android.os.BinderProxy@39e926b@0
+09-10 12:53:37.535 V/ShellRecents( 1103): RecentsTransitionHandler.startAnimation: no controller found
+09-10 12:53:37.535 V/WindowManagerShell( 1103): Transition doesn't have explicit remote, search filters for match for {id=100 t=CLOSE f=0x0 trk=0 r=[0@Point(0, 0)] c=[{m=CLOSE f=TRANSLUCENT|FILLS_TASK leash=Surface(name=ActivityRecord{58117303 u0 com.android.systemui/.mediaprojection.permission.MediaProjectionPermissionActivity)/@0x7e74186 sb=Rect(0, 0 - 2560, 1440) eb=Rect(0, 0 - 2560, 1440) epz=Point(2560, 1440) d=0 bc=ffeceef4 component=com.android.systemui/.mediaprojection.permission.MediaProjectionPermissionActivity opt={t=FROM_STYLE mUserId=0}}]}
+09-10 12:53:37.535 V/WindowManagerShell( 1103):  Checking filter Pair{{types=[] flags=0x0] notFlags=0x100 checks=[{atype=home independent=true modes=[OPEN,TO_FRONT] flags=NONE mustBeTask=false order=TOP topActivity=ComponentInfo{app.lawnchair/app.lawnchair.LawnchairLauncher} launchCookie=null windowingMode=undefined},{atype=standard independent=true modes=[CLOSE,TO_BACK] flags=NONE mustBeTask=false order=ANY topActivity=null launchCookie=null windowingMode=undefined},{NOT atype=undefined independent=true modes=[] flags=NONE mustBeTask=true order=ANY topActivity=null launchCookie=null windowingMode=undefined}]} RemoteTransition { remoteTransition = android.window.IRemoteTransition$Stub$Proxy@16c99cb, appThread = android.app.IApplicationThread$Stub$Proxy@1b85a8, debugName = QuickstepLaunchHome }}
+09-10 12:53:37.535 V/WindowManagerShell( 1103):  Delegate animation for (#100) to null
+09-10 12:53:37.535 V/WindowManagerShell( 1103): start default transition animation, info = {id=100 t=CLOSE f=0x0 trk=0 r=[0@Point(0, 0)] c=[{m=CLOSE f=TRANSLUCENT|FILLS_TASK leash=Surface(name=ActivityRecord{58117303 u0 com.android.systemui/.mediaprojection.permission.MediaProjectionPermissionActivity)/@0x7e74186 sb=Rect(0, 0 - 2560, 1440) eb=Rect(0, 0 - 2560, 1440) epz=Point(2560, 1440) d=0 bc=ffeceef4 component=com.android.systemui/.mediaprojection.permission.MediaProjectionPermissionActivity opt={t=FROM_STYLE mUserId=0}}]}
+09-10 12:53:37.535 W/UserManagerService(  835): Requested status bar icon for non-badged user 0
+09-10 12:53:37.535 V/WindowManagerShell( 1103): loadAnimation: anim=android.view.animation.AnimationSet@178e3e3 animAttr=0x7 type=CLOSE isEntrance=false
+09-10 12:53:37.536 V/WindowManagerShell( 1103):  animated by com.android.wm.shell.transition.DefaultTransitionHandler@41f61c0
+09-10 12:53:37.537 I/ActivityManager(  835): Background started FGS: Allowed [callingPackage: com.relayqahub.android.preview.debug; callingUid: 10051; uidState: TOP ; uidBFSL: [BFSL]; intent: Intent { act=com.relayqahub.android.preview.capture.action.START_SESSION cmp=com.relayqahub.android.preview.debug/com.relayqahub.android.capture.CaptureSessionService (has extras) }; code:PROC_STATE_TOP; tempAllowListReason:<null>; targetSdkVersion:37; callerTargetSdkVersion:37; startForegroundCount:0; bindFromPackage:null: isBindService:false]
+09-10 12:53:37.545 V/WindowManager(  835): Unknown focus tokens, dropping reportFocusChanged
+09-10 12:53:37.549 W/ForegroundServiceTypeLoggerModule(  835): Foreground service start for UID: 10051 does not have any types
+09-10 12:53:37.549 D/BackgroundInstallControlService(  835): Package event received: 0
+09-10 12:53:37.550 V/MediaProjectionManagerService(  835): Start the token instance com.android.server.media.projection.MediaProjectionManagerService$MediaProjection@dcd0f6f
+09-10 12:53:37.554 D/DisplayManagerService(  835): Virtual Display: creating DisplayDevice with VirtualDisplayAdapter
+09-10 12:53:37.556 D/VirtualDisplayAdapter(  835): Virtual Display: registered media projection callback for new VirtualDisplayDevice
+09-10 12:53:37.556 I/DisplayDeviceRepository(  835): Display device added: DisplayDeviceInfo{"Relay QA Hub evidence session": uniqueId="virtual:com.relayqahub.android.preview.debug,10051,Relay QA Hub evidence session,7", 2560 x 1440, modeId 10, renderFrameRate 60.0, hasArrSupport false, frameRateCategoryRate null, supportedRefreshRates [], defaultModeId 10, userPreferredModeId -1, supportedModes [{id=10, width=2560, height=1440, fps=60.0, vsync=60.0, synthetic=false, alternativeRefreshRates=[], supportedHdrTypes=[]}], colorMode 0, supportedColorModes [0], hdrCapabilities null, isForceSdr false, allmSupported false, gameContentTypeSupported false, density 360, 360.0 x 360.0 dpi, appVsyncOff 0, presDeadline 16666666, touch NONE, rotation 0, type VIRTUAL, deviceProductInfo null, state ON, committedState UNKNOWN, owner com.relayqahub.android.preview.debug (uid 10051), frameRateOverride , brightnessMinimum 0.0, brightnessMaximum 1.0, brightnessDefault 0.0, brightnessDim -1.0, hdrSdrRatio NaN, FLAG_PRIVATE, FLAG_PRESENTATION, installOrientation 0, displayShape DisplayShape{ spec=129168335 displayWidth=2560 displayHeight=1440 physicalPixelDisplaySizeRatio=1.0 rotation=0 offsetX=0 offsetY=0 scale=1.0}}
+09-10 12:53:37.557 I/LogicalDisplayMapper(  835): Applying layout: [{dispId: 0(ON), displayGroupName: , addr: {port=0, model=0x401ceced0008c5}, mThermalBrightnessThrottlingMapId: null, mRefreshRateZoneId: null, mLeadDisplayId: -1, mLeadDisplayAddress: null, mThermalRefreshRateThrottlingMapId: null, mPowerThrottlingMapId: null}], Previous layout: [{dispId: 0(ON), displayGroupName: , addr: {port=0, model=0x401ceced0008c5}, mThermalBrightnessThrottlingMapId: null, mRefreshRateZoneId: null, mLeadDisplayId: -1, mLeadDisplayAddress: null, mThermalRefreshRateThrottlingMapId: null, mPowerThrottlingMapId: null}]
+09-10 12:53:37.557 I/LogicalDisplayMapper(  835): Setting new display group 0 for display 9, from previous group: null
+09-10 12:53:37.557 W/BrightnessThrottler(  835): DeviceConfig ThermalBrightnessThrottlingData is null
+09-10 12:53:37.558 W/DisplayPowerController[9](  835): Screen brightness nits configuration is unavailable; falling back
+09-10 12:53:37.558 D/BrightnessThermalClamper(  835): Thermal status observer already started
+09-10 12:53:37.558 V/WindowManager(  835): Content Recording: Handle incoming session on display 9, with a pre-existing session null
+09-10 12:53:37.559 I/system_server(  835): AssetManager2(0x7f70ef2c93f8) locale list changing from [] to [zh-Hans-CN]
+09-10 12:53:37.562 D/BrightnessThermalClamper(  835): Thermal status observer already started
+09-10 12:53:37.563 D/BrightnessThermalClamper(  835): Thermal status observer already started
+09-10 12:53:37.563 I/WindowManager(  835): Override config changes=20005df8 {0.0 ?mcc0mnc ?localeList ?layoutDir sw640dp w1138dp h640dp 360dpi lrg long land ?uimode ?night -touch -keyb/v/v -nav/h winConfig={ mBounds=Rect(0, 0 - 2560, 1440) mAppBounds=Rect(0, 0 - 2560, 1440) mMaxBounds=Rect(0, 0 - 2560, 1440) mDisplayRotation=ROTATION_0 mWindowingMode=fullscreen mActivityType=undefined mAlwaysOnTop=undefined mRotation=ROTATION_0} ?fontWeightAdjustment} for displayId=9
+09-10 12:53:37.563 W/DisplayController( 1103): Skipping Display Configuration change on non-added display.
+09-10 12:53:37.563 I/DisplayDevice(  835): [9] Layerstack set to 9 for virtual:com.relayqahub.android.preview.debug,10051,Relay QA Hub evidence session,7
+09-10 12:53:37.564 W/WindowTokenClientController(  835): Can't find attached WindowTokenClient for android.window.WindowTokenClient@eb500dc
+09-10 12:53:37.564 V/WindowManager(  835): Content Recording: Display 9 has no content and is on, so start recording for state 2
+09-10 12:53:37.565 V/WindowManager(  835): Content Recording: Apply transformations of shift 0 x 0, scale 1.0 x 1.0, crop (aka recorded content size) 2560 x 1440 for display 9; display has size 1138 x 640; surface has size 2560 x 1440
+09-10 12:53:37.565 D/MediaProjectionMetricsLogger(  835): logChangedCaptureBounds: captureBounds= Rect(0, 0 - 2560, 1440) position= Point(1280, 720)
+09-10 12:53:37.565 D/MediaProjectionMetricsLogger(  835): targetChangeType= changePosition
+09-10 12:53:37.565 D/MediaProjectionMetricsLogger(  835): logChangedWindowingMode: windowingMode= fullscreen
+09-10 12:53:37.565 D/MediaProjectionMetricsLogger(  835): targetChangeType= changeWindowingMode
+09-10 12:53:37.565 D/MediaProjectionMetricsLogger(  835): logInProgress
+09-10 12:53:37.565 D/DisplayManagerService(  835): Content Recording: notifying MediaProjection of successful VirtualDisplay creation.
+09-10 12:53:37.565 D/DisplayManagerService(  835): Virtual Display: successfully set up virtual display 9
+09-10 12:53:37.567 V/WindowManager(  835): Content Recording: Display 9 state was (2), is now (2), so update recording?
+09-10 12:53:37.567 I/DisplayPowerController(  835): Window Manager Policy screenTurningOn complete
+09-10 12:53:37.567 I/DisplayBrightnessStrategySelector(  835): Changing the DisplayBrightnessStrategy from InvalidBrightnessStrategy to FallbackBrightnessStrategy for display 9
+09-10 12:53:37.567 V/DisplayPowerController[9](  835): Brightness [0.0] reason changing to: 'manual', previous reason: '0'.
+09-10 12:53:37.567 I/DisplayPowerController[9](  835): BrightnessEvent: brt=0.0 (0.0%), nits= -1.0, lux=-1.0, reason=manual, strat=FallbackBrightnessStrategy, state=ON, stateReason=DEFAULT_POLICY, policy=BRIGHT, flags=, initBrt=NaN, rcmdBrt=NaN, preBrt=NaN, preLux=0.0, wasShortTermModelActive=false, autoBrightness=false (default), unclampedBrt=0.0, hbmMax=1.0, hbmMode=off, thrmMax=1.0, rbcStrength=-1, powerFactor=1.0, physDisp=Relay QA Hub evidence session(virtual:com.relayqahub.android.preview.debug,10051,Relay QA Hub evidence session,7), logicalId=9
+09-10 12:53:37.582 D/gralloc_kona(52177): gralloc_alloc: Creating ashmem region of size 14749696
+09-10 12:53:37.596 W/AppOps  (  835): Noting op not finished: uid 10051 pkg com.relayqahub.android.preview.debug code 24 startTime of in progress event=1789016017590
+09-10 12:53:37.600 I/ImeTracker(  835): com.relayqahub.android.preview.debug:a4459cfb: onRequestHide at ORIGIN_SERVER reason HIDE_SAME_WINDOW_FOCUSED_WITHOUT_EDITOR fromUser false
+09-10 12:53:37.612 D/CoreBackPreview(  835): Window{c57432f u0 com.relayqahub.android.preview.debug}: Setting back callback OnBackInvokedCallbackInfo{mCallback=android.window.IOnBackInvokedCallback$Stub$Proxy@8766927, mPriority=0, mIsAnimationCallback=false, mOverrideBehavior=0}
+09-10 12:53:37.612 D/gralloc_kona(52177): gralloc_alloc: Creating ashmem region of size 159744
+09-10 12:53:37.615 D/gralloc_kona(52177): gralloc_alloc: Creating ashmem region of size 159744
+09-10 12:53:37.615 D/gralloc_kona(52177): gralloc_alloc: Creating ashmem region of size 159744
+09-10 12:53:37.616 D/CoreBackPreview(  835): Window{79ee34b u0 com.relayqahub.android.preview.debug}: Setting back callback OnBackInvokedCallbackInfo{mCallback=android.window.IOnBackInvokedCallback$Stub$Proxy@99ed7d4, mPriority=0, mIsAnimationCallback=false, mOverrideBehavior=0}
+09-10 12:53:37.627 D/InsetsController(52177): hide(ime(), fromIme=false)
+09-10 12:53:37.627 I/ImeTracker(52177): com.relayqahub.android.preview.debug:a4459cfb: onCancelled at PHASE_CLIENT_ALREADY_HIDDEN
+09-10 12:53:37.677 V/WindowManagerShell( 1103): Transition animation finished (aborted=false), notifying core (#100) android.os.BinderProxy@39e926b@0
+09-10 12:53:37.677 V/WindowManager(  835): Finish Transition (#100): created at 09-10 12:53:37.513 collect-started=0.018ms request-sent=0.032ms started=1.586ms ready=19.322ms sent=21.299ms finished=164.65ms
+09-10 12:53:37.678 V/WindowManagerShell( 1103): Track 0 became idle
+09-10 12:53:37.678 V/WindowManagerShell( 1103): All active transition animations finished
+09-10 12:53:37.679 D/VRI[MediaProjectionPermissionActivity]( 1103): visibilityChanged oldVisibility=true newVisibility=false
+09-10 12:53:37.696 W/WindowOnBackDispatcher( 1103): sendCancelIfRunning: isInProgress=false callback=android.app.Activity$$ExternalSyntheticLambda0@7c961ea
+09-10 12:53:37.696 D/CoreBackPreview(  835): Window{925be9a u0 com.android.systemui/com.android.systemui.mediaprojection.permission.MediaProjectionPermissionActivity}: Setting back callback null
+09-10 12:53:37.697 D/ViewRootImpl( 1103): Skipping stats log for color mode
+09-10 12:53:37.698 D/BackgroundInstallControlService(  835): Package event received: 0
+09-10 12:53:37.698 W/UserManagerService(  835): Requested status bar icon for non-badged user 0
+09-10 12:53:37.757 W/NotificationHistory(  835): Attempted to add notif for locked/gone/disabled user 0
+09-10 12:53:37.757 D/BackgroundInstallControlService(  835): Package event received: 0
+09-10 12:53:37.761 I/id.ext.services( 1625): AssetManager2(0x7f70ef33b818) locale list changing from [] to [zh-Hans-CN]
+09-10 12:53:37.805 D/LocalImageResolver( 1103): Couldn't use ImageDecoder for drawable, falling back to non-resized load.
+09-10 12:53:37.809 D/LocalImageResolver( 1103): Couldn't use ImageDecoder for drawable, falling back to non-resized load.
+09-10 12:53:37.812 W/ExpandableNotifRow( 1103): ignore set Color filter for com.relayqahub.android.preview.debug
+09-10 12:53:37.817 W/ExpandableNotifRow( 1103): ignore set Color filter for com.relayqahub.android.preview.debug
+09-10 12:53:37.819 W/ExpandableNotifRow( 1103): ignore set Color filter for com.relayqahub.android.preview.debug
+09-10 12:53:37.834 W/NotificationHistory(  835): Attempted to add notif for locked/gone/disabled user 0
+09-10 12:53:37.834 D/BackgroundInstallControlService(  835): Package event received: 0
+09-10 12:53:37.837 I/id.ext.services( 1625): AssetManager2(0x7f70ef3302d8) locale list changing from [] to [zh-Hans-CN]
+09-10 12:53:37.867 D/LocalImageResolver( 1103): Couldn't use ImageDecoder for drawable, falling back to non-resized load.
+09-10 12:53:37.871 D/LocalImageResolver( 1103): Couldn't use ImageDecoder for drawable, falling back to non-resized load.
+09-10 12:53:38.201 D/AndroidRuntime(52648): >>>>>> START com.android.internal.os.RuntimeInit uid 2000 <<<<<<
+09-10 12:53:38.203 I/AndroidRuntime(52648): Using default boot image
+09-10 12:53:38.203 I/AndroidRuntime(52648): Leaving lock profiling enabled
+09-10 12:53:38.204 W/app_process(52648): ART APEX data files are untrusted.
+09-10 12:53:38.204 I/app_process(52648): Using CollectorTypeCMC GC.
+09-10 12:53:38.247 D/nativeloader(52648): InitDefaultPublicLibraries for_preload=1: libandroid.so:libaaudio.so:libamidi.so:libbinder_ndk.so:libc.so:libcamera2ndk.so:libdl.so:libEGL.so:libGLESv1_CM.so:libGLESv2.so:libGLESv3.so:libicu.so:libicui18n.so:libicuuc.so:libjnigraphics.so:liblog.so:libmediandk.so:libm.so:libnativehelper.so:libnativewindow.so:libOpenMAXAL.so:libOpenSLES.so:libRS.so:libstdc++.so:libsync.so:libvulkan.so:libwebviewchromium_plat_support.so:libz.so:libcallhost.so
+09-10 12:53:38.254 D/nativeloader(52648): Load libicu_jni.so using APEX ns com_android_art for caller /apex/com.android.art/javalib/core-oj.jar: ok
+09-10 12:53:38.255 D/app_process(52648): u_setTimeZoneFilesDirectory("/apex/com.android.tzdata/etc/tz/versioned/8/icu") succeeded. 
+09-10 12:53:38.255 D/app_process(52648): I18n APEX ICU file found: /apex/com.android.i18n/etc/icu/icudt75l.dat
+09-10 12:53:38.255 D/nativeloader(52648): Load libjavacore.so using APEX ns com_android_art for caller /apex/com.android.art/javalib/core-oj.jar: ok
+09-10 12:53:38.256 D/nativeloader(52648): Load libopenjdk.so using APEX ns com_android_art for caller /apex/com.android.art/javalib/core-oj.jar: ok
+09-10 12:53:38.257 W/app_process(52648): Unexpected CPU variant for x86: x86_64.
+09-10 12:53:38.257 W/app_process(52648): Known variants: atom, sandybridge, silvermont, goldmont, goldmont-plus, goldmont-without-sha-xsaves, tremont, kabylake, alderlake, default
+09-10 12:53:38.257 W/app_process(52648): ClassLoaderContext shared library size mismatch. Expected=2, found=0 (PCL[]{PCL[/system/framework/android.test.base.jar*2643221532]#PCL[/system/framework/android.test.mock.jar*4236284042]} | PCL[])
+09-10 12:53:38.258 W/app_process(52648): ClassLoaderContext classpath size mismatch. expected=0, found=1 (PCL[]{PCL[/system/framework/android.test.runner.jar*760235463]#PCL[/system/framework/android.test.base.jar*2643221532]} | PCL[/system/framework/android.test.runner.jar*760235463])
+09-10 12:53:38.258 W/app_process(52648): Could not create mount namespace.
+09-10 12:53:38.258 W/nativebridge(52648): Failed to bind-mount /system/etc/cpuinfo.x86_64.txt as /proc/cpuinfo: Operation not permitted
+09-10 12:53:38.258 W/nativebridge(52648): Failed to bind-mount /system/lib64/x86_64/cpuinfo as /proc/cpuinfo: Operation not permitted
+09-10 12:53:38.258 W/nativebridge(52648): Cannot create code cache directory ./code_cache: Read-only file system.
+09-10 12:53:38.258 V/libnb   (52648): enter native_bridge2_initialize (null) x86_64
+09-10 12:53:38.258 E/libnb   (52648): The translator implementation library has not been set.
+09-10 12:53:38.264 E/libnb   (52648): get_callbacks native_handle 0xba8cf7dd1745d34b: 1 libnb:/system/lib64/libhoudini.so
+09-10 12:53:38.264 I/libnb   (52648): Found /system/lib64/libhoudini.so version 7
+09-10 12:53:38.276 D/nativeloader(52648): Load libframework-connectivity-tiramisu-jni.so using APEX ns com_android_tethering for caller /apex/com.android.tethering/javalib/framework-connectivity-t.jar: ok
+09-10 12:53:38.276 D/AndroidRuntime(52648): Calling main entry com.android.commands.uiautomator.Launcher
+09-10 12:53:38.278 D/UiAutomationConnection(52648): Created on user UserHandle{0}
+09-10 12:53:38.278 I/UiAutomation(52648): Initialized for user 0 on display 0
+09-10 12:53:38.278 W/UiAutomation(52648): Created with deprecatead constructor, assumes DEFAULT_DISPLAY
+09-10 12:53:38.279 D/AccessibilityManagerService(  835): changeCurrentUserForTestAutomationIfNeededLocked(0): ignoring because device doesn't support visible background users
+09-10 12:53:38.279 I/UiAutomationManager(  835): Registering UiTestAutomationService (id=com.android.server.accessibility/UiAutomation, flags=0x0) when called by user 0
+09-10 12:53:38.280 W/MagnificationConnectionManager(  835): requestConnection duplicated request: connect=false, mConnectionState=DISCONNECTED
+09-10 12:53:38.282 D/BatterySaverPolicy(  835): accessibility changed to true, updating policy.
+09-10 12:53:38.284 W/MagnificationConnectionManager(  835): requestConnection duplicated request: connect=false, mConnectionState=DISCONNECTED
+09-10 12:53:39.280 I/d.preview.debug(52177): type=1400 audit(0.0:2658): avc:  denied  { call } for  scontext=u:r:zygote:s0 tcontext=u:r:shell:s0 tclass=binder permissive=1 app=com.relayqahub.android.preview.debug
+09-10 12:53:39.293 W/MediaProvider( 1643): isAppCloneUserPair for user 0: false
+09-10 12:53:39.296 E/StorageManager( 1643): Failed to set extended attributes for /storage/emulated/0/c26-afterauth.xml to set project id.: Operation not supported on transport endpoint
+09-10 12:53:39.296 W/MediaProvider( 1643): Failed to update quota type for /storage/emulated/0/c26-afterauth.xml
+09-10 12:53:39.296 W/MediaProvider( 1643): java.io.IOException: Failed to update quota type for /storage/emulated/0/c26-afterauth.xml
+09-10 12:53:39.296 W/MediaProvider( 1643): 	at android.os.storage.StorageManager.updateExternalStorageFileQuotaType(StorageManager.java:2598)
+09-10 12:53:39.296 W/MediaProvider( 1643): 	at com.android.providers.media.MediaProvider.updateQuotaTypeForFileInternal(MediaProvider.java:1024)
+09-10 12:53:39.296 W/MediaProvider( 1643): 	at com.android.providers.media.MediaProvider.lambda$onFileCreatedForFuse$16(MediaProvider.java:2290)
+09-10 12:53:39.296 W/MediaProvider( 1643): 	at com.android.providers.media.MediaProvider.$r8$lambda$QvobK0mrOcF7YLdAJMtFTbarHSw(MediaProvider.java:0)
+09-10 12:53:39.296 W/MediaProvider( 1643): 	at com.android.providers.media.MediaProvider$$ExternalSyntheticLambda18.run(R8$$SyntheticClass:0)
+09-10 12:53:39.296 W/MediaProvider( 1643): 	at android.os.Handler.handleCallback(Handler.java:991)
+09-10 12:53:39.296 W/MediaProvider( 1643): 	at android.os.Handler.dispatchMessage(Handler.java:102)
+09-10 12:53:39.296 W/MediaProvider( 1643): 	at android.os.Looper.loopOnce(Looper.java:232)
+09-10 12:53:39.296 W/MediaProvider( 1643): 	at android.os.Looper.loop(Looper.java:317)
+09-10 12:53:39.296 W/MediaProvider( 1643): 	at android.os.HandlerThread.run(HandlerThread.java:85)
+09-10 12:53:39.296 E/StorageManager( 1643): Failed to set extended attributes for /storage/emulated/0/c26-afterauth.xml to set project id.: Operation not supported on transport endpoint
+09-10 12:53:39.296 W/MediaProvider( 1643): Failed to update quota type for /storage/emulated/0/c26-afterauth.xml
+09-10 12:53:39.296 W/MediaProvider( 1643): java.io.IOException: Failed to update quota type for /storage/emulated/0/c26-afterauth.xml
+09-10 12:53:39.296 W/MediaProvider( 1643): 	at android.os.storage.StorageManager.updateExternalStorageFileQuotaType(StorageManager.java:2598)
+09-10 12:53:39.296 W/MediaProvider( 1643): 	at com.android.providers.media.MediaProvider.updateQuotaTypeForFileInternal(MediaProvider.java:1024)
+09-10 12:53:39.296 W/MediaProvider( 1643): 	at com.android.providers.media.MediaProvider.updateQuotaTypeForUri(MediaProvider.java:999)
+09-10 12:53:39.296 W/MediaProvider( 1643): 	at com.android.providers.media.MediaProvider$5.lambda$onInsert$0(MediaProvider.java:1058)
+09-10 12:53:39.296 W/MediaProvider( 1643): 	at com.android.providers.media.MediaProvider$5.$r8$lambda$4KU7YPdO1inr9tOLVzprJ5YcfCE(MediaProvider.java:0)
+09-10 12:53:39.296 W/MediaProvider( 1643): 	at com.android.providers.media.MediaProvider$5$$ExternalSyntheticLambda2.run(R8$$SyntheticClass:0)
+09-10 12:53:39.296 W/MediaProvider( 1643): 	at android.os.Handler.handleCallback(Handler.java:991)
+09-10 12:53:39.296 W/MediaProvider( 1643): 	at android.os.Handler.dispatchMessage(Handler.java:102)
+09-10 12:53:39.296 W/MediaProvider( 1643): 	at android.os.Looper.loopOnce(Looper.java:232)
+09-10 12:53:39.296 W/MediaProvider( 1643): 	at android.os.Looper.loop(Looper.java:317)
+09-10 12:53:39.296 W/MediaProvider( 1643): 	at android.os.HandlerThread.run(HandlerThread.java:85)
+09-10 12:53:39.317 W/AccessibilityNodeInfoDumper(52648): Fetch time: 30ms
+09-10 12:53:39.318 W/MagnificationConnectionManager(  835): requestConnection duplicated request: connect=false, mConnectionState=DISCONNECTED
+09-10 12:53:39.318 D/AccessibilityManagerService(  835): restoreCurrentUserForTestAutomationIfNeededLocked(): ignoring because device doesn't support visible background users
+09-10 12:53:39.319 D/AndroidRuntime(52648): Shutting down VM
+09-10 12:53:39.319 D/BatterySaverPolicy(  835): accessibility changed to false, updating policy.
+09-10 12:53:40.126 F/libc    (52648): Fatal signal 11 (SIGSEGV), code 1 (SEGV_MAPERR), fault addr 0x756290067be0 in tid 52648 (Shutdown thread), pid 52648 (Shutdown thread)
+09-10 12:53:40.135 I/crash_dump64(52665): obtaining output fd from tombstoned, type: kDebuggerdTombstoneProto
+09-10 12:53:40.135 I/tombstoned(  513): received crash request for pid 52648
+09-10 12:53:40.135 I/crash_dump64(52665): performing dump of process 52648 (target tid = 52648)
+09-10 12:53:40.171 F/DEBUG   (52665): *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** ***
+09-10 12:53:40.171 F/DEBUG   (52665): Build fingerprint: 'Redmi/rubens/rubens:15/V417IR/861:user/release-keys'
+09-10 12:53:40.171 F/DEBUG   (52665): Revision: '0'
+09-10 12:53:40.171 F/DEBUG   (52665): ABI: 'x86_64'
+09-10 12:53:40.171 F/DEBUG   (52665): Timestamp: 2026-09-10 12:53:40.137576047+0800
+09-10 12:53:40.171 F/DEBUG   (52665): Process uptime: 3s
+09-10 12:53:40.171 F/DEBUG   (52665): Cmdline: uiautomator
+09-10 12:53:40.171 F/DEBUG   (52665): pid: 52648, tid: 52648, name: Shutdown thread  >>> uiautomator <<<
+09-10 12:53:40.171 F/DEBUG   (52665): uid: 2000
+09-10 12:53:40.171 F/DEBUG   (52665): signal 11 (SIGSEGV), code 1 (SEGV_MAPERR), fault addr 0x0000756290067be0
+09-10 12:53:40.171 F/DEBUG   (52665):     rax 0000000000000000  rbx 000075655658289c  rcx 0000000000000001  rdx 0000000000000002
+09-10 12:53:40.171 F/DEBUG   (52665):     r8  0000000000000020  r9  0000000000020002  r10 0000000000000001  r11 0000000000000206
+09-10 12:53:40.171 F/DEBUG   (52665):     r12 0000000000001000  r13 00000000000005b7  r14 0000756290067be0  r15 0000000000008928
+09-10 12:53:40.171 F/DEBUG   (52665):     rdi 000075629042dee8  rsi 0000000000001000
+09-10 12:53:40.171 F/DEBUG   (52665):     rbp 00007fff06ce05c0  rsp 00007fff06ce0558  rip 0000756290067be0
+09-10 12:53:40.171 F/DEBUG   (52665): 4 total frames
+09-10 12:53:40.171 F/DEBUG   (52665): backtrace:
+09-10 12:53:40.171 F/DEBUG   (52665):       #00 pc 0000756290067be0  <unknown>
+09-10 12:53:40.171 F/DEBUG   (52665):       #01 pc 000000000005846f  /apex/com.android.runtime/lib64/bionic/libc.so (__cxa_finalize+287) (BuildId: 52bc34193ef6f6311bbb44f2305d1b1d)
+09-10 12:53:40.171 F/DEBUG   (52665):       #02 pc 000000000005c83f  /apex/com.android.runtime/lib64/bionic/libc.so (exit+31) (BuildId: 52bc34193ef6f6311bbb44f2305d1b1d)
+09-10 12:53:40.171 F/DEBUG   (52665):       #03 pc 00000000000520dc  /apex/com.android.runtime/lib64/bionic/libc.so (__libc_init+124) (BuildId: 52bc34193ef6f6311bbb44f2305d1b1d)
+09-10 12:53:40.174 W/NativeCrashListener(  835): Couldn't find ProcessRecord for pid 52648
+09-10 12:53:40.174 E/crash_dump64(52665): AM data write failed: Broken pipe
+09-10 12:53:40.174 E/tombstoned(  513): Tombstone written to: tombstone_11
+09-10 12:53:40.175 E/NativeTombstoneManager(  835): Tombstone's UID (2000) not an app, ignoring
+09-10 12:53:40.175 E/NativeTombstoneManager(  835): Tombstone's UID (2000) not an app, ignoring
+09-10 12:53:40.356 W/dumpsys (52673): Thread Pool max thread count is 0. Cannot cache binder as linkToDeath cannot be implemented. serviceName: activity
+09-10 12:53:40.951 W/libc    (    1): Rewrite len too long for denied property "init.svc.serial_console", len = 7, oldlen = 0
+09-10 12:53:40.948 I/init    (52676): type=1400 audit(0.0:2659): avc:  denied  { entrypoint } for  path="/system/xbin/serial_console" dev="sda6" ino=3974 scontext=u:r:su:s0 tcontext=u:object_r:system_file:s0 tclass=file permissive=1
+09-10 12:53:40.948 I/serial_console(52676): type=1400 audit(0.0:2660): avc:  denied  { map } for  path="/system/xbin/serial_console" dev="sda6" ino=3974 scontext=u:r:su:s0 tcontext=u:object_r:system_file:s0 tclass=file permissive=1
+09-10 12:53:40.973 W/libc    (    1): Rewrite len too long for denied property "init.svc.serial_console", len = 10, oldlen = 0
+09-10 12:53:40.948 I/serial_console(52676): type=1400 audit(0.0:2661): avc:  denied  { read execute } for  path="/system/xbin/serial_console" dev="sda6" ino=3974 scontext=u:r:su:s0 tcontext=u:object_r:system_file:s0 tclass=file permissive=1
+09-10 12:53:45.955 W/libc    (    1): Rewrite len too long for denied property "init.svc.serial_console", len = 7, oldlen = 0
+09-10 12:53:45.965 W/libc    (    1): Rewrite len too long for denied property "init.svc.serial_console", len = 10, oldlen = 0
+09-10 12:53:50.963 W/libc    (    1): Rewrite len too long for denied property "init.svc.serial_console", len = 7, oldlen = 0
+09-10 12:53:50.973 W/libc    (    1): Rewrite len too long for denied property "init.svc.serial_console", len = 10, oldlen = 0
+09-10 12:53:55.963 W/libc    (    1): Rewrite len too long for denied property "init.svc.serial_console", len = 7, oldlen = 0
+09-10 12:53:55.973 W/libc    (    1): Rewrite len too long for denied property "init.svc.serial_console", len = 10, oldlen = 0
+09-10 12:54:00.963 W/libc    (    1): Rewrite len too long for denied property "init.svc.serial_console", len = 7, oldlen = 0
+09-10 12:54:00.973 W/libc    (    1): Rewrite len too long for denied property "init.svc.serial_console", len = 10, oldlen = 0
+09-10 12:54:05.983 W/libc    (    1): Rewrite len too long for denied property "init.svc.serial_console", len = 7, oldlen = 0
+09-10 12:54:05.993 W/libc    (    1): Rewrite len too long for denied property "init.svc.serial_console", len = 10, oldlen = 0
+09-10 12:54:10.979 W/libc    (    1): Rewrite len too long for denied property "init.svc.serial_console", len = 7, oldlen = 0
+09-10 12:54:10.989 W/libc    (    1): Rewrite len too long for denied property "init.svc.serial_console", len = 10, oldlen = 0
+09-10 12:54:15.987 W/libc    (    1): Rewrite len too long for denied property "init.svc.serial_console", len = 7, oldlen = 0
+09-10 12:54:15.997 W/libc    (    1): Rewrite len too long for denied property "init.svc.serial_console", len = 10, oldlen = 0
+09-10 12:54:20.991 W/libc    (    1): Rewrite len too long for denied property "init.svc.serial_console", len = 7, oldlen = 0
+09-10 12:54:21.001 W/libc    (    1): Rewrite len too long for denied property "init.svc.serial_console", len = 10, oldlen = 0
+09-10 12:54:25.999 W/libc    (    1): Rewrite len too long for denied property "init.svc.serial_console", len = 7, oldlen = 0
+09-10 12:54:26.009 W/libc    (    1): Rewrite len too long for denied property "init.svc.serial_console", len = 10, oldlen = 0
+09-10 12:54:30.999 W/libc    (    1): Rewrite len too long for denied property "init.svc.serial_console", len = 7, oldlen = 0
+09-10 12:54:31.009 W/libc    (    1): Rewrite len too long for denied property "init.svc.serial_console", len = 10, oldlen = 0
+09-10 12:54:36.011 W/libc    (    1): Rewrite len too long for denied property "init.svc.serial_console", len = 7, oldlen = 0
+09-10 12:54:36.021 W/libc    (    1): Rewrite len too long for denied property "init.svc.serial_console", len = 10, oldlen = 0
+09-10 12:54:41.011 W/libc    (    1): Rewrite len too long for denied property "init.svc.serial_console", len = 7, oldlen = 0
+09-10 12:54:41.021 W/libc    (    1): Rewrite len too long for denied property "init.svc.serial_console", len = 10, oldlen = 0
+09-10 12:54:46.035 W/libc    (    1): Rewrite len too long for denied property "init.svc.serial_console", len = 7, oldlen = 0
+09-10 12:54:46.045 W/libc    (    1): Rewrite len too long for denied property "init.svc.serial_console", len = 10, oldlen = 0
+09-10 12:54:51.027 W/libc    (    1): Rewrite len too long for denied property "init.svc.serial_console", len = 7, oldlen = 0
+09-10 12:54:51.037 W/libc    (    1): Rewrite len too long for denied property "init.svc.serial_console", len = 10, oldlen = 0
+09-10 12:54:56.035 W/libc    (    1): Rewrite len too long for denied property "init.svc.serial_console", len = 7, oldlen = 0
+09-10 12:54:56.045 W/libc    (    1): Rewrite len too long for denied property "init.svc.serial_console", len = 10, oldlen = 0
+09-10 12:55:01.047 W/libc    (    1): Rewrite len too long for denied property "init.svc.serial_console", len = 7, oldlen = 0
+09-10 12:55:01.057 W/libc    (    1): Rewrite len too long for denied property "init.svc.serial_console", len = 10, oldlen = 0
+09-10 12:55:02.064 W/NotificationHistory(  835): Attempted to remove channel for locked/gone/disabled user 0
+09-10 12:55:02.096 D/gralloc_kona(52177): gralloc_alloc: Creating ashmem region of size 14749696
+09-10 12:55:02.111 D/gralloc_kona(52177): gralloc_alloc: Creating ashmem region of size 14749696
+09-10 12:55:02.257 W/HWUI    (52177): Image decoding logging dropped!
+09-10 12:55:02.304 D/gralloc_kona(52177): gralloc_alloc: Creating ashmem region of size 159744
+09-10 12:55:02.306 D/gralloc_kona(52177): gralloc_alloc: Creating ashmem region of size 159744
+09-10 12:55:02.320 D/gralloc_kona(52177): gralloc_alloc: Creating ashmem region of size 159744
+09-10 12:55:02.532 D/BackgroundInstallControlService(  835): Package event received: 0
+09-10 12:55:02.532 W/NotificationHistory(  835): Attempted to add notif for locked/gone/disabled user 0
+09-10 12:55:02.550 D/LocalImageResolver( 1103): Couldn't use ImageDecoder for drawable, falling back to non-resized load.
+09-10 12:55:02.553 D/LocalImageResolver( 1103): Couldn't use ImageDecoder for drawable, falling back to non-resized load.
+09-10 12:55:03.486 D/AndroidRuntime(52700): >>>>>> START com.android.internal.os.RuntimeInit uid 2000 <<<<<<
+09-10 12:55:03.488 I/AndroidRuntime(52700): Using default boot image
+09-10 12:55:03.489 I/AndroidRuntime(52700): Leaving lock profiling enabled
+09-10 12:55:03.490 W/app_process(52700): ART APEX data files are untrusted.
+09-10 12:55:03.490 I/app_process(52700): Using CollectorTypeCMC GC.
+09-10 12:55:03.578 D/nativeloader(52700): InitDefaultPublicLibraries for_preload=1: libandroid.so:libaaudio.so:libamidi.so:libbinder_ndk.so:libc.so:libcamera2ndk.so:libdl.so:libEGL.so:libGLESv1_CM.so:libGLESv2.so:libGLESv3.so:libicu.so:libicui18n.so:libicuuc.so:libjnigraphics.so:liblog.so:libmediandk.so:libm.so:libnativehelper.so:libnativewindow.so:libOpenMAXAL.so:libOpenSLES.so:libRS.so:libstdc++.so:libsync.so:libvulkan.so:libwebviewchromium_plat_support.so:libz.so:libcallhost.so
+09-10 12:55:03.585 D/nativeloader(52700): Load libicu_jni.so using APEX ns com_android_art for caller /apex/com.android.art/javalib/core-oj.jar: ok
+09-10 12:55:03.585 D/app_process(52700): u_setTimeZoneFilesDirectory("/apex/com.android.tzdata/etc/tz/versioned/8/icu") succeeded. 
+09-10 12:55:03.585 D/app_process(52700): I18n APEX ICU file found: /apex/com.android.i18n/etc/icu/icudt75l.dat
+09-10 12:55:03.585 D/nativeloader(52700): Load libjavacore.so using APEX ns com_android_art for caller /apex/com.android.art/javalib/core-oj.jar: ok
+09-10 12:55:03.586 D/nativeloader(52700): Load libopenjdk.so using APEX ns com_android_art for caller /apex/com.android.art/javalib/core-oj.jar: ok
+09-10 12:55:03.586 W/app_process(52700): Unexpected CPU variant for x86: x86_64.
+09-10 12:55:03.586 W/app_process(52700): Known variants: atom, sandybridge, silvermont, goldmont, goldmont-plus, goldmont-without-sha-xsaves, tremont, kabylake, alderlake, default
+09-10 12:55:03.587 W/app_process(52700): ClassLoaderContext shared library size mismatch. Expected=2, found=0 (PCL[]{PCL[/system/framework/android.test.base.jar*2643221532]#PCL[/system/framework/android.test.mock.jar*4236284042]} | PCL[])
+09-10 12:55:03.588 W/app_process(52700): ClassLoaderContext classpath size mismatch. expected=0, found=1 (PCL[]{PCL[/system/framework/android.test.runner.jar*760235463]#PCL[/system/framework/android.test.base.jar*2643221532]} | PCL[/system/framework/android.test.runner.jar*760235463])
+09-10 12:55:03.588 W/app_process(52700): Could not create mount namespace.
+09-10 12:55:03.588 W/nativebridge(52700): Failed to bind-mount /system/etc/cpuinfo.x86_64.txt as /proc/cpuinfo: Operation not permitted
+09-10 12:55:03.588 W/nativebridge(52700): Failed to bind-mount /system/lib64/x86_64/cpuinfo as /proc/cpuinfo: Operation not permitted
+09-10 12:55:03.588 W/nativebridge(52700): Cannot create code cache directory ./code_cache: Read-only file system.
+09-10 12:55:03.588 V/libnb   (52700): enter native_bridge2_initialize (null) x86_64
+09-10 12:55:03.588 E/libnb   (52700): The translator implementation library has not been set.
+09-10 12:55:03.594 E/libnb   (52700): get_callbacks native_handle 0xb30e3734b323fc83: 1 libnb:/system/lib64/libhoudini.so
+09-10 12:55:03.594 I/libnb   (52700): Found /system/lib64/libhoudini.so version 7
+09-10 12:55:03.584 I/main    (52700): type=1400 audit(0.0:2662): avc:  denied  { mounton } for  path="/proc/cpuinfo" dev="proc" ino=4026532022 scontext=u:r:shell:s0 tcontext=u:object_r:proc_cpuinfo:s0 tclass=file permissive=1
+09-10 12:55:03.605 D/nativeloader(52700): Load libframework-connectivity-tiramisu-jni.so using APEX ns com_android_tethering for caller /apex/com.android.tethering/javalib/framework-connectivity-t.jar: ok
+09-10 12:55:03.605 D/AndroidRuntime(52700): Calling main entry com.android.commands.uiautomator.Launcher
+09-10 12:55:03.608 D/UiAutomationConnection(52700): Created on user UserHandle{0}
+09-10 12:55:03.608 I/UiAutomation(52700): Initialized for user 0 on display 0
+09-10 12:55:03.608 W/UiAutomation(52700): Created with deprecatead constructor, assumes DEFAULT_DISPLAY
+09-10 12:55:03.608 D/AccessibilityManagerService(  835): changeCurrentUserForTestAutomationIfNeededLocked(0): ignoring because device doesn't support visible background users
+09-10 12:55:03.608 I/UiAutomationManager(  835): Registering UiTestAutomationService (id=com.android.server.accessibility/UiAutomation, flags=0x0) when called by user 0
+09-10 12:55:03.609 W/MagnificationConnectionManager(  835): requestConnection duplicated request: connect=false, mConnectionState=DISCONNECTED
+09-10 12:55:03.610 D/BatterySaverPolicy(  835): accessibility changed to true, updating policy.
+09-10 12:55:03.611 W/MagnificationConnectionManager(  835): requestConnection duplicated request: connect=false, mConnectionState=DISCONNECTED
+09-10 12:55:04.608 I/uiautomator(52700): type=1400 audit(0.0:2663): avc:  denied  { read } for  name="u:object_r:qemu_sf_lcd_density_prop:s0" dev="tmpfs" ino=460 scontext=u:r:shell:s0 tcontext=u:object_r:qemu_sf_lcd_density_prop:s0 tclass=file permissive=1
+09-10 12:55:04.623 W/MediaProvider( 1643): isAppCloneUserPair for user 0: false
+09-10 12:55:04.625 E/StorageManager( 1643): Failed to set extended attributes for /storage/emulated/0/c26-capture-after-click.xml to set project id.: Operation not supported on transport endpoint
+09-10 12:55:04.625 W/MediaProvider( 1643): Failed to update quota type for /storage/emulated/0/c26-capture-after-click.xml
+09-10 12:55:04.625 W/MediaProvider( 1643): java.io.IOException: Failed to update quota type for /storage/emulated/0/c26-capture-after-click.xml
+09-10 12:55:04.625 W/MediaProvider( 1643): 	at android.os.storage.StorageManager.updateExternalStorageFileQuotaType(StorageManager.java:2598)
+09-10 12:55:04.625 W/MediaProvider( 1643): 	at com.android.providers.media.MediaProvider.updateQuotaTypeForFileInternal(MediaProvider.java:1024)
+09-10 12:55:04.625 W/MediaProvider( 1643): 	at com.android.providers.media.MediaProvider.lambda$onFileCreatedForFuse$16(MediaProvider.java:2290)
+09-10 12:55:04.625 W/MediaProvider( 1643): 	at com.android.providers.media.MediaProvider.$r8$lambda$QvobK0mrOcF7YLdAJMtFTbarHSw(MediaProvider.java:0)
+09-10 12:55:04.625 W/MediaProvider( 1643): 	at com.android.providers.media.MediaProvider$$ExternalSyntheticLambda18.run(R8$$SyntheticClass:0)
+09-10 12:55:04.625 W/MediaProvider( 1643): 	at android.os.Handler.handleCallback(Handler.java:991)
+09-10 12:55:04.625 W/MediaProvider( 1643): 	at android.os.Handler.dispatchMessage(Handler.java:102)
+09-10 12:55:04.625 W/MediaProvider( 1643): 	at android.os.Looper.loopOnce(Looper.java:232)
+09-10 12:55:04.625 W/MediaProvider( 1643): 	at android.os.Looper.loop(Looper.java:317)
+09-10 12:55:04.625 W/MediaProvider( 1643): 	at android.os.HandlerThread.run(HandlerThread.java:85)
+09-10 12:55:04.608 I/uiautomator(52700): type=1400 audit(0.0:2664): avc:  denied  { open } for  path="/dev/__properties__/u:object_r:qemu_sf_lcd_density_prop:s0" dev="tmpfs" ino=460 scontext=u:r:shell:s0 tcontext=u:object_r:qemu_sf_lcd_density_prop:s0 tclass=file permissive=1
+09-10 12:55:04.633 W/AccessibilityNodeInfoDumper(52700): Fetch time: 12ms
+09-10 12:55:04.634 W/MagnificationConnectionManager(  835): requestConnection duplicated request: connect=false, mConnectionState=DISCONNECTED
+09-10 12:55:04.634 D/AccessibilityManagerService(  835): restoreCurrentUserForTestAutomationIfNeededLocked(): ignoring because device doesn't support visible background users
+09-10 12:55:04.635 D/AndroidRuntime(52700): Shutting down VM
+09-10 12:55:04.635 D/BatterySaverPolicy(  835): accessibility changed to false, updating policy.
+09-10 12:55:04.608 I/uiautomator(52700): type=1400 audit(0.0:2665): avc:  denied  { getattr } for  path="/dev/__properties__/u:object_r:qemu_sf_lcd_density_prop:s0" dev="tmpfs" ino=460 scontext=u:r:shell:s0 tcontext=u:object_r:qemu_sf_lcd_density_prop:s0 tclass=file permissive=1
+09-10 12:55:04.638 E/StorageManager( 1643): Failed to set extended attributes for /storage/emulated/0/c26-capture-after-click.xml to set project id.: Operation not supported on transport endpoint
+09-10 12:55:04.638 W/MediaProvider( 1643): Failed to update quota type for /storage/emulated/0/c26-capture-after-click.xml
+09-10 12:55:04.638 W/MediaProvider( 1643): java.io.IOException: Failed to update quota type for /storage/emulated/0/c26-capture-after-click.xml
+09-10 12:55:04.638 W/MediaProvider( 1643): 	at android.os.storage.StorageManager.updateExternalStorageFileQuotaType(StorageManager.java:2598)
+09-10 12:55:04.638 W/MediaProvider( 1643): 	at com.android.providers.media.MediaProvider.updateQuotaTypeForFileInternal(MediaProvider.java:1024)
+09-10 12:55:04.638 W/MediaProvider( 1643): 	at com.android.providers.media.MediaProvider.updateQuotaTypeForUri(MediaProvider.java:999)
+09-10 12:55:04.638 W/MediaProvider( 1643): 	at com.android.providers.media.MediaProvider$5.lambda$onInsert$0(MediaProvider.java:1058)
+09-10 12:55:04.638 W/MediaProvider( 1643): 	at com.android.providers.media.MediaProvider$5.$r8$lambda$4KU7YPdO1inr9tOLVzprJ5YcfCE(MediaProvider.java:0)
+09-10 12:55:04.638 W/MediaProvider( 1643): 	at com.android.providers.media.MediaProvider$5$$ExternalSyntheticLambda2.run(R8$$SyntheticClass:0)
+09-10 12:55:04.638 W/MediaProvider( 1643): 	at android.os.Handler.handleCallback(Handler.java:991)
+09-10 12:55:04.638 W/MediaProvider( 1643): 	at android.os.Handler.dispatchMessage(Handler.java:102)
+09-10 12:55:04.638 W/MediaProvider( 1643): 	at android.os.Looper.loopOnce(Looper.java:232)
+09-10 12:55:04.638 W/MediaProvider( 1643): 	at android.os.Looper.loop(Looper.java:317)
+09-10 12:55:04.638 W/MediaProvider( 1643): 	at android.os.HandlerThread.run(HandlerThread.java:85)
+09-10 12:55:04.608 I/uiautomator(52700): type=1400 audit(0.0:2666): avc:  denied  { map } for  path="/dev/__properties__/u:object_r:qemu_sf_lcd_density_prop:s0" dev="tmpfs" ino=460 scontext=u:r:shell:s0 tcontext=u:object_r:qemu_sf_lcd_density_prop:s0 tclass=file permissive=1
+09-10 12:55:05.443 F/libc    (52700): Fatal signal 7 (SIGBUS), code 2 (BUS_ADRERR), fault addr 0x75ab79923be0 in tid 52700 (Shutdown thread), pid 52700 (Shutdown thread)
+09-10 12:55:05.458 I/crash_dump64(52716): obtaining output fd from tombstoned, type: kDebuggerdTombstoneProto
+09-10 12:55:05.458 I/tombstoned(  513): received crash request for pid 52700
+09-10 12:55:05.458 I/crash_dump64(52716): performing dump of process 52700 (target tid = 52700)
+09-10 12:55:05.499 F/DEBUG   (52716): *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** ***
+09-10 12:55:05.499 F/DEBUG   (52716): Build fingerprint: 'Redmi/rubens/rubens:15/V417IR/861:user/release-keys'
+09-10 12:55:05.499 F/DEBUG   (52716): Revision: '0'
+09-10 12:55:05.499 F/DEBUG   (52716): ABI: 'x86_64'
+09-10 12:55:05.499 F/DEBUG   (52716): Timestamp: 2026-09-10 12:55:05.462677000+0800
+09-10 12:55:05.499 F/DEBUG   (52716): Process uptime: 3s
+09-10 12:55:05.499 F/DEBUG   (52716): Cmdline: uiautomator
+09-10 12:55:05.499 F/DEBUG   (52716): pid: 52700, tid: 52700, name: Shutdown thread  >>> uiautomator <<<
+09-10 12:55:05.499 F/DEBUG   (52716): uid: 2000
+09-10 12:55:05.499 F/DEBUG   (52716): signal 7 (SIGBUS), code 2 (BUS_ADRERR), fault addr 0x000075ab79923be0
+09-10 12:55:05.499 F/DEBUG   (52716):     rax 0000000000000000  rbx 000075aee91b989c  rcx 0000000000000001  rdx 0000000000000002
+09-10 12:55:05.499 F/DEBUG   (52716):     r8  0000000000000020  r9  0000000000020002  r10 0000000000000001  r11 0000000000000206
+09-10 12:55:05.499 F/DEBUG   (52716):     r12 0000000000001000  r13 00000000000005b7  r14 000075ab79923be0  r15 0000000000008928
+09-10 12:55:05.499 F/DEBUG   (52716):     rdi 000075ab79ce9ee8  rsi 0000000000001000
+09-10 12:55:05.499 F/DEBUG   (52716):     rbp 00007ffe3b44fce0  rsp 00007ffe3b44fc78  rip 000075ab79923be0
+09-10 12:55:05.499 F/DEBUG   (52716): 4 total frames
+09-10 12:55:05.499 F/DEBUG   (52716): backtrace:
+09-10 12:55:05.499 F/DEBUG   (52716):       #00 pc 000075ab79923be0  <unknown>
+09-10 12:55:05.499 F/DEBUG   (52716):       #01 pc 000000000005846f  /apex/com.android.runtime/lib64/bionic/libc.so (__cxa_finalize+287) (BuildId: 52bc34193ef6f6311bbb44f2305d1b1d)
+09-10 12:55:05.499 F/DEBUG   (52716):       #02 pc 000000000005c83f  /apex/com.android.runtime/lib64/bionic/libc.so (exit+31) (BuildId: 52bc34193ef6f6311bbb44f2305d1b1d)
+09-10 12:55:05.499 F/DEBUG   (52716):       #03 pc 00000000000520dc  /apex/com.android.runtime/lib64/bionic/libc.so (__libc_init+124) (BuildId: 52bc34193ef6f6311bbb44f2305d1b1d)
+09-10 12:55:05.502 W/NativeCrashListener(  835): Couldn't find ProcessRecord for pid 52700
+09-10 12:55:05.502 E/crash_dump64(52716): AM data write failed: Broken pipe
+09-10 12:55:05.502 E/tombstoned(  513): Tombstone written to: tombstone_12
+09-10 12:55:05.502 E/NativeTombstoneManager(  835): Tombstone's UID (2000) not an app, ignoring
+09-10 12:55:05.503 E/NativeTombstoneManager(  835): Tombstone's UID (2000) not an app, ignoring
+09-10 12:55:05.648 W/screencap(52722): Thread Pool max thread count is 0. Cannot cache binder as linkToDeath cannot be implemented. serviceName: SurfaceFlingerAIDL
+09-10 12:55:05.648 W/BpBinder(52722): Linking to death on android.gui.ISurfaceComposer but there are no threads (yet?) listening to incoming transactions. See ProcessState::startThreadPool and ProcessState::setThreadPoolMaxThreadCount. Generally you should setup the binder threadpool before other initialization steps.
+09-10 12:55:05.648 W/ProcessState(52722): Extra binder thread started, but 0 threads requested. Do not use *startThreadPool when zero threads are requested.
+09-10 12:55:05.648 D/gralloc_kona(  696): gralloc_alloc: Creating ashmem region of size 14749696
+09-10 12:55:05.650 E/HidlServiceManagement(52722): getService: Potential race detected, descriptor: android.hardware.graphics.mapper@2.0::IMapper instance: default
+09-10 12:55:05.651 W/screencap(52722): Cannot open renderer configuration file (nemuhotd pid=497)

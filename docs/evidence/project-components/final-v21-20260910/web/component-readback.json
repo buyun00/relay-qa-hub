@@ -1,0 +1,18 @@
+{
+  "endpoint": "http://127.0.0.1:4639/api/v1/projects/62a2f031-c436-402b-ba7d-57488c83450d/components",
+  "httpStatus": 200,
+  "projectId": "62a2f031-c436-402b-ba7d-57488c83450d",
+  "items": [
+    {"key":"build","enabled":true,"status":"ready","version":1},
+    {"key":"build_upload.single","enabled":true,"status":"ready","version":1},
+    {"key":"upload.incremental","enabled":true,"status":"needs_configuration","version":1},
+    {"key":"relay.production","enabled":false,"status":"disabled","version":0},
+    {"key":"qingyu.sync","enabled":false,"status":"disabled","version":0}
+  ],
+  "safeConfigEvidence": {
+    "build": "127.0.0.1:9 dummy Jenkins/artifact/job/ref values read back",
+    "build_upload.single": "buildPreset=external",
+    "upload.incremental": "127.0.0.1:9 dummy source/upload/login and dummy defaults read back",
+    "externalCalls": false
+  }
+}

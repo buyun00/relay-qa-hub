@@ -1,0 +1,26 @@
+{
+  "url": "http://127.0.0.1:4640/",
+  "title": "Relay QA Hub",
+  "project": {
+    "name": "Luna Final Dependency 0910",
+    "key": "LFD0910",
+    "id": "3f6e5980-0ced-4030-b544-a8204e2a8be0"
+  },
+  "visibleText": [
+    "项目已创建，仅启用 Bug 管理。",
+    "组件设置",
+    "打包\n未启用",
+    "单次打包上传\n未启用",
+    "打包预设键\ndependency-test",
+    "请先启用打包和增量上传，再启用单次打包上传；当前输入仍保留。",
+    "增量上传\n未启用",
+    "Relay AI 制作\n未启用",
+    "第三方订单同步\n未启用"
+  ],
+  "uiAssertions": {
+    "dependencyErrorExact": true,
+    "singleSwitchStillChecked": true,
+    "inputRetained": "dependency-test",
+    "recordChangedTextPresent": false
+  }
+}

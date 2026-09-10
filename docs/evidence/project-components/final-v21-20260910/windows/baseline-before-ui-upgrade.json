@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "capturedAt": "2026-09-10T04:51:16.3408688Z",
+  "target": "qa-hub-preview-v21-e2e-fresh-0910",
+  "process": {
+    "pid": 20552,
+    "parentPid": 20516,
+    "creationDate": "2026-09-10T11:41:36.997933+08:00",
+    "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview-v21-e2e-fresh-0910\\RelayQaHubPreview-v21-e2e-fresh-0910.exe",
+    "commandLine": "\"C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview-v21-e2e-fresh-0910\\RelayQaHubPreview-v21-e2e-fresh-0910.exe\" --updated --user-data-dir=\"C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-v21-e2e-fresh-0910\\desktop\\profile\"",
+    "fileVersion": "0.2.0.12",
+    "productVersion": "0.2.0-preview.12",
+    "sha256": "C36D9C384C6167F691B93877E93120C1DA749954846BF1E2392F04869212B6E8"
+  },
+  "profile": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-v21-e2e-fresh-0910\\desktop\\profile",
+  "businessFingerprint": {
+    "projectId": "305b4def-ae7e-4a2d-ae96-a05d616390bf",
+    "projectKey": "LUNAEXE246",
+    "draftEvidence": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-v21-e2e-fresh-0910\\acceptance\\postupgrade-draft-exact.json"
+  },
+  "candidateManifest": {
+    "releaseId": "20260910T044149231Z",
+    "version": "0.2.0-preview.13",
+    "size": 108296156,
+    "sha256": "7610c92fd39d4485d78e3d8ee7618d79d5e8ed9f3d6ce096c2922c72e5388ab0",
+    "signature": "/GXBLgsHbTTGptqFuke0RnYdzyO2CR6LoURy7FlkPZ0Q9KwvHoPlR+qyipirLR9YdV6odxgXAa4KBEpEYrbrCg==",
+    "archiveBytes": 108296156,
+    "archiveSha256": "7610C92FD39D4485D78E3D8EE7618D79D5E8ED9F3D6CE096C2922C72E5388AB0"
+  },
+  "reservedPorts": {
+    "preview": {"api": 4639, "web": 4640, "serverMcp": 4641, "desktopMcp": 4642},
+    "productionDailyObserved": {"api": 4319, "mcp": 4320},
+    "oldPreviewsObserved": [4174, 4274, 4419, 4420, 4539, 4541]
+  },
+  "uiUpgrade": "UNRUN: native Windows UI surface unavailable to this subagent"
+}

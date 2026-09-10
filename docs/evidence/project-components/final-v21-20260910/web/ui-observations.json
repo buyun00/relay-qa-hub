@@ -1,0 +1,25 @@
+{
+  "environment": {
+    "api": "http://127.0.0.1:4639",
+    "web": "http://127.0.0.1:4640",
+    "mcp": "http://127.0.0.1:4641/mcp",
+    "projectId": "62a2f031-c436-402b-ba7d-57488c83450d",
+    "projectName": "Luna UI E2E 0910",
+    "entryCode": "LUI0910",
+    "userName": "Luna UI User",
+    "bugKey": "LUI0910-1"
+  },
+  "checks": [
+    {"id":"gm_project_create","status":"PASS","evidence":"Visible UI showed project-created toast and selected project ID/code."},
+    {"id":"name_login_scope","status":"PASS","evidence":"Visible UI greeted Luna UI User; project switcher contained only selected project."},
+    {"id":"bug_list_detail_create_edit","status":"PASS","evidence":"Created LUI0910-1; list/detail visible; edit toast and updated title/history visible."},
+    {"id":"membership_revoke_restore","status":"PASS","evidence":"Revoke produced qualification-disabled login message; restore allowed login and bug visibility."},
+    {"id":"gm_components","status":"PASS","evidence":"Visible GM page exposed personnel and five component sections."},
+    {"id":"packaging_dummy_save_readback","status":"PASS","evidence":"127.0.0.1:9 dummy configuration saved, showed available, and read back after reload/project reselection."},
+    {"id":"single_upload_dependency_save","status":"PASS","evidence":"After upload.incremental was enabled and saved, build_upload.single saved successfully and visible UI showed 可用; HTTP readback is ready/version 1."},
+    {"id":"web_comment_ui","status":"PASS","evidence":"Expanded 状态轨迹与处理记录; submitted unique comment and UI showed 处理记录已添加 with full body and 3 records."},
+    {"id":"attachment_http_mcp_byte_roundtrip","status":"PASS","evidence":"Deterministic 68-byte PNG completed init/chunk/finalize/bind/download; downloaded bytes and SHA256 matched; MCP metadata/materialize passed."},
+    {"id":"external_integrations","status":"UNRUN","evidence":"No isolated real Jenkins/upload/Relay/third-party/Qingyu resources."}
+  ],
+  "safety": "Production and old preview endpoints were not touched; all component values were isolated dummy values."
+}
