@@ -7,6 +7,7 @@ import { isAllowedNetworkUrl } from "./config.js";
 import { DesktopBrowserSessionCookieStore, readBoundedBody } from "./network.js";
 import { commitRememberedIdentity, RememberedIdentityCommitError } from "./remembered-identity.js";
 import { callProductionTool, PRODUCTION_MCP_TOOLS } from "./mcp-production.js";
+import { callPackagingTool, PACKAGING_MCP_TOOLS } from "./mcp-packaging.js";
 
 const QA_MEDIA_TYPE = "application/vnd.relay-qa-hub.v1.1+json";
 const MAX_JSON_BYTES = 48 * 1024 * 1024;
@@ -421,6 +422,7 @@ const EXTERNAL_STATE_WRITE = Object.freeze({
 
 export const QA_HUB_MCP_TOOLS: readonly McpToolDefinition[] = Object.freeze([
   ...PRODUCTION_MCP_TOOLS,
+  ...PACKAGING_MCP_TOOLS,
   {
     name: "qa_list_projects",
     title: "列出 QA Hub 项目",
@@ -1472,54 +1474,8 @@ export class QaHubMcpTools {
   }
 
   async call(name: string, argumentsValue: unknown): Promise<unknown> {
-    if (this.options.sharedApi) {
-      if (!this.sharedDefinitions.some((tool) => tool.name === name))
-        throw new QaHubMcpError("TOOL_NOT_FOUND", `Unknown QA Hub MCP tool: ${name}`, 404);
-      if (name === "qa_materialize_attachment") return this.materializeAttachment(argumentsValue);
-      if (name === "qa_logout")
-        return this.api.json("/api/v1/auth/logout", { method: "POST", body: {} });
-      if (name === "qa_login_gm") {
-        const args = requireRecord(argumentsValue, "arguments");
-        onlyKeys(args, ["request", "projectId"]);
-        const request = requireRecord(args["request"], "request");
-        if (
-          args["projectId"] !== undefined &&
-          request["projectId"] !== undefined &&
-          args["projectId"] !== request["projectId"]
-        )
-          throw new QaHubMcpError("PROJECT_MISMATCH", "Project identifiers must match", 400);
-        return this.api.json("/api/v1/auth/gm/login", {
-          method: "POST",
-          body: {
-            ...request,
-            ...(args["projectId"] ? { projectId: args["projectId"] } : {}),
-            client: "web",
-          },
-        });
-      }
-      if (name === "qa_login") {
-        const args = requireRecord(argumentsValue, "arguments");
-        onlyKeys(args, ["name", "projectId", "projectName", "code"]);
-        const projectCodeLogin = args["projectName"] !== undefined || args["code"] !== undefined;
-        return this.api.json("/api/v1/auth/login", {
-          method: "POST",
-          body: {
-            name: requireString(args, "name", 1, 128),
-            ...(projectCodeLogin
-              ? {
-                  projectName: requireString(args, "projectName", 1, 200),
-                  code: requireString(args, "code", 4, 4),
-                }
-              : { projectId: requireUuid(args, "projectId") }),
-            client: "web",
-          },
-        });
-      }
-      return this.api.json("/api/v1/mcp/call", {
-        method: "POST",
-        body: { name, arguments: argumentsValue },
-      });
-    }
+    if (PACKAGING_MCP_TOOLS.some((tool) => tool.name === name))
+      return callPackagingTool(name, argumentsValue, this.api);
     if (PRODUCTION_MCP_TOOLS.some((tool) => tool.name === name))
       return callProductionTool(name, argumentsValue, this.api, this.attachmentCacheRoot);
     switch (name) {

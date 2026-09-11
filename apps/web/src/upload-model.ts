@@ -136,10 +136,16 @@ const STAGES: Record<string, string> = {
   AWAITING_PUBLISH_CONFIRMATION: "等待最终确认发布",
 };
 const ERRORS: Record<string, string> = {
-  UPLOAD_SOURCE_NO_ZIP: "iOS 目录中还没有可上传的 ZIP，请等待构建完成后重试。",
-  UPLOAD_SOURCE_UNAVAILABLE: "暂时无法读取 iOS 构建目录，请稍后恢复任务。",
+  UPLOAD_SOURCE_NO_ZIP: "所选平台、配置或版本还没有已核验的热更 ZIP，请等待构建完成或核对版本。",
+  UPLOAD_SOURCE_UNAVAILABLE: "暂时无法读取构建目录，请稍后恢复任务。",
+  BUILD_RESULT_UNAVAILABLE: "暂时无法读取构建产物清单，请稍后恢复任务。",
+  BUILD_ARTIFACT_MISMATCH: "ZIP 与构建清单的版本、平台、产品渠道或 SHA-256 不一致，已停止上传。",
   BUILD_ZIP_CHANGED: "增量包大小或修改时间已变化，本次已停止上传，请核对构建结果。",
   BUILD_PLATFORM_UNSUPPORTED: "打外网包按钮构建 Android，请在上传增量页选择 iOS 并上传已有 ZIP。",
+  CHECKPOINT_WRITE_FAILED:
+    "服务端保存上传断点失败，原任务和增量包已保留。请检查文件占用或磁盘状态后恢复任务。",
+  WAITING_REMOTE_STATE: "正在等待平台处理结果，后台会继续核对。",
+  REMOTE_PUBLISHED_RECONCILED: "已同步平台上的正式发布结果。",
   UPLOAD_CHANNEL_HELD: "同产品和渠道有未完成任务，正在等待前一任务完成或确认发布。",
   UPLOAD_QUEUE_BUSY: "服务端正在核对任务，稍后重试即可；提交标识已保留。",
   UPLOAD_SERVICE_UNAVAILABLE: "暂时无法连接上传服务，已有任务仍保存在服务端。",

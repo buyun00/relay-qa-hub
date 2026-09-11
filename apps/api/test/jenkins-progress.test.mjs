@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { parseBuildLog, describeBuild, applyBuildHistory } from "../dist/jenkins-progress.js";
 import { JenkinsBuildService } from "../dist/jenkins-builds.js";
-import { jenkinsConfig } from "./component-test-config.mjs";
+import { QUICK_BUILD_PRESETS } from "@relay-qa-hub/upload-contract";
 
 const timed = `00:00:01.000 [JenkinsPlayerPolicy] profile=sdk-external requested=App effective=App reason=external_profile_unchanged
 00:00:01.100 [init] MAKE_PKG_ZIP_VAL=true
@@ -138,6 +138,74 @@ test("timestamped stages carry actual boundaries, worker work and a separate Gra
   assert.equal(applyBuildHistory([result])[0].percent, 100);
 });
 
+test("quick-entry script output advances Unity progress without shell tracing", () => {
+  const log = `[JenkinsPlayerPolicy] profile=sdk-external requested=App effective=App reason=requested_app
+[init] Debug 2.5.1 build=10177 mode=0
+[build] 🛠 Unity 导出中（最耗时，约 10-30 分钟）…`;
+  const result = describe(meta(8, { building: true, result: null }), log);
+  assert.equal(result.stages[0].state, "complete");
+  assert.equal(result.stages[1].state, "running");
+  assert.equal(result.stages[1].timing, "observed");
+  const echoed = describe(
+    meta(9, { building: true, result: null }),
+    `+ echo '${log.split("\n").at(-1)}'`,
+  );
+  assert.equal(echoed.stages[1].state, "waiting");
+});
+
+test("actual Gradle and Xcode output identifies native compilation after Unity export", () => {
+  for (const marker of [
+    "> Configure project :launcher",
+    "> Task :unityLibrary:compileReleaseJavaWithJavac",
+    "[buildIPA] xcodebuild archive 开始",
+  ]) {
+    const result = describe(
+      meta(8, { result: "FAILURE" }),
+      `[build] Unity 导出中\nUnity build process exited with code: 0\n${marker}`,
+    );
+    assert.equal(result.stages[1].state, "complete");
+    assert.equal(result.stages[2].state, "failed");
+  }
+  const result = describe(
+    meta(9, { building: true, result: null }),
+    "+ echo '> Configure project :launcher'",
+  );
+  assert.equal(result.stages[2].state, "waiting");
+});
+
+test("iOS effective build mode controls whether native compilation is skipped", () => {
+  const resource = describe(
+    meta(8, { building: true, result: null }),
+    "[iOSPlayerPolicy] profile=sdk-external requested=Res effective=Res reason=hot_update_allowed",
+  );
+  assert.equal(resource.mode, "Res");
+  assert.equal(resource.stages[2].state, "skipped");
+  const fallback = describe(
+    meta(9, { building: true, result: null }),
+    "[iOSPlayerPolicy] profile=sdk-external requested=Res effective=App reason=player_required",
+  );
+  assert.equal(fallback.mode, "App");
+  assert.equal(fallback.stages[2].state, "waiting");
+});
+
+test("iOS export without a start marker has an honest combined phase and export timeout", () => {
+  const preset = QUICK_BUILD_PRESETS.find((p) => p.id === "ios-debug-app");
+  const build = meta(8, {
+    building: true,
+    result: null,
+    actions: [{ parameters: [{ name: "打包用途", value: preset.label }] }],
+  });
+  const policy =
+    "[iOSPlayerPolicy] profile=sdk-external requested=App effective=App reason=requested_player";
+  const combined = applyBuildHistory([describe(build, policy, 1_600_000)])[0];
+  assert.equal(combined.stages[0].label, "准备并导出 iOS 工程");
+  assert.equal(combined.stages[0].alertAfterMs, 1_800_000);
+  assert.equal(combined.stages[0].alert, false);
+  const explicit = describe(build, policy + "\n[build] Unity 导出中", 1_600_000);
+  assert.equal(explicit.stages[0].label, "准备环境");
+  assert.equal(explicit.stages[1].state, "running");
+});
+
 test("legacy logs retain stage order without inventing stage durations or exposing console secrets", () => {
   const legacy = timed.replace(/^\d+:\d+:\d+\.\d+ /gmu, "  ") + "\n+ PRIVATE_TOKEN=not-for-browser";
   const result = describe(meta(), legacy);
@@ -200,7 +268,7 @@ test("untimed running stages use lower-bound observation and initial alarms, nev
 });
 
 test("monitor follows the precise queue executable, handles canceled/expired queues and tolerates log loss", async () => {
-  const jobPath = `/job/${encodeURIComponent("01-【OZDQP】【Android】")}/`;
+  const jobPath = `/job/${encodeURIComponent("00-【OZDQP】【快捷打包】")}/`;
   const json = (body, status = 200) => new Response(JSON.stringify(body), { status });
   const seen = [];
   const service = new JenkinsBuildService(async (value) => {

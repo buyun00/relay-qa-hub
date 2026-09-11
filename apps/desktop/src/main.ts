@@ -16,13 +16,11 @@ import {
   Tray,
 } from "electron";
 
-import { APP_HOST, appUrl, isAppUrl, parseBugDeepLink, parseDesktopConfig } from "./config.js";
-import { isPackageDownloadUrl } from "./package-downloads.js";
-import { buildPackagingNotificationId, parsePackagingNotice } from "./packaging-notifications.js";
-import type { DesktopBugChange, DesktopBugRoute, DesktopConnectionStatus } from "./bridge-types.js";
-import bugRoutes from "./bug-route.cjs";
-import { RendererDeliveryGate } from "./renderer-delivery-gate.js";
-import { NotificationHistory, type NotificationHistoryRoute } from "./notification-history.js";
+import { APP_HOST, APP_SCHEME, appUrl, isAppUrl, parseDesktopConfig } from "./config.js";
+import { isCompatibilityReportUrl, isPackageDownloadUrl } from "./package-downloads.js";
+import { parsePackagingNotice } from "./packaging-notifications.js";
+import type { DesktopBugChange, DesktopConnectionStatus } from "./bridge-types.js";
+import { NotificationHistory } from "./notification-history.js";
 import {
   boundedNotificationFailure,
   buildUpdateNotificationId,
@@ -1174,7 +1172,8 @@ function installNavigationGuards(window: BrowserWindow): void {
     if (!isTrustedRendererUrl(url)) event.preventDefault();
   });
   window.webContents.setWindowOpenHandler(({ url }) => {
-    if (isPackageDownloadUrl(url)) void shell.openExternal(url).catch(() => undefined);
+    if (isPackageDownloadUrl(url) || isCompatibilityReportUrl(url))
+      void shell.openExternal(url).catch(() => undefined);
     return { action: "deny" };
   });
 }

@@ -10,12 +10,11 @@ public sealed class TencentUploader : IObjectUploader
     public async Task Upload(JobConfig c,JobState s,IPlatform api,Journal journal,CancellationToken ct)
     {
         if(s.Done.Contains("COS_UPLOAD"))return;
-        CosXmlServer? server=null;DateTimeOffset refreshAt=DateTimeOffset.MinValue;
-        using var credentialGate=new SemaphoreSlim(1,1);var stateGate=new object();
+        var stateGate=new object();
         void Diagnostic(string kind,object data) { lock(stateGate)journal.Emit(s,kind,data); }
-        async Task Refresh()
+        async Task<ClientLease<CosXmlServer>> Refresh(CancellationToken refreshCancellation)
         {
-            var sts=await api.Get("/api/v1/thirdpartyadminapi/oss_sts",null,ct) as JsonObject??throw new UploadException("SCHEMA_CHANGED","STS 配置为空。");
+            var sts=await api.Get("/api/v1/thirdpartyadminapi/oss_sts",null,refreshCancellation) as JsonObject??throw new UploadException("SCHEMA_CHANGED","STS 配置为空。");
             if(Json.Text(sts["provider"])!="tencent")throw new UploadException("UNSUPPORTED_PROVIDER","STS provider 不受支持。");
             string bucket=Json.Text(sts["bucket"]),region=Json.Text(sts["region"]),domain=Json.Text(sts["domain"]);
             if(string.IsNullOrWhiteSpace(bucket)||string.IsNullOrWhiteSpace(region)||!Uri.TryCreate(domain,UriKind.Absolute,out var domainUri)||domainUri.Scheme!="https")throw new UploadException("SCHEMA_CHANGED","STS 缺少 bucket、region 或 HTTPS domain。");
@@ -35,21 +34,13 @@ public sealed class TencentUploader : IObjectUploader
             // bounds the whole synchronous part request, not just connecting.
             // A 5 MiB part must survive temporary slow uplink periods.
             var config=new CosXmlConfig.Builder().SetRegion(region).IsHttps(true).SetDebugLog(false).SetConnectionLimit(Math.Max(8,c.UploadConcurrency)).SetConnectionTimeoutMs(180000).SetReadWriteTimeoutMs(90000).Build();
-            server=new CosXmlServer(config,new DefaultSessionQCloudCredentialProvider(id,key,now-30,expiry,token));
-            refreshAt=DateTimeOffset.FromUnixTimeSeconds(Math.Max(now+5,expiry-60));
+            var server=new CosXmlServer(config,new DefaultSessionQCloudCredentialProvider(id,key,now-30,expiry,token));
+            var refreshAt=DateTimeOffset.FromUnixTimeSeconds(Math.Max(now+5,expiry-60));
             lock(stateGate){s.Bucket=bucket;s.Region=region;s.PublicUrl=domain.TrimEnd('/')+"/"+s.ObjectKey;journal.Save(s);}
+            Diagnostic("credentialsRefreshed",new{issuedAt=now,expiresAt=expiry,refreshAt=refreshAt.ToUnixTimeSeconds()});
+            return new(server,refreshAt);
         }
-        async Task<CosXmlServer> CurrentServer(CosXmlServer? failed,CancellationToken token)
-        {
-            await credentialGate.WaitAsync(token);
-            try
-            {
-                if(server==null||DateTimeOffset.UtcNow>=refreshAt||(failed!=null&&ReferenceEquals(server,failed)))await Refresh();
-                return server!;
-            }
-            finally{credentialGate.Release();}
-        }
-        await Refresh();
+        using var requests=new RefreshingClient<CosXmlServer>(Refresh);
         bool reconcilingCompletion=s.PendingAction=="COS_COMPLETE";
         if(reconcilingCompletion)
         {
@@ -57,7 +48,7 @@ public sealed class TencentUploader : IObjectUploader
             // a matching object size alone cannot prove this multipart completed.
             try
             {
-                var head=await Task.Run(()=>server!.HeadObject(new HeadObjectRequest(s.Bucket,s.ObjectKey)),ct);
+                var head=await requests.Run(client=>client.HeadObject(new HeadObjectRequest(s.Bucket,s.ObjectKey)),ct);
                 if(head.size==s.File!.Size&&head.eTag.Trim('"')==ExpectedMultipartEtag(s.Parts))
                 {s.PendingAction=null;s.Done.Add("COS_UPLOAD");journal.Save(s);return;}
                 throw new UploadException("OBJECT_CONFLICT","COS 成品文件与本任务的大小或分片摘要不一致，已停止合并恢复。");
@@ -72,7 +63,7 @@ public sealed class TencentUploader : IObjectUploader
         if(s.PendingAction!=null&&!reconcilingCompletion)throw new UploadException("REMOTE_RESULT_UNKNOWN","存在其他未决操作："+s.PendingAction);
         if(string.IsNullOrEmpty(s.UploadId))
         {
-            var result=await Task.Run(()=>server!.InitMultipartUpload(new InitMultipartUploadRequest(s.Bucket,s.ObjectKey)),ct);
+            var result=await requests.Run(client=>client.InitMultipartUpload(new InitMultipartUploadRequest(s.Bucket,s.ObjectKey)),ct);
             s.UploadId=result.initMultipartUpload.uploadId;
             if(string.IsNullOrWhiteSpace(s.UploadId))throw new UploadException("UPLOAD_FAILED","未取得 COS uploadId。");journal.Save(s);
         }
@@ -82,10 +73,12 @@ public sealed class TencentUploader : IObjectUploader
             var confirmed=new Dictionary<int,string>();int marker=0;
             do
             {
-                var request=new ListPartsRequest(s.Bucket,s.ObjectKey,s.UploadId);request.SetMaxParts(1000);if(marker>0)request.SetPartNumberMarker(marker);
                 Diagnostic("reconcileParts",new{marker});
                 COSXML.Model.Object.ListPartsResult result;
-                try { result=await Task.Run(()=>server!.ListParts(request),ct); }
+                try { result=await requests.Run(client=>{
+                    var request=new ListPartsRequest(s.Bucket,s.ObjectKey,s.UploadId);request.SetMaxParts(1000);if(marker>0)request.SetPartNumberMarker(marker);
+                    return client.ListParts(request);
+                },ct); }
                 catch(Exception error) {
                     Diagnostic("cosRequestFailed",new{operation="ListParts",error=CosDiagnostics.Describe(error)});
                     if(reconcilingCompletion)throw new UploadException("REMOTE_RESULT_UNKNOWN","不能确认原 COS 合并结果或活动分片，已保留原任务，请核对云端状态。");
@@ -124,9 +117,10 @@ public sealed class TencentUploader : IObjectUploader
                 var watch=Stopwatch.StartNew();
                 try
                 {
-                    currentServer=await CurrentServer(failed,token);
-                    var request=new UploadPartRequest(s.Bucket,s.ObjectKey,current,s.UploadId,s.File.Path,offset,length);
-                    var result=await Task.Run(()=>currentServer.UploadPart(request),token);
+                    var result=await requests.Run(client=>{
+                        currentServer=client;
+                        return client.UploadPart(new UploadPartRequest(s.Bucket,s.ObjectKey,current,s.UploadId,s.File.Path,offset,length));
+                    },token,failed);
                     return result.eTag;
                 }
                 catch(OperationCanceledException){throw;}
@@ -148,8 +142,13 @@ public sealed class TencentUploader : IObjectUploader
         Files.CheckStable(s.File);ct.ThrowIfCancellationRequested();
         s.PendingAction="COS_COMPLETE";journal.Save(s);
         var complete=CreateCompletion(s.Bucket,s.ObjectKey,s.UploadId,s.Parts);
-        try { await Task.Run(()=>server!.CompleteMultiUpload(complete),ct); }
-        catch(Exception error) { Diagnostic("cosRequestFailed",new{operation="CompleteMultipartUpload",error=CosDiagnostics.Describe(error)});throw; }
+        try { await requests.Run(client=>client.CompleteMultiUpload(complete),ct); }
+        catch(OperationCanceledException){throw;}
+        catch(UploadException){throw;}
+        catch(Exception error) {
+            Diagnostic("cosRequestFailed",new{operation="CompleteMultipartUpload",error=CosDiagnostics.Describe(error)});
+            throw new UploadException("REMOTE_RESULT_UNKNOWN","COS 合并结果尚未确认，原分片已保留；恢复原任务会先核对云端结果。");
+        }
         s.PendingAction=null;s.Done.Add("COS_UPLOAD");journal.Save(s);
     }
     public static CompleteMultipartUploadRequest CreateCompletion(string bucket,string key,string uploadId,IReadOnlyDictionary<int,string> parts)

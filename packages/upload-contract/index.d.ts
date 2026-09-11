@@ -1,3 +1,5 @@
+export * from "./quick-build.js";
+import type { QuickBuildPresetId } from "./quick-build.js";
 // Legacy modes remain readable for existing jobs; new jobs expose only the last two.
 export type UploadMode = "upload_only" | "prepare_test" | "publish_workflow" | "prepare_publish";
 export type UploadPlatform = "android" | "ios";
@@ -37,10 +39,12 @@ export interface UploadLogin {
 export interface UploadSourceIdentity {
   size: number;
   lastModified: string;
+  url?: string;
+  sha256?: string;
 }
 export interface BuildUploadChain {
-  projectId?: string;
-  componentVersion?: number;
+  preset?: QuickBuildPresetId;
+  buildVersion?: string;
   id: string;
   ownerId: string;
   canManage?: boolean;
@@ -146,6 +150,7 @@ export interface UploaderBridge {
   buildChains: () => Promise<UploadReply<BuildUploadChain[]>>;
   buildAndUpload: (input: {
     requestId: string;
+    preset?: QuickBuildPresetId;
     upload: UploadInput;
   }) => Promise<UploadReply<BuildUploadChain>>;
   cancelBuildUpload: (id: string) => Promise<UploadReply<boolean>>;

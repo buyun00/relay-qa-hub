@@ -1,4 +1,26 @@
 import type { UploadSourceIdentity } from "./uploader-types.js";
+import { artifactCatalog, pinBuildSource } from "./build-artifacts.js";
+import type { UploadInput } from "./uploader-types.js";
+
+export async function resolveUploadBuild(input: UploadInput, fetcher: typeof fetch = fetch) {
+  if (!["2001", "2002"].includes(input.productId) || !["1002", "2004"].includes(input.channelId))
+    throw new Error("INVALID_INPUT");
+  const results = await artifactCatalog(fetcher);
+  const result = results.find(
+    (r) =>
+      r.productId === input.productId &&
+      r.channelId === input.channelId &&
+      (!input.version || r.version === input.version),
+  );
+  if (!result) throw new Error("UPLOAD_SOURCE_NO_ZIP");
+  const expectedSource = await pinBuildSource(result, fetcher);
+  return {
+    version: result.version,
+    downloadUrl: expectedSource.url!,
+    sourceFileName: result.hotUpdate.name,
+    expectedSource,
+  };
+}
 
 export interface ResolvedUploadSource {
   downloadUrl: string;

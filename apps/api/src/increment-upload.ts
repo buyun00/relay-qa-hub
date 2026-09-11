@@ -7,6 +7,11 @@ import type { FastifyInstance, FastifyRequest } from "fastify";
 import { BuildUploadHost } from "./build-upload-host.js";
 import { JenkinsBuildService } from "./jenkins-builds.js";
 import {
+  quickBuildPreset,
+  quickUploadInput,
+  type QuickBuildPresetId,
+} from "@relay-qa-hub/upload-contract";
+import {
   UploaderHost,
   parseNewUploadInput,
   readJson,
@@ -46,6 +51,7 @@ type WorkerHost = Pick<
   | "resume"
   | "confirmPublish"
   | "folder"
+  | "reconcilePublications"
 >;
 interface Options {
   root: string;
@@ -62,6 +68,7 @@ interface Options {
 }
 type Kind = "upload" | "build" | "resume" | "confirm";
 interface Payload {
+  preset?: QuickBuildPresetId;
   input: UploadInput;
   accountIdentity: string;
   source?: UploadSourceIdentity;
@@ -236,7 +243,7 @@ export class IncrementUploadService {
           if (url === "/api/v1/auth/me") return { userId: owner };
           if (url === "/api/v1/packaging/builds" && request?.method === "POST")
             return this.options.jenkins.trigger(
-              this.options.buildPreset ?? "",
+              quickBuildPreset(record(request.body)["preset"])?.id ?? "external",
               `${owner}:${request.headers?.["idempotency-key"]}`,
             );
           if (url.startsWith("/api/v1/packaging/progress?")) {
@@ -244,7 +251,14 @@ export class IncrementUploadService {
             return this.options.jenkins.progress(
               [Number(params.get("queues"))],
               params.has("builds") ? [Number(params.get("builds"))] : [],
+              params.get("legacy") === "1",
             );
+          }
+          if (url.startsWith("/api/v1/packaging/build-result?")) {
+            const params = new URL(url, "http://localhost").searchParams;
+            const preset = quickBuildPreset(params.get("preset"));
+            if (!preset) throw new Error("INVALID_INPUT");
+            return this.options.jenkins.buildResult(Number(params.get("build")), preset.id);
           }
           throw new Error("INVALID_INPUT");
         },
@@ -272,7 +286,8 @@ export class IncrementUploadService {
         prior.jobId !== jobId ||
         prior.kind !== kind ||
         JSON.stringify(old.input) !== JSON.stringify(payload.input) ||
-        JSON.stringify(old.source) !== JSON.stringify(payload.source)
+        JSON.stringify(old.source) !== JSON.stringify(payload.source) ||
+        old.preset !== payload.preset
       )
         throw new Error("UPLOAD_REQUEST_CONFLICT");
       return prior;
@@ -307,19 +322,22 @@ export class IncrementUploadService {
     id: unknown,
     value: unknown,
     kind: "upload" | "build" = "upload",
+    presetValue?: unknown,
   ): Promise<string> {
     // Enqueue does not wait for Jenkins polling or a platform request. Only the
     // scheduler dispatches; the SQLite insertion itself is atomic and idempotent.
     this.leader();
-    if (this.options.canStart && !(await this.options.canStart(kind)))
-      throw new Error("COMPONENT_DISABLED");
+    const preset =
+      kind === "build" ? quickBuildPreset(presetValue ?? "android-release-app") : undefined;
+    if (kind === "build" && !preset) throw new Error("INVALID_INPUT");
+    const selected = preset ? { preset: preset.id } : {};
     const key = uuid(id),
-      input = parseNewUploadInput(value, this.options.project?.defaults),
+      input = parseNewUploadInput(
+        preset ? quickUploadInput(parseNewUploadInput(value), preset.id) : value,
+      ),
       prior = this.rows().find((c) => c.id === key);
-    if (kind === "build" && this.options.project?.sourceKind === "ios_directory")
-      throw new Error("BUILD_PLATFORM_UNSUPPORTED");
     if (prior) {
-      this.insert(owner, key, key, kind, { input, accountIdentity: "" });
+      this.insert(owner, key, key, kind, { input, accountIdentity: "", ...selected });
       return key;
     }
     const host = this.host(owner),
@@ -328,7 +346,7 @@ export class IncrementUploadService {
     if (!snapshot.available) throw new Error("UPLOADER_MISSING");
     if (snapshot.unreadableJobs) throw new Error("LOCAL_STATE_INVALID");
     const accountIdentity = await host.accountIdentity();
-    this.insert(owner, key, key, kind, { input, accountIdentity });
+    this.insert(owner, key, key, kind, { input, accountIdentity, ...selected });
     return key;
   }
   async account(
@@ -568,6 +586,7 @@ export class IncrementUploadService {
         ownerId: c.owner,
         accountIdentity: p.accountIdentity,
         input: p.input,
+        ...(p.preset ? { preset: p.preset } : {}),
         createdAt: c.createdAt,
         updatedAt: c.updatedAt,
         queueId: null,
@@ -687,6 +706,9 @@ export class IncrementUploadService {
       const owners = [...new Set(rows.map((c) => c.owner))];
       const snapshots = new Map<string, UploaderSnapshot>();
       for (const owner of owners) {
+        // The platform may have been published manually after our worker stopped
+        // at status 60. Verify that original publication before reserving lanes.
+        await this.host(owner).reconcilePublications();
         const s = await this.host(owner).snapshot();
         if (s.unreadableJobs) throw new Error("LOCAL_STATE_INVALID");
         snapshots.set(owner, s);
@@ -772,7 +794,11 @@ export class IncrementUploadService {
             this.save(c);
           }
           if (c.kind === "build")
-            await this.chain(c.owner).start({ requestId: c.jobId, upload: p.input });
+            await this.chain(c.owner).start({
+              requestId: c.jobId,
+              upload: p.input,
+              preset: p.preset,
+            });
           else if (c.kind === "upload") {
             if (p.source) await host.startForBuild(p.input, c.jobId, p.source, p.accountIdentity);
             else await host.startWithId(p.input, c.jobId);
@@ -847,7 +873,13 @@ export function registerIncrementUploadRoutes(
   route("GET", `${base}/jobs/:id/logs`, (owner, r) => service!.logs(owner, id(r)));
   route("GET", `${base}/build-chains`, (owner) => service!.buildChains(owner));
   route("POST", `${base}/build-chains`, async (owner, r) => {
-    const jobId = await service!.enqueue(owner, key(r), record(r.body)["upload"], "build");
+    const jobId = await service!.enqueue(
+      owner,
+      key(r),
+      record(r.body)["upload"],
+      "build",
+      record(r.body)["preset"],
+    );
     return (await service!.buildChains(owner)).find((c) => c.id === jobId);
   });
   route("POST", `${base}/build-chains/:id/cancel`, (owner, r) =>

@@ -17,7 +17,7 @@ public static class Program
             string LoginArg()=>ProjectBinding.Origin(Arg("--login-base"));
             if(args.Length==0||args[0] is "help" or "--help")
             {
-                Console.WriteLine("QA Hub project uploader 0.5.0\nExplicit project/version/sourceRoot/apiBase/loginBase/target prefixes required.\nCommands: run|resume|confirm-publish --config job.json; self-test; status --work directory; preflight --file package.zip; login|auth-check|logout --api-base URL --login-base URL.\nCredentials require instance-local OZDQP_AUTH_FILE. No production defaults.");return 0;
+                Console.WriteLine("OZDQP Uploader 0.5.1 / 固定地址下载 + 账号密码登录\n\n  login [--kind email|subaccount]   登录并保存账号密码，默认邮箱\n  auth-check                       只读检查已保存的登录状态\n  logout                           清除本工具本地登录缓存\n  download --work <目录>            仅从固定地址下载并校验 ZIP\n  preflight --file <ZIP>            本地检查\n  self-test                        本地测试，不访问业务平台\n  run --config <job.json>           登录、下载、执行完整流程\n  resume --config <job.json>        恢复本任务的相同 ZIP\n  confirm-publish --config <job.json> 最终确认发布（prepare_publish 等待后）\n  status --work <任务目录>          读取当前结果\n\nZIP 固定来源："+PackageDownload.SourceUrl+"\n账号密码保存在本地 JSON；后续自动登录。兼容 OZDQP_AUTHORIZATION。\nCtrl+C 保留断点；下载中断后从头下载，已完成下载的旧任务不会取新包。");return 0;
             }
             if(args[0]=="login")
             {
@@ -68,9 +68,9 @@ public static class Program
             if(config.ExpectedSource is {} expectedSource && (expectedSource.Size<=0 || !DateTimeOffset.TryParse(expectedSource.LastModified,out _)))throw new UploadException("INVALID_INPUT","构建产物身份无效。");
             if(string.IsNullOrWhiteSpace(config.Summary)||string.IsNullOrWhiteSpace(config.ProductId)||string.IsNullOrWhiteSpace(config.ChannelId))throw new UploadException("INVALID_INPUT","产品、渠道、版本概述不能为空。");
             config.WorkDirectory=Path.GetFullPath(config.WorkDirectory,Path.GetDirectoryName(configPath)!);
-            ProjectBinding.Validate(config);
-            string downloadUrl=PackageDownload.ValidateSource(config.DownloadUrl,config.SourceRoot);
-            config.FilePath=PackageDownload.LocalPath(config.WorkDirectory,downloadUrl,config.SourceRoot);
+            string downloadUrl=PackageDownload.ValidateSource(config.DownloadUrl);
+            PackageDownload.ValidateTarget(config,downloadUrl);
+            config.FilePath=PackageDownload.LocalPath(config.WorkDirectory,downloadUrl);
             var digest=Convert.ToHexString(SHA256.HashData(JsonSerializer.SerializeToUtf8Bytes(new{config.ApiBase,source=downloadUrl,config.FilePath,config.ProductId,config.ChannelId,config.Version,config.Summary,config.Description,config.BelongName,config.ExistingVersionId,config.PartSizeBytes,config.Mode})));
             // Every task binds the complete project configuration; unscoped old jobs cannot resume.
             if(config.UseVersionText||config.RecordedTestWorkflow)
@@ -91,6 +91,7 @@ public static class Program
             if(state.File!=null&&!File.Exists(config.FilePath))throw new UploadException("FILE_CHANGED","本任务的下载文件已丢失，不能用固定地址上的新包替换旧断点。");
             var identity=state.File==null?await PackageDownload.Get(config.WorkDirectory,cancel.Token,(received,total)=>journal.Emit(state,"downloadProgress",new{received,total}),expectedSource:config.ExpectedSource,sourceUrl:downloadUrl,sourceRoot:config.SourceRoot):await Files.Inspect(config.FilePath,cancel.Token);
             if(state.File!=null&&(state.File.Sha256!=identity.Sha256||state.File.Size!=identity.Size))throw new UploadException("FILE_CHANGED","文件内容与断点不一致。");
+            PackageDownload.CheckFile(identity,config.ExpectedSource);
             state.File=identity;journal.Save(state);
             // Prevent file replacement and writes throughout the run.
             using var fileGuard=new FileStream(config.FilePath,FileMode.Open,FileAccess.Read,FileShare.Read);
@@ -113,7 +114,19 @@ public static class Program
             string code=error is UploadException known?known.Code:"UNEXPECTED_ERROR";
             // Do not serialize SDK exceptions: they may contain signed URLs.
             string message=error is UploadException?error.Message:"操作失败。异常类型："+error.GetType().Name+"。详细信息需使用脱敏诊断排查。";
-            if(state!=null&&journal!=null){state.RunStatus=code=="AUTH_REQUIRED"?"AUTH_REQUIRED":"FAILED";try{journal.Save(state);journal.Emit(state,"failed",new{code,message,pendingAction=state.PendingAction});}catch{Console.Error.WriteLine("LOCAL_STORAGE_FAILED");}}
+            if(state!=null&&journal!=null)
+            {
+                state.RunStatus=code=="AUTH_REQUIRED"?"AUTH_REQUIRED":"FAILED";
+                var failure=new{code,message,pendingAction=state.PendingAction};
+                try{journal.Save(state);}catch{Console.Error.WriteLine("LOCAL_STORAGE_FAILED");}
+                try{journal.Emit(state,"failed",failure);}
+                catch
+                {
+                    // A locked/unwritable journal must not hide the failure from
+                    // the server supervisor's independent stdout receipt.
+                    Console.WriteLine(JsonSerializer.Serialize(new{protocolVersion=1,type="event",@event="failed",jobId=state.JobId,at=DateTimeOffset.UtcNow,stage=state.Stage,data=failure}));
+                }
+            }
             else Console.WriteLine(JsonSerializer.Serialize(new{protocolVersion=1,type="error",code,message}));
             return code=="AUTH_REQUIRED"?3:code.Contains("CONFLICT")?4:6;
         }

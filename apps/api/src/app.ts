@@ -200,24 +200,7 @@ import {
 } from "./qingyu-integration.js";
 import { QingyuError } from "./qingyu-client.js";
 import { JenkinsBuildService, registerPackagingRoutes } from "./jenkins-builds.js";
-import {
-  registerProjectManagementRoutes,
-  type ProjectManagementService,
-} from "./project-management.js";
-import type { ProjectRequestContext } from "./project-request-context.js";
-import { registerBugActionRoutes } from "./bug-actions.js";
-import {
-  frozenRepairAttempt,
-  frozenVerification,
-  frozenVerificationResult,
-  workflowResponseMedia,
-  legacyVerificationResultMedia,
-} from "./frozen-workflow-response.js";
-import { registerAutomationRoutes } from "./automation.js";
-import {
-  registerProjectComponentRoutes,
-  type ProjectComponentsRuntime,
-} from "./project-components-runtime.js";
+import { BuildCompatibilityService, registerCompatibilityRoutes } from "./build-compatibility.js";
 import { IncrementUploadService, registerIncrementUploadRoutes } from "./increment-upload.js";
 import {
   ProductionTasks,
@@ -3147,15 +3130,27 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
     },
   );
 
-  if (!options.isolateLegacyComponents) {
-    registerProductionRoutes(
-      app,
-      options.productionConfig
-        ? new ProductionTasks(options.productionConfig, {
-            bugs: mobileBugStore,
-            relay: mobileRelayStore,
-            attachments: mobileAttachmentStore,
-            projects: mobileProjectDirectoryStore,
+  const jenkinsBuildService = options.jenkinsBuildService ?? new JenkinsBuildService();
+  registerCompatibilityRoutes(
+    app,
+    new BuildCompatibilityService(
+      jenkinsBuildService,
+      options.incrementUploadRoot
+        ? options.incrementUploadRoot + "/../build-compatibility"
+        : undefined,
+    ),
+    (request) =>
+      readHeader(request.headers.authorization) === `Bearer ${debugBearerToken}`
+        ? authenticatedActorId(request, debugActorId)
+        : null,
+  );
+  registerIncrementUploadRoutes(
+    app,
+    options.incrementUploadService ??
+      (options.incrementUploadRoot
+        ? new IncrementUploadService({
+            root: options.incrementUploadRoot,
+            jenkins: jenkinsBuildService,
           })
         : undefined,
       (request) =>

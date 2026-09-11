@@ -20,7 +20,7 @@
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "test": "tsc -p tsconfig.json && node --test test/*.test.mjs && node --import tsx --test test/*.test.ts",
+    "test": "tsc -p tsconfig.json && node --test test/api.test.mjs test/backup-archive-worker.test.mjs test/backup-retention.test.mjs test/qingyu-integration.test.mjs test/build-compatibility.test.mjs test/jenkins-builds.test.mjs test/jenkins-progress.test.mjs test/production-tasks.test.mjs test/relay-lifecycle-outbox.test.mjs test/increment-upload.test.mjs test/server-uploader-process.test.mjs && node --import tsx --test test/uploader-host.test.ts test/build-upload-host.test.ts test/upload-source.test.ts",
     "start": "node dist/main.js"
   },
   "dependencies": {

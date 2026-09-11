@@ -2,7 +2,13 @@ import { createHash, randomUUID } from "node:crypto";
 import { createReadStream, promises as fs } from "node:fs";
 import path from "node:path";
 import { spawn } from "node:child_process";
-import { latestIosUploadSource } from "./upload-source.js";
+import { DEFAULT_UPLOAD_PARAMETERS } from "./uploader-types.js";
+import { resolveUploadBuild } from "./upload-source.js";
+import {
+  awaitingPublication,
+  publicationDigest,
+  verifiedPublication,
+} from "./publication-reconciliation.js";
 import type {
   UploadEvent,
   UploadInput,
@@ -12,9 +18,11 @@ import type {
   UploadSourceIdentity,
 } from "./uploader-types.js";
 
-export const UPLOADER_SHA256 = "0d5e930bd6421550ac18d816a4f08ca444c3a8f078df26e2c051e960649fc907";
-/** Compatibility display value only; execution always needs explicit project configuration. */
-export const UPLOAD_SOURCE = "";
+export const UPLOADER_SHA256 = "6734b552caf70743af644fbac4e59f4e0209d196723481ef4a19b68f2001c649";
+export const UPLOAD_SOURCE =
+  "http://10.100.5.129:8000/pkg_zip/ozdqp/_pkg_cfg_2001_1002.zip?download=true";
+const API_BASE = "https://fq2ivi.ipwana.com";
+const LOGIN_BASE = "https://54cetx.jiaxiangxm.com";
 const UUID = /^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/;
 type RecordValue = Record<string, unknown>;
 export function record(value: unknown): RecordValue {
@@ -184,6 +192,7 @@ export interface UploadProjectConfiguration {
 }
 export class UploaderHost {
   private mutating = false;
+  private nextPublicationCheck = 0;
   constructor(private readonly options: HostOptions) {}
   private get project(): UploadProjectConfiguration {
     if (!this.options.project) throw new Error("COMPONENT_NOT_CONFIGURED");
@@ -225,7 +234,7 @@ export class UploaderHost {
     )
       throw new Error("UPLOAD_PROJECT_SCOPE_MISMATCH");
     let input = parseUploadInput({ ...config, version: config?.["version"] ?? "" });
-    const state = (await readJson(path.join(directory, "state.json"))) ?? {};
+    let state = (await readJson(path.join(directory, "state.json"))) ?? {};
     if (config?.["useVersionText"] === true && state["version"])
       input = {
         ...input,
@@ -242,9 +251,33 @@ export class UploaderHost {
       ((running(receipt?.["pid"] ?? meta["pid"]) &&
         Date.now() - (Number.isFinite(heartbeat) ? heartbeat : started) < 20000) ||
         (!receipt && Date.now() - started < 15000));
+    let reconciled = false;
+    if (!active && config && awaitingPublication(config, state)) {
+      const proof = await readJson(path.join(directory, "publication-reconciliation.json"));
+      if (
+        proof?.["schemaVersion"] === 1 &&
+        proof["writesIssued"] === false &&
+        proof["stateDigest"] === publicationDigest(meta, config, state)
+      ) {
+        const publication = verifiedPublication(config, state, record(proof["detail"]));
+        if (publication) {
+          state = {
+            ...state,
+            stage: "PUBLISHED",
+            runStatus: "SUCCEEDED",
+            finalRemoteStatus: 100,
+            publishTime: publication.publishTime,
+            releaseDir: publication.releaseDir,
+            done: [...(state["done"] as string[]), "WAIT_PUBLISHED"],
+          };
+          reconciled = true;
+        }
+      }
+    }
     const events = parseUploadEvents(await tail(path.join(directory, `run-${runId}.jsonl`)));
-    const errorCode =
-      [...events].reverse().find((e) => e.code)?.code ?? str(receipt?.["errorCode"]);
+    const errorCode = reconciled
+      ? "REMOTE_PUBLISHED_RECONCILED"
+      : ([...events].reverse().find((e) => e.code)?.code ?? str(receipt?.["errorCode"]));
     const stage = str(state["stage"], 80) || "NEW";
     const done = Array.isArray(state["done"])
       ? state["done"].filter((v): v is string => typeof v === "string").slice(0, 80)
@@ -337,8 +370,8 @@ export class UploaderHost {
     jobs.sort((a, b) => b.createdAt.localeCompare(a.createdAt));
     return {
       available,
-      toolVersion: "0.5.0",
-      sourceUrl: this.options.project?.sourceUrl ?? "",
+      toolVersion: "0.5.1",
+      sourceUrl: UPLOAD_SOURCE,
       configured: !!auth,
       authError,
       account: str(auth?.["account"], 200),
@@ -346,6 +379,76 @@ export class UploaderHost {
       jobs,
       unreadableJobs,
     };
+  }
+  async reconcilePublications(): Promise<void> {
+    if (this.mutating || Date.now() < this.nextPublicationCheck) return;
+    this.nextPublicationCheck = Date.now() + 30_000;
+    const snapshot = await this.snapshot();
+    if (snapshot.unreadableJobs || snapshot.jobs.some((job) => job.active)) return;
+    const waiting = snapshot.jobs.filter((job) => job.status === "awaiting_publish");
+    if (!waiting.length) return;
+    let renewed = false;
+    for (const job of waiting) {
+      const reconcile = () =>
+        this.exclusive(async () => {
+          if ((await this.job(job.id)).status !== "awaiting_publish") return;
+          const directory = this.folder(job.id);
+          const [meta, config, state, auth] = await Promise.all([
+            readJson(path.join(directory, "desktop.json")),
+            readJson(path.join(directory, "job.json")),
+            readJson(path.join(directory, "state.json")),
+            readJson(this.options.authFile),
+          ]);
+          if (!meta || !config || !state || !awaitingPublication(config, state)) return;
+          if (!auth?.["accessToken"]) throw new Error("AUTH_REQUIRED");
+          const digest = publicationDigest(meta, config, state);
+          const detail = await this.request(
+            API_BASE,
+            `/api/v1/developapi/versions/detail?vid=${num(state["versionId"])}`,
+            null,
+            str(auth["accessToken"], 20000),
+            12_000,
+          );
+          if (!verifiedPublication(config, state, detail)) return;
+          const current = await Promise.all([
+            readJson(path.join(directory, "desktop.json")),
+            readJson(path.join(directory, "job.json")),
+            readJson(path.join(directory, "state.json")),
+          ]);
+          if (
+            publicationDigest(...current) !== digest ||
+            (await this.job(job.id)).status !== "awaiting_publish"
+          )
+            return;
+          // Preserve worker checkpoints/results byte-for-byte. The projection only
+          // accepts this receipt while the original run/config/state still match.
+          await writeJson(path.join(directory, "publication-reconciliation.json"), {
+            schemaVersion: 1,
+            stateDigest: digest,
+            checkedAt: new Date().toISOString(),
+            writesIssued: false,
+            detail: Object.fromEntries(
+              ["id", "version", "product_id", "channel_id", "status", "url", "publish_time"].map(
+                (key) => [key, detail[key]],
+              ),
+            ),
+          });
+        });
+      try {
+        await reconcile();
+      } catch (error) {
+        if (!renewed && error instanceof Error && error.message === "AUTH_REQUIRED") {
+          renewed = true;
+          try {
+            await this.checkAuth();
+            await reconcile();
+          } catch {
+            /* Keep the reservation when identity or remote state is uncertain. */
+          }
+        }
+        // Remote outages and mismatches cannot release a reservation or replay a write.
+      }
+    }
   }
   private async idle(prelaunchId?: string): Promise<void> {
     const snapshot = await this.snapshot();
@@ -365,13 +468,14 @@ export class UploaderHost {
     route: string,
     body: unknown,
     authorization = "",
+    timeoutMs = 90000,
   ): Promise<RecordValue> {
     let response: Response;
     try {
       response = await (this.options.fetch ?? fetch)(`${origin}${route}`, {
         method: body === null ? "GET" : "POST",
         redirect: "error",
-        signal: AbortSignal.timeout(90000),
+        signal: AbortSignal.timeout(timeoutMs),
         headers: {
           Accept: "application/json",
           "ruixue-language": "zh",
@@ -550,11 +654,15 @@ export class UploaderHost {
     source: UploadSourceIdentity,
     accountIdentity: string,
   ): Promise<string> {
-    if (this.project.sourceKind === "ios_directory") throw new Error("BUILD_PLATFORM_UNSUPPORTED");
     if (
       !Number.isSafeInteger(source.size) ||
       source.size <= 0 ||
-      !Number.isFinite(Date.parse(source.lastModified))
+      !Number.isFinite(Date.parse(source.lastModified)) ||
+      (source.url !== undefined &&
+        (!/^http:\/\/10\.100\.5\.129:8000\/ozdqp\/(Android|iOS)\/(Debug|Release)\/\d+\.\d+\.\d+\/[1-9]\d*\/hot-update\/[A-Za-z0-9][A-Za-z0-9._-]+\.zip\?download=true$/.test(
+          source.url,
+        ) ||
+          !/^[a-f0-9]{64}$/.test(source.sha256 ?? "")))
     )
       throw new Error("INVALID_INPUT");
     return this.startJob(value, id, source, accountIdentity);
@@ -566,12 +674,8 @@ export class UploaderHost {
     accountIdentity?: string,
   ): Promise<string> {
     return this.exclusive(async () => {
-      const input = parseNewUploadInput(value, this.project.defaults);
-      if (
-        input.productId !== this.project.defaults.productId ||
-        input.channelId !== this.project.defaults.channelId
-      )
-        throw new Error("UPLOAD_TARGET_MISMATCH");
+      let input = parseNewUploadInput(value);
+      const requestedInput = input;
       const directory = this.folder(id);
       const existing = await readJson(path.join(directory, "job.json"));
       if (existing) {
@@ -582,10 +686,11 @@ export class UploaderHost {
           throw new Error("PROJECT_SCOPE_MISMATCH");
         if (
           (source && existing["buildChainId"] !== id) ||
-          ((source || this.project.sourceKind !== "ios_directory") &&
+          ((source || !existing["requestedInput"]) &&
             JSON.stringify(existing["expectedSource"]) !== JSON.stringify(source)) ||
           JSON.stringify(
-            parseNewUploadInput({ ...existing, version: existing["version"] ?? "" }),
+            existing["requestedInput"] ??
+              parseNewUploadInput({ ...existing, version: existing["version"] ?? "" }),
           ) !== JSON.stringify(input)
         )
           throw new Error("LOCAL_STATE_INVALID");
@@ -599,9 +704,15 @@ export class UploaderHost {
       await this.verifiedExecutable();
       // Keep an already resolved source if dispatch was interrupted before spawn.
       // Resume and lost acknowledgements must never select a newer iOS ZIP.
-      if (!existing)
+      if (!existing) {
+        const resolved = source
+          ? { downloadUrl: source.url ?? UPLOAD_SOURCE, expectedSource: source }
+          : await resolveUploadBuild(input, this.options.fetch);
+        if ("version" in resolved)
+          input = parseNewUploadInput({ ...input, version: resolved.version });
         await writeJson(path.join(directory, "job.json"), {
           ...input,
+          requestedInput,
           useVersionText: true,
           recordedTestWorkflow: true,
           version: input.version || null,
@@ -621,12 +732,11 @@ export class UploaderHost {
           pollSeconds: 3,
           waitTimeoutSeconds: 1800,
           partSizeBytes: 5242880,
-          uploadConcurrency: 2,
-          ...(this.project.sourceKind === "ios_directory"
-            ? await latestIosUploadSource(this.options.fetch, this.project.sourceUrl)
-            : {}),
+          uploadConcurrency: 8,
+          ...resolved,
           ...(source ? { buildChainId: id, expectedSource: source } : {}),
         });
+      }
       return this.launch(id, "run", new Date().toISOString());
     });
   }

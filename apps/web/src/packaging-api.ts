@@ -1,12 +1,70 @@
 import type { BuildTask } from "./BuildTasksPanel";
 import { requestJson } from "./api";
+import { QUICK_BUILD_PRESETS, type QuickBuildPresetId } from "@relay-qa-hub/upload-contract";
 
-export const BUILD_PRESETS = [
-  { id: "internal-nosdk", label: "打不带 SDK 的内网包", packageLabel: "内网 · 不带 SDK" },
-  { id: "internal-sdk", label: "打带 SDK 的内网包", packageLabel: "内网 · 带 SDK" },
-  { id: "external", label: "打外网包", packageLabel: "外网包" },
-] as const;
-export type BuildPreset = string;
+export const BUILD_PRESETS = QUICK_BUILD_PRESETS;
+export interface CompatibilityCheck {
+  target: { id: string; platform: "Android" | "iOS"; configuration: "Debug" | "Release" };
+  state: "pending" | "submitting" | "queued" | "running" | "complete" | "error";
+  queueId: number | null;
+  buildNumber: number | null;
+  checkedAt: string | null;
+  reportUrl: string | null;
+  errorCode: string | null;
+  report: {
+    result: "PLAYER_REBUILD_REQUIRED" | "HOT_UPDATE_ALLOWED" | "NO_BASELINE" | "UNKNOWN";
+    targetRevision: string | null;
+    baseRevision: string | null;
+    selectedVersion: string | null;
+    playerVersion: string | null;
+    commitCount: number;
+    changeCount: number;
+    changeCounts: Record<string, number>;
+  } | null;
+}
+export interface CompatibilityBatch {
+  id: string;
+  requestedAt: string;
+  checks: CompatibilityCheck[];
+}
+export async function refreshBuildCompatibility(
+  requestId: string,
+  signal: AbortSignal,
+): Promise<CompatibilityBatch> {
+  return (await requestJson("/api/v1/packaging/compatibility", {
+    method: "POST",
+    headers: { "idempotency-key": requestId },
+    signal,
+  })) as CompatibilityBatch;
+}
+export async function getBuildCompatibility(
+  id: string,
+  signal: AbortSignal,
+): Promise<CompatibilityBatch> {
+  return (await requestJson("/api/v1/packaging/compatibility?id=" + encodeURIComponent(id), {
+    signal,
+  })) as CompatibilityBatch;
+}
+export type BuildPreset = QuickBuildPresetId | "internal-nosdk" | "internal-sdk" | "external";
+export interface BuildArtifactFile {
+  name: string;
+  url: string;
+  size: number;
+  sha256: string;
+  kind: "apk" | "aab" | "ipa" | "zip";
+}
+export interface BuildArtifactResult {
+  version: string;
+  buildNumber: number;
+  platform: "Android" | "iOS";
+  configuration: "Debug" | "Release";
+  productId: string;
+  channelId: string;
+  directory: string;
+  packages: BuildArtifactFile[];
+  hotUpdate: BuildArtifactFile;
+  hotUpdateMode: "full" | "incremental";
+}
 export interface BuildStageProgress {
   id: string;
   label: string;
@@ -23,6 +81,7 @@ export interface BuildStageProgress {
   alert: boolean;
 }
 export interface BuildProgress {
+  errorCode?: string;
   number: number;
   queueId: number | null;
   preset: BuildPreset | null;
@@ -59,6 +118,8 @@ export interface PackageFile {
   preset: BuildPreset | null;
 }
 export interface PackagingStatus {
+  artifacts?: BuildArtifactResult[];
+  artifactError?: string | null;
   checkedAt: string;
   jenkins: {
     buildable: boolean;

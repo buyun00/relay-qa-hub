@@ -34,6 +34,37 @@ public sealed class Engine(JobConfig c, JobState s, IPlatform api, IObjectUpload
             throw new UploadException("VERSION_CONFLICT","远端版本身份与本任务不一致。");
         return d;
     }
+    static bool EmptyUnzipLog(JsonNode? value)
+    {
+        if(value==null)return true;
+        // The platform also represents "no temporary unzip job" with a zero row.
+        // Never interpret an active/partial/unknown object as successful processing.
+        return value is JsonObject row && Json.Text(row["id"])=="0" &&
+            Json.Text(row["version_id"])=="0" && Json.Text(row["status"])=="0" &&
+            row.ContainsKey("path") && Json.Text(row["path"])=="" &&
+            Json.Text(row["rely_path"])=="" && Json.Text(row["err_msg"])=="";
+    }
+    bool ReconcilePublication(JsonObject detail)
+    {
+        int status=Json.Int(detail["status"]);
+        if(status!=100)
+        {
+            if(s.FinalRemoteStatus!=status){s.FinalRemoteStatus=status;Save();}
+            return false;
+        }
+        if(!s.Done.Contains("OBJECT_READY") || !s.ObjectKey.StartsWith("test/pkg/") ||
+            !s.ObjectKey.EndsWith(".zip") || s.ObjectKey.Contains(".."))
+            throw new UploadException("VERSION_CONFLICT","远端已发布，但缺少可核对的本次上传对象。");
+        string expected="release/dir/"+Path.GetFileNameWithoutExtension(s.ObjectKey)+"/";
+        string published=Json.Text(detail["publish_time"]);
+        if(Json.Text(detail["url"])!=expected || string.IsNullOrWhiteSpace(published) ||
+            published.StartsWith("0000") || !DateTimeOffset.TryParse(published,out _))
+            throw new UploadException("VERSION_CONFLICT","远端已发布，但资源目录或发布时间与原任务不一致。");
+        s.ReleaseDir=expected;s.FinalRemoteStatus=100;s.PublishTime=published;
+        s.PendingAction=null;s.Done.Add("WAIT_PUBLISHED");Save();
+        log.Emit(s,"remotePublicationReconciled",new{code="REMOTE_PUBLISHED_RECONCILED",version=s.Version,versionId=s.VersionId,remoteStatus=100,publishTime=published,writesIssued=false});
+        Complete("PUBLISHED");return true;
+    }
     public static JsonObject Form(JobConfig c,JobState s,JsonObject? detail=null)
     {
         var result=new JsonObject {
@@ -90,10 +121,17 @@ public sealed class Engine(JobConfig c, JobState s, IPlatform api, IObjectUpload
     {
         if(s.Done.Contains(stage))return;
         Stage(stage);var deadline=DateTimeOffset.UtcNow.AddSeconds(c.WaitTimeoutSeconds);
+        var nextNotice=DateTimeOffset.MinValue;
         while(true)
         {
             ct.ThrowIfCancellationRequested();
+            if(ReconcilePublication(await Detail(ct)))return;
             if(await predicate()){s.Done.Add(stage);Save();return;}
+            if(DateTimeOffset.UtcNow>=nextNotice)
+            {
+                log.Emit(s,"waitingRemoteState",new{code="WAITING_REMOTE_STATE",remoteStatus=s.FinalRemoteStatus});
+                nextNotice=DateTimeOffset.UtcNow.AddSeconds(30);
+            }
             if(DateTimeOffset.UtcNow>=deadline)throw new UploadException("PROCESSING_TIMEOUT",$"{stage} 等待超时，可从当前任务恢复继续查询。");
             await Task.Delay(TimeSpan.FromSeconds(c.PollSeconds),ct);
         }
@@ -127,7 +165,7 @@ public sealed class Engine(JobConfig c, JobState s, IPlatform api, IObjectUpload
                 },RecoverCreate);
             }
         }
-        await Detail(ct);
+        if(ReconcilePublication(await Detail(ct)))return;
         await Update("PREPARE_VERSION",10,null,[1],[20],ct);
         if(!s.Done.Contains("OBJECT_READY"))
         {
@@ -175,8 +213,9 @@ public sealed class Engine(JobConfig c, JobState s, IPlatform api, IObjectUpload
             if(c.ConfirmedTestUnzipStatus.HasValue && active is JsonObject obj && Json.Int(obj["status"])==c.ConfirmedTestUnzipStatus.Value)return true;
             // Observed platform removes the active log after completion. Require
             // both independent views to be empty AND the task-specific directory.
-            return unzip==null && d.ContainsKey("test_package_unzip_log") && active==null;
+            return EmptyUnzipLog(unzip) && d.ContainsKey("test_package_unzip_log") && active==null;
         },ct);
+        if(s.Stage=="PUBLISHED")return;
         if(c.Mode=="upload_only"){Complete("TEST_ASSETS_READY");return;}
         await Update("REQUEST_TEST",40,s.TestDir,[20],[40],ct);
         if(c.Mode=="prepare_test"){Complete("TEST_REQUESTED");return;}
@@ -206,6 +245,7 @@ public sealed class Engine(JobConfig c, JobState s, IPlatform api, IObjectUpload
             var d=await Detail(ct);return new[]{50,60,99,100}.Contains(Json.Int(d["status"]));
         });
         await Poll("WAIT_RELEASE_COPY",async()=>Json.Bool(await api.Get(R+"filecopystatus",Vid(),ct)),ct);
+        if(s.Stage=="PUBLISHED")return;
         await Poll("WAIT_RELEASE_ASSETS",async()=>{
             var data=await api.Write("POST",V+"check_unzip_on_test_ok",new JsonObject{["vid_list"]=new JsonArray(s.VersionId)},ct);
             var x=data?[s.VersionId.ToString()];
@@ -215,6 +255,7 @@ public sealed class Engine(JobConfig c, JobState s, IPlatform api, IObjectUpload
             if(Json.Text(x?["path"])!=expected)throw new UploadException("OBJECT_CONFLICT","正式目录不匹配本次上传对象。");
             s.ReleaseDir=expected;Save();return true;
         },ct);
+        if(s.Stage=="PUBLISHED")return;
         await Update("PREPARE_PUBLISH",60,s.ReleaseDir,[50],[60],ct);
         if(c.Mode=="prepare_publish"&&!s.PublishConfirmed)
         {
@@ -232,6 +273,7 @@ public sealed class Engine(JobConfig c, JobState s, IPlatform api, IObjectUpload
             if(s.FinalRemoteStatus!=100)return false;
             if(Json.Text(d["url"])!=s.ReleaseDir||string.IsNullOrWhiteSpace(s.PublishTime)||s.PublishTime.StartsWith("0000"))throw new UploadException("SCHEMA_CHANGED","最终状态缺少一致的目录或发布时间。");return true;
         },ct);
+        if(s.Stage=="PUBLISHED")return;
         Complete("PUBLISHED");
     }
     void Complete(string stage){s.Stage=stage;s.RunStatus="SUCCEEDED";Save();log.Emit(s,"completed",new{version=s.Version,versionId=s.VersionId,published=stage=="PUBLISHED",reused=s.Reused,remoteStatus=s.FinalRemoteStatus,publishTime=s.PublishTime});}

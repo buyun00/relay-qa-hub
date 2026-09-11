@@ -1,5 +1,7 @@
 import { projectStorageKey } from "./project-context";
 import AppIcon from "./AppIcon";
+import BuildCompatibilitySummary from "./BuildCompatibilitySummary";
+import type { CompatibilityCheck } from "./packaging-api";
 import { serverUploader, createUploadRequestId } from "./increment-upload-api";
 import { useCallback, useEffect, useRef, useState } from "react";
 import type {
@@ -7,9 +9,21 @@ import type {
   UploadInput,
   UploaderSnapshot,
 } from "@relay-qa-hub/upload-contract";
-import { projectUploadDraft, UPLOAD_MODES, uploadPlatform } from "./upload-model";
+import { uploadDraftDefaults, UPLOAD_MODES } from "./upload-model";
+import {
+  QUICK_BUILD_PRESETS,
+  quickUploadInput,
+  type QuickBuildPresetId,
+} from "@relay-qa-hub/upload-contract";
 
 const messages: Record<string, string> = {
+  UPLOAD_CHANNEL_HELD:
+    "已提交，正在等待同产品、渠道的上一任务结束。服务端会自动核对瑞雪发布状态并继续，请勿重复提交。",
+  UPLOADER_MISSING: "服务端上传程序暂未就绪，请稍后重试。",
+  UPLOAD_QUEUE_BUSY: "服务端正在核对任务，请稍后重试。",
+  BUILD_PROJECT_PATH_INVALID: "打包机的 Unity 项目路径配置无效，构建未完成，没有上传。",
+  BUILD_ARTIFACT_MISMATCH: "本次构建的版本、平台、产品渠道或 ZIP 哈希不一致，已停止上传。",
+  BUILD_RESULT_UNAVAILABLE: "正在等待本次构建的产物核验结果，不会改取其他构建的 ZIP。",
   BUILD_PLATFORM_UNSUPPORTED: "此按钮构建 Android。请在上传增量页选择 iOS，上传已有的 iOS ZIP。",
   AUTH_REQUIRED: "请先到上传增量页登录平台账号。",
   UPLOAD_ACCOUNT_CHANGED: "上传平台账号已切换，自动上传已暂停；切回原账号后继续。",
@@ -29,10 +43,9 @@ const messages: Record<string, string> = {
 };
 const labels: Record<BuildUploadChain["status"], string> = {
   queued: "服务端等待打包",
-  paused: "已暂停",
-  submitting: "正在提交外网打包",
+  submitting: "正在提交打包",
   submission_unknown: "待核对打包提交结果",
-  building: "等待外网打包完成",
+  building: "等待打包完成",
   waiting_zip: "正在核对本次增量包",
   starting_upload: "正在衔接上传增量",
   upload_started: "已衔接上传增量",
@@ -48,25 +61,35 @@ export default function BuildUploadControls({
   onBuildOnly,
   onSubmitted,
   onOpenUpload,
-  uploadDefaults,
-  label = "打包",
+  checks,
+  checking = false,
+  checkError = false,
+  onRefreshChecks,
 }: {
   userId?: string;
   uploadDefaults: Record<string, unknown>;
   label?: string;
   disabled: boolean;
-  onBuildOnly: () => void;
+  onBuildOnly: (preset: QuickBuildPresetId) => void;
   onSubmitted: (queueId: number) => void;
   onOpenUpload?: ((jobId?: string) => void) | undefined;
+  checks?: CompatibilityCheck[] | undefined;
+  checking?: boolean;
+  checkError?: boolean;
+  onRefreshChecks?: (() => void) | undefined;
 }) {
   const bridge = serverUploader;
   const [open, setOpen] = useState(false);
+  const [preset, setPreset] = useState<QuickBuildPresetId>("android-release-app");
   const [busy, setBusy] = useState(false);
   const busyRef = useRef(false);
   const root = useRef<HTMLDivElement>(null);
   const trigger = useRef<HTMLButtonElement>(null);
   const [input, setInput] = useState<UploadInput>(() => projectUploadDraft(null, uploadDefaults));
   const [snapshot, setSnapshot] = useState<UploaderSnapshot | null>(null);
+  const [checkingUpload, setCheckingUpload] = useState(false);
+  const snapshotRequest = useRef(0);
+  const [notice, setNotice] = useState("");
   const [chains, setChains] = useState<BuildUploadChain[]>([]);
   const [error, setError] = useState("");
   const refresh = useCallback(async () => {
@@ -101,51 +124,70 @@ export default function BuildUploadControls({
       document.removeEventListener("keydown", escape);
     };
   }, [open]);
-  const toggle = async () => {
-    if (open) {
+  const toggle = async (selected: QuickBuildPresetId) => {
+    if (open && preset === selected) {
       setOpen(false);
       return;
     }
     setError("");
+    setPreset(selected);
     setSnapshot(null);
+    setCheckingUpload(true);
+    const revision = ++snapshotRequest.current;
     try {
       setInput(
-        projectUploadDraft(
-          JSON.parse(
-            localStorage.getItem(projectStorageKey("upload-draft", undefined, userId)) ?? "{}",
+        quickUploadInput(
+          uploadDraftDefaults(
+            JSON.parse(localStorage.getItem(`qa-hub:upload-draft:${userId}`) ?? "{}"),
           ),
-          uploadDefaults,
+          selected,
         ),
       );
     } catch {
-      setInput(projectUploadDraft(null, uploadDefaults));
+      setInput(quickUploadInput(uploadDraftDefaults(null), selected));
     }
     setOpen(true);
     if (bridge) {
       try {
         const result = await bridge.snapshot();
+        if (revision !== snapshotRequest.current) return;
         if (result.ok) setSnapshot(result.value);
         else setError(result.code);
       } catch {
-        setError("UPLOADER_FAILED");
+        if (revision === snapshotRequest.current) setError("UPLOADER_FAILED");
+      } finally {
+        if (revision === snapshotRequest.current) setCheckingUpload(false);
       }
     }
   };
   const combined = async () => {
     if (!bridge?.buildAndUpload || busyRef.current) return;
+    const existing = chains.find(
+      (chain) =>
+        chain.canManage !== false &&
+        chain.preset === preset &&
+        !["failed", "cancelled", "upload_started"].includes(chain.status),
+    );
+    if (existing) {
+      setNotice(`该打包上传任务已经提交（${existing.id.slice(0, 8)}），请查看下方进度。`);
+      setOpen(false);
+      return;
+    }
     busyRef.current = true;
     setBusy(true);
     setError("");
     try {
       const result = await bridge.buildAndUpload({
         requestId: createUploadRequestId(),
-        upload: projectUploadDraft(input, uploadDefaults),
+        preset,
+        upload: input,
       });
       if (!result.ok) {
         setError(result.code);
         return;
       }
       setOpen(false);
+      setNotice(`打包并上传任务已提交（${result.value.id.slice(0, 8)}），服务端正在排队处理。`);
       setChains((current) => [result.value, ...current.filter((c) => c.id !== result.value.id)]);
       if (result.value.queueId) onSubmitted(result.value.queueId);
       await refresh();
@@ -175,25 +217,42 @@ export default function BuildUploadControls({
     (c) => !["failed", "cancelled", "upload_started"].includes(c.status),
   );
   const latest = activeChain ?? chains[0];
-  return (
-    <div className="package-external-control" ref={root}>
+  const renderChoice = (selection: (typeof QUICK_BUILD_PRESETS)[number]) => (
+    <div className="package-external-control" key={selection.id} data-mode={selection.mode}>
       <button
-        ref={trigger}
+        ref={preset === selection.id ? trigger : undefined}
         className="package-build-button"
+        data-build-preset={selection.id}
+        aria-label={selection.label}
         type="button"
         disabled={disabled || busy}
-        aria-expanded={open}
-        aria-controls="external-build-options"
-        onClick={() => void toggle()}
+        aria-expanded={open && preset === selection.id}
+        aria-controls={`build-options-${selection.id}`}
+        onClick={() => void toggle(selection.id)}
       >
-        {label} <AppIcon name={open ? "up" : "down"} />
+        <span className="package-choice-title">
+          <span>
+            <AppIcon name={selection.mode === "App" ? "package" : "folder"} />
+            {selection.mode === "App" ? "完整包" : "增量热更"}
+          </span>
+          <AppIcon name={open && preset === selection.id ? "up" : "down"} size={15} />
+        </span>
+        <span className="package-choice-files">
+          {selection.mode === "Res"
+            ? "热更 ZIP"
+            : selection.platform === "iOS"
+              ? "IPA + 完整热更 ZIP"
+              : selection.configuration === "Release"
+                ? "APK / AAB + 完整热更 ZIP"
+                : "APK + 完整热更 ZIP"}
+        </span>
       </button>
-      {open ? (
+      {open && preset === selection.id ? (
         <div
-          id="external-build-options"
+          id={`build-options-${selection.id}`}
           className="package-build-options"
           role="region"
-          aria-label="外网打包选项"
+          aria-label={`${selection.label} 操作选项`}
         >
           <strong>选择本次操作</strong>
           <button
@@ -201,10 +260,10 @@ export default function BuildUploadControls({
             disabled={busy || disabled}
             onClick={() => {
               setOpen(false);
-              onBuildOnly();
+              onBuildOnly(selection.id);
             }}
           >
-            仅打包
+            只构建
           </button>
           <button
             className="package-combined-action"
@@ -214,27 +273,31 @@ export default function BuildUploadControls({
               disabled ||
               !bridge?.buildAndUpload ||
               !snapshot?.configured ||
-              !snapshot.available ||
-              uploadPlatform(input) === "ios"
+              !snapshot.available
             }
             onClick={() => void combined()}
           >
-            {busy ? "正在检查并提交…" : "打包并上传增量"}
+            {busy ? "正在检查并提交…" : "构建完自动上传增量"}
           </button>
           <p>
             产品 {input.productId} · 渠道 {input.channelId} · 测试人 {input.testerId}
           </p>
-          {uploadPlatform(input) === "ios" ? <p>{messages.BUILD_PLATFORM_UNSUPPORTED}</p> : null}
-          <p>
-            版本 {input.version || "自动生成"} ·{" "}
-            {UPLOAD_MODES.find((m) => m.id === input.mode)?.label}
-          </p>
+          <p>版本与本次构建完全一致 · {UPLOAD_MODES.find((m) => m.id === input.mode)?.label}</p>
           <small>
             更新说明只写版本号。服务端在打包成功后自动上传，退出客户端或关闭电脑不影响执行。
           </small>
-          {!bridge?.buildAndUpload ? (
+          {error ? (
+            <p className="banner error-banner" role="alert">
+              {buildUploadError(error)}
+            </p>
+          ) : null}
+          {checkingUpload ? (
+            <p role="status">正在检查上传账号与服务状态…</p>
+          ) : !bridge?.buildAndUpload ? (
             <p>服务端上传暂时不可用。</p>
-          ) : !snapshot?.configured ? (
+          ) : snapshot && !snapshot.available ? (
+            <p>{buildUploadError("UPLOADER_MISSING")}</p>
+          ) : snapshot && !snapshot.configured ? (
             <p>请先登录上传平台账号。</p>
           ) : null}
           {onOpenUpload ? (
@@ -252,15 +315,81 @@ export default function BuildUploadControls({
           ) : null}
         </div>
       ) : null}
+    </div>
+  );
+  return (
+    <div className="package-quick-controls" ref={root}>
+      {notice ? (
+        <p className="banner pending-banner" role="status">
+          {notice}
+        </p>
+      ) : null}
+      <div className="package-check-toolbar">
+        <span>四组并行检测 · 切回本页停留 2 秒自动检测，也可手动开始</span>
+        {onRefreshChecks ? (
+          <button type="button" onClick={onRefreshChecks} disabled={checking}>
+            <AppIcon name="refresh" busy={checking} size={15} />
+            {checking ? "正在检测四组…" : checks?.length ? "重新检测" : "开始检测"}
+          </button>
+        ) : null}
+      </div>
+      <div className="package-platform-grid">
+        {(["Android", "iOS"] as const).map((platform) => (
+          <section
+            className="package-platform-group"
+            key={platform}
+            aria-label={platform + " 打包"}
+            data-platform={platform}
+          >
+            <h2>{platform}</h2>
+            {(["Debug", "Release"] as const).map((configuration) => (
+              <div
+                className="package-configuration-group"
+                key={configuration}
+                aria-label={platform + " " + configuration}
+              >
+                <h3>
+                  <span className="package-configuration-tag" data-configuration={configuration}>
+                    {configuration}
+                  </span>
+                </h3>
+                <BuildCompatibilitySummary
+                  check={checks?.find(
+                    (c) =>
+                      c.target.platform === platform && c.target.configuration === configuration,
+                  )}
+                  unavailable={checkError}
+                  checking={checking}
+                />
+                <div className="package-build-buttons">
+                  {QUICK_BUILD_PRESETS.filter(
+                    (p) => p.platform === platform && p.configuration === configuration,
+                  ).map(renderChoice)}
+                </div>
+              </div>
+            ))}
+          </section>
+        ))}
+      </div>
       {latest ? (
         <div className="package-upload-chain" role="status">
           <strong>{labels[latest.status]}</strong>
+          {chains.filter((chain) => chain.status === "queued").length > 0 ? (
+            <span>
+              服务端共有 {chains.filter((chain) => chain.status === "queued").length}{" "}
+              条打包上传任务排队，尚未提交 Jenkins 的任务会自动继续。
+            </span>
+          ) : null}
           <span>
             {latest.buildNumber
               ? `构建 #${latest.buildNumber}`
               : latest.queueId
                 ? `排队 #${latest.queueId}`
-                : "打包任务"}{" "}
+                : "等待构建"}{" "}
+            {latest.buildVersion ? ` · ${latest.buildVersion}` : ""}
+            {latest.preset
+              ? ` · ${QUICK_BUILD_PRESETS.find((p) => p.id === latest.preset)?.label}`
+              : ""}
             · {UPLOAD_MODES.find((m) => m.id === latest.input.mode)?.label}
           </span>
           {latest.errorCode ? <p>{buildUploadError(latest.errorCode)}</p> : null}
@@ -275,7 +404,7 @@ export default function BuildUploadControls({
           ) : null}
         </div>
       ) : null}
-      {error ? (
+      {error && !open ? (
         <p className="banner error-banner" role="alert">
           {buildUploadError(error)}
         </p>

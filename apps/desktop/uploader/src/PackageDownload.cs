@@ -6,24 +6,42 @@ public static class PackageDownload
 {
     public static string ValidateSource(string? sourceUrl,string? sourceRoot=null)
     {
-        if(!Uri.TryCreate(sourceUrl,UriKind.Absolute,out var uri)||uri.Scheme is not ("http" or "https")||uri.UserInfo!=""||uri.Fragment!=""||uri.Query is not ("" or "?download=true")||sourceUrl!.Contains("..")||sourceUrl.Contains('\\'))
-            throw new UploadException("INVALID_INPUT","下载地址格式无效。");
-        if(!Uri.TryCreate(sourceRoot,UriKind.Absolute,out var root)||root.Scheme is not ("http" or "https")||root.UserInfo!=""||root.Query!=""||root.Fragment!=""||!root.AbsolutePath.EndsWith('/')||root.GetLeftPart(UriPartial.Authority)!=uri.GetLeftPart(UriPartial.Authority))
-            throw new UploadException("INVALID_INPUT","下载地址不属于项目配置的构建目录。");
-        string prefix=Uri.UnescapeDataString(root.AbsolutePath);
+        if(sourceUrl==null||sourceUrl==SourceUrl)return SourceUrl;
+        if(sourceUrl.Contains("..")||sourceUrl.Contains('\\'))throw new UploadException("INVALID_INPUT","下载路径无效。");
+        if(!Uri.TryCreate(sourceUrl,UriKind.Absolute,out var uri)||uri.Scheme!="http"||uri.Host!="10.100.5.129"||uri.Port!=8000||uri.UserInfo!=""||uri.Fragment!=""||uri.Query!="?download=true")
+            throw new UploadException("INVALID_INPUT","下载地址不属于固定构建目录。");
+        const string prefix="/pkg_zip/ozdqp/ios/";
         string decoded=Uri.UnescapeDataString(uri.AbsolutePath);
+        if(System.Text.RegularExpressions.Regex.IsMatch(decoded,@"^/ozdqp/(Android|iOS)/(Debug|Release)/\d+\.\d+\.\d+/[1-9]\d*/hot-update/[A-Za-z0-9][A-Za-z0-9._-]{0,230}\.zip$")&&!decoded.Contains(".."))return uri.AbsoluteUri;
         string name=decoded.StartsWith(prefix,StringComparison.Ordinal)?decoded[prefix.Length..]:"";
         if(name.Length is <5 or >240||!name.EndsWith(".zip",StringComparison.OrdinalIgnoreCase)||name.IndexOfAny(Path.GetInvalidFileNameChars())>=0||name.Contains('/')||name.Contains('\\'))
             throw new UploadException("INVALID_INPUT","项目下载文件名无效或超出目录。");
         return uri.AbsoluteUri;
     }
-    public static string LocalPath(string work,string? sourceUrl=null,string? sourceRoot=null)=>Path.Combine(Path.GetFullPath(work),"input",Uri.UnescapeDataString(new Uri(ValidateSource(sourceUrl,sourceRoot)).Segments[^1]));
-    public static async Task<FileIdentity> Get(string work,CancellationToken ct,Action<long,long?>? progress=null,HttpMessageHandler? testHandler=null,SourceIdentity? expectedSource=null,string? sourceUrl=null,string? sourceRoot=null)
+    public static void ValidateTarget(JobConfig config,string url)
+    {
+        var path=new Uri(url).AbsolutePath;
+        if(path.StartsWith("/ozdqp/",StringComparison.Ordinal))
+        {
+            var parts=path.Split('/');
+            if((parts[2]=="Android"?"1002":"2004")!=config.ChannelId || (parts[3]=="Debug"?"2001":"2002")!=config.ProductId || parts[4]!=config.Version || config.ExpectedSource?.Sha256 is not {} hash || !System.Text.RegularExpressions.Regex.IsMatch(hash,"^[a-f0-9]{64}$"))
+                throw new UploadException("BUILD_ARTIFACT_MISMATCH","构建产物的平台、产品、渠道、版本或文件哈希与上传目标不一致。");
+        }
+        else if(config.DownloadUrl!=null && (url!=SourceUrl)!=(config.ChannelId=="2004"))throw new UploadException("INVALID_INPUT","增量包来源与渠道不一致。");
+        if(url!=SourceUrl&&config.ExpectedSource==null)throw new UploadException("INVALID_INPUT","任务缺少固定文件身份。");
+    }
+    public static void CheckFile(FileIdentity identity,SourceIdentity? source)
+    {
+        if(source?.Sha256 is {} hash && (source.Size!=identity.Size || !string.Equals(hash,identity.Sha256,StringComparison.OrdinalIgnoreCase)))
+            throw new UploadException("BUILD_ARTIFACT_MISMATCH","ZIP SHA-256 与本次构建结果不一致，已停止上传。");
+    }
+    public static string LocalPath(string work,string? sourceUrl=null)=>Path.Combine(Path.GetFullPath(work),"input",Uri.UnescapeDataString(new Uri(ValidateSource(sourceUrl)).Segments[^1]));
+    public static async Task<FileIdentity> Get(string work,CancellationToken ct,Action<long,long?>? progress=null,HttpMessageHandler? testHandler=null,SourceIdentity? expectedSource=null,string? sourceUrl=null)
     {
         string resolved=ValidateSource(sourceUrl,sourceRoot);
         string target=LocalPath(work,resolved,sourceRoot);Directory.CreateDirectory(Path.GetDirectoryName(target)!);
         // Complete files are immutable snapshots belonging to this task.
-        if(File.Exists(target))return await Files.Inspect(target,ct);
+        if(File.Exists(target)){var cached=await Files.Inspect(target,ct);CheckFile(cached,expectedSource);return cached;}
         string partial=target+".partial";
         using var client=new HttpClient(testHandler??new HttpClientHandler{AllowAutoRedirect=false,UseCookies=false}){Timeout=Timeout.InfiniteTimeSpan};
         using var idle=CancellationTokenSource.CreateLinkedTokenSource(ct);idle.CancelAfter(TimeSpan.FromSeconds(60));
@@ -54,6 +72,7 @@ public static class PackageDownload
             idle.CancelAfter(Timeout.InfiniteTimeSpan);
             FileIdentity identity;
             try{identity=await Files.Inspect(partial,ct);}catch(InvalidDataException){throw new UploadException("DOWNLOAD_FAILED","下载内容不是有效 ZIP，未开始上传。");}
+            CheckFile(identity,expectedSource);
             if(expectedSource!=null)
             {
                 idle.CancelAfter(TimeSpan.FromSeconds(60));

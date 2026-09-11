@@ -1,12 +1,16 @@
 package com.relayqahub.android.network
 
 import android.content.Context
-import com.relayqahub.android.BuildConfig
+import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
 import java.security.MessageDigest
 import java.util.UUID
+import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonArray
@@ -36,6 +40,8 @@ data class ApkArtifact(
     val expectedSha256: String? = null,
     val expectedPackageName: String? = null,
     val expectedVersionCode: Long? = null,
+    val configuration: String? = null,
+    val buildNumber: Long? = null,
 ) {
     val id: String get() = downloadUrl
 }
@@ -100,9 +106,13 @@ class AndroidUpdateClient(
 
 class GameApkCatalogClient(
     directoryUrl: String,
-    private val httpClient: OkHttpClient,
+    httpClient: OkHttpClient,
     allowPrivateHttp: Boolean = false,
 ) {
+    private val httpClient = httpClient.newBuilder()
+        .callTimeout(15, TimeUnit.SECONDS)
+        .retryOnConnectionFailure(true)
+        .build()
     private val directoryUrl = parseControlledDistributionUrl(directoryUrl, allowPrivateHttp)
         .newBuilder()
         .query(null)
@@ -112,28 +122,83 @@ class GameApkCatalogClient(
 
     suspend fun latest(limit: Int = 5): List<ApkArtifact> = withContext(Dispatchers.IO) {
         require(limit in 1..20)
-        val listUrl = directoryUrl.newBuilder().addQueryParameter("json", "true").build()
+        if (directoryUrl.encodedPath.trimEnd('/').endsWith("/apk")) {
+            // Keep explicitly configured legacy feeds; the default never falls back to old APKs.
+            return@withContext parseGameApkCatalog(readMetadata(directoryUrl.newBuilder()
+                .addQueryParameter("json", "true").build())!!, directoryUrl, limit)
+        }
+        coroutineScope {
+            listOf("Debug", "Release").map { configuration ->
+                async { latestVersioned(configuration, limit) }
+            }.awaitAll().flatten()
+        }
+    }
+
+    private fun latestVersioned(configuration: String, limit: Int): List<ApkArtifact> {
+        val base = directoryUrl.newBuilder().addPathSegment("Android")
+            .addPathSegment(configuration).addPathSegment("").build()
+        val entries = parseGameBuildDirectories(readMetadata(base.newBuilder()
+            .addQueryParameter("json", "true").build())!!)
+        val result = mutableListOf<ApkArtifact>()
+        var inspectedBuilds = 0
+        // A folded version/build directory and an ordinary version directory are both valid.
+        for (version in entries.map { it.version }.distinct().sortedWith(GAME_VERSION_ORDER).take(100)) {
+            val direct = entries.filter { it.version == version && it.buildNumber != null }
+            val expanded = if (entries.any { it.version == version && it.buildNumber == null }) {
+                val url = base.newBuilder().addPathSegment(version).addPathSegment("")
+                    .addQueryParameter("json", "true").build()
+                parseGameBuildDirectories(readMetadata(url)!!, version)
+            } else emptyList()
+            for (entry in (direct + expanded).distinctBy { it.buildNumber }
+                .sortedByDescending { it.buildNumber }.take(100)) {
+                val buildNumber = entry.buildNumber ?: continue
+                if (++inspectedBuilds > 100) throw ApkDistributionException("GAME_APK_SCAN_LIMIT")
+                val buildRoot = base.newBuilder().addPathSegment(version)
+                    .addPathSegment(buildNumber.toString()).addPathSegment("").build()
+                val metadata = readMetadata(buildRoot.newBuilder().addPathSegment("build-info.json").build(), optional = true)
+                    ?: continue
+                val artifacts = parseVersionedGameApks(metadata, buildRoot, configuration, version, buildNumber, entry.modifiedAt)
+                result += artifacts
+                if (result.size >= limit) return result.take(limit)
+            }
+        }
+        return result
+    }
+
+    private fun readMetadata(url: HttpUrl, optional: Boolean = false): String? {
         val request = Request.Builder()
-            .url(listUrl)
+            .url(url)
             .header("Accept", "application/json")
             .header("Cache-Control", "no-cache")
             .build()
         httpClient.newCall(request).execute().use { response ->
+            if (optional && response.code == 404) return null
             if (!response.isSuccessful) throw ApkDistributionException("GAME_APK_HTTP_${response.code}")
             val body = response.body ?: throw ApkDistributionException("GAME_APK_EMPTY_BODY")
-            val text = body.charStream().use { it.readText() }
-            if (text.toByteArray(Charsets.UTF_8).size > MAX_CATALOG_BYTES) {
+            val bytes = body.byteStream().use { input ->
+                val output = ByteArrayOutputStream()
+                val buffer = ByteArray(DEFAULT_BUFFER_SIZE)
+                while (output.size() <= MAX_CATALOG_BYTES) {
+                    val count = input.read(buffer, 0, minOf(buffer.size, MAX_CATALOG_BYTES + 1 - output.size()))
+                    if (count < 0) break
+                    output.write(buffer, 0, count)
+                }
+                output.toByteArray()
+            }
+            if (bytes.size > MAX_CATALOG_BYTES) {
                 throw ApkDistributionException("GAME_APK_CATALOG_TOO_LARGE")
             }
-            parseGameApkCatalog(text, directoryUrl, limit)
+            return bytes.toString(Charsets.UTF_8)
         }
     }
 }
 
 class ApkDownloadClient(
     context: Context,
-    private val httpClient: OkHttpClient,
+    httpClient: OkHttpClient,
 ) {
+    // These requests are GETs. Recover a pooled connection closed by the file server.
+    private val httpClient = httpClient.newBuilder().retryOnConnectionFailure(true).build()
     private val downloadDirectory = File(context.filesDir, DOWNLOAD_DIRECTORY_NAME)
 
     suspend fun download(
@@ -328,7 +393,7 @@ private fun parseControlledDistributionUrl(value: String, allowPrivateHttp: Bool
     return parsed
 }
 
-private fun requireSafeApkFileName(fileName: String) {
+internal fun requireSafeApkFileName(fileName: String) {
     require(fileName.length in 5..160)
     require(fileName.endsWith(".apk", ignoreCase = true))
     require('/' !in fileName && '\\' !in fileName)

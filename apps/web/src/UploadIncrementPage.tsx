@@ -462,16 +462,16 @@ export default function UploadIncrementPage({
                 <span>ZIP</span>
                 <div>
                   <strong>
-                    {uploadPlatform(form) === "ios" ? "iOS · 最新 ZIP" : "本项目增量 ZIP"}
+                    {UPLOAD_TARGETS[uploadPlatform(form)].label} ·{" "}
+                    {form.productId === "2001" ? "Debug" : "Release"} 热更 ZIP
                   </strong>
-                  <small>
-                    {uploadPlatform(form) === "ios"
-                      ? "按目录中文件修改时间取最新 ZIP，恢复时继续使用原包"
-                      : "从内网构建服务自动下载并校验"}
-                  </small>
+                  <small>按构建清单校验版本、渠道和文件哈希；恢复时继续使用原包</small>
                   <details>
                     <summary>查看取包地址</summary>
-                    <code>{snapshot?.sourceUrl || "由此项目配置提供"}</code>
+                    <code>
+                      {UPLOAD_TARGETS[uploadPlatform(form)].sourceUrl}
+                      {form.productId === "2001" ? "Debug/" : "Release/"}
+                    </code>
                   </details>
                 </div>
               </div>
@@ -482,14 +482,101 @@ export default function UploadIncrementPage({
                   setReview(true);
                 }}
               >
-                <p>上传目标：{form.belongName || "等待 GM 配置此项目"}</p>
                 <label>
-                  版本号 <span className="upload-muted">留空由平台生成</span>
+                  包类型
+                  <select
+                    aria-label="包类型"
+                    value={uploadPlatform(form)}
+                    onChange={(event) => {
+                      setForm((current) =>
+                        selectUploadPlatform(
+                          current,
+                          event.target.value === "ios" ? "ios" : "android",
+                        ),
+                      );
+                      setReview(false);
+                    }}
+                  >
+                    <option value="android">Android</option>
+                    <option value="ios">iOS</option>
+                  </select>
+                </label>
+                <div className="upload-field-pair">
+                  <label>
+                    构建配置
+                    <select
+                      aria-label="构建配置"
+                      value={form.productId === "2001" ? "Debug" : "Release"}
+                      onChange={(event) => {
+                        const productId = event.target.value === "Debug" ? "2001" : "2002";
+                        setForm((current) => ({
+                          ...current,
+                          productId,
+                          version: "",
+                          belongName: current.belongName.replace(/^\[[0-9]+\]/, `[${productId}]`),
+                        }));
+                        setReview(false);
+                      }}
+                    >
+                      <option value="Debug">Debug · 产品 2001</option>
+                      <option value="Release">Release · 产品 2002</option>
+                    </select>
+                  </label>
+                  <label>
+                    产品 ID
+                    <input
+                      required
+                      inputMode="numeric"
+                      pattern="[1-9][0-9]*"
+                      maxLength={20}
+                      value={form.productId}
+                      readOnly
+                      placeholder="例如 2002"
+                      onChange={(event) => setField("productId", event.target.value)}
+                    />
+                  </label>
+                  <label>
+                    渠道 ID
+                    <input
+                      required
+                      inputMode="numeric"
+                      pattern="[1-9][0-9]*"
+                      maxLength={20}
+                      value={form.channelId}
+                      readOnly
+                      placeholder="例如 1002"
+                      onChange={(event) => {
+                        const channelId = event.target.value;
+                        setForm((current) =>
+                          ["1002", "2004"].includes(channelId)
+                            ? selectUploadPlatform(
+                                current,
+                                channelId === "2004" ? "ios" : "android",
+                              )
+                            : { ...current, channelId },
+                        );
+                        setReview(false);
+                      }}
+                    />
+                  </label>
+                </div>
+                <label>
+                  产品 / 渠道名称
+                  <input
+                    required
+                    maxLength={300}
+                    value={form.belongName}
+                    placeholder="例如 [2002]Baloot Go|[1002]谷歌-国际正式"
+                    onChange={(event) => setField("belongName", event.target.value)}
+                  />
+                </label>
+                <label>
+                  构建版本号 <span className="upload-muted">留空取该配置最新已核验构建</span>
                   <input
                     maxLength={80}
                     pattern="[0-9A-Za-z][0-9A-Za-z._-]*"
                     value={form.version}
-                    placeholder="自动使用下一个版本"
+                    placeholder="与构建版本完全一致"
                     onChange={(event) => setField("version", event.target.value)}
                   />
                 </label>
@@ -536,8 +623,9 @@ export default function UploadIncrementPage({
                     <p>
                       {form.belongName}
                       <br />
-                      目标 · 产品 {form.productId} · 渠道 {form.channelId} · 版本{" "}
-                      {form.version || "自动生成"} · 测试人 {form.testerId}
+                      {UPLOAD_TARGETS[uploadPlatform(form)].label} · 产品 {form.productId} · 渠道{" "}
+                      {form.channelId} · 版本 {form.version || "取最新已核验构建版本"} · 测试人{" "}
+                      {form.testerId}
                     </p>
                     <p>
                       {form.mode === "publish_workflow"

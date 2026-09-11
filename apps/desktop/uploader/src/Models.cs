@@ -44,7 +44,8 @@ public sealed class JobConfig
     public int? ConfirmedTestUnzipStatus { get; set; }
     public string WorkDirectory { get; set; } = "";
 }
-public sealed record SourceIdentity(long Size, string LastModified);
+public sealed record SourceIdentity(long Size, string LastModified,
+    [property:System.Text.Json.Serialization.JsonIgnore(Condition=System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)] string? Sha256=null);
 public sealed class JobState
 {
     public string ProjectId { get; set; } = "";
@@ -110,6 +111,7 @@ public static class Files
 public sealed class Journal : IDisposable
 {
     readonly FileStream exclusive;
+    readonly object writeGate = new();
     public string Root { get; }
     public string StatePath => Path.Combine(Root, "state.json");
     public Journal(string root)
@@ -118,12 +120,40 @@ public sealed class Journal : IDisposable
         try { exclusive = new FileStream(Path.Combine(Root, "job.lock"), FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.None); }
         catch (IOException) { throw new UploadException("JOB_LOCKED", "该任务正在另一个进程中运行。"); }
     }
-    public JobState? Read() => File.Exists(StatePath) ? JsonSerializer.Deserialize<JobState>(File.ReadAllText(StatePath), Json.Options) : null;
+    public JobState? Read()
+    {
+        if (!File.Exists(StatePath)) return null;
+        using var file = new FileStream(StatePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite | FileShare.Delete);
+        return JsonSerializer.Deserialize<JobState>(file, Json.Options);
+    }
     public void Save(JobState s)
     {
-        string tmp = StatePath + ".tmp";
-        using (var f = new FileStream(tmp, FileMode.Create, FileAccess.Write, FileShare.None)) { var bytes = JsonSerializer.SerializeToUtf8Bytes(s, Json.Options); f.Write(bytes); f.Flush(true); }
-        File.Move(tmp, StatePath, true);
+        lock (writeGate)
+        {
+            var bytes = JsonSerializer.SerializeToUtf8Bytes(s, Json.Options);
+            string tmp = StatePath + ".tmp";
+            for (int attempt = 0; ; attempt++)
+            {
+                try
+                {
+                    using (var f = new FileStream(tmp, FileMode.Create, FileAccess.Write, FileShare.None)) { f.Write(bytes); f.Flush(true); }
+                    File.Move(tmp, StatePath, true);
+                    return;
+                }
+                catch (Exception error) when (error is IOException or UnauthorizedAccessException)
+                {
+                    // Readers on Windows can temporarily deny replacement. Retry only
+                    // this local atomic checkpoint, never the successful COS request.
+                    int nativeCode = error.HResult & 0xffff;
+                    if (OperatingSystem.IsWindows() && nativeCode is 5 or 32 or 33 && attempt < 10)
+                    {
+                        Thread.Sleep(Math.Min(250, 20 << Math.Min(attempt, 4)));
+                        continue;
+                    }
+                    throw new UploadException("CHECKPOINT_WRITE_FAILED", "服务端保存上传断点失败，原状态和临时文件已保留。请检查磁盘或文件占用后恢复原任务。");
+                }
+            }
+        }
     }
     public void Emit(JobState s, string kind, object? data = null)
     {

@@ -4,9 +4,23 @@ import com.relayqahub.android.data.AccountProjectScope
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotEquals
 import org.junit.Assert.assertTrue
+import org.junit.Assert.assertFalse
+import androidx.work.NetworkType
 import org.junit.Test
 
 class SyncSchedulerTest {
+    @Test
+    fun `uploads and continuations never require a healthy battery`() {
+        listOf(0L, 30_000L).forEach { delay ->
+            val request = SyncScheduler.buildRequest(SCOPE, initialDelayMs = delay)
+            assertFalse(request.workSpec.constraints.requiresBatteryNotLow())
+            assertFalse(request.workSpec.constraints.requiresCharging())
+            assertEquals(NetworkType.CONNECTED, request.workSpec.constraints.requiredNetworkType)
+            assertEquals(delay, request.workSpec.initialDelay)
+        }
+        assertTrue(SyncScheduler.uniqueWorkName(SCOPE).startsWith("qa-hub-offline-sync-v2-"))
+    }
+
     @Test
     fun `work request carries non-PII account and session cancellation tags`() {
         val request = SyncScheduler.buildRequest(SCOPE)

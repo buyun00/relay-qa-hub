@@ -105,7 +105,6 @@ class SyncScheduler(
                 .setConstraints(
                     Constraints.Builder()
                         .setRequiredNetworkType(NetworkType.CONNECTED)
-                        .setRequiresBatteryNotLow(true)
                         .build(),
                 )
                 .setBackoffCriteria(
@@ -121,7 +120,9 @@ class SyncScheduler(
         }
 
         fun uniqueWorkName(scope: AccountProjectScope): String {
-            return "qa-hub-offline-sync-${digest(scopeIdentity(scope, includeProject = true))}"
+            // A fresh name also bypasses battery-constrained work persisted by older APKs.
+            // The Room transaction still arbitrates claims across old/new workers.
+            return "qa-hub-offline-sync-v2-${digest(scopeIdentity(scope, includeProject = true))}"
         }
 
         fun accountWorkTag(scope: AccountProjectScope): String =

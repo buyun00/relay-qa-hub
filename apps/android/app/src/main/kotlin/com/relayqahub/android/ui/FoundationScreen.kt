@@ -747,7 +747,7 @@ private fun GameApkSection(
     val catalog = state.gameApkCatalog
     SectionCard(
         title = "最新游戏 APK",
-        subtitle = "来自当前预览配置的下载目录，按上传时间显示最新 5 个",
+        subtitle = "Debug / Release 分别显示最新 5 个安装包，按版本与构建号排序",
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -803,7 +803,8 @@ private fun GameApkRow(
     ) {
         Column(Modifier.weight(1f)) {
             Text(
-                artifact.versionName?.let { "游戏版本 $it" } ?: artifact.displayName,
+                if (artifact.configuration != null) artifact.displayName
+                else artifact.versionName?.let { "游戏版本 $it" } ?: artifact.displayName,
                 style = MaterialTheme.typography.titleSmall,
                 fontWeight = FontWeight.ExtraBold,
             )
@@ -835,7 +836,7 @@ private fun GameApkRow(
         OutlinedButton(
             onClick = onDownload,
             enabled = download.phase != "downloading" && download.phase != "installing",
-            modifier = Modifier.testTag("download-game-apk-${artifact.versionName ?: artifact.fileName}"),
+            modifier = Modifier.testTag("download-game-apk-${artifact.configuration ?: "legacy"}-${artifact.buildNumber ?: artifact.versionName ?: artifact.fileName}"),
         ) {
             Text(
                 when {
@@ -980,6 +981,7 @@ private fun BugListPage(
                     }
                 }
             }
+            item { SubmissionStatusCard(state) }
             when {
                 state.bugWorkbench.phase == "loading" -> item {
                     EmptyListCard("正在刷新项目 Bug…")
@@ -2103,24 +2105,7 @@ private fun NewBugPage(
             ) {
                 Text("提交 Bug", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.ExtraBold)
             }
-            if (state.replaceableRejectedCreationId != null) {
-                OutlinedButton(
-                    onClick = onPreserveRejectedAndEdit,
-                    enabled = !draft.isDeleting && !draft.isSubmitting,
-                    modifier = Modifier.fillMaxWidth().testTag("preserve-rejected-and-edit"),
-                ) {
-                    Text("保留附件失败记录，允许修改后新建")
-                }
-            }
-            if (state.reconfirmableCreationId != null) {
-                OutlinedButton(
-                    onClick = onReconfirmOriginalCreation,
-                    enabled = !draft.isDeleting && !draft.isSubmitting,
-                    modifier = Modifier.fillMaxWidth().testTag("reconfirm-original-creation"),
-                ) {
-                    Text("使用原请求重新确认")
-                }
-            }
+            SubmissionStatusCard(state)
             if (state.lastAction.isNotBlank()) {
                 Surface(
                     modifier = Modifier.fillMaxWidth(),

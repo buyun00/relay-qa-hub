@@ -4,6 +4,7 @@ import { mkdtemp, readFile, rm, writeFile, mkdir, unlink } from "node:fs/promise
 import os from "node:os";
 import path from "node:path";
 import test from "node:test";
+import { catalogFetch } from "./quick-build-fixture.mjs";
 import {
   UploaderHost,
   parseUploadInput,
@@ -29,24 +30,10 @@ const executable = path.resolve("../desktop/vendor/ozdqp-uploader/ozdqp-uploader
 test("iOS jobs retain the selected ZIP through acknowledgement loss, prelaunch retry and resume", async (t) => {
   const requests: string[] = [];
   const mtime = Date.parse("2026-09-08T09:16:23Z");
-  const { host, options } = await fixture(
-    t,
-    async (url, init) => {
-      requests.push(String(url));
-      if (init?.method === "HEAD")
-        return new Response(null, {
-          headers: { "content-length": "12345", "last-modified": new Date(mtime).toUTCString() },
-        });
-      return Response.json({
-        files: [{ name: "ios_latest.zip", type: "file", size: 12345, mtime }],
-      });
-    },
-    {
-      sourceKind: "ios_directory",
-      sourceUrl: "https://artifacts.fixture.invalid/ios/",
-      defaults: { ...input, channelId: "2004" },
-    },
-  );
+  const { host, options } = await fixture(t, async (url, init) => {
+    requests.push(String(url));
+    return catalogFetch(url, init);
+  });
   await writeJson(options.authFile, { account: "fixture" });
   await writeFile(
     options.runner,
@@ -67,20 +54,23 @@ test("iOS jobs retain the selected ZIP through acknowledgement loss, prelaunch r
   const original = await readJson(configPath);
   assert.equal(
     original?.["downloadUrl"],
-    "https://artifacts.fixture.invalid/ios/ios_latest.zip?download=true",
+    "http://10.100.5.129:8000/ozdqp/iOS/Release/2.4.37/46/hot-update/ozdqp_ios_release_2.4.37_46.zip?download=true",
   );
-  assert.equal(original?.["uploadConcurrency"], 2);
-  assert.equal(original?.["projectId"], options.project.projectId);
-  assert.equal(original?.["componentVersion"], options.project.componentVersion);
-  assert.equal((await host.snapshot()).jobs[0]?.sourceFileName, "ios_latest.zip");
+  assert.equal(original?.["uploadConcurrency"], 8);
+  assert.equal((await host.snapshot()).jobs[0]?.sourceFileName, "ozdqp_ios_release_2.4.37_46.zip");
+  const originalRequestCount = requests.length;
   await host.startWithId(ios, id);
-  assert.equal(requests.length, 2);
+  assert.equal(requests.length, originalRequestCount);
   await unlink(path.join(host.folder(id), "desktop.json")); // Simulate persisted intent before launch.
   await host.startWithId(ios, id);
   await wait();
   await host.resume({ id, testerId: ios.testerId, testResultReference: "" });
   await wait();
-  assert.equal(requests.length, 2, "Original directory selection is never repeated");
+  assert.equal(
+    requests.length,
+    originalRequestCount,
+    "Original directory selection is never repeated",
+  );
   assert.deepEqual(await readJson(configPath), original);
   await assert.rejects(
     host.startForBuild(
@@ -89,7 +79,7 @@ test("iOS jobs retain the selected ZIP through acknowledgement loss, prelaunch r
       { size: 10, lastModified: new Date(mtime).toUTCString() },
       "fixture",
     ),
-    /BUILD_PLATFORM_UNSUPPORTED/,
+    /UPLOAD_ACCOUNT_CHANGED/,
   );
 });
 async function fixture(
@@ -105,19 +95,7 @@ async function fixture(
     executable,
     runner: path.join(root, "runner.mjs"),
     nodeExecutable: process.execPath,
-    project: {
-      projectId: randomUUID(),
-      componentVersion: 3,
-      apiBase: "https://upload.fixture.invalid",
-      loginBase: "https://login.fixture.invalid",
-      sourceUrl: "https://artifacts.fixture.invalid/test.zip",
-      sourceKind: "file" as const,
-      targetPrefix: "fixture-only",
-      defaults: input,
-      credentialRef: "fixture-only",
-      ...projectOverrides,
-    },
-    ...(fetcher ? { fetch: fetcher } : {}),
+    fetch: fetcher ?? (catalogFetch as typeof fetch),
   };
   return { root, options, host: new UploaderHost(options) };
 }
@@ -310,6 +288,160 @@ test("restart reads progress from disk, and only a verified published state is s
   assert.equal(job.published, true);
   assert.equal(job.status, "succeeded");
 });
+
+test("manual publication is reconciled by GET, survives restart and preserves worker evidence", async (t) => {
+  const calls: string[] = [];
+  const detail = {
+    id: 849,
+    version: "2.5.1",
+    product_id: "2002",
+    channel_id: "1002",
+    status: 100,
+    url: "release/dir/original-zip/",
+    publish_time: "2026-09-11 01:43:06",
+  };
+  const { host, options } = await fixture(t, async (url, init) => {
+    assert.equal(init?.method, "GET");
+    assert.equal(
+      String(url),
+      "https://fq2ivi.ipwana.com/api/v1/developapi/versions/detail?vid=849",
+    );
+    calls.push(String(url));
+    return Response.json({ code: 0, data: detail });
+  });
+  await writeJson(options.authFile, { accessToken: "fixture-token", account: "fixture" });
+  const state = {
+    stage: "AWAITING_PUBLISH_CONFIRMATION",
+    runStatus: "WAITING",
+    finalRemoteStatus: 60,
+    version: "2.5.1",
+    versionId: 849,
+    objectKey: "test/pkg/original-zip.zip",
+    done: ["OBJECT_READY", "PREPARE_PUBLISH"],
+    pendingAction: null,
+  };
+  const { folder } = await seed(options, state);
+  await writeJson(path.join(folder, "job.json"), { ...input, mode: "prepare_publish" });
+  await writeJson(path.join(folder, "result.json"), state);
+  const original = await Promise.all(
+    ["state.json", "result.json", "job.json"].map((f) => readFile(path.join(folder, f))),
+  );
+  assert.equal((await host.snapshot()).jobs[0]?.status, "awaiting_publish");
+  await host.reconcilePublications();
+  await host.reconcilePublications();
+  assert.equal(calls.length, 1);
+  const job = (await new UploaderHost(options).snapshot()).jobs[0]!;
+  assert.equal(job.status, "succeeded");
+  assert.equal(job.published, true);
+  assert.equal(job.remoteStatus, 100);
+  assert.equal(job.publishTime, detail.publish_time);
+  assert.equal(job.errorCode, "REMOTE_PUBLISHED_RECONCILED");
+  assert.deepEqual(
+    await Promise.all(
+      ["state.json", "result.json", "job.json"].map((f) => readFile(path.join(folder, f))),
+    ),
+    original,
+  );
+  const proof = await readJson(path.join(folder, "publication-reconciliation.json"));
+  assert.equal(proof?.["writesIssued"], false);
+  assert.ok(!JSON.stringify(proof).includes("fixture-token"));
+  await writeJson(path.join(folder, "state.json"), { ...state, objectKey: "test/pkg/other.zip" });
+  assert.equal(
+    (await new UploaderHost(options).snapshot()).jobs[0]?.status,
+    "awaiting_publish",
+    "Changed checkpoint invalidates old proof",
+  );
+});
+
+test("publication reconciliation retains reservations for unready, mismatched or unreachable results", async (t) => {
+  const correct = {
+    id: 849,
+    version: "2.5.1",
+    product_id: "2002",
+    channel_id: "1002",
+    status: 100,
+    url: "release/dir/original-zip/",
+    publish_time: "2026-09-11 01:43:06",
+  };
+  for (const change of [
+    { status: 60 },
+    { id: 850 },
+    { version: "2.5.2" },
+    { product_id: "2001" },
+    { channel_id: "2004" },
+    { url: "release/dir/other-zip/" },
+    { publish_time: "0000-00-00 00:00:00" },
+    { publish_time: "" },
+    { httpError: true },
+  ]) {
+    await t.test(JSON.stringify(change), async (sub) => {
+      const { host, options } = await fixture(sub, async (_url, init) => {
+        assert.equal(init?.method, "GET");
+        return "httpError" in change
+          ? new Response(null, { status: 503 })
+          : Response.json({ code: 0, data: { ...correct, ...change } });
+      });
+      await writeJson(options.authFile, { accessToken: "fixture-token" });
+      const { folder } = await seed(options, {
+        stage: "AWAITING_PUBLISH_CONFIRMATION",
+        runStatus: "WAITING",
+        finalRemoteStatus: 60,
+        version: "2.5.1",
+        versionId: 849,
+        objectKey: "test/pkg/original-zip.zip",
+        done: ["OBJECT_READY", "PREPARE_PUBLISH"],
+        pendingAction: null,
+      });
+      await writeJson(path.join(folder, "job.json"), { ...input, mode: "prepare_publish" });
+      await host.reconcilePublications();
+      assert.equal((await host.snapshot()).jobs[0]?.status, "awaiting_publish");
+      assert.equal(await readJson(path.join(folder, "publication-reconciliation.json")), null);
+    });
+  }
+});
+
+test("reconciliation cannot certify a run changed during the remote GET or an active worker", async (t) => {
+  let folder = "",
+    calls = 0;
+  const state = {
+    stage: "AWAITING_PUBLISH_CONFIRMATION",
+    runStatus: "WAITING",
+    finalRemoteStatus: 60,
+    version: "2.5.1",
+    versionId: 849,
+    objectKey: "test/pkg/original-zip.zip",
+    done: ["OBJECT_READY", "PREPARE_PUBLISH"],
+  };
+  const { host, options } = await fixture(t, async () => {
+    calls++;
+    await writeJson(path.join(folder, "state.json"), {
+      ...state,
+      objectKey: "test/pkg/changed.zip",
+    });
+    return Response.json({
+      code: 0,
+      data: {
+        id: 849,
+        version: "2.5.1",
+        product_id: "2002",
+        channel_id: "1002",
+        status: 100,
+        url: "release/dir/original-zip/",
+        publish_time: "2026-09-11 01:43:06",
+      },
+    });
+  });
+  await writeJson(options.authFile, { accessToken: "fixture-token" });
+  const seeded = await seed(options, state, "", true);
+  folder = seeded.folder;
+  await writeJson(path.join(folder, "job.json"), { ...input, mode: "prepare_publish" });
+  await host.reconcilePublications();
+  assert.equal(calls, 0);
+  await writeJson(path.join(folder, `run-${seeded.runId}.json`), { finished: true });
+  await new UploaderHost(options).reconcilePublications();
+  assert.equal(calls, 1);
+  assert.equal(await readJson(path.join(folder, "publication-reconciliation.json")), null);
+});
 test("live jobs prevent changing account and launching duplicate tasks; expired heartbeat is interrupted", async (t) => {
   const { host, options } = await fixture(t);
   const { folder, runId } = await seed(
@@ -432,7 +564,7 @@ test("new jobs default to recorded parameters and persist version-only text beha
     await assert.rejects(host.start({ ...input, mode }), /INVALID_INPUT/);
   const id = await host.start({
     mode: "prepare_publish",
-    version: "2.4.28",
+    version: "2.4.37",
     summary: "ignore",
     description: "ignore",
   });
@@ -442,13 +574,13 @@ test("new jobs default to recorded parameters and persist version-only text beha
   assert.equal(config?.["productId"], "2002");
   assert.equal(config?.["channelId"], "1002");
   assert.equal(config?.["testerId"], 11562);
-  assert.equal(config?.["summary"], "2.4.28");
-  assert.equal(config?.["description"], "2.4.28");
+  assert.equal(config?.["summary"], "2.4.37");
+  assert.equal(config?.["description"], "2.4.37");
   assert.equal(config?.["useVersionText"], true);
   assert.equal(config?.["recordedTestWorkflow"], true);
   assert.equal(config?.["testResultReference"], "");
-  await writeJson(path.join(host.folder(id), "state.json"), { version: "2.4.29" });
-  assert.equal((await host.snapshot()).jobs[0]?.input.summary, "2.4.29");
+  await writeJson(path.join(host.folder(id), "state.json"), { version: "2.4.38" });
+  assert.equal((await host.snapshot()).jobs[0]?.input.summary, "2.4.38");
 });
 test("final confirmation requires the persisted boundary and uses its own command exactly once", async (t) => {
   const { host, options } = await fixture(t);

@@ -1,6 +1,6 @@
 {
   "name": "@relay-qa-hub/web",
-  "version": "3.3.5",
+  "version": "3.5.2",
   "private": true,
   "description": "Desktop-first management platform for the independent Relay QA Hub source of truth.",
   "license": "UNLICENSED",

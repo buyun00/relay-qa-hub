@@ -83,7 +83,12 @@ class ScopedRepository(
             scope.installationId,
             scope.sessionId,
         ),
-    ) { operation, receipt -> LocalSubmissionSnapshot(operation, receipt) }
+    ) { operation, receipt ->
+        LocalSubmissionSnapshot(
+            operation,
+            receipt?.takeIf { it.operationId == operation?.operationId },
+        )
+    }
 
     suspend fun listBlockedDeviceScopes(): List<AccountProjectScope> =
         offlineOperationDao.listBlockedDeviceScopes()

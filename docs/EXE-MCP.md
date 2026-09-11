@@ -34,6 +34,51 @@ MCP 负责回写修复和真实验证证据；代码交付仍需精确构建证�
 
 如果历史单据或异常重试只需要补做轻语同步，可调用 `qa_resolve_qingyu_bug`。该工具会回传命中的 QA Hub 单号、轻语 defect ID、最终外部状态和是否原本就已解决；它不会代替人工验收，也不会修改 QA Hub 状态。
 
+## 打包和上传增量（Windows 3.4.0）
+
+| MCP 工具 | 用途 |
+| --- | --- |
+| `qa_get_packaging_status` | 查询排队原因、构建阶段、结果及下载地址；可传 `queueIds`、`buildNumbers` |
+| `qa_start_build` | 单独打包，`preset` 支持下表 8 项 |
+| `qa_build_and_upload` | 一键 Android / iOS 打包，按本次构建清单上传、提测及发布 |
+| `qa_start_increment_upload` | 上传已有已核验 ZIP，支持 `platform: android/ios` 和 `configuration: Debug/Release` |
+| `qa_get_increment_upload_status` | 查看所有人的记录，或用 `chainId` / `jobId` 查询单个任务；`includeLogs:true` 附带脱敏记录 |
+| `qa_resume_increment_upload` | 恢复本人失败或中断的原上传，保留原版本、ZIP、测试人和分片 |
+| `qa_confirm_increment_publish` | 对本人 `awaiting_publish` 任务执行最后一步正式发布 |
+| `qa_cancel_increment_upload` | 取消本人尚未开始的上传排队 |
+| `qa_cancel_build_upload` | 取消本人打包后的自动上传；已提交的 Jenkins 构建继续运行 |
+
+一键调用示例（每次新任务使用新的 UUID，重试同一任务复用原值）：
+
+```json
+{
+  "name": "qa_build_and_upload",
+  "arguments": {
+    "requestId": "bca850fa-c4d1-4d96-802a-e4c23c0c631c",
+    "preset": "ios-release-res"
+  }
+}
+```
+
+| 平台配置 | App preset | Res preset | 产品 / 渠道 |
+| --- | --- | --- | --- |
+| Android Debug | android-debug-app | android-debug-res | 2001 / 1002 |
+| Android Release | android-release-app | android-release-res | 2002 / 1002 |
+| iOS Debug | ios-debug-app | ios-debug-res | 2001 / 2004 |
+| iOS Release | ios-release-app | ios-release-res | 2002 / 2004 |
+
+默认 preset 为 `android-release-app`，测试人 `11562`、8 分片并发。构建并上传的版本号及更新说明只取本次构建结果，不接受版本覆盖；`testerId` 可显式指定。`mode` 默认 `publish_workflow` 完成正式发布，`prepare_publish` 停在最后确认前。
+
+`qa_start_increment_upload` 单独上传默认 Android Release；可传 `platform:"ios"`、`configuration:"Debug"`。可选 `version` 用来查找已有构建版本；留空选该平台配置最新已核验构建，瑞雪版本仍与所选构建完全一致。详情参见 [打包与下载](JENKINS-PACKAGING.md)。
+
+返回 `accepted:true` 只表示任务已提交。保留返回的 `chainId`，通过 `qa_get_increment_upload_status` 跟踪；`chain.status=upload_started` 仍需继续查看关联 `job`。正式发布完成应同时核对 `job.published=true`、`job.remoteStatus=100`。不要把提测、上传完成或提交成功当成正式发布完成。
+
+MCP 复用 EXE 当前用户的 QA Hub 会话和该用户已配置在后端的上传账户，不接受平台密码、本机 ZIP 路径或任意服务器地址。若状态返回 `configured:false`，先在“上传增量”页面设置上传账户。所有人可查询记录，恢复、取消和确认仍由创建者执行。任务及进度由后端持久化，提交后关闭 EXE 或断开 MCP 不会中断执行；再次连接可按原 ID 查询。
+
+一键任务及上传请求在后端持久化去重，超时后用原 `requestId` 查询/重试，不要生成新 ID。单独打包沿用现有 Jenkins 接口，其去重缓存只在当前 API 进程保留 24 小时，因此该工具不宣称永久幂等；发生未知提交结果或 API 重启时，先查询构建队列核对，不要自动重新提交。
+
+安装新版并重启 EXE 后，本机 MCP 才会加载这 9 个新工具（总计 27 个）；已提交的后端任务不受 EXE 更新影响。
+
 ## 运行配置
 
 便携包旁及 `%LOCALAPPDATA%\Relay QA Hub\desktop-runtime.json` 支持：

@@ -2,8 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { latestIosUploadSource as configuredIosUploadSource } from "../src/upload-source.js";
 
-const origin = "https://artifacts.fixture.invalid/ios/";
-const latestIosUploadSource = (fetcher: typeof fetch) => configuredIosUploadSource(fetcher, origin);
+const origin = "http://10.100.5.129:8000/ozdqp/iOS/";
 const mtime = Date.parse("2026-09-08T09:16:23Z") + 385;
 const latest = { name: "ozdqp_ios_2.1.157_38_full.zip", type: "file", size: 12345, mtime };
 test("iOS selects the newest ZIP by modification time and pins matching HEAD identity", async () => {

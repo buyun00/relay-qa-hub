@@ -87,19 +87,8 @@ describe("Relay QA Hub browser workbench", () => {
   });
 
   it("exposes the build and frozen contract versions", () => {
-    expect(product.appVersion).toBe("3.3.5");
-    expect(product.contractVersion).toBe("1.1.0");
-  });
-
-  it("keeps project switching and component history out of the desktop workspace", () => {
-    expect(workspaceChromeForDesktop({} as Window["qaHubDesktop"])).toEqual({
-      showProjectSwitcher: false,
-      showComponentHistory: false,
-    });
-    expect(workspaceChromeForDesktop(undefined)).toEqual({
-      showProjectSwitcher: true,
-      showComponentHistory: true,
-    });
+    expect(product.appVersion).toBe("3.5.2");
+    expect(product.contractVersion).toBe("1.0.0");
   });
 
   it("collects supported clipboard images and gives them upload-safe names", () => {

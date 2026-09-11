@@ -1,6 +1,14 @@
 import { promises as fs } from "node:fs";
 import path from "node:path";
-import { parseNewUploadInput, readJson, record, writeJson } from "./uploader-host.js";
+import { quickBuildPreset, quickUploadInput } from "@relay-qa-hub/upload-contract";
+import { pinBuildSource, type BuildResult } from "./build-artifacts.js";
+import {
+  parseNewUploadInput,
+  readJson,
+  record,
+  UPLOAD_SOURCE,
+  writeJson,
+} from "./uploader-host.js";
 import type { BuildUploadChain, UploadInput, UploadSourceIdentity } from "./uploader-types.js";
 interface QaHubJsonRequest {
   method?: "GET" | "POST";
@@ -102,12 +110,8 @@ export class BuildUploadHost {
       )
         throw new Error("LOCAL_STATE_INVALID");
       const chain = raw as unknown as BuildUploadChain;
-      if (
-        this.options.projectId &&
-        (chain.projectId !== this.options.projectId ||
-          chain.componentVersion !== this.options.componentVersion)
-      )
-        throw new Error("BUILD_UPLOAD_PROJECT_SCOPE_MISMATCH");
+      if (chain.preset !== undefined && !quickBuildPreset(chain.preset))
+        throw new Error("LOCAL_STATE_INVALID");
       chain.input = parseNewUploadInput(chain.input);
       if (
         !Number.isFinite(Date.parse(chain.createdAt)) ||
@@ -145,26 +149,39 @@ export class BuildUploadHost {
       const raw = record(value),
         id = raw["requestId"];
       this.file(id);
-      const input = parseNewUploadInput(raw["upload"], this.options.defaults),
+      const selection = quickBuildPreset(raw["preset"] ?? "android-release-app");
+      if (!selection) throw new Error("INVALID_INPUT");
+      const input = parseNewUploadInput(
+          quickUploadInput(parseNewUploadInput(raw["upload"]), selection.id),
+        ),
         ownerId = await this.owner();
-      if (!this.options.preset) throw new Error("COMPONENT_NOT_CONFIGURED");
       const chains = await this.all(),
         prior = chains.find((c) => c.id === id);
       if (prior) {
-        if (prior.ownerId !== ownerId || JSON.stringify(prior.input) !== JSON.stringify(input))
+        if (
+          prior.ownerId !== ownerId ||
+          prior.preset !== selection.id ||
+          JSON.stringify({
+            ...prior.input,
+            version: "",
+            summary: "自动版本号",
+            description: "自动版本号",
+          }) !== JSON.stringify(input)
+        )
           throw new Error("BUILD_CHAIN_CONFLICT");
         return prior;
       }
       if (chains.some((c) => !terminal(c))) throw new Error("BUILD_CHAIN_ACTIVE");
       await this.options.uploader.checkAuth();
       const accountIdentity = await this.options.uploader.accountIdentity();
-      const baseline = await this.source(true);
+      const baseline = null;
       const now = new Date().toISOString();
       const chain: BuildUploadChain = {
         ...(this.options.projectId
           ? { projectId: this.options.projectId, componentVersion: this.options.componentVersion! }
           : {}),
         id: String(id),
+        preset: selection.id,
         ownerId,
         accountIdentity,
         createdAt: now,
@@ -184,7 +201,7 @@ export class BuildUploadHost {
           await this.options.api.json("/api/v1/packaging/builds", {
             method: "POST",
             headers: { "idempotency-key": chain.id },
-            body: { preset: this.options.preset },
+            body: { preset: selection.id },
           }),
         );
         if (!Number.isSafeInteger(result["queueId"]) || Number(result["queueId"]) <= 0)
@@ -264,6 +281,8 @@ export class BuildUploadHost {
               "BUILD_FAILED",
               "BUILD_IDENTITY_MISMATCH",
               "BUILD_TIMED_OUT",
+              "BUILD_ARTIFACT_MISMATCH",
+              "BUILD_PROJECT_PATH_INVALID",
             ].includes(chain.errorCode)
           )
             chain.status = "failed";
@@ -301,7 +320,7 @@ export class BuildUploadHost {
       throw new Error("BUILD_TIMED_OUT");
     const progress = record(
       await this.options.api.json(
-        `/api/v1/packaging/progress?queues=${chain.queueId}${chain.buildNumber ? `&builds=${chain.buildNumber}` : ""}`,
+        `/api/v1/packaging/progress?queues=${chain.queueId}${chain.buildNumber ? `&builds=${chain.buildNumber}` : ""}${chain.preset ? "" : "&legacy=1"}`,
       ),
     );
     const builds = Array.isArray(progress["builds"]) ? progress["builds"].map(record) : [];
@@ -322,7 +341,7 @@ export class BuildUploadHost {
     }
     if (
       build["queueId"] !== chain.queueId ||
-      (build["preset"] !== null && build["preset"] !== this.options.preset) ||
+      build["preset"] !== (chain.preset ?? "external") ||
       !Number.isSafeInteger(build["number"]) ||
       Number(build["number"]) <= 0
     )
@@ -333,7 +352,35 @@ export class BuildUploadHost {
       await this.save(chain);
       return;
     }
-    if (build["status"] !== "SUCCESS") throw new Error("BUILD_FAILED");
+    if (build["status"] !== "SUCCESS")
+      throw new Error(
+        build["errorCode"] === "BUILD_PROJECT_PATH_INVALID"
+          ? "BUILD_PROJECT_PATH_INVALID"
+          : "BUILD_FAILED",
+      );
+    if (chain.preset) {
+      chain.status = "waiting_zip";
+      await this.save(chain);
+      const result = (await this.options.api.json(
+        `/api/v1/packaging/build-result?build=${chain.buildNumber}&preset=${chain.preset}`,
+      )) as BuildResult;
+      const preset = quickBuildPreset(chain.preset)!;
+      if (
+        result.productId !== preset.productId ||
+        result.channelId !== preset.channelId ||
+        result.platform !== preset.platform ||
+        result.configuration !== preset.configuration ||
+        !/^\d+\.\d+\.\d+$/.test(result.version)
+      )
+        throw new Error("BUILD_ARTIFACT_MISMATCH");
+      chain.source = await pinBuildSource(result, this.options.fetch);
+      chain.buildVersion = result.version;
+      chain.input = parseNewUploadInput({ ...chain.input, version: result.version });
+      chain.status = "starting_upload";
+      await this.save(chain);
+      await this.advance(chain);
+      return;
+    }
     if (build["logError"] === true) throw new Error("BUILD_LOG_UNAVAILABLE");
     const stages = Array.isArray(build["stages"]) ? build["stages"].map(record) : [];
     if (

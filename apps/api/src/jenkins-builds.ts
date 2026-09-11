@@ -1,5 +1,20 @@
 import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import {
+  QUICK_JOB_NAME,
+  COMPATIBILITY_JOB_NAME,
+  QUICK_BUILD_PRESETS,
+  quickBuildPreset,
+  type QuickBuildPresetId,
+} from "@relay-qa-hub/upload-contract";
+import { artifactCatalog, validateBuildResult, type BuildResult } from "./build-artifacts.js";
+import {
+  COMPATIBILITY_TARGETS,
+  COMPATIBILITY_BATCH_PURPOSE,
+  compatibilitySource,
+  validateCompatibilityReport,
+  type CompatibilityCheck,
+} from "./jenkins-compatibility.js";
+import {
   applyBuildHistory,
   describeBuild,
   parseBuildLog,
@@ -8,23 +23,18 @@ import {
   type ParsedBuildLog,
 } from "./jenkins-progress.js";
 
+// Fixed intranet installation, as requested. Credentials stay in the API process.
+const JENKINS_ORIGIN = "http://10.100.5.129:8080";
+const DOWNLOAD_ORIGIN = "http://10.100.5.129:8000";
+const JOB_PATH = `/job/${encodeURIComponent(QUICK_JOB_NAME)}/`;
+const CHECK_JOB_PATH = `/job/${encodeURIComponent(COMPATIBILITY_JOB_NAME)}/`;
+const LEGACY_JOB_PATH = `/job/${encodeURIComponent("01-【OZDQP】【Android】")}/`;
+const JENKINS_AUTH = `Basic ${Buffer.from("admin:admin").toString("base64")}`;
 const TIMEOUT_MS = 8_000;
 const MAX_JSON_BYTES = 4 * 1024 * 1024;
 
-export const BUILD_PRESETS = ["internal-nosdk", "internal-sdk", "external"] as const;
-export type BuildPreset = string;
-export interface JenkinsProjectConfiguration {
-  readonly projectId: string;
-  readonly version: number;
-  readonly origin: string;
-  readonly downloadOrigin: string;
-  readonly jobPath: string;
-  readonly authorization: string;
-  readonly zipPath: string;
-  readonly presets: Readonly<Record<string, Readonly<Record<string, string>>>>;
-  readonly apkPath?: string;
-  readonly ipaPath?: string;
-}
+export const BUILD_PRESETS = QUICK_BUILD_PRESETS.map((p) => p.id);
+export type BuildPreset = QuickBuildPresetId | "internal-nosdk" | "internal-sdk" | "external";
 export const JENKINS_BUILDS_PATH = "/api/v1/packaging";
 
 interface ParameterDefinition {
@@ -66,20 +76,49 @@ export class PackagingError extends Error {
 /** Only these choices change. Jenkins supplies every other parameter's current default,
  * including the Json Editor plugin's BuildParam startval and the blank version. */
 export function buildParameters(preset: BuildPreset): Record<string, string> {
-  return {
-    networkScope: preset === "external" ? "外网_保留原参数" : "内网_自动判断",
-    internalUseSdk: preset === "internal-sdk" ? "接入SDK" : "不接入SDK",
-    // Switching to external in ParameterUX also switches this hidden selection.
-    buildMode: preset === "external" ? "App_资源和包体" : "Auto_自动判断",
-  };
+  const selection = quickBuildPreset(preset === "external" ? "android-release-app" : preset);
+  if (!selection) throw new PackagingError("JENKINS_PARAMETERS_CHANGED", 409);
+  return { 打包用途: selection.label };
 }
 
-export function packageFiles(
-  files: DirectoryFile[],
-  kind: "apk" | "ipa",
-  downloadOrigin = "",
-  directoryPath = `/${kind}/`,
-): PackageFile[] {
+function presetForParameters(actions: JenkinsParameters[] = []): BuildPreset | null {
+  const values = Object.fromEntries(
+    actions.flatMap((action) => action.parameters ?? []).map((p) => [p.name, p.value]),
+  );
+  const quick = QUICK_BUILD_PRESETS.find((p) => p.label === values["打包用途"]);
+  if (quick) return quick.id;
+  if (values["networkScope"] === "外网_保留原参数") return "external";
+  if (values["networkScope"] !== "内网_自动判断") return null;
+  return values["internalUseSdk"] === "接入SDK" ? "internal-sdk" : "internal-nosdk";
+}
+function isCompatibilityBuild(actions: JenkinsParameters[] = []): boolean {
+  const purpose = actions
+    .flatMap((a) => a.parameters ?? [])
+    .find((p) => p.name === "打包用途")?.value;
+  return (
+    purpose === COMPATIBILITY_BATCH_PURPOSE ||
+    COMPATIBILITY_TARGETS.some((t) => purpose === `${t.platform} ${t.configuration} · 快捷检测`)
+  );
+}
+function sameJenkinsUrl(value: unknown, expected: string): boolean {
+  if (typeof value !== "string") return false;
+  try {
+    const actual = new URL(value),
+      wanted = new URL(expected);
+    return (
+      actual.origin === wanted.origin &&
+      !actual.username &&
+      !actual.password &&
+      !actual.search &&
+      !actual.hash &&
+      decodeURI(actual.pathname) === decodeURI(wanted.pathname)
+    );
+  } catch {
+    return false;
+  }
+}
+
+export function packageFiles(files: DirectoryFile[], kind: "apk" | "ipa"): PackageFile[] {
   return files
     .filter(
       (file) =>
@@ -114,7 +153,7 @@ export class JenkinsBuildService {
   private crumbLoading: Promise<void> | null = null;
   private cachedStatus: { until: number; value: Promise<PackagingStatus> } | null = null;
   private progressCache = new Map<string, { until: number; value: Promise<PackagingProgress> }>();
-  private logCache = new Map<number, { until: number; value: Promise<ParsedBuildLog> }>();
+  private logCache = new Map<string, { until: number; value: Promise<ParsedBuildLog> }>();
   private observedStages = new Map<string, number>();
   private submissions = new Map<
     string,
@@ -213,12 +252,16 @@ export class JenkinsBuildService {
     }
   }
 
-  private async job(signal?: AbortSignal, progress = false): Promise<JenkinsJob> {
+  private async job(
+    signal?: AbortSignal,
+    progress = false,
+    jobPath = JOB_PATH,
+  ): Promise<JenkinsJob> {
     const tree = progress
       ? "buildable,builds[number,timestamp,duration,estimatedDuration,queueId,builtOn,building,result,actions[causes[userName],parameters[name,value]]]{0,24}"
       : "buildable,property[parameterDefinitions[name,choices]],builds[number,timestamp,building,result,actions[parameters[name,value]]]{0,10}";
     let response = await this.request(
-      `${this.config.jobPath}api/json?tree=${encodeURIComponent(tree)}`,
+      `${jobPath}api/json?tree=${encodeURIComponent(tree)}`,
       signal ? { signal } : {},
     );
     if ([401, 403, 302].includes(response.status)) {
@@ -226,7 +269,7 @@ export class JenkinsBuildService {
       this.cookies.clear();
       this.crumb = null;
       response = await this.request(
-        `${this.config.jobPath}api/json?tree=${encodeURIComponent(tree)}`,
+        `${jobPath}api/json?tree=${encodeURIComponent(tree)}`,
         signal ? { signal } : {},
       );
     }
@@ -256,25 +299,31 @@ export class JenkinsBuildService {
     return this.crumbLoading;
   }
 
-  private async submit(preset: BuildPreset): Promise<{ queueId: number; preset: BuildPreset }> {
+  private async submitParameters(
+    parameters: Record<string, string>,
+    jobPath = JOB_PATH,
+  ): Promise<number> {
     const signal = AbortSignal.timeout(15_000);
-    const job = await this.job(signal);
+    const job = await this.job(signal, false, jobPath);
     if (!job.buildable) throw new PackagingError("JENKINS_JOB_DISABLED", 409);
-    const parameters = this.config.presets[preset];
-    if (!parameters) throw new PackagingError("BUILD_PRESET_NOT_CONFIGURED", 400);
     const definitions = job.property?.flatMap((p) => p.parameterDefinitions ?? []) ?? [];
-    for (const [name, value] of Object.entries(parameters)) {
-      const definition = definitions.find((p) => p.name === name);
-      if (!definition || (definition.choices && !definition.choices.includes(value))) {
-        throw new PackagingError("JENKINS_PARAMETERS_CHANGED", 409);
-      }
+    if (!definitions.some((p) => p.name === "打包用途"))
+      throw new PackagingError("JENKINS_PARAMETERS_CHANGED", 409);
+    // Active Choices does not expose choices in api/json. Read its installed script without executing it.
+    const configResponse = await this.request(`${jobPath}config.xml`, { signal });
+    if (!configResponse.ok) {
+      await configResponse.body?.cancel();
+      throw new PackagingError("JENKINS_PARAMETERS_CHANGED", 409);
     }
+    const config = await configResponse.text();
+    if (config.length > MAX_JSON_BYTES || !config.includes(parameters["打包用途"]!))
+      throw new PackagingError("JENKINS_PARAMETERS_CHANGED", 409);
     if (!this.crumb) await this.loadCrumb(signal);
     for (let attempt = 0; attempt < 2; attempt++) {
       const crumb = this.crumb!;
       let response: Response;
       try {
-        response = await this.request(`${this.config.jobPath}buildWithParameters`, {
+        response = await this.request(`${jobPath}buildWithParameters`, {
           method: "POST",
           signal,
           headers: {
@@ -304,9 +353,123 @@ export class JenkinsBuildService {
       if (response.status !== 201 || !queue)
         throw new PackagingError("JENKINS_SUBMISSION_UNKNOWN", 502);
       this.cachedStatus = null;
-      return { preset, queueId: Number(queue[1]) };
+      return Number(queue[1]);
     }
     throw new PackagingError("JENKINS_AUTH_FAILED");
+  }
+
+  private async submit(preset: BuildPreset): Promise<{ queueId: number; preset: BuildPreset }> {
+    return { preset, queueId: await this.submitParameters(buildParameters(preset)) };
+  }
+
+  async startCompatibilityBatch(): Promise<number> {
+    const sourceResponse = await this.request(`${JOB_PATH}config.xml`);
+    if (!sourceResponse.ok) {
+      await sourceResponse.body?.cancel();
+      throw new PackagingError("CHECK_SOURCE_UNAVAILABLE", 502);
+    }
+    const config = await sourceResponse.text();
+    if (config.length > MAX_JSON_BYTES) throw new PackagingError("CHECK_SOURCE_CHANGED", 502);
+    let source: string;
+    try {
+      source = compatibilitySource(config);
+    } catch {
+      throw new PackagingError("CHECK_SOURCE_CHANGED", 502);
+    }
+    return this.submitParameters(
+      {
+        打包用途: COMPATIBILITY_BATCH_PURPOSE,
+        参考版本: "自动：最新成功版本",
+        CHECK_SOURCE: source,
+      },
+      CHECK_JOB_PATH,
+    );
+  }
+
+  async compatibilityProgress(check: CompatibilityCheck): Promise<CompatibilityCheck> {
+    const expected = `${check.target.platform} ${check.target.configuration} · 快捷检测`;
+    let number = check.buildNumber;
+    if (!number) {
+      const response = await this.request(`/queue/item/${check.queueId}/api/json`);
+      if (response.status === 404) {
+        await response.body?.cancel();
+        const recent = await this.job(undefined, true, CHECK_JOB_PATH);
+        number = recent.builds.find((b) => b.queueId === check.queueId)?.number ?? null;
+        if (!number) throw new PackagingError("CHECK_QUEUE_UNKNOWN");
+      } else {
+        const q = await this.readJson<{
+          id: number;
+          cancelled?: boolean;
+          task?: { url?: string };
+          executable?: { number?: number; url?: string };
+        }>(response);
+        if (q.id !== check.queueId || !sameJenkinsUrl(q.task?.url, JENKINS_ORIGIN + CHECK_JOB_PATH))
+          throw new PackagingError("CHECK_IDENTITY_MISMATCH");
+        if (q.cancelled) throw new PackagingError("CHECK_CANCELLED");
+        if (!q.executable) return { ...check, state: "queued", errorCode: null };
+        number = q.executable.number ?? null;
+        if (
+          !number ||
+          !Number.isSafeInteger(number) ||
+          !sameJenkinsUrl(q.executable.url, JENKINS_ORIGIN + CHECK_JOB_PATH + number + "/")
+        )
+          throw new PackagingError("CHECK_IDENTITY_MISMATCH");
+      }
+    }
+    const b = await this.readJson<{
+      number: number;
+      queueId: number;
+      building: boolean;
+      result: string | null;
+      timestamp: number;
+      duration: number;
+      actions?: JenkinsParameters[];
+    }>(
+      await this.request(
+        `${CHECK_JOB_PATH}${number}/api/json?tree=number,queueId,building,result,timestamp,duration,actions[parameters[name,value]]`,
+      ),
+    );
+    const params = Object.fromEntries(
+      (b.actions ?? []).flatMap((a) => a.parameters ?? []).map((p) => [p.name, p.value]),
+    );
+    if (
+      b.number !== number ||
+      b.queueId !== check.queueId ||
+      ![expected, COMPATIBILITY_BATCH_PURPOSE].includes(String(params["打包用途"])) ||
+      !["自动：最新成功版本", "latest"].includes(String(params["参考版本"]))
+    )
+      throw new PackagingError("CHECK_IDENTITY_MISMATCH");
+    if (b.building) return { ...check, buildNumber: number, state: "running", errorCode: null };
+    if (!["SUCCESS", "UNSTABLE"].includes(b.result ?? "")) throw new PackagingError("CHECK_FAILED");
+    // Old single-target history remains readable after the job is renamed.
+    const artifactDirectory =
+      params["打包用途"] === COMPATIBILITY_BATCH_PURPOSE ? `checks/${check.target.id}/` : "";
+    const reportResponse = await this.request(
+      `${CHECK_JOB_PATH}${number}/artifact/${artifactDirectory}compatibility.json`,
+    );
+    if (reportResponse.status === 404) {
+      await reportResponse.body?.cancel();
+      throw new PackagingError("CHECK_FAILED");
+    }
+    const value = await this.readJson<unknown>(reportResponse);
+    let report;
+    try {
+      report = validateCompatibilityReport(value, check.target);
+    } catch {
+      throw new PackagingError("CHECK_INVALID_REPORT");
+    }
+    const finishedAt = b.timestamp + b.duration;
+    if (!Number.isFinite(finishedAt) || finishedAt <= 0 || finishedAt > Date.now() + 60_000)
+      throw new PackagingError("CHECK_INVALID_REPORT");
+    return {
+      ...check,
+      buildNumber: number,
+      state: "complete",
+      checkedAt: new Date(finishedAt).toISOString(),
+      reportUrl: `${JENKINS_ORIGIN}${CHECK_JOB_PATH}${number}/artifact/${artifactDirectory}compatibility.html`,
+      report,
+      errorCode: null,
+    };
   }
 
   trigger(
@@ -347,7 +510,7 @@ export class JenkinsBuildService {
   }
 
   private async readStatus() {
-    const [jenkins, apk, ipa, zip] = await Promise.allSettled([
+    const [jenkins, catalogResult] = await Promise.allSettled([
       (async () => {
         const [job, queue] = await Promise.all([
           this.job(),
@@ -366,13 +529,16 @@ export class JenkinsBuildService {
         ]);
         return {
           buildable: job.buildable,
-          builds: job.builds.map((build) => ({
-            number: build.number,
-            startedAt: new Date(build.timestamp).toISOString(),
-            status: build.building ? "BUILDING" : (build.result ?? "UNKNOWN"),
-            preset: this.configuredPreset(build.actions),
-          })),
+          builds: job.builds
+            .filter((build) => !isCompatibilityBuild(build.actions))
+            .map((build) => ({
+              number: build.number,
+              startedAt: new Date(build.timestamp).toISOString(),
+              status: build.building ? "BUILDING" : (build.result ?? "UNKNOWN"),
+              preset: presetForParameters(build.actions),
+            })),
           queue: queue.items
+            .filter((q) => !isCompatibilityBuild(q.actions))
             .filter(
               (q) =>
                 q.task?.url === `${this.config.origin}${this.config.jobPath}` ||
@@ -382,30 +548,55 @@ export class JenkinsBuildService {
             .map((q) => ({ id: q.id, reason: q.why, preset: this.configuredPreset(q.actions) })),
         };
       })(),
-      this.directory("apk"),
-      this.directory("ipa"),
-      this.request(this.config.zipPath, { method: "HEAD" }, false).then((r) => {
-        if (!r.ok) throw new PackagingError("PACKAGING_UNAVAILABLE");
-        return {
-          url: `${this.config.downloadOrigin}${this.config.zipPath}`,
-          name: this.config.zipPath.split("/").at(-1) ?? "artifact.zip",
-          size: Number(r.headers.get("content-length")),
-          modifiedAt: r.headers.get("last-modified"),
-        };
-      }),
+      artifactCatalog(this.fetchImpl),
     ]);
+    const catalog = catalogResult.status === "fulfilled" ? catalogResult.value : null;
     const errorCode = (error: unknown) =>
       error instanceof PackagingError ? error.code : "PACKAGING_UNAVAILABLE";
     return {
       checkedAt: new Date().toISOString(),
       jenkins: jenkins.status === "fulfilled" ? jenkins.value : null,
       jenkinsError: jenkins.status === "rejected" ? errorCode(jenkins.reason) : null,
-      apks: apk.status === "fulfilled" ? apk.value : [],
-      apkError: apk.status === "rejected" ? errorCode(apk.reason) : null,
-      ipas: ipa.status === "fulfilled" ? ipa.value : [],
-      ipaError: ipa.status === "rejected" ? errorCode(ipa.reason) : null,
-      zip: zip.status === "fulfilled" ? zip.value : null,
-      zipError: zip.status === "rejected" ? errorCode(zip.reason) : null,
+      apks: catalog
+        ? catalog.flatMap((r) =>
+            r.packages
+              .filter((f) => f.kind === "apk")
+              .map((f) => ({
+                ...f,
+                kind: "apk" as const,
+                modifiedAt: r.modifiedAt!,
+                preset: QUICK_BUILD_PRESETS.find(
+                  (p) =>
+                    p.platform === r.platform &&
+                    p.configuration === r.configuration &&
+                    p.mode === "App",
+                )!.id,
+              })),
+          )
+        : [],
+      apkError: catalog ? null : "BUILD_RESULT_UNAVAILABLE",
+      ipas: catalog
+        ? catalog.flatMap((r) =>
+            r.packages
+              .filter((f) => f.kind === "ipa")
+              .map((f) => ({
+                ...f,
+                kind: "ipa" as const,
+                modifiedAt: r.modifiedAt!,
+                preset: QUICK_BUILD_PRESETS.find(
+                  (p) =>
+                    p.platform === r.platform &&
+                    p.configuration === r.configuration &&
+                    p.mode === "App",
+                )!.id,
+              })),
+          )
+        : [],
+      ipaError: catalog ? null : "BUILD_RESULT_UNAVAILABLE",
+      zip: null,
+      zipError: null,
+      artifacts: catalog ?? [],
+      artifactError: catalog ? null : "BUILD_RESULT_UNAVAILABLE",
     };
   }
 
@@ -416,14 +607,23 @@ export class JenkinsBuildService {
     return value;
   }
 
-  private buildLog(build: JenkinsBuildRecord, signal: AbortSignal): Promise<ParsedBuildLog> {
-    const previous = this.logCache.get(build.number);
+  private buildLog(
+    build: JenkinsBuildRecord,
+    signal: AbortSignal,
+    jobPath = JOB_PATH,
+  ): Promise<ParsedBuildLog> {
+    const cacheNumber = `${jobPath}${build.number}`;
+    const previous = this.logCache.get(cacheNumber);
     if (previous && previous.until > Date.now()) return previous.value;
     const value = (async () => {
-      const response = await this.request(
-        `${this.config.jobPath}${build.number}/timestamps/?elapsed=HH:mm:ss.SSS&appendLog`,
+      let response = await this.request(
+        `${jobPath}${build.number}/timestamps/?elapsed=HH:mm:ss.SSS&appendLog`,
         { signal },
       );
+      if (response.status === 404) {
+        await response.body?.cancel();
+        response = await this.request(`${jobPath}${build.number}/consoleText`, { signal });
+      }
       if (!response.ok) {
         await response.body?.cancel();
         throw new PackagingError("PACKAGING_LOG_UNAVAILABLE");
@@ -448,12 +648,12 @@ export class JenkinsBuildService {
         reader.releaseLock();
       }
     })();
-    this.logCache.set(build.number, {
+    this.logCache.set(cacheNumber, {
       until: Date.now() + (build.building ? 4_000 : 86_400_000),
       value,
     });
     void value.catch(() => {
-      this.logCache.delete(build.number);
+      this.logCache.delete(cacheNumber);
     });
     while (this.logCache.size > 80) this.logCache.delete(this.logCache.keys().next().value!);
     return value;
@@ -462,26 +662,21 @@ export class JenkinsBuildService {
   private async readProgress(
     queueIds: number[],
     buildNumbers: number[],
+    legacy = false,
   ): Promise<PackagingProgress> {
+    const jobPath = legacy ? LEGACY_JOB_PATH : JOB_PATH;
     const signal = AbortSignal.timeout(18_000);
-    const job = await this.job(signal, true);
-    const builds = job.builds.filter(
-      (build) =>
-        buildNumbers.includes(build.number) ||
-        (build.queueId !== undefined && queueIds.includes(build.queueId)),
-    );
+    const job = await this.job(signal, true, jobPath);
+    const builds = [...job.builds];
     const queues: PackagingProgress["queues"] = [];
     const buildTree =
       "number,timestamp,duration,estimatedDuration,queueId,builtOn,building,result,actions[causes[userName],parameters[name,value]]";
     const loadBuild = async (number: number) => {
       if (builds.some((b) => b.number === number)) return;
       const build = await this.readJson<JenkinsBuildRecord>(
-        await this.request(
-          `${this.config.jobPath}${number}/api/json?tree=${encodeURIComponent(buildTree)}`,
-          {
-            signal,
-          },
-        ),
+        await this.request(`${jobPath}${number}/api/json?tree=${encodeURIComponent(buildTree)}`, {
+          signal,
+        }),
       );
       if (build.number !== number || !Number.isFinite(build.timestamp))
         throw new PackagingError("PACKAGING_INVALID_RESPONSE");
@@ -510,8 +705,7 @@ export class JenkinsBuildService {
           }>(response);
           if (
             item.id !== id ||
-            decodeURI(item.task?.url ?? "") !==
-              decodeURI(`${this.config.origin}${this.config.jobPath}`)
+            decodeURI(item.task?.url ?? "") !== decodeURI(`${JENKINS_ORIGIN}${jobPath}`)
           )
             throw new Error("Unrelated queue item");
           if (item.cancelled)
@@ -533,6 +727,10 @@ export class JenkinsBuildService {
         }
       }),
     );
+    // Compatibility checks have their own progress; they are not package builds
+    // and must not enter duration baselines or build-completion notifications.
+    for (let i = builds.length - 1; i >= 0; i--)
+      if (isCompatibilityBuild(builds[i]!.actions)) builds.splice(i, 1);
     const descriptions: ReturnType<typeof describeBuild>[] = [];
     let index = 0;
     // Cap concurrent console reads so inspecting history does not flood Jenkins.
@@ -541,15 +739,61 @@ export class JenkinsBuildService {
         while (index < builds.length) {
           const build = builds[index++]!;
           try {
-            descriptions.push({
-              ...describeBuild(
-                build,
-                await this.buildLog(build, signal),
-                Date.now(),
-                this.observedStages,
-              ),
-              preset: this.configuredPreset(build.actions),
-            });
+            const parentLog = await this.buildLog(build, signal, jobPath);
+            let parsed = parentLog;
+            if (!legacy && parentLog.downstream) {
+              const link = parentLog.downstream;
+              const childPath = `/job/${encodeURIComponent(link.job)}/`;
+              try {
+                const child = await this.readJson<JenkinsBuildRecord>(
+                  await this.request(
+                    `${childPath}${link.number}/api/json?tree=${encodeURIComponent(buildTree.replace("causes[userName]", "causes[userName,upstreamProject,upstreamBuild]"))}`,
+                    { signal },
+                  ),
+                );
+                if (
+                  child.number !== link.number ||
+                  !child.actions?.some((a) =>
+                    a.causes?.some(
+                      (c) =>
+                        c.upstreamProject === QUICK_JOB_NAME && c.upstreamBuild === build.number,
+                    ),
+                  )
+                )
+                  throw new Error("BUILD_IDENTITY_MISMATCH");
+                parsed = structuredClone(await this.buildLog(child, signal, childPath));
+                const offset = Math.max(0, child.timestamp - build.timestamp);
+                for (const stage of Object.keys(
+                  parsed.markers,
+                ) as (keyof ParsedBuildLog["markers"])[])
+                  if (parsed.markers[stage] !== null && parsed.markers[stage] !== undefined)
+                    parsed.markers[stage]! += offset;
+                if (parsed.lockWait) {
+                  if (parsed.lockWait.start !== null) parsed.lockWait.start += offset;
+                  if (parsed.lockWait.end !== null) parsed.lockWait.end += offset;
+                }
+                if (parentLog.markers.finalize !== undefined)
+                  parsed.markers.finalize = parentLog.markers.finalize;
+              } catch {
+                /* Keep visible parent progress if its downstream log cannot currently be read. */
+              }
+            }
+            const description = describeBuild(build, parsed, Date.now(), this.observedStages);
+            if (!legacy && parsed === parentLog && parentLog.downstream) {
+              const stage = description.stages.find((s) => s.id === "unity");
+              if (stage) {
+                stage.label = "执行打包";
+                stage.work = "等待底层构建完成，正在同步详细阶段";
+              }
+            }
+            if (quickBuildPreset(description.preset)?.platform === "iOS") {
+              const compile = description.stages.find((s) => s.id === "apk");
+              if (compile) {
+                compile.label = "编译 IPA";
+                compile.work = "Xcode 编译、签名并导出 IPA";
+              }
+            }
+            descriptions.push(description);
           } catch {
             descriptions.push({
               ...describeBuild(build, parseBuildLog(""), Date.now(), this.observedStages, true),
@@ -568,11 +812,15 @@ export class JenkinsBuildService {
     };
   }
 
-  progress(queueIds: number[] = [], buildNumbers: number[] = []): Promise<PackagingProgress> {
-    const key = `${[...queueIds].sort((a, b) => a - b)}:${[...buildNumbers].sort((a, b) => a - b)}`;
+  progress(
+    queueIds: number[] = [],
+    buildNumbers: number[] = [],
+    legacy = false,
+  ): Promise<PackagingProgress> {
+    const key = `${legacy}:${[...queueIds].sort((a, b) => a - b)}:${[...buildNumbers].sort((a, b) => a - b)}`;
     const previous = this.progressCache.get(key);
     if (previous && previous.until > Date.now()) return previous.value;
-    const value = this.readProgress(queueIds, buildNumbers);
+    const value = this.readProgress(queueIds, buildNumbers, legacy);
     this.progressCache.set(key, { until: Date.now() + 5_000, value });
     void value.catch(() => {
       this.progressCache.delete(key);
@@ -583,9 +831,65 @@ export class JenkinsBuildService {
       this.progressCache.delete(this.progressCache.keys().next().value!);
     return value;
   }
+
+  async buildResult(number: number, presetId: QuickBuildPresetId): Promise<BuildResult> {
+    const preset = quickBuildPreset(presetId);
+    if (!preset || !Number.isSafeInteger(number) || number < 1)
+      throw new PackagingError("INVALID_REQUEST", 400);
+    const parent = await this.readJson<JenkinsBuildRecord>(
+      await this.request(`${JOB_PATH}${number}/api/json?depth=2`),
+    );
+    if (
+      parent.number !== number ||
+      parent.building ||
+      parent.result !== "SUCCESS" ||
+      presetForParameters(parent.actions) !== presetId
+    )
+      throw new PackagingError("BUILD_IDENTITY_MISMATCH", 409);
+    const value = await this.readJson<unknown>(
+      await this.request(`${JOB_PATH}${number}/artifact/build-result.json`),
+    );
+    const result = validateBuildResult(value, preset, true);
+    if (
+      preset.mode === "App" &&
+      (result.hotUpdateMode !== "full" ||
+        result.packages
+          .map((p) => p.kind)
+          .sort()
+          .join(",") !==
+          (preset.platform === "iOS"
+            ? "ipa"
+            : preset.configuration === "Release"
+              ? "aab,apk"
+              : "apk"))
+    )
+      throw new PackagingError("BUILD_ARTIFACT_MISMATCH", 409);
+    const child = await this.readJson<{
+      number: number;
+      building: boolean;
+      result: string;
+      actions?: { causes?: { upstreamProject?: string; upstreamBuild?: number }[] }[];
+    }>(
+      await this.request(
+        `/job/${encodeURIComponent(preset.childJob)}/${result.childBuildNumber}/api/json?tree=number,building,result,actions[causes[upstreamProject,upstreamBuild]]`,
+      ),
+    );
+    if (
+      child.number !== result.childBuildNumber ||
+      child.building ||
+      child.result !== "SUCCESS" ||
+      !child.actions?.some((a) =>
+        a.causes?.some((c) => c.upstreamProject === QUICK_JOB_NAME && c.upstreamBuild === number),
+      )
+    )
+      throw new PackagingError("BUILD_IDENTITY_MISMATCH", 409);
+    return result;
+  }
 }
 
 export interface PackagingStatus {
+  artifacts?: BuildResult[];
+  artifactError?: string | null;
   checkedAt: string;
   jenkins: {
     buildable: boolean;
@@ -646,7 +950,7 @@ export function registerPackagingRoutes(
         !body ||
         Object.keys(body).length !== 1 ||
         typeof preset !== "string" ||
-        !(BUILD_PRESETS as readonly string[]).includes(preset) ||
+        (!BUILD_PRESETS.includes(preset as QuickBuildPresetId) && preset !== "external") ||
         typeof key !== "string" ||
         !/^[a-zA-Z0-9-]{16,80}$/u.test(key)
       ) {
