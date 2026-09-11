@@ -26,7 +26,7 @@ import { moveFileWriteThrough } from "./windows-write-through.mjs";
 
 const SHA256 = /^[0-9a-f]{64}$/u;
 const RELEASE_ID = /^\d{8}T\d{9}Z$/u;
-const VERSION = /^0\.2\.0-preview\.[1-9]\d*$/u;
+const VERSION = /^0\.2\.0-(?:preview|lan)\.[1-9]\d*$/u;
 const ED25519_SIGNATURE = /^[A-Za-z0-9+/]{86}==$/u;
 const MAX_INSTALLER_BYTES = 350 * 1024 * 1024;
 

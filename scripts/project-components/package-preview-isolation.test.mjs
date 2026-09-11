@@ -896,6 +896,21 @@ test("signed update manifest rejects field, archive, and signature drift", () =>
   };
   const publicKey = pair.publicKey.export({ type: "spki", format: "pem" });
   assert.equal(assertSignedUpdateManifest(manifest, publicKey), manifest);
+  const lanPayload = {
+    ...payload,
+    version: "0.2.0-lan.18",
+    archive: {
+      ...payload.archive,
+      url: "/downloads/qa-hub-lan-unit-windows-0.2.0-lan.18-20260911T123456789Z.exe",
+    },
+  };
+  const lanManifest = {
+    ...lanPayload,
+    signature: sign(null, serializeUpdateManifestPayload(lanPayload), pair.privateKey).toString(
+      "base64",
+    ),
+  };
+  assert.equal(assertSignedUpdateManifest(lanManifest, publicKey), lanManifest);
   assert.throws(
     () => assertSignedUpdateManifest({ ...manifest, releaseId: "20260911T123456788Z" }, publicKey),
     /UPDATE_MANIFEST_SIGNATURE_INVALID/u,
