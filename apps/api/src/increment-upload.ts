@@ -50,6 +50,7 @@ type WorkerHost = Pick<
   | "resume"
   | "confirmPublish"
   | "folder"
+  | "reconcilePublications"
 >;
 interface Options {
   root: string;
@@ -576,6 +577,9 @@ export class IncrementUploadService {
       const owners = [...new Set(rows.map((c) => c.owner))];
       const snapshots = new Map<string, UploaderSnapshot>();
       for (const owner of owners) {
+        // The platform may have been published manually after our worker stopped
+        // at status 60. Verify that original publication before reserving lanes.
+        await this.host(owner).reconcilePublications();
         const s = await this.host(owner).snapshot();
         if (s.unreadableJobs) throw new Error("LOCAL_STATE_INVALID");
         snapshots.set(owner, s);

@@ -83,6 +83,7 @@ async function fixture(t) {
       login: async () => true,
       logout: async () => true,
       checkAuth: async () => true,
+      reconcilePublications: async () => {},
       accountIdentity: async () => `identity-${id}`,
       hasBuildJob: async (jobId) => jobs.some((j) => j.id === jobId),
       startWithId: start,
@@ -288,6 +289,35 @@ test("unfinished failed task blocks its channel but not other products", async (
   await f.service.tick();
   assert.equal(f.launches[1].id, c);
   assert.equal((await f.service.snapshot(f.other)).jobs.find((j) => j.id === b).status, "queued");
+});
+
+test("reconciling a manual publication releases the original queued build without a publish write", async (t) => {
+  const f = await fixture(t),
+    original = randomUUID(),
+    queued = randomUUID();
+  await f.service.enqueue(f.owner, original, input);
+  await f.service.tick();
+  const host = f.hosts.get(f.owner);
+  Object.assign(host.jobs[0], { active: false, status: "awaiting_publish", remoteStatus: 60 });
+  await f.service.enqueue(f.other, queued, input, "build");
+  await f.service.tick();
+  assert.equal(f.builds.length, 0);
+  assert.equal(
+    (await f.service.buildChains(f.other)).find((c) => c.id === queued).errorCode,
+    "UPLOAD_CHANNEL_HELD",
+  );
+  host.reconcilePublications = async () => {
+    Object.assign(host.jobs[0], { status: "succeeded", published: true, remoteStatus: 100 });
+  };
+  await f.service.tick();
+  assert.equal(f.launches.length, 1, "No upload/recovery/confirmation was launched");
+  assert.equal(f.builds.length, 1);
+  const chain = (await f.service.buildChains(f.other)).find((c) => c.id === queued);
+  assert.equal(chain.status, "building");
+  assert.equal(chain.queueId, 760);
+  await f.restart();
+  await f.service.tick();
+  assert.equal(f.builds.length, 1, "Restart cannot resubmit the released build");
 });
 test("restart retains active and failed checkpoints without replaying writes", async (t) => {
   const f = await fixture(t),

@@ -278,6 +278,160 @@ test("restart reads progress from disk, and only a verified published state is s
   assert.equal(job.published, true);
   assert.equal(job.status, "succeeded");
 });
+
+test("manual publication is reconciled by GET, survives restart and preserves worker evidence", async (t) => {
+  const calls: string[] = [];
+  const detail = {
+    id: 849,
+    version: "2.5.1",
+    product_id: "2002",
+    channel_id: "1002",
+    status: 100,
+    url: "release/dir/original-zip/",
+    publish_time: "2026-09-11 01:43:06",
+  };
+  const { host, options } = await fixture(t, async (url, init) => {
+    assert.equal(init?.method, "GET");
+    assert.equal(
+      String(url),
+      "https://fq2ivi.ipwana.com/api/v1/developapi/versions/detail?vid=849",
+    );
+    calls.push(String(url));
+    return Response.json({ code: 0, data: detail });
+  });
+  await writeJson(options.authFile, { accessToken: "fixture-token", account: "fixture" });
+  const state = {
+    stage: "AWAITING_PUBLISH_CONFIRMATION",
+    runStatus: "WAITING",
+    finalRemoteStatus: 60,
+    version: "2.5.1",
+    versionId: 849,
+    objectKey: "test/pkg/original-zip.zip",
+    done: ["OBJECT_READY", "PREPARE_PUBLISH"],
+    pendingAction: null,
+  };
+  const { folder } = await seed(options, state);
+  await writeJson(path.join(folder, "job.json"), { ...input, mode: "prepare_publish" });
+  await writeJson(path.join(folder, "result.json"), state);
+  const original = await Promise.all(
+    ["state.json", "result.json", "job.json"].map((f) => readFile(path.join(folder, f))),
+  );
+  assert.equal((await host.snapshot()).jobs[0]?.status, "awaiting_publish");
+  await host.reconcilePublications();
+  await host.reconcilePublications();
+  assert.equal(calls.length, 1);
+  const job = (await new UploaderHost(options).snapshot()).jobs[0]!;
+  assert.equal(job.status, "succeeded");
+  assert.equal(job.published, true);
+  assert.equal(job.remoteStatus, 100);
+  assert.equal(job.publishTime, detail.publish_time);
+  assert.equal(job.errorCode, "REMOTE_PUBLISHED_RECONCILED");
+  assert.deepEqual(
+    await Promise.all(
+      ["state.json", "result.json", "job.json"].map((f) => readFile(path.join(folder, f))),
+    ),
+    original,
+  );
+  const proof = await readJson(path.join(folder, "publication-reconciliation.json"));
+  assert.equal(proof?.["writesIssued"], false);
+  assert.ok(!JSON.stringify(proof).includes("fixture-token"));
+  await writeJson(path.join(folder, "state.json"), { ...state, objectKey: "test/pkg/other.zip" });
+  assert.equal(
+    (await new UploaderHost(options).snapshot()).jobs[0]?.status,
+    "awaiting_publish",
+    "Changed checkpoint invalidates old proof",
+  );
+});
+
+test("publication reconciliation retains reservations for unready, mismatched or unreachable results", async (t) => {
+  const correct = {
+    id: 849,
+    version: "2.5.1",
+    product_id: "2002",
+    channel_id: "1002",
+    status: 100,
+    url: "release/dir/original-zip/",
+    publish_time: "2026-09-11 01:43:06",
+  };
+  for (const change of [
+    { status: 60 },
+    { id: 850 },
+    { version: "2.5.2" },
+    { product_id: "2001" },
+    { channel_id: "2004" },
+    { url: "release/dir/other-zip/" },
+    { publish_time: "0000-00-00 00:00:00" },
+    { publish_time: "" },
+    { httpError: true },
+  ]) {
+    await t.test(JSON.stringify(change), async (sub) => {
+      const { host, options } = await fixture(sub, async (_url, init) => {
+        assert.equal(init?.method, "GET");
+        return "httpError" in change
+          ? new Response(null, { status: 503 })
+          : Response.json({ code: 0, data: { ...correct, ...change } });
+      });
+      await writeJson(options.authFile, { accessToken: "fixture-token" });
+      const { folder } = await seed(options, {
+        stage: "AWAITING_PUBLISH_CONFIRMATION",
+        runStatus: "WAITING",
+        finalRemoteStatus: 60,
+        version: "2.5.1",
+        versionId: 849,
+        objectKey: "test/pkg/original-zip.zip",
+        done: ["OBJECT_READY", "PREPARE_PUBLISH"],
+        pendingAction: null,
+      });
+      await writeJson(path.join(folder, "job.json"), { ...input, mode: "prepare_publish" });
+      await host.reconcilePublications();
+      assert.equal((await host.snapshot()).jobs[0]?.status, "awaiting_publish");
+      assert.equal(await readJson(path.join(folder, "publication-reconciliation.json")), null);
+    });
+  }
+});
+
+test("reconciliation cannot certify a run changed during the remote GET or an active worker", async (t) => {
+  let folder = "",
+    calls = 0;
+  const state = {
+    stage: "AWAITING_PUBLISH_CONFIRMATION",
+    runStatus: "WAITING",
+    finalRemoteStatus: 60,
+    version: "2.5.1",
+    versionId: 849,
+    objectKey: "test/pkg/original-zip.zip",
+    done: ["OBJECT_READY", "PREPARE_PUBLISH"],
+  };
+  const { host, options } = await fixture(t, async () => {
+    calls++;
+    await writeJson(path.join(folder, "state.json"), {
+      ...state,
+      objectKey: "test/pkg/changed.zip",
+    });
+    return Response.json({
+      code: 0,
+      data: {
+        id: 849,
+        version: "2.5.1",
+        product_id: "2002",
+        channel_id: "1002",
+        status: 100,
+        url: "release/dir/original-zip/",
+        publish_time: "2026-09-11 01:43:06",
+      },
+    });
+  });
+  await writeJson(options.authFile, { accessToken: "fixture-token" });
+  const seeded = await seed(options, state, "", true);
+  folder = seeded.folder;
+  await writeJson(path.join(folder, "job.json"), { ...input, mode: "prepare_publish" });
+  await host.reconcilePublications();
+  assert.equal(calls, 0);
+  await writeJson(path.join(folder, `run-${seeded.runId}.json`), { finished: true });
+  await new UploaderHost(options).reconcilePublications();
+  assert.equal(calls, 1);
+  assert.equal(await readJson(path.join(folder, "publication-reconciliation.json")), null);
+});
 test("live jobs prevent changing account and launching duplicate tasks; expired heartbeat is interrupted", async (t) => {
   const { host, options } = await fixture(t);
   const { folder, runId } = await seed(

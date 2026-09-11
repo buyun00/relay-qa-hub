@@ -16,6 +16,10 @@ import {
 } from "@relay-qa-hub/upload-contract";
 
 const messages: Record<string, string> = {
+  UPLOAD_CHANNEL_HELD:
+    "已提交，正在等待同产品、渠道的上一任务结束。服务端会自动核对瑞雪发布状态并继续，请勿重复提交。",
+  UPLOADER_MISSING: "服务端上传程序暂未就绪，请稍后重试。",
+  UPLOAD_QUEUE_BUSY: "服务端正在核对任务，请稍后重试。",
   BUILD_PROJECT_PATH_INVALID: "打包机的 Unity 项目路径配置无效，构建未完成，没有上传。",
   BUILD_ARTIFACT_MISMATCH: "本次构建的版本、平台、产品渠道或 ZIP 哈希不一致，已停止上传。",
   BUILD_RESULT_UNAVAILABLE: "正在等待本次构建的产物核验结果，不会改取其他构建的 ZIP。",
@@ -80,6 +84,9 @@ export default function BuildUploadControls({
   const trigger = useRef<HTMLButtonElement>(null);
   const [input, setInput] = useState<UploadInput>(() => uploadDraftDefaults(null));
   const [snapshot, setSnapshot] = useState<UploaderSnapshot | null>(null);
+  const [checkingUpload, setCheckingUpload] = useState(false);
+  const snapshotRequest = useRef(0);
+  const [notice, setNotice] = useState("");
   const [chains, setChains] = useState<BuildUploadChain[]>([]);
   const [error, setError] = useState("");
   const refresh = useCallback(async () => {
@@ -122,6 +129,8 @@ export default function BuildUploadControls({
     setError("");
     setPreset(selected);
     setSnapshot(null);
+    setCheckingUpload(true);
+    const revision = ++snapshotRequest.current;
     try {
       setInput(
         quickUploadInput(
@@ -138,15 +147,29 @@ export default function BuildUploadControls({
     if (bridge) {
       try {
         const result = await bridge.snapshot();
+        if (revision !== snapshotRequest.current) return;
         if (result.ok) setSnapshot(result.value);
         else setError(result.code);
       } catch {
-        setError("UPLOADER_FAILED");
+        if (revision === snapshotRequest.current) setError("UPLOADER_FAILED");
+      } finally {
+        if (revision === snapshotRequest.current) setCheckingUpload(false);
       }
     }
   };
   const combined = async () => {
     if (!bridge?.buildAndUpload || busyRef.current) return;
+    const existing = chains.find(
+      (chain) =>
+        chain.canManage !== false &&
+        chain.preset === preset &&
+        !["failed", "cancelled", "upload_started"].includes(chain.status),
+    );
+    if (existing) {
+      setNotice(`该打包上传任务已经提交（${existing.id.slice(0, 8)}），请查看下方进度。`);
+      setOpen(false);
+      return;
+    }
     busyRef.current = true;
     setBusy(true);
     setError("");
@@ -161,6 +184,7 @@ export default function BuildUploadControls({
         return;
       }
       setOpen(false);
+      setNotice(`打包并上传任务已提交（${result.value.id.slice(0, 8)}），服务端正在排队处理。`);
       setChains((current) => [result.value, ...current.filter((c) => c.id !== result.value.id)]);
       if (result.value.queueId) onSubmitted(result.value.queueId);
       await refresh();
@@ -259,9 +283,18 @@ export default function BuildUploadControls({
           <small>
             更新说明只写版本号。服务端在打包成功后自动上传，退出客户端或关闭电脑不影响执行。
           </small>
-          {!bridge?.buildAndUpload ? (
+          {error ? (
+            <p className="banner error-banner" role="alert">
+              {buildUploadError(error)}
+            </p>
+          ) : null}
+          {checkingUpload ? (
+            <p role="status">正在检查上传账号与服务状态…</p>
+          ) : !bridge?.buildAndUpload ? (
             <p>服务端上传暂时不可用。</p>
-          ) : !snapshot?.configured ? (
+          ) : snapshot && !snapshot.available ? (
+            <p>{buildUploadError("UPLOADER_MISSING")}</p>
+          ) : snapshot && !snapshot.configured ? (
             <p>请先登录上传平台账号。</p>
           ) : null}
           {onOpenUpload ? (
@@ -283,6 +316,11 @@ export default function BuildUploadControls({
   );
   return (
     <div className="package-quick-controls" ref={root}>
+      {notice ? (
+        <p className="banner pending-banner" role="status">
+          {notice}
+        </p>
+      ) : null}
       <div className="package-check-toolbar">
         <span>按对应安装包与最新代码判断 · 每次进入自动刷新</span>
         {onRefreshChecks ? (
@@ -332,6 +370,12 @@ export default function BuildUploadControls({
       {latest ? (
         <div className="package-upload-chain" role="status">
           <strong>{labels[latest.status]}</strong>
+          {chains.filter((chain) => chain.status === "queued").length > 0 ? (
+            <span>
+              服务端共有 {chains.filter((chain) => chain.status === "queued").length}{" "}
+              条打包上传任务排队，尚未提交 Jenkins 的任务会自动继续。
+            </span>
+          ) : null}
           <span>
             {latest.buildNumber
               ? `构建 #${latest.buildNumber}`
@@ -356,7 +400,7 @@ export default function BuildUploadControls({
           ) : null}
         </div>
       ) : null}
-      {error ? (
+      {error && !open ? (
         <p className="banner error-banner" role="alert">
           {buildUploadError(error)}
         </p>

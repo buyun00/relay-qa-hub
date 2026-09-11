@@ -4,6 +4,11 @@ import path from "node:path";
 import { spawn } from "node:child_process";
 import { DEFAULT_UPLOAD_PARAMETERS } from "./uploader-types.js";
 import { resolveUploadBuild } from "./upload-source.js";
+import {
+  awaitingPublication,
+  publicationDigest,
+  verifiedPublication,
+} from "./publication-reconciliation.js";
 import type {
   UploadEvent,
   UploadInput,
@@ -170,6 +175,7 @@ export interface HostOptions {
 }
 export class UploaderHost {
   private mutating = false;
+  private nextPublicationCheck = 0;
   constructor(private readonly options: HostOptions) {}
   private async exclusive<T>(action: () => Promise<T>): Promise<T> {
     if (this.mutating) throw new Error("UPLOADER_BUSY");
@@ -201,7 +207,7 @@ export class UploaderHost {
     if (!meta) throw new Error("JOB_NOT_FOUND");
     const config = await readJson(path.join(directory, "job.json"));
     let input = parseUploadInput({ ...config, version: config?.["version"] ?? "" });
-    const state = (await readJson(path.join(directory, "state.json"))) ?? {};
+    let state = (await readJson(path.join(directory, "state.json"))) ?? {};
     if (config?.["useVersionText"] === true && state["version"])
       input = {
         ...input,
@@ -218,9 +224,33 @@ export class UploaderHost {
       ((running(receipt?.["pid"] ?? meta["pid"]) &&
         Date.now() - (Number.isFinite(heartbeat) ? heartbeat : started) < 20000) ||
         (!receipt && Date.now() - started < 15000));
+    let reconciled = false;
+    if (!active && config && awaitingPublication(config, state)) {
+      const proof = await readJson(path.join(directory, "publication-reconciliation.json"));
+      if (
+        proof?.["schemaVersion"] === 1 &&
+        proof["writesIssued"] === false &&
+        proof["stateDigest"] === publicationDigest(meta, config, state)
+      ) {
+        const publication = verifiedPublication(config, state, record(proof["detail"]));
+        if (publication) {
+          state = {
+            ...state,
+            stage: "PUBLISHED",
+            runStatus: "SUCCEEDED",
+            finalRemoteStatus: 100,
+            publishTime: publication.publishTime,
+            releaseDir: publication.releaseDir,
+            done: [...(state["done"] as string[]), "WAIT_PUBLISHED"],
+          };
+          reconciled = true;
+        }
+      }
+    }
     const events = parseUploadEvents(await tail(path.join(directory, `run-${runId}.jsonl`)));
-    const errorCode =
-      [...events].reverse().find((e) => e.code)?.code ?? str(receipt?.["errorCode"]);
+    const errorCode = reconciled
+      ? "REMOTE_PUBLISHED_RECONCILED"
+      : ([...events].reverse().find((e) => e.code)?.code ?? str(receipt?.["errorCode"]));
     const stage = str(state["stage"], 80) || "NEW";
     const done = Array.isArray(state["done"])
       ? state["done"].filter((v): v is string => typeof v === "string").slice(0, 80)
@@ -317,6 +347,76 @@ export class UploaderHost {
       unreadableJobs,
     };
   }
+  async reconcilePublications(): Promise<void> {
+    if (this.mutating || Date.now() < this.nextPublicationCheck) return;
+    this.nextPublicationCheck = Date.now() + 30_000;
+    const snapshot = await this.snapshot();
+    if (snapshot.unreadableJobs || snapshot.jobs.some((job) => job.active)) return;
+    const waiting = snapshot.jobs.filter((job) => job.status === "awaiting_publish");
+    if (!waiting.length) return;
+    let renewed = false;
+    for (const job of waiting) {
+      const reconcile = () =>
+        this.exclusive(async () => {
+          if ((await this.job(job.id)).status !== "awaiting_publish") return;
+          const directory = this.folder(job.id);
+          const [meta, config, state, auth] = await Promise.all([
+            readJson(path.join(directory, "desktop.json")),
+            readJson(path.join(directory, "job.json")),
+            readJson(path.join(directory, "state.json")),
+            readJson(this.options.authFile),
+          ]);
+          if (!meta || !config || !state || !awaitingPublication(config, state)) return;
+          if (!auth?.["accessToken"]) throw new Error("AUTH_REQUIRED");
+          const digest = publicationDigest(meta, config, state);
+          const detail = await this.request(
+            API_BASE,
+            `/api/v1/developapi/versions/detail?vid=${num(state["versionId"])}`,
+            null,
+            str(auth["accessToken"], 20000),
+            12_000,
+          );
+          if (!verifiedPublication(config, state, detail)) return;
+          const current = await Promise.all([
+            readJson(path.join(directory, "desktop.json")),
+            readJson(path.join(directory, "job.json")),
+            readJson(path.join(directory, "state.json")),
+          ]);
+          if (
+            publicationDigest(...current) !== digest ||
+            (await this.job(job.id)).status !== "awaiting_publish"
+          )
+            return;
+          // Preserve worker checkpoints/results byte-for-byte. The projection only
+          // accepts this receipt while the original run/config/state still match.
+          await writeJson(path.join(directory, "publication-reconciliation.json"), {
+            schemaVersion: 1,
+            stateDigest: digest,
+            checkedAt: new Date().toISOString(),
+            writesIssued: false,
+            detail: Object.fromEntries(
+              ["id", "version", "product_id", "channel_id", "status", "url", "publish_time"].map(
+                (key) => [key, detail[key]],
+              ),
+            ),
+          });
+        });
+      try {
+        await reconcile();
+      } catch (error) {
+        if (!renewed && error instanceof Error && error.message === "AUTH_REQUIRED") {
+          renewed = true;
+          try {
+            await this.checkAuth();
+            await reconcile();
+          } catch {
+            /* Keep the reservation when identity or remote state is uncertain. */
+          }
+        }
+        // Remote outages and mismatches cannot release a reservation or replay a write.
+      }
+    }
+  }
   private async idle(prelaunchId?: string): Promise<void> {
     const snapshot = await this.snapshot();
     if (snapshot.jobs.some((job) => job.active)) throw new Error("UPLOADER_BUSY");
@@ -335,13 +435,14 @@ export class UploaderHost {
     route: string,
     body: unknown,
     authorization = "",
+    timeoutMs = 90000,
   ): Promise<RecordValue> {
     let response: Response;
     try {
       response = await (this.options.fetch ?? fetch)(`${origin}${route}`, {
         method: body === null ? "GET" : "POST",
         redirect: "error",
-        signal: AbortSignal.timeout(90000),
+        signal: AbortSignal.timeout(timeoutMs),
         headers: {
           Accept: "application/json",
           "ruixue-language": "zh",

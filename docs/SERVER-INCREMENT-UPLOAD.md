@@ -107,6 +107,19 @@ match. A mismatched or missing receipt never falls back to another build's lates
 Old chains without a preset retain their legacy Android progress/source rules.
 Cancelling handoff preserves Jenkins work; unknown submissions are not blindly retried.
 
+If a `prepare_publish` worker stopped at status 60 and somebody later published the
+version in RuiXue, the scheduler checks the exact version detail through GET before
+reserving its channel. Checks are throttled to 30 seconds per owner. Status 100,
+version ID/text, product/channel, the original uploaded object's release directory
+and a valid publication time must all match. An expired session can be renewed
+through the existing auth check; unknown results retain the reservation.
+
+The server stores a `publication-reconciliation.json` receipt bound to the original
+run metadata, config and checkpoint digest. It leaves worker state, results, ZIPs
+and logs intact. The snapshot projects only matching receipts as published; a new
+run or changed checkpoint invalidates the receipt. This issues no publication write
+and automatically releases already-published channels for existing queued work.
+
 ## API and diagnostics
 
 Prefix: `/api/v1/increment-upload`. All routes require existing QA Hub authentication
