@@ -1,0 +1,46 @@
+{
+  "schemaVersion": 1,
+  "ready": true,
+  "readyAt": "2026-09-11T00:10:02.9271185Z",
+  "observerPid": 8420,
+  "observerSessionId": 2,
+  "appPid": 10688,
+  "appSessionId": 2,
+  "activeConsoleSessionId": 1,
+  "wtsSessions": [
+    {
+      "sessionId": 0,
+      "stationName": "Services",
+      "state": 4
+    },
+    {
+      "sessionId": 1,
+      "stationName": "Console",
+      "state": 1
+    },
+    {
+      "sessionId": 2,
+      "stationName": "RDP-Tcp#0",
+      "state": 0
+    },
+    {
+      "sessionId": 65536,
+      "stationName": "RDP-Tcp",
+      "state": 6
+    }
+  ],
+  "explorer": [
+    {
+      "pid": 12460,
+      "sessionId": 2,
+      "name": "explorer.exe"
+    }
+  ],
+  "shellExperienceHost": [
+    {
+      "pid": 9176,
+      "sessionId": 2,
+      "name": "ShellExperienceHost.exe"
+    }
+  ]
+}

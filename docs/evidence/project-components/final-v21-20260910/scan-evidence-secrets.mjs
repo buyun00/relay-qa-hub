@@ -5,7 +5,7 @@ import { lstat, readFile, readdir, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-const productSourceCommit = "c4e2eb7d9341a16d2430df9073a93f44f381dd2b";
+const productSourceCommit = "fd0f0f850f907b8a77aac8ec8b6a71b308bdd711";
 const defaultInstancePath =
   "C:/Users/lin0/.codex/parallel-runtimes/qa-hub-preview-v21-e2e-fresh-0910/instance.json";
 const expectedInstanceSha256 = "cf92bad26060bbcddcfc37d620320e8bac15e09104088944e456a3b9205257db";
@@ -184,20 +184,36 @@ function collectSemanticProofDependencies(value, propertyName = null) {
       "semanticProof must use the canonical notification runner path",
     );
     const proofRoot = path.posix.dirname(value);
+    const blockedProof =
+      value ===
+      "../desktop-notification-project-route-live/81c44b26-5c6f-47c6-a56a-d4eb27f19d7a/proof.json";
+    const rawNames = blockedProof
+      ? [
+          "host-before.json",
+          "host-after.json",
+          "session-preflight-native-submit.json",
+          "session-preflight-native-close.json",
+          "session-preflight-toast-ready.json",
+          "session-preflight-wpn-boundary.json",
+          "session-preflight-wpn-events.json",
+          "session-preflight-wpn-query-002.json",
+          "session-preflight-wpn-correlation.json",
+        ]
+      : [
+          "a1-toast-observed.json",
+          "a1-toast-invoked.json",
+          "a1-routed-renderer.json",
+          "a2-toast-observed.json",
+          "a2-toast-invoked.json",
+          "a2-denied-renderer.json",
+          "b3-toast-observed.json",
+          "host-before.json",
+          "host-after-quit-probe.json",
+          "host-after.json",
+        ];
     return [
       value,
-      ...[
-        "a1-toast-observed.json",
-        "a1-toast-invoked.json",
-        "a1-routed-renderer.json",
-        "a2-toast-observed.json",
-        "a2-toast-invoked.json",
-        "a2-denied-renderer.json",
-        "b3-toast-observed.json",
-        "host-before.json",
-        "host-after-quit-probe.json",
-        "host-after.json",
-      ].map((name) => `${proofRoot}/raw/${name}`),
+      ...rawNames.map((name) => `${proofRoot}/raw/${name}`),
     ];
   }
   if (Array.isArray(value)) {

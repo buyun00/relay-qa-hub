@@ -1,0 +1,138 @@
+{
+  "boundary": {
+    "schemaVersion": 1,
+    "capturedAt": "2026-09-11T00:10:03.4918116Z",
+    "newestRecordId": 73495
+  },
+  "snapshot": {
+    "schemaVersion": 1,
+    "queriedAt": "2026-09-11T00:10:04.1940521Z",
+    "events": [
+      {
+        "eventId": 2418,
+        "recordId": 73497,
+        "timeCreated": "2026-09-11T00:10:03.5386782Z",
+        "providerProcessId": 7204,
+        "appUserModelId": "com.relayqahub.desktop.preview.v21.e2e.fresh.0910",
+        "notificationType": "toast",
+        "trackingId": "5747",
+        "sessionId": null,
+        "messageId": ""
+      },
+      {
+        "eventId": 3052,
+        "recordId": 73498,
+        "timeCreated": "2026-09-11T00:10:03.5401993Z",
+        "providerProcessId": 7204,
+        "appUserModelId": "com.relayqahub.desktop.preview.v21.e2e.fresh.0910",
+        "notificationType": "",
+        "trackingId": "5747",
+        "sessionId": 1,
+        "messageId": "{ec5a2173-30ee-480d-be6c-fc91fe2b985b}"
+      },
+      {
+        "eventId": 3153,
+        "recordId": 73499,
+        "timeCreated": "2026-09-11T00:10:03.5402673Z",
+        "providerProcessId": 7204,
+        "appUserModelId": "com.relayqahub.desktop.preview.v21.e2e.fresh.0910",
+        "notificationType": "",
+        "trackingId": "5747",
+        "sessionId": 1,
+        "messageId": "{ec5a2173-30ee-480d-be6c-fc91fe2b985b}"
+      }
+    ]
+  },
+  "correlation": {
+    "appUserModelId": "com.relayqahub.desktop.preview.v21.e2e.fresh.0910",
+    "trackingId": "5747",
+    "messageId": "{ec5a2173-30ee-480d-be6c-fc91fe2b985b}",
+    "destinationSessionId": 1,
+    "boundary": {
+      "capturedAt": "2026-09-11T00:10:03.4918116Z",
+      "newestRecordId": 73495
+    },
+    "queriedAt": "2026-09-11T00:10:04.1940521Z",
+    "events": [
+      {
+        "eventId": 2418,
+        "recordId": 73497,
+        "timeCreated": "2026-09-11T00:10:03.5386782Z",
+        "providerProcessId": 7204,
+        "appUserModelId": "com.relayqahub.desktop.preview.v21.e2e.fresh.0910",
+        "notificationType": "toast",
+        "trackingId": "5747",
+        "sessionId": null,
+        "messageId": ""
+      },
+      {
+        "eventId": 3052,
+        "recordId": 73498,
+        "timeCreated": "2026-09-11T00:10:03.5401993Z",
+        "providerProcessId": 7204,
+        "appUserModelId": "com.relayqahub.desktop.preview.v21.e2e.fresh.0910",
+        "notificationType": "",
+        "trackingId": "5747",
+        "sessionId": 1,
+        "messageId": "{ec5a2173-30ee-480d-be6c-fc91fe2b985b}"
+      },
+      {
+        "eventId": 3153,
+        "recordId": 73499,
+        "timeCreated": "2026-09-11T00:10:03.5402673Z",
+        "providerProcessId": 7204,
+        "appUserModelId": "com.relayqahub.desktop.preview.v21.e2e.fresh.0910",
+        "notificationType": "",
+        "trackingId": "5747",
+        "sessionId": 1,
+        "messageId": "{ec5a2173-30ee-480d-be6c-fc91fe2b985b}"
+      }
+    ]
+  },
+  "watcherReady": {
+    "schemaVersion": 1,
+    "ready": true,
+    "readyAt": "2026-09-11T00:10:02.9271185Z",
+    "observerPid": 8420,
+    "observerSessionId": 2,
+    "appPid": 10688,
+    "appSessionId": 2,
+    "activeConsoleSessionId": 1,
+    "wtsSessions": [
+      {
+        "sessionId": 0,
+        "stationName": "Services",
+        "state": 4
+      },
+      {
+        "sessionId": 1,
+        "stationName": "Console",
+        "state": 1
+      },
+      {
+        "sessionId": 2,
+        "stationName": "RDP-Tcp#0",
+        "state": 0
+      },
+      {
+        "sessionId": 65536,
+        "stationName": "RDP-Tcp",
+        "state": 6
+      }
+    ],
+    "explorer": [
+      {
+        "pid": 12460,
+        "sessionId": 2,
+        "name": "explorer.exe"
+      }
+    ],
+    "shellExperienceHost": [
+      {
+        "pid": 9176,
+        "sessionId": 2,
+        "name": "ShellExperienceHost.exe"
+      }
+    ]
+  }
+}

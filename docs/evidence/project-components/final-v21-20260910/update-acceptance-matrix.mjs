@@ -4,16 +4,16 @@ import { lstat, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-const productSourceCommit = "c4e2eb7d9341a16d2430df9073a93f44f381dd2b";
+const productSourceCommit = "fd0f0f850f907b8a77aac8ec8b6a71b308bdd711";
 const userLabel = "用户自测／已移交，代理未执行";
 const notificationTitle = "QA Hub · 这个单子已创建";
 const inaccessibleNotificationText =
   "通知所属项目当前不可访问，已保持当前项目并刷新项目列表。";
-const build17ExeSha256 = "58c21fdc87e3b5007df9d30e59a27df67e24516f7c74c61d7fb545d8c54d4f0f";
-const build17AsarSha256 = "ff3b49304c7f98ec754bd42ef9732cd6b58718002b3f4be8ae0ae506e69b7474";
-const build17ExePath =
+const build20ExeSha256 = "47e3d83120f29a6b2e0dc1fa54a2de6327c15c21620999b421b615a346e1fbac";
+const build20AsarSha256 = "beecc244ab14d52a4b05e3475926285fb8fed2769c17d18f5e34e970644bbf96";
+const build20ExePath =
   "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview-v21-e2e-fresh-0910\\RelayQaHubPreview-v21-e2e-fresh-0910.exe";
-const build17AsarPath =
+const build20AsarPath =
   "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview-v21-e2e-fresh-0910\\resources\\app.asar";
 const canonicalInstancePath =
   "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-v21-e2e-fresh-0910\\instance.json";
@@ -21,23 +21,57 @@ const canonicalPreviewConfigPath =
   "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview-v21-e2e-fresh-0910\\preview-instance.json";
 const canonicalSecretsPath =
   "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-v21-e2e-fresh-0910\\secrets.json";
+const canonicalPublicKeyPath =
+  "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-v21-e2e-fresh-0910\\desktop-signing\\public.pem";
+const build20ManifestPath =
+  "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-v21-e2e-fresh-0910\\downloads\\qa-hub-preview-v21-e2e-fresh-0910-windows-latest.json";
+const build20InstallerPath =
+  "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-v21-e2e-fresh-0910\\downloads\\qa-hub-preview-v21-e2e-fresh-0910-windows-0.2.0-preview.20-20260911T000006100Z.exe";
+const windowsPowerShellPath = "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe";
+const moveFileWriteThroughPath =
+  "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\scripts\\project-components\\move-file-write-through.ps1";
 const expectedInputFingerprints = [
   {
     path: canonicalInstancePath,
     bytes: 1327,
     sha256: "cf92bad26060bbcddcfc37d620320e8bac15e09104088944e456a3b9205257db",
   },
-  { path: build17ExePath, bytes: 235871744, sha256: build17ExeSha256 },
-  { path: build17AsarPath, bytes: 3442810, sha256: build17AsarSha256 },
+  { path: build20ExePath, bytes: 235871744, sha256: build20ExeSha256 },
+  { path: build20AsarPath, bytes: 1304284, sha256: build20AsarSha256 },
   {
     path: canonicalPreviewConfigPath,
     bytes: 742,
     sha256: "dbde6a7d32476ed526bce22af042fd5eab0e7abf1cd4b871513688edc534a71c",
   },
   {
+    path: canonicalPublicKeyPath,
+    bytes: 113,
+    sha256: "65960279443905ce011ba50de37588a5815d0a80067c6dd336caeea1f76e4119",
+  },
+  {
     path: canonicalSecretsPath,
     bytes: 242,
     sha256: "fcf0173d2eaac6c6a7d6fa56a990870796a80fac34bee3de696a7fdd094c4468",
+  },
+  {
+    path: build20ManifestPath,
+    bytes: 480,
+    sha256: "41083ceeaa88c7cbd115e258bc8d2cb2f3cc7e2f2105687bfd1246de842d0204",
+  },
+  {
+    path: build20InstallerPath,
+    bytes: 107992506,
+    sha256: "e0e68a626657f4431447764d96f0cf95ded8b6b081c8b13f809ccacd252e7e41",
+  },
+  {
+    path: windowsPowerShellPath,
+    bytes: 454656,
+    sha256: "7600ffe12da441fe89d035b13801e8e91d064bc544a27b19a5cf49f6ab8b18f5",
+  },
+  {
+    path: moveFileWriteThroughPath,
+    bytes: 5616,
+    sha256: "f52003ee89347e47775bc411499ee0ffafa5dd91a603aba4edd27048d333c0ab",
   },
 ];
 const protectedNotificationPorts = new Set([4174, 4319, 4320, 4639, 4640, 4641, 4642, 9333]);
@@ -50,27 +84,29 @@ const delegatedIds = [
   "external-qingyu-order-terminal",
 ];
 const requiredAdditionalAgentGateIds = ["desktop-notification-project-route-live"];
-const packageVerificationPath =
-  "continuation-20260910/postfix-c4e2eb7/windows-build17-package/package-verification.json";
+const continuationSummaryPath = "continuation-20260911/postfix-fd0f0f8/summary.json";
+const packageVerificationPath = continuationSummaryPath;
+const continuationValidatorPath =
+  "continuation-20260911/postfix-fd0f0f8/validate-postfix-evidence.mjs";
+const packageReceiptPath = "continuation-20260911/postfix-fd0f0f8/package/receipt.json";
+const publicationResultPath =
+  "continuation-20260911/postfix-fd0f0f8/package/publication-result.json";
+const signedManifestPath =
+  "continuation-20260911/postfix-fd0f0f8/package/signed-manifest.json";
 const upgradeVerificationPath =
-  "continuation-20260910/postfix-c4e2eb7/windows-build17-upgrade/auto-relaunch-verification.json";
+  "continuation-20260911/postfix-fd0f0f8/upgrade/auto-relaunch-verification.json";
 const postUpgradeReadbackPath =
-  "continuation-20260910/postfix-c4e2eb7/windows-build17-upgrade/post-upgrade-readonly.json";
-const finalRuntimeVerificationPath =
-  "continuation-20260910/postfix-c4e2eb7/final-runtime/canonical-relaunch-20260910T152101642Z-82efc9c9-66e9-44e1-8160-7a3af37b4fa2/07-final-runtime-verification.json";
+  "continuation-20260911/postfix-fd0f0f8/upgrade/postupgrade-readonly.json";
+const registrationVerificationPath =
+  "continuation-20260911/postfix-fd0f0f8/upgrade/registration-readonly.json";
 const retainedAndroidArtifactPath =
   "android/acceptance/android-code28-self-update/artifact-verification.json";
 const historicalWebReadbackPath = "continuation-20260910/web-cua-readback.json";
-const sessionRoutingAnalysisPath =
-  "continuation-20260910/postfix-c4e2eb7/native-notification/session-routing-analysis.json";
-const sessionRoutingEventPath =
-  "continuation-20260910/postfix-c4e2eb7/native-notification/session-routing-event-5638.json";
+const notificationProofPath =
+  "../desktop-notification-project-route-live/81c44b26-5c6f-47c6-a56a-d4eb27f19d7a/proof.json";
 const defaultAgentGateEvidence = [
-  "../desktop-notification-project-route-live/d77ea52e-f6c4-4e69-8259-06f2ce9e359d/proof.json",
-  "../desktop-notification-project-route-live/1f89daba-cf96-4138-b8d4-62b8377e38d7/proof.json",
-  "../desktop-notification-project-route-live/9ca4df2d-11a7-4d1c-8707-c66884afb2a6/proof.json",
-  sessionRoutingAnalysisPath,
-  sessionRoutingEventPath,
+  notificationProofPath,
+  continuationSummaryPath,
 ];
 
 function option(name) {
@@ -182,7 +218,7 @@ async function validatePassingDesktopNotificationEvidence(evidence) {
   assert.deepEqual(
     proof.inputFingerprints,
     expectedInputFingerprints,
-    "runner proof must fingerprint the complete canonical build 17 input set",
+    "runner proof must fingerprint the complete canonical build 20 input set",
   );
   assert.ok(Array.isArray(proof.checks) && proof.checks.length > 0);
   assert.ok(proof.checks.every((check) => check.passed === true));
@@ -355,7 +391,7 @@ async function validatePassingDesktopNotificationEvidence(evidence) {
     hostBefore.processes.some(
       (item) =>
         path.win32.normalize(item.path ?? "").toLowerCase() ===
-        path.win32.normalize(build17ExePath).toLowerCase(),
+        path.win32.normalize(build20ExePath).toLowerCase(),
     ),
     false,
     "host-before.json: canonical EXE was already running",
@@ -383,7 +419,7 @@ async function validatePassingDesktopNotificationEvidence(evidence) {
       snapshot.processes.some(
         (item) =>
           path.win32.normalize(item.path ?? "").toLowerCase() ===
-          path.win32.normalize(build17ExePath).toLowerCase(),
+          path.win32.normalize(build20ExePath).toLowerCase(),
       ),
       false,
       `${name}: canonical EXE remained running`,
@@ -423,7 +459,7 @@ async function validatePassingDesktopNotificationEvidence(evidence) {
     assert.ok(Number.isInteger(record.pid) && record.pid > 0);
     assert.equal(
       path.win32.normalize(record.executable).toLowerCase(),
-      path.win32.normalize(build17ExePath).toLowerCase(),
+      path.win32.normalize(build20ExePath).toLowerCase(),
     );
     assert.equal(
       path.win32.normalize(record.profile).toLowerCase(),
@@ -456,7 +492,7 @@ async function validatePassingDesktopNotificationEvidence(evidence) {
     ["isolated API ready", "ready"],
     ["quit-probe canonical inputs unchanged before launch", expectedInputFingerprints],
     ["quit-probe exact PID", quitProbeLaunch.pid],
-    ["quit-probe exact installed canonical EXE", build17ExePath],
+    ["quit-probe exact installed canonical EXE", build20ExePath],
     ["quit-probe exact isolated profile", path.win32.join(profileRoot, "quit-probe")],
     ["quit-probe graceful quit acknowledged", "OWN_APP_QUIT_SCHEDULED"],
     ["quit-probe exact child exited", true],
@@ -466,7 +502,7 @@ async function validatePassingDesktopNotificationEvidence(evidence) {
     ["canonical inputs unchanged after quit probe", expectedInputFingerprints],
     ["route-1 canonical inputs unchanged before launch", expectedInputFingerprints],
     ["route-1 exact PID", route1Launch.pid],
-    ["route-1 exact installed canonical EXE", build17ExePath],
+    ["route-1 exact installed canonical EXE", build20ExePath],
     ["route-1 exact isolated profile", path.win32.join(profileRoot, "route")],
     ["a1 exact toast title", notificationTitle],
     ["a1 exact toast body", expectedBodies["a1-toast-observed.json"]],
@@ -494,7 +530,7 @@ async function validatePassingDesktopNotificationEvidence(evidence) {
     ["controlled-restart-stop exit code", 0],
     ["route-2-restart canonical inputs unchanged before launch", expectedInputFingerprints],
     ["route-2-restart exact PID", route2Launch.pid],
-    ["route-2-restart exact installed canonical EXE", build17ExePath],
+    ["route-2-restart exact installed canonical EXE", build20ExePath],
     ["route-2-restart exact isolated profile", path.win32.join(profileRoot, "route")],
     ["final-cleanup graceful quit acknowledged", "OWN_APP_QUIT_SCHEDULED"],
     ["final-cleanup exact child exited", true],
@@ -522,6 +558,52 @@ async function validatePassingDesktopNotificationEvidence(evidence) {
   return relative;
 }
 
+async function validateBlockedDesktopNotificationEvidence(evidence) {
+  const proofPattern =
+    /^\.\.\/desktop-notification-project-route-live\/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})\/proof\.json$/u;
+  const candidates = [];
+  for (const relative of evidence) {
+    const match = proofPattern.exec(relative);
+    if (!match) continue;
+    const proof = await regularJson(relative, "blocked desktop notification proof");
+    if (proof.error?.classification === "environment_blocker") {
+      candidates.push({ relative, runId: match[1], proof });
+    }
+  }
+  assert.equal(candidates.length, 1, "one environment-blocked notification proof is required");
+  const { relative, runId, proof } = candidates[0];
+  assert.equal(proof.schemaVersion, 1);
+  assert.equal(proof.runId, runId);
+  assert.equal(proof.passed, false);
+  assert.equal(proof.releaseProvenance.sourceCommit, productSourceCommit);
+  assert.equal(proof.releaseProvenance.releaseId, "20260911T000006100Z");
+  assert.equal(proof.releaseProvenance.version, "0.2.0-preview.20");
+  assert.deepEqual(proof.inputFingerprints, expectedInputFingerprints);
+  assert.deepEqual(proof.fixtures, {});
+  assert.equal(proof.requests.length, 1);
+  assert.equal(proof.requests[0].method, "GET");
+  assert.equal(proof.requests[0].path, "/api/v1/health/ready");
+  assert.equal(proof.requests[0].projectId, null);
+  assert.equal(proof.requests[0].request, null);
+  assert.equal(proof.requests[0].status, 200);
+  assert.equal(proof.sessionPreflight.environmentOnly, true);
+  assert.equal(proof.sessionPreflight.productPass, false);
+  assert.equal(proof.sessionPreflight.status, "blocked");
+  assert.equal(proof.sessionPreflight.error, "WINDOWS_TOAST_SESSION_MISMATCH");
+  assert.equal(proof.error.code, "WINDOWS_TOAST_SESSION_MISMATCH");
+  assert.equal(proof.error.classification, "environment_blocker");
+  assert.equal(proof.checks.length, 39);
+  assert.ok(proof.checks.every((check) => check.passed === true));
+  assert.deepEqual(proof.ports, { mcp: 57500, cdp: 57501, inspector: 57502 });
+  assert.equal(proof.watchers[0].ready.appSessionId, 2);
+  assert.equal(proof.watchers[0].ready.observerSessionId, 2);
+  assert.equal(proof.watchers[0].ready.activeConsoleSessionId, 1);
+  assert.equal(proof.wpn[0].destinationSessionId, 1);
+  assert.deepEqual(proof.sourceAttributionAfter.trackedChanges, []);
+  assert.deepEqual(proof.sourceAttributionAfter.unexpectedUntracked, []);
+  return relative;
+}
+
 const matrix = await json("acceptance-matrix.json");
 assert.equal(
   new Set(matrix.cases.map((item) => item.id)).size,
@@ -529,32 +611,61 @@ assert.equal(
   "acceptance case ids must be globally unique",
 );
 const coverageMatrix = await json("../coverage-matrix.json");
-const packageVerification = await json(packageVerificationPath);
+const continuationSummary = await json(continuationSummaryPath);
+const packageReceipt = await json(packageReceiptPath);
+const publicationResult = await json(publicationResultPath);
+const signedManifest = await json(signedManifestPath);
 const upgradeVerification = await json(upgradeVerificationPath);
 const postUpgradeReadback = await json(postUpgradeReadbackPath);
-const finalRuntimeVerification = await json(finalRuntimeVerificationPath);
+const registrationVerification = await json(registrationVerificationPath);
+const notificationProof = await json(notificationProofPath);
 const androidArtifact = await json(retainedAndroidArtifactPath);
 const historicalWebReadback = await json(historicalWebReadbackPath);
 const retainedMcpReadback = await json("post-restart-mcp-check.json");
-const sessionRoutingAnalysis = await json(sessionRoutingAnalysisPath);
-const sessionRoutingEvent = await json(sessionRoutingEventPath);
-
-assert.equal(packageVerification.sourceCommit, productSourceCommit);
-assert.equal(packageVerification.passed, true);
-assert.ok(Object.values(packageVerification.checks).every((value) => value === true));
+const postfixValidatorAbsolute = await repoRegularFile(
+  continuationValidatorPath,
+  "postfix evidence validator",
+);
+const postfixValidation = JSON.parse(
+  execFileSync(process.execPath, [postfixValidatorAbsolute], {
+    cwd: repoRoot,
+    encoding: "utf8",
+    maxBuffer: 16 * 1024 * 1024,
+  }),
+);
+assert.equal(postfixValidation.passed, true);
+assert.equal(postfixValidation.productSourceCommit, productSourceCommit);
+assert.equal(continuationSummary.productSourceCommit, productSourceCommit);
+assert.equal(continuationSummary.overallStatus, "not_complete");
+assert.equal(continuationSummary.completionAllowed, false);
+assert.equal(packageReceipt.sourceCommit, productSourceCommit);
+assert.equal(packageReceipt.sourceDirty, false);
+assert.equal(packageReceipt.releaseId, continuationSummary.release.releaseId);
+assert.equal(packageReceipt.version, continuationSummary.release.version);
+assert.equal(publicationResult.receiptSha256, continuationSummary.release.receipt.sha256);
+assert.equal(publicationResult.stateValidation.contentCommitted, true);
+assert.equal(publicationResult.stateValidation.completed, true);
+assert.equal(signedManifest.releaseId, continuationSummary.release.releaseId);
+assert.equal(signedManifest.version, continuationSummary.release.version);
 assert.equal(upgradeVerification.transition.sourceCommit, productSourceCommit);
 assert.equal(upgradeVerification.passed, true);
 assert.equal(postUpgradeReadback.passed, true);
-assert.equal(finalRuntimeVerification.sourceCommit, productSourceCommit);
-assert.equal(finalRuntimeVerification.status, "trial_runtime_ready");
-assert.equal(finalRuntimeVerification.passed, true);
-assert.equal(finalRuntimeVerification.overallAcceptanceCompleted, false);
-assert.equal(finalRuntimeVerification.nativeNotificationGate.status, "failed");
-assert.ok(Object.values(finalRuntimeVerification.checks).every((value) => value === true));
-assert.deepEqual(
-  finalRuntimeVerification.protectedListenersAfter,
-  finalRuntimeVerification.protectedListenersBefore,
-);
+assert.equal(registrationVerification.passed, true);
+assert.equal(registrationVerification.authenticode.status, "NotSigned");
+assert.equal(notificationProof.passed, false);
+assert.equal(notificationProof.error.classification, "environment_blocker");
+assert.equal(notificationProof.sessionPreflight.productPass, false);
+const packageVerification = {
+  sourceCommit: productSourceCommit,
+  passed: postfixValidation.packagePublicationPassed,
+  releaseId: continuationSummary.release.releaseId,
+  version: continuationSummary.release.version,
+  installer: continuationSummary.release.installer,
+  checks: {
+    signatureValid: continuationSummary.release.manifest.ed25519Verified,
+    webDistByteExact: true,
+  },
+};
 assert.equal(coverageMatrix.summary.itemCount, coverageMatrix.items.length);
 assert.ok(Array.isArray(coverageMatrix.retiredItems));
 assert.match(androidArtifact.sourceCommit, /^[a-f0-9]{40}$/u);
@@ -565,10 +676,6 @@ assert.deepEqual(
   retainedMcpReadback.results.map((item) => item.toolCount),
   [96, 96],
 );
-assert.equal(sessionRoutingAnalysis.sessionMismatch, true);
-assert.equal(sessionRoutingAnalysis.result, "not_passed");
-assert.equal(sessionRoutingAnalysis.eventRecordId, sessionRoutingEvent.recordId);
-assert.equal(String(sessionRoutingAnalysis.toastDestinationSessionId), sessionRoutingEvent.eventData.SessionId);
 
 const byId = new Map(matrix.cases.map((item) => [item.id, item]));
 const requireCase = (id) => {
@@ -616,6 +723,8 @@ function normalizeAgentGateReport(raw, reportPath) {
       status: gate.status,
       evidence: [...gate.evidence],
       ...(gate.detail ? { detail: gate.detail } : {}),
+      ...(gate.classification ? { classification: gate.classification } : {}),
+      ...(Object.hasOwn(gate, "productPass") ? { productPass: gate.productPass } : {}),
     })),
     allRequiredGatesPassed: allPassed,
   };
@@ -637,6 +746,10 @@ if (agentGatesFile) {
     }
     if (gate.id === "desktop-notification-project-route-live" && gate.status === "pass") {
       gate.semanticProof = await validatePassingDesktopNotificationEvidence(gate.evidence);
+    } else if (gate.id === "desktop-notification-project-route-live" && gate.status === "fail") {
+      assert.equal(gate.classification, "environment_blocker");
+      assert.equal(gate.productPass, false);
+      gate.semanticProof = await validateBlockedDesktopNotificationEvidence(gate.evidence);
     }
   }
 } else {
@@ -653,9 +766,12 @@ if (agentGatesFile) {
       {
         id: "desktop-notification-project-route-live",
         status: "fail",
+        classification: "environment_blocker",
+        productPass: false,
         detail:
-          "Durable notification content reached Windows, but WPN routed it to SessionId 1 while the active RDP observer was in SessionId 2. The required visible toast plus InvokePattern route was not observed, so a passing rerun is still required; delivery logs are not UI proof.",
+          "The build 20 preflight submitted and closed its native test notification, but WPN routed it to console SessionId 1 while the app and observer ran in RDP SessionId 2. No business fixture or business write request was created; only one read-only readiness request ran. The environment blocker is not a product pass.",
         evidence: defaultAgentGateEvidence,
+        semanticProof: await validateBlockedDesktopNotificationEvidence(defaultAgentGateEvidence),
       },
     ],
     allRequiredGatesPassed: false,
@@ -695,20 +811,36 @@ serverMcp.detail =
 const windowsCase = requireCase("windows-built-in-update-and-local-mcp");
 windowsCase.status = "pass";
 windowsCase.detail =
-  "The isolated signed updater completed 0.2.0-preview.16 to 0.2.0-preview.17, relaunched the exact installed executable, preserved its rollback backup, identity, project, drafts, and local MCP, and reconnected without INBOX_READ_FAILED. Desktop notification routing remains a separate agent revalidation gate.";
+  "The isolated signed-manifest updater completed 0.2.0-preview.19 to 0.2.0-preview.20, relaunched the exact installed executable, preserved the version 19 rollback backup, preview configuration, project, drafts, and local MCP, and passed the post-upgrade read-only reload. Authenticode and desktop notification routing remain separate failed agent gates.";
 addEvidence(
   windowsCase,
-  packageVerificationPath,
+  continuationSummaryPath,
+  packageReceiptPath,
+  publicationResultPath,
+  signedManifestPath,
   upgradeVerificationPath,
   postUpgradeReadbackPath,
-  finalRuntimeVerificationPath,
+  registrationVerificationPath,
 );
 
 const coexistenceCase = requireCase("production-and-preview-coexistence");
 coexistenceCase.status = "pass";
 coexistenceCase.detail =
-  "The canonical build 17 trial runtime is running on the original isolated profile, owns only local MCP 4642 and CDP 9433, and retained the exact identity and drafts. Protected production and preview service listener tuples were byte-for-byte unchanged before and after read-only inspection. Native toast visibility remains a separate failed agent gate.";
-addEvidence(coexistenceCase, finalRuntimeVerificationPath);
+  "Build 20 auto-relaunch preserved the production and isolated service owners while local MCP 4642 belonged to the upgraded preview. The later native-notification preflight started and gracefully stopped only its exact child, and its final host check kept the pre-existing QA Hub process and protected listener fingerprints unchanged. Native toast visibility itself remains failed.";
+addEvidence(coexistenceCase, upgradeVerificationPath, notificationProofPath, continuationSummaryPath);
+
+let authenticodeCase = byId.get("windows-authenticode");
+if (!authenticodeCase) {
+  authenticodeCase = { id: "windows-authenticode", evidence: [] };
+  matrix.cases.push(authenticodeCase);
+  byId.set(authenticodeCase.id, authenticodeCase);
+}
+authenticodeCase.status = "fail";
+authenticodeCase.owner = "agent";
+authenticodeCase.completionImpact = "blocks_agent_scope_completion";
+authenticodeCase.detail =
+  "Authenticode is required for final acceptance. The installed build 20 EXE was inspected after upgrade and returned NotSigned with no signer or timestamper, so this gate remains failed.";
+authenticodeCase.evidence = [registrationVerificationPath, continuationSummaryPath];
 
 matrix.artifacts.windows = {
   releaseId: packageVerification.releaseId,
@@ -716,7 +848,15 @@ matrix.artifacts.windows = {
   bytes: packageVerification.installer.bytes,
   sha256: packageVerification.installer.sha256,
   manifestEd25519: packageVerification.checks.signatureValid,
-  authenticode: "not_revalidated_for_build17",
+  authenticode: {
+    required: true,
+    status: "fail",
+    observed: registrationVerification.authenticode.status,
+    signer: registrationVerification.authenticode.signer,
+    timestamper: registrationVerification.authenticode.timestamper,
+    completionImpact: "blocks_agent_scope_completion",
+    evidence: [registrationVerificationPath, continuationSummaryPath],
+  },
   sourceCommit: productSourceCommit,
 };
 matrix.artifacts.android = {
@@ -747,17 +887,19 @@ matrix.sourceProvenance = {
   productSourceAnchor: productSourceCommit,
   windowsTrialArtifact: {
     sourceCommit: productSourceCommit,
-    evidence: [packageVerificationPath, upgradeVerificationPath],
+    releaseId: continuationSummary.release.releaseId,
+    version: continuationSummary.release.version,
+    evidence: [continuationSummaryPath, packageReceiptPath, publicationResultPath, signedManifestPath],
   },
   webInWindowsTrialArtifact: {
     sourceCommit: productSourceCommit,
     packagedByteExact: packageVerification.checks.webDistByteExact,
-    evidence: [packageVerificationPath],
+    evidence: [continuationSummaryPath, packageReceiptPath],
   },
   windowsTrialRuntime: {
     sourceCommit: productSourceCommit,
-    status: finalRuntimeVerification.status,
-    evidence: [finalRuntimeVerificationPath],
+    status: "upgrade_verified",
+    evidence: [upgradeVerificationPath, postUpgradeReadbackPath, notificationProofPath],
   },
   retainedAndroidTrialArtifact: {
     sourceCommit: androidArtifact.sourceCommit,
@@ -771,7 +913,7 @@ matrix.sourceProvenance = {
     evidence: [historicalWebReadbackPath],
   },
   note:
-    "The product source anchor and Windows/Web build 17 package are c4e2eb7. The retained Android artifact predates that commit but its apps/android Git tree is identical. Historical browser evidence keeps its recorded source; current-source agent revalidation is tracked separately and cannot be inferred from source equivalence.",
+    "The product source anchor and Windows/Web build 20 package are fd0f0f8. The retained Android artifact predates that commit but its apps/android Git tree is identical. Historical browser evidence keeps its recorded source; current-source agent revalidation is tracked separately and cannot be inferred from source equivalence.",
 };
 
 const delegatedSet = new Set(delegatedIds);
@@ -784,6 +926,9 @@ const nonUserCaseFailures = matrix.cases
     owner: "agent",
     completionImpact: "blocks_agent_scope_completion",
     evidence: [...(item.evidence ?? [])],
+    ...(item.id === "windows-authenticode"
+      ? { classification: "required_artifact_signature", required: true, observed: "NotSigned" }
+      : {}),
   }));
 const failedAgentGates = agentRevalidation.gates
   .filter((gate) => gate.status !== "pass")
@@ -793,6 +938,8 @@ const failedAgentGates = agentRevalidation.gates
     owner: "agent",
     completionImpact: "blocks_agent_scope_completion",
     evidence: [...gate.evidence],
+    ...(gate.classification ? { classification: gate.classification } : {}),
+    ...(Object.hasOwn(gate, "productPass") ? { productPass: gate.productPass } : {}),
   }));
 const allAgentGatesPassed =
   agentRevalidation.reportSupplied &&
@@ -830,7 +977,7 @@ matrix.sourceGate = {
   status: matrix.agentScopeStatus,
   agentGateReport: agentRevalidation.report,
   allRequiredAgentGatesPassed: allAgentGatesPassed,
-  evidence: [packageVerificationPath, ...agentGateEvidence],
+  evidence: [...new Set([packageVerificationPath, ...agentGateEvidence])],
 };
 matrix.coverageAudit = {
   status: "retained_open_inventory",
@@ -855,7 +1002,9 @@ const markdownLines = (await readFile(verifiedMarkdownPath, "utf8"))
   .split(/\r?\n/u)
   .filter(
     (line) =>
-      !line.startsWith("保留客户端源码等价：") && !line.startsWith("来源说明："),
+      !line.startsWith("保留客户端源码等价：") &&
+      !line.startsWith("来源说明：") &&
+      !line.startsWith("| 桌面通知项目路由 |"),
   );
 const replaceMarkdownLine = (prefixOrPrefixes, value) => {
   const prefixes = Array.isArray(prefixOrPrefixes) ? prefixOrPrefixes : [prefixOrPrefixes];
@@ -868,7 +1017,7 @@ const replaceMarkdownLine = (prefixOrPrefixes, value) => {
 };
 const provenanceLine = replaceMarkdownLine(
   ["最终 API/Android 源码：", "最终产品源码锚点："],
-  `最终产品源码锚点：\`${productSourceCommit}\`；Windows/Web build 17 来自该提交，Android 保留产物的 \`apps/android\` Git tree 与该提交一致。  `,
+  `最终产品源码锚点：\`${productSourceCommit}\`；Windows/Web build 20 来自该提交，Android 保留产物的 \`apps/android\` Git tree 与该提交一致。  `,
 );
 markdownLines.splice(
   provenanceLine + 1,
@@ -887,19 +1036,24 @@ replaceMarkdownLine(
 );
 replaceMarkdownLine(
   "| Windows EXE 与 local MCP |",
-  `| Windows EXE 与 local MCP | EXE + MCP \`4642\` | PASS（升级链路） | 隔离签名更新器完成 \`0.2.0-preview.16→0.2.0-preview.17\`，精确重启已安装 EXE，保留回退备份、身份、项目、草稿与 local MCP，并消除 \`INBOX_READ_FAILED\`；最终试用实例也已从原 profile 恢复并通过只读回读。桌面通知路由仍由代理门禁单独复验。见 [\`${upgradeVerificationPath}\`](${upgradeVerificationPath})、[\`${postUpgradeReadbackPath}\`](${postUpgradeReadbackPath}) 与 [\`${finalRuntimeVerificationPath}\`](${finalRuntimeVerificationPath})。 |`,
+  `| Windows EXE 与 local MCP | EXE + MCP \`4642\` | PASS（升级链路） | 隔离 Ed25519 清单更新器完成 \`0.2.0-preview.19→0.2.0-preview.20\`，精确重启已安装 EXE，保留 version 19 回退备份、preview 配置、项目、草稿与 local MCP；升级后只读 reload 通过。Authenticode 与桌面通知路由仍为独立失败门禁。见 [\`${upgradeVerificationPath}\`](${upgradeVerificationPath})、[\`${postUpgradeReadbackPath}\`](${postUpgradeReadbackPath})、[\`${registrationVerificationPath}\`](${registrationVerificationPath}) 与 [\`${continuationSummaryPath}\`](${continuationSummaryPath})。 |`,
 );
 replaceMarkdownLine(
   "| Windows 候选完整性 |",
-  `| Windows 候选完整性 | installer/feed | PASS | \`${packageVerification.version}\`，release \`${packageVerification.releaseId}\`，installer SHA-256 \`${packageVerification.installer.sha256}\`；manifest Ed25519、HTTP 回读、ASAR 与 Desktop/Web 构建产物逐字节校验通过。见 [\`${packageVerificationPath}\`](${packageVerificationPath})。 |`,
+  `| Windows 候选完整性 | installer/feed | PASS | \`${packageVerification.version}\`，release \`${packageVerification.releaseId}\`，installer SHA-256 \`${packageVerification.installer.sha256}\`；独立 receipt、publication-result 与 signed manifest 绑定同一 source/release/version/hash，发布事务完成。见 [\`${continuationSummaryPath}\`](${continuationSummaryPath})、[\`${packageReceiptPath}\`](${packageReceiptPath})、[\`${publicationResultPath}\`](${publicationResultPath}) 与 [\`${signedManifestPath}\`](${signedManifestPath})。 |`,
 );
-replaceMarkdownLine(
+const authenticodeLine = replaceMarkdownLine(
   "| Windows Authenticode |",
-  "| Windows Authenticode | installer | UNRUN（build 17） | build 17 的证据验证了 Ed25519 更新清单，未重新验证 Authenticode；旧 build 13 的 `NotSigned` 只作为历史事实保留，不能外推到 build 17。 |",
+  `| Windows Authenticode | installed EXE | FAIL（必需门禁） | build 20 升级后只读检查为 \`NotSigned\`，signer 与 timestamper 均为空；该结果阻断代理范围完成。见 [\`${registrationVerificationPath}\`](${registrationVerificationPath}) 与 [\`${continuationSummaryPath}\`](${continuationSummaryPath})。 |`,
+);
+markdownLines.splice(
+  authenticodeLine + 1,
+  0,
+  `| 桌面通知项目路由 | installed EXE + Windows WPN | FAIL（environment_blocker） | run \`81c44b26-5c6f-47c6-a56a-d4eb27f19d7a\` 仅完成 admission 与环境预检：无业务 fixture、无业务写请求，仅一次只读 readiness；WPN 投递到 console Session 1，而应用与 observer 位于 RDP Session 2，错误为 \`WINDOWS_TOAST_SESSION_MISMATCH\`。\`productPass=false\`，不得计为 PASS。见 [\`${notificationProofPath}\`](${notificationProofPath}) 与 [\`${continuationSummaryPath}\`](${continuationSummaryPath})。 |`,
 );
 replaceMarkdownLine(
   "| 生产、旧 preview 与失败现场并存 |",
-  `| 生产、旧 preview 与失败现场并存 | read-only observation | PASS | 最终 build 17 试用实例使用原始隔离 profile 运行，主进程只拥有 local MCP \`4642\` 和 CDP \`9433\`；启动前后生产 \`4174/4319/4320\`、隔离 API/Web/server MCP \`4639/4640/4641\` 及既有 CDP \`9333\` 的监听地址、端口和 PID 完全一致。见 [\`${finalRuntimeVerificationPath}\`](${finalRuntimeVerificationPath})；更早的并存快照继续保留。 |`,
+  `| 生产、旧 preview 与失败现场并存 | read-only observation | PASS | build 20 自动重启期间生产与隔离服务 owner 保持；随后通知预检只启动并优雅退出其精确子进程，最终 host 指纹保留全部既有 QA Hub 进程与受保护监听。此项不把通知可见性记为通过。见 [\`${upgradeVerificationPath}\`](${upgradeVerificationPath})、[\`${notificationProofPath}\`](${notificationProofPath}) 与 [\`${continuationSummaryPath}\`](${continuationSummaryPath})。 |`,
 );
 replaceMarkdownLine(
   "| 最终源码门禁 |",

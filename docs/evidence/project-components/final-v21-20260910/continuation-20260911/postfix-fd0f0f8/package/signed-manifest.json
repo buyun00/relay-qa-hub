@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "releaseId": "20260911T000006100Z",
+  "version": "0.2.0-preview.20",
+  "publishedAt": "2026-09-11T00:03:01.318Z",
+  "archive": {
+    "url": "/downloads/qa-hub-preview-v21-e2e-fresh-0910-windows-0.2.0-preview.20-20260911T000006100Z.exe",
+    "size": 107992506,
+    "sha256": "e0e68a626657f4431447764d96f0cf95ded8b6b081c8b13f809ccacd252e7e41"
+  },
+  "signature": "8cRcHTVuKzezV/zafqtTP+GmGJVKOf/tCz6itrIjWsR0lwrRnasvpZIcr7EGgjjSXYBsP9Ua6bGHDeBE2zORAQ=="
+}

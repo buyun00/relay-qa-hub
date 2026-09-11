@@ -5,16 +5,16 @@ import { lstat, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-const productSourceCommit = "c4e2eb7d9341a16d2430df9073a93f44f381dd2b";
+const productSourceCommit = "fd0f0f850f907b8a77aac8ec8b6a71b308bdd711";
 const userLabel = "用户自测／已移交，代理未执行";
 const notificationTitle = "QA Hub · 这个单子已创建";
 const inaccessibleNotificationText =
   "通知所属项目当前不可访问，已保持当前项目并刷新项目列表。";
-const build17ExeSha256 = "58c21fdc87e3b5007df9d30e59a27df67e24516f7c74c61d7fb545d8c54d4f0f";
-const build17AsarSha256 = "ff3b49304c7f98ec754bd42ef9732cd6b58718002b3f4be8ae0ae506e69b7474";
-const build17ExePath =
+const build20ExeSha256 = "47e3d83120f29a6b2e0dc1fa54a2de6327c15c21620999b421b615a346e1fbac";
+const build20AsarSha256 = "beecc244ab14d52a4b05e3475926285fb8fed2769c17d18f5e34e970644bbf96";
+const build20ExePath =
   "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview-v21-e2e-fresh-0910\\RelayQaHubPreview-v21-e2e-fresh-0910.exe";
-const build17AsarPath =
+const build20AsarPath =
   "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview-v21-e2e-fresh-0910\\resources\\app.asar";
 const canonicalInstancePath =
   "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-v21-e2e-fresh-0910\\instance.json";
@@ -22,19 +22,53 @@ const canonicalSecretsPath =
   "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-v21-e2e-fresh-0910\\secrets.json";
 const canonicalPreviewConfigPath =
   "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview-v21-e2e-fresh-0910\\preview-instance.json";
+const canonicalPublicKeyPath =
+  "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-v21-e2e-fresh-0910\\desktop-signing\\public.pem";
+const build20ManifestPath =
+  "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-v21-e2e-fresh-0910\\downloads\\qa-hub-preview-v21-e2e-fresh-0910-windows-latest.json";
+const build20InstallerPath =
+  "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-v21-e2e-fresh-0910\\downloads\\qa-hub-preview-v21-e2e-fresh-0910-windows-0.2.0-preview.20-20260911T000006100Z.exe";
+const windowsPowerShellPath = "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe";
+const moveFileWriteThroughPath =
+  "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\scripts\\project-components\\move-file-write-through.ps1";
 const canonicalInstanceSha256 = "cf92bad26060bbcddcfc37d620320e8bac15e09104088944e456a3b9205257db";
 const canonicalSecretsSha256 = "fcf0173d2eaac6c6a7d6fa56a990870796a80fac34bee3de696a7fdd094c4468";
 const canonicalSecretNames = ["debugToken", "gmPassword", "sessionSecret"];
 const expectedInputFingerprints = [
   { path: canonicalInstancePath, bytes: 1327, sha256: canonicalInstanceSha256 },
-  { path: build17ExePath, bytes: 235871744, sha256: build17ExeSha256 },
-  { path: build17AsarPath, bytes: 3442810, sha256: build17AsarSha256 },
+  { path: build20ExePath, bytes: 235871744, sha256: build20ExeSha256 },
+  { path: build20AsarPath, bytes: 1304284, sha256: build20AsarSha256 },
   {
     path: canonicalPreviewConfigPath,
     bytes: 742,
     sha256: "dbde6a7d32476ed526bce22af042fd5eab0e7abf1cd4b871513688edc534a71c",
   },
+  {
+    path: canonicalPublicKeyPath,
+    bytes: 113,
+    sha256: "65960279443905ce011ba50de37588a5815d0a80067c6dd336caeea1f76e4119",
+  },
   { path: canonicalSecretsPath, bytes: 242, sha256: canonicalSecretsSha256 },
+  {
+    path: build20ManifestPath,
+    bytes: 480,
+    sha256: "41083ceeaa88c7cbd115e258bc8d2cb2f3cc7e2f2105687bfd1246de842d0204",
+  },
+  {
+    path: build20InstallerPath,
+    bytes: 107992506,
+    sha256: "e0e68a626657f4431447764d96f0cf95ded8b6b081c8b13f809ccacd252e7e41",
+  },
+  {
+    path: windowsPowerShellPath,
+    bytes: 454656,
+    sha256: "7600ffe12da441fe89d035b13801e8e91d064bc544a27b19a5cf49f6ab8b18f5",
+  },
+  {
+    path: moveFileWriteThroughPath,
+    bytes: 5616,
+    sha256: "f52003ee89347e47775bc411499ee0ffafa5dd91a603aba4edd27048d333c0ab",
+  },
 ];
 const protectedNotificationPorts = new Set([4174, 4319, 4320, 4639, 4640, 4641, 4642, 9333]);
 const delegatedIds = [
@@ -55,8 +89,14 @@ const productSourceRoots = [
   "apps/worker/src",
   "packages/domain/src",
 ];
-const packageVerificationPath =
-  "continuation-20260910/postfix-c4e2eb7/windows-build17-package/package-verification.json";
+const continuationSummaryPath = "continuation-20260911/postfix-fd0f0f8/summary.json";
+const continuationValidatorPath =
+  "continuation-20260911/postfix-fd0f0f8/validate-postfix-evidence.mjs";
+const packageReceiptPath = "continuation-20260911/postfix-fd0f0f8/package/receipt.json";
+const registrationVerificationPath =
+  "continuation-20260911/postfix-fd0f0f8/upgrade/registration-readonly.json";
+const notificationProofPath =
+  "../desktop-notification-project-route-live/81c44b26-5c6f-47c6-a56a-d4eb27f19d7a/proof.json";
 const retainedAndroidArtifactPath =
   "android/acceptance/android-code28-self-update/artifact-verification.json";
 
@@ -163,7 +203,7 @@ async function validatePassingDesktopNotificationEvidence(evidence) {
   assert.deepEqual(
     proof.inputFingerprints,
     expectedInputFingerprints,
-    "runner proof must fingerprint the complete canonical build 17 input set",
+    "runner proof must fingerprint the complete canonical build 20 input set",
   );
   assert.ok(Array.isArray(proof.checks) && proof.checks.length > 0);
   assert.ok(proof.checks.every((check) => check.passed === true));
@@ -336,7 +376,7 @@ async function validatePassingDesktopNotificationEvidence(evidence) {
     hostBefore.processes.some(
       (item) =>
         path.win32.normalize(item.path ?? "").toLowerCase() ===
-        path.win32.normalize(build17ExePath).toLowerCase(),
+        path.win32.normalize(build20ExePath).toLowerCase(),
     ),
     false,
     "host-before.json: canonical EXE was already running",
@@ -364,7 +404,7 @@ async function validatePassingDesktopNotificationEvidence(evidence) {
       snapshot.processes.some(
         (item) =>
           path.win32.normalize(item.path ?? "").toLowerCase() ===
-          path.win32.normalize(build17ExePath).toLowerCase(),
+          path.win32.normalize(build20ExePath).toLowerCase(),
       ),
       false,
       `${name}: canonical EXE remained running`,
@@ -404,7 +444,7 @@ async function validatePassingDesktopNotificationEvidence(evidence) {
     assert.ok(Number.isInteger(record.pid) && record.pid > 0);
     assert.equal(
       path.win32.normalize(record.executable).toLowerCase(),
-      path.win32.normalize(build17ExePath).toLowerCase(),
+      path.win32.normalize(build20ExePath).toLowerCase(),
     );
     assert.equal(
       path.win32.normalize(record.profile).toLowerCase(),
@@ -437,7 +477,7 @@ async function validatePassingDesktopNotificationEvidence(evidence) {
     ["isolated API ready", "ready"],
     ["quit-probe canonical inputs unchanged before launch", expectedInputFingerprints],
     ["quit-probe exact PID", quitProbeLaunch.pid],
-    ["quit-probe exact installed canonical EXE", build17ExePath],
+    ["quit-probe exact installed canonical EXE", build20ExePath],
     ["quit-probe exact isolated profile", path.win32.join(profileRoot, "quit-probe")],
     ["quit-probe graceful quit acknowledged", "OWN_APP_QUIT_SCHEDULED"],
     ["quit-probe exact child exited", true],
@@ -447,7 +487,7 @@ async function validatePassingDesktopNotificationEvidence(evidence) {
     ["canonical inputs unchanged after quit probe", expectedInputFingerprints],
     ["route-1 canonical inputs unchanged before launch", expectedInputFingerprints],
     ["route-1 exact PID", route1Launch.pid],
-    ["route-1 exact installed canonical EXE", build17ExePath],
+    ["route-1 exact installed canonical EXE", build20ExePath],
     ["route-1 exact isolated profile", path.win32.join(profileRoot, "route")],
     ["a1 exact toast title", notificationTitle],
     ["a1 exact toast body", expectedBodies["a1-toast-observed.json"]],
@@ -475,7 +515,7 @@ async function validatePassingDesktopNotificationEvidence(evidence) {
     ["controlled-restart-stop exit code", 0],
     ["route-2-restart canonical inputs unchanged before launch", expectedInputFingerprints],
     ["route-2-restart exact PID", route2Launch.pid],
-    ["route-2-restart exact installed canonical EXE", build17ExePath],
+    ["route-2-restart exact installed canonical EXE", build20ExePath],
     ["route-2-restart exact isolated profile", path.win32.join(profileRoot, "route")],
     ["final-cleanup graceful quit acknowledged", "OWN_APP_QUIT_SCHEDULED"],
     ["final-cleanup exact child exited", true],
@@ -503,6 +543,52 @@ async function validatePassingDesktopNotificationEvidence(evidence) {
   return relative;
 }
 
+async function validateBlockedDesktopNotificationEvidence(evidence) {
+  const proofPattern =
+    /^\.\.\/desktop-notification-project-route-live\/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})\/proof\.json$/u;
+  const candidates = [];
+  for (const relative of evidence) {
+    const match = proofPattern.exec(relative);
+    if (!match) continue;
+    const proof = await regularJson(relative, "blocked desktop notification proof");
+    if (proof.error?.classification === "environment_blocker") {
+      candidates.push({ relative, runId: match[1], proof });
+    }
+  }
+  assert.equal(candidates.length, 1, "one environment-blocked notification proof is required");
+  const { relative, runId, proof } = candidates[0];
+  assert.equal(proof.schemaVersion, 1);
+  assert.equal(proof.runId, runId);
+  assert.equal(proof.passed, false);
+  assert.equal(proof.releaseProvenance.sourceCommit, productSourceCommit);
+  assert.equal(proof.releaseProvenance.releaseId, "20260911T000006100Z");
+  assert.equal(proof.releaseProvenance.version, "0.2.0-preview.20");
+  assert.deepEqual(proof.inputFingerprints, expectedInputFingerprints);
+  assert.deepEqual(proof.fixtures, {});
+  assert.equal(proof.requests.length, 1);
+  assert.equal(proof.requests[0].method, "GET");
+  assert.equal(proof.requests[0].path, "/api/v1/health/ready");
+  assert.equal(proof.requests[0].projectId, null);
+  assert.equal(proof.requests[0].request, null);
+  assert.equal(proof.requests[0].status, 200);
+  assert.equal(proof.sessionPreflight.environmentOnly, true);
+  assert.equal(proof.sessionPreflight.productPass, false);
+  assert.equal(proof.sessionPreflight.status, "blocked");
+  assert.equal(proof.sessionPreflight.error, "WINDOWS_TOAST_SESSION_MISMATCH");
+  assert.equal(proof.error.code, "WINDOWS_TOAST_SESSION_MISMATCH");
+  assert.equal(proof.error.classification, "environment_blocker");
+  assert.equal(proof.checks.length, 39);
+  assert.ok(proof.checks.every((check) => check.passed === true));
+  assert.deepEqual(proof.ports, { mcp: 57500, cdp: 57501, inspector: 57502 });
+  assert.equal(proof.watchers[0].ready.appSessionId, 2);
+  assert.equal(proof.watchers[0].ready.observerSessionId, 2);
+  assert.equal(proof.watchers[0].ready.activeConsoleSessionId, 1);
+  assert.equal(proof.wpn[0].destinationSessionId, 1);
+  assert.deepEqual(proof.sourceAttributionAfter.trackedChanges, []);
+  assert.deepEqual(proof.sourceAttributionAfter.unexpectedUntracked, []);
+  return relative;
+}
+
 function trackedAllowlist() {
   const stdout = execFileSync("git", ["ls-files", "-z", "--", rootFromRepo], {
     cwd: repoRoot,
@@ -525,6 +611,32 @@ function trackedAllowlist() {
 
 const acceptance = await json("acceptance-matrix.json");
 const index = await json("evidence-index.json");
+const continuationSummary = await json(continuationSummaryPath);
+const packageReceipt = await json(packageReceiptPath);
+const registrationVerification = await json(registrationVerificationPath);
+const postfixValidatorAbsolute = await repoRegularFile(
+  continuationValidatorPath,
+  "postfix evidence validator",
+);
+const postfixValidationProcess = spawnSync(process.execPath, [postfixValidatorAbsolute], {
+  cwd: repoRoot,
+  encoding: "utf8",
+  maxBuffer: 16 * 1024 * 1024,
+});
+assert.equal(
+  postfixValidationProcess.status,
+  0,
+  `postfix evidence validation failed: ${postfixValidationProcess.stderr}`,
+);
+const postfixValidation = JSON.parse(postfixValidationProcess.stdout);
+assert.equal(postfixValidation.passed, true);
+assert.equal(postfixValidation.productSourceCommit, productSourceCommit);
+assert.equal(postfixValidation.releaseId, "20260911T000006100Z");
+assert.equal(postfixValidation.version, "0.2.0-preview.20");
+assert.equal(postfixValidation.notification.productPass, false);
+assert.equal(postfixValidation.notification.classification, "environment_blocker");
+assert.equal(postfixValidation.authenticode.required, true);
+assert.equal(postfixValidation.authenticode.status, "fail");
 assert.equal(
   new Set(acceptance.cases.map((item) => item.id)).size,
   acceptance.cases.length,
@@ -548,10 +660,24 @@ assert.equal(acceptance.sourceProvenance.productSourceAnchor, productSourceCommi
 assert.equal(acceptance.sourceProvenance.windowsTrialArtifact.sourceCommit, productSourceCommit);
 assert.equal(acceptance.sourceProvenance.webInWindowsTrialArtifact.sourceCommit, productSourceCommit);
 assert.equal(acceptance.sourceProvenance.windowsTrialRuntime.sourceCommit, productSourceCommit);
-assert.equal(acceptance.sourceProvenance.windowsTrialRuntime.status, "trial_runtime_ready");
+assert.equal(acceptance.sourceProvenance.windowsTrialRuntime.status, "upgrade_verified");
 assert.equal(acceptance.sourceProvenance.retainedAndroidTrialArtifact.treeEqual, true);
 assert.equal(acceptance.artifacts.windows.sourceCommit, productSourceCommit);
-assert.equal(acceptance.artifacts.windows.authenticode, "not_revalidated_for_build17");
+assert.equal(acceptance.artifacts.windows.releaseId, continuationSummary.release.releaseId);
+assert.equal(acceptance.artifacts.windows.version, continuationSummary.release.version);
+assert.equal(acceptance.artifacts.windows.sha256, continuationSummary.release.installer.sha256);
+assert.deepEqual(acceptance.artifacts.windows.authenticode, {
+  required: true,
+  status: "fail",
+  observed: "NotSigned",
+  signer: null,
+  timestamper: null,
+  completionImpact: "blocks_agent_scope_completion",
+  evidence: [registrationVerificationPath, continuationSummaryPath],
+});
+assert.equal(packageReceipt.sourceCommit, productSourceCommit);
+assert.equal(packageReceipt.sourceDirty, false);
+assert.equal(registrationVerification.authenticode.status, "NotSigned");
 assert.equal(acceptance.userAcceptancePending.length, delegatedIds.length);
 for (const id of delegatedIds) {
   const expected = {
@@ -592,6 +718,14 @@ assert.deepEqual(
   [...delegatedIds].sort(),
   "only the six named cases may be delegated to the user",
 );
+
+const authenticodeCase = acceptance.cases.find((item) => item.id === "windows-authenticode");
+assert.ok(authenticodeCase, "missing required Windows Authenticode gate");
+assert.equal(authenticodeCase.status, "fail");
+assert.equal(authenticodeCase.owner, "agent");
+assert.equal(authenticodeCase.completionImpact, "blocks_agent_scope_completion");
+assert.match(authenticodeCase.detail, /NotSigned/u);
+assert.deepEqual(authenticodeCase.evidence, [registrationVerificationPath, continuationSummaryPath]);
 
 const serverMcp = acceptance.cases.find(
   (item) => item.id === "server-mcp-catalog-and-business-subset",
@@ -669,8 +803,28 @@ for (const gate of acceptance.agentRevalidation.gates) {
       gate.semanticProof,
       await validatePassingDesktopNotificationEvidence(gate.evidence),
     );
+  } else if (gate.id === "desktop-notification-project-route-live") {
+    assert.equal(gate.status, "fail");
+    assert.equal(gate.classification, "environment_blocker");
+    assert.equal(gate.productPass, false);
+    assert.equal(
+      gate.semanticProof,
+      await validateBlockedDesktopNotificationEvidence(gate.evidence),
+    );
   }
 }
+const notificationGate = acceptance.agentRevalidation.gates.find(
+  (gate) => gate.id === "desktop-notification-project-route-live",
+);
+assert.ok(notificationGate);
+assert.equal(notificationGate.status, "fail");
+assert.equal(notificationGate.classification, "environment_blocker");
+assert.equal(notificationGate.productPass, false);
+assert.deepEqual(notificationGate.evidence, [notificationProofPath, continuationSummaryPath]);
+assert.equal(notificationGate.semanticProof, notificationProofPath);
+assert.equal(acceptance.agentRevalidation.reportSupplied, false);
+assert.equal(acceptance.agentRevalidation.report, null);
+assert.equal(acceptance.agentRevalidation.allRequiredGatesPassed, false);
 const delegatedSet = new Set(delegatedIds);
 const nonUserCaseFailures = acceptance.cases.filter(
   (item) =>
@@ -705,6 +859,9 @@ const expectedAgentBlocking = [
     owner: "agent",
     completionImpact: "blocks_agent_scope_completion",
     evidence: [...(item.evidence ?? [])],
+    ...(item.id === "windows-authenticode"
+      ? { classification: "required_artifact_signature", required: true, observed: "NotSigned" }
+      : {}),
   })),
   ...acceptance.agentRevalidation.gates
     .filter((gate) => gate.status !== "pass")
@@ -714,6 +871,8 @@ const expectedAgentBlocking = [
       owner: "agent",
       completionImpact: "blocks_agent_scope_completion",
       evidence: [...gate.evidence],
+      ...(gate.classification ? { classification: gate.classification } : {}),
+      ...(Object.hasOwn(gate, "productPass") ? { productPass: gate.productPass } : {}),
     })),
 ];
 assert.deepEqual(acceptance.agentBlocking, expectedAgentBlocking);
@@ -723,6 +882,23 @@ assert.deepEqual(
 );
 if (allAgentGatesPassed) assert.deepEqual(acceptance.agentBlocking, []);
 else assert.ok(acceptance.agentBlocking.length > 0);
+assert.equal(allAgentGatesPassed, false);
+assert.equal(acceptance.agentScopeStatus, "incomplete_agent_revalidation_pending");
+assert.equal(acceptance.sourceGate.allRequiredAgentGatesPassed, false);
+assert.equal(finalSourceCase.status, "partial");
+assert.deepEqual(
+  acceptance.agentBlocking.map((item) => item.id).sort(),
+  ["desktop-notification-project-route-live", "windows-authenticode"],
+);
+assert.ok(
+  acceptance.blocking.some(
+    (item) =>
+      item.id === "desktop-notification-project-route-live" &&
+      item.status === "fail" &&
+      item.classification === "environment_blocker" &&
+      item.productPass === false,
+  ),
+);
 
 for (const item of acceptance.cases) {
   for (const evidence of item.evidence ?? []) {
@@ -754,11 +930,13 @@ if (allAgentGatesPassed) {
   );
 }
 
-const packageVerification = await json(packageVerificationPath);
-assert.equal(packageVerification.sourceCommit, productSourceCommit);
-assert.equal(packageVerification.version, "0.2.0-preview.17");
-assert.equal(packageVerification.passed, true);
-assert.ok(Object.values(packageVerification.checks).every((value) => value === true));
+assert.equal(continuationSummary.productSourceCommit, productSourceCommit);
+assert.equal(continuationSummary.release.releaseId, "20260911T000006100Z");
+assert.equal(continuationSummary.release.version, "0.2.0-preview.20");
+assert.equal(continuationSummary.release.installer.sha256, acceptance.artifacts.windows.sha256);
+assert.equal(postfixValidation.packagePublicationPassed, true);
+assert.equal(postfixValidation.installedUpgradePassed, true);
+assert.equal(postfixValidation.registrationPassed, true);
 const androidArtifact = await json(retainedAndroidArtifactPath);
 assert.match(androidArtifact.sourceCommit, /^[a-f0-9]{40}$/u);
 assert.equal(androidArtifact.signatureVerified, true);
@@ -916,6 +1094,23 @@ const result = {
   delegatedUserCases: delegatedIds.length,
   delegatedCasesAllNotRun: true,
   agentGatesAllPassed: allAgentGatesPassed,
+  postfixEvidence: {
+    passed: postfixValidation.passed,
+    releaseId: postfixValidation.releaseId,
+    version: postfixValidation.version,
+    packagePublicationPassed: postfixValidation.packagePublicationPassed,
+    installedUpgradePassed: postfixValidation.installedUpgradePassed,
+    registrationPassed: postfixValidation.registrationPassed,
+  },
+  agentBlockers: acceptance.agentBlocking,
+  authenticode: acceptance.artifacts.windows.authenticode,
+  notificationGate: {
+    id: notificationGate.id,
+    status: notificationGate.status,
+    classification: notificationGate.classification,
+    productPass: notificationGate.productPass,
+    semanticProof: notificationGate.semanticProof,
+  },
   fineGrainedCoverage: {
     items: coverage.items.length,
     retiredItems: coverage.retiredItems.length,

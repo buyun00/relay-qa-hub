@@ -1,0 +1,56 @@
+{
+  "schemaVersion": 1,
+  "capturedAt": "2026-09-11T00:09:08.1735849Z",
+  "links": [
+    {
+      "path": "C:\\Users\\lin0\\Desktop\\QA Hub Project Preview - v21-e2e-fresh-0910.lnk",
+      "exists": true,
+      "target": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview-v21-e2e-fresh-0910\\RelayQaHubPreview-v21-e2e-fresh-0910.exe",
+      "appUserModelId": "com.relayqahub.desktop.preview.v21.e2e.fresh.0910",
+      "toastActivatorClsid": "{27F8E9AF-5D78-5B08-8ED1-4E810F2046D5}",
+      "sha256": "27a73dc38a0e5a5d5e0a7deaa7bd6b2bbde1b98fa2564c73c846ff061b7847f9"
+    },
+    {
+      "path": "C:\\Users\\lin0\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\QA Hub Project Preview (v21-e2e-fresh-0910).lnk",
+      "exists": true,
+      "target": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview-v21-e2e-fresh-0910\\RelayQaHubPreview-v21-e2e-fresh-0910.exe",
+      "appUserModelId": "com.relayqahub.desktop.preview.v21.e2e.fresh.0910",
+      "toastActivatorClsid": "{27F8E9AF-5D78-5B08-8ED1-4E810F2046D5}",
+      "sha256": "df3e500efddd1fffe44dc38e20146049d322d0b8abb9046d352f22836def1d13"
+    }
+  ],
+  "legacy": {
+    "root": "C:\\Users\\lin0\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\QA Hub Project Preview - v21-e2e-fresh-0910.lnk",
+    "rootExists": false,
+    "nested": "C:\\Users\\lin0\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\QA Hub Project Preview - v21-e2e-fresh-0910\\QA Hub Project Preview - v21-e2e-fresh-0910.lnk",
+    "nestedExists": false
+  },
+  "uninstall": {
+    "displayName": "QA Hub Project Preview (v21-e2e-fresh-0910)",
+    "displayVersion": "0.2.0-preview.20",
+    "installLocation": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview-v21-e2e-fresh-0910",
+    "uninstallString": "\"C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview-v21-e2e-fresh-0910\\Uninstall-Preview.exe\""
+  },
+  "protocolCommand": "\"C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview-v21-e2e-fresh-0910\\RelayQaHubPreview-v21-e2e-fresh-0910.exe\" \"%1\"",
+  "clsid": {
+    "value": "{27F8E9AF-5D78-5B08-8ED1-4E810F2046D5}",
+    "view64Exit": 0,
+    "view32Exit": 1,
+    "localServer": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview-v21-e2e-fresh-0910\\RelayQaHubPreview-v21-e2e-fresh-0910.exe"
+  },
+  "authenticode": {
+    "status": "NotSigned",
+    "statusMessage": "The file C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview-v21-e2e-fresh-0910\\RelayQaHubPreview-v21-e2e-fresh-0910.exe is not digitally signed. You cannot run this script on the current system. For more information about running scripts and setting execution policy, see about_Execution_Policies at https://go.microsoft.com/fwlink/?LinkID=135170",
+    "signer": null,
+    "timestamper": null
+  },
+  "checks": {
+    "linksExact": true,
+    "legacyRemoved": true,
+    "uninstallExact": true,
+    "protocolExact": true,
+    "clsid64Exact": true,
+    "clsid32Absent": true
+  },
+  "passed": true
+}

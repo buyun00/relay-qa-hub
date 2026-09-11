@@ -1,0 +1,199 @@
+{
+  "schemaVersion": 1,
+  "capturedAt": "2026-09-11T00:07:52.6318410Z",
+  "transition": {
+    "from": "0.2.0-preview.19",
+    "to": "0.2.0-preview.20",
+    "releaseId": "20260911T000006100Z",
+    "sourceCommit": "fd0f0f850f907b8a77aac8ec8b6a71b308bdd711"
+  },
+  "updaterDirectory": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-v21-e2e-fresh-0910\\desktop\\profile\\updates\\updater-20260911T000006100Z-26824-e694987d-e36e-45d9-abcf-170c490e5353",
+  "ini": {
+    "PackagePath": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-v21-e2e-fresh-0910\\desktop\\profile\\updates\\20260911T000006100Z.exe",
+    "AppPath": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview-v21-e2e-fresh-0910\\RelayQaHubPreview-v21-e2e-fresh-0910.exe",
+    "UserDataPath": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-v21-e2e-fresh-0910\\desktop\\profile",
+    "ParentPid": "26824",
+    "ResultPath": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-v21-e2e-fresh-0910\\desktop\\profile\\updates\\last-update-result.json",
+    "ReleaseId": "20260911T000006100Z",
+    "Version": "0.2.0-preview.20"
+  },
+  "log": [
+    "native updater started",
+    "handoff validated",
+    "main process exited; starting installer",
+    "update installed; relaunching application",
+    "application relaunch acknowledged"
+  ],
+  "result": {
+    "schemaVersion": 1,
+    "status": "installed",
+    "releaseId": "20260911T000006100Z",
+    "version": "0.2.0-preview.20",
+    "recordedAt": "2026-09-11T00:04:54Z"
+  },
+  "resultEncoding": "UTF-16LE-without-BOM",
+  "marker": {
+    "schemaVersion": 1,
+    "status": "ready",
+    "version": "0.2.0-preview.20",
+    "pid": 24848,
+    "recordedAt": "2026-09-11T00:04:54.429Z"
+  },
+  "main": {
+    "ProcessId": 24848,
+    "ParentProcessId": 25872,
+    "SessionId": 2,
+    "CreationDate": "2026-09-11T08:04:54.093271+08:00",
+    "ExecutablePath": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview-v21-e2e-fresh-0910\\RelayQaHubPreview-v21-e2e-fresh-0910.exe",
+    "CommandLine": "\"C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview-v21-e2e-fresh-0910\\RelayQaHubPreview-v21-e2e-fresh-0910.exe\" --updated --user-data-dir=\"C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-v21-e2e-fresh-0910\\desktop\\profile\" --update-relaunch-marker=\"C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-v21-e2e-fresh-0910\\desktop\\profile\\updates\\updater-20260911T000006100Z-26824-e694987d-e36e-45d9-abcf-170c490e5353\\relaunched.flag\""
+  },
+  "listeners": [
+    {
+      "port": 4174,
+      "pid": 7420,
+      "address": "0.0.0.0"
+    },
+    {
+      "port": 4319,
+      "pid": 14044,
+      "address": "0.0.0.0"
+    },
+    {
+      "port": 4320,
+      "pid": 17160,
+      "address": "127.0.0.1"
+    },
+    {
+      "port": 4639,
+      "pid": 19004,
+      "address": "127.0.0.1"
+    },
+    {
+      "port": 4640,
+      "pid": 20452,
+      "address": "127.0.0.1"
+    },
+    {
+      "port": 4641,
+      "pid": 19112,
+      "address": "127.0.0.1"
+    },
+    {
+      "port": 4642,
+      "pid": 24848,
+      "address": "127.0.0.1"
+    },
+    {
+      "port": 9333,
+      "pid": 26828,
+      "address": "127.0.0.1"
+    }
+  ],
+  "installed": {
+    "exe": {
+      "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview-v21-e2e-fresh-0910\\RelayQaHubPreview-v21-e2e-fresh-0910.exe",
+      "bytes": 235871744,
+      "sha256": "47e3d83120f29a6b2e0dc1fa54a2de6327c15c21620999b421b615a346e1fbac"
+    },
+    "asar": {
+      "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview-v21-e2e-fresh-0910\\resources\\app.asar",
+      "bytes": 1304284,
+      "sha256": "beecc244ab14d52a4b05e3475926285fb8fed2769c17d18f5e34e970644bbf96"
+    },
+    "updater": {
+      "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview-v21-e2e-fresh-0910\\RelayQaHubUpdater.exe",
+      "bytes": 422326,
+      "sha256": "1e0ec8e4f74d9dbfca43639f90bb677d0e4d7df817a13331d0beef6c8affef28"
+    },
+    "config": {
+      "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview-v21-e2e-fresh-0910\\preview-instance.json",
+      "bytes": 742,
+      "sha256": "dbde6a7d32476ed526bce22af042fd5eab0e7abf1cd4b871513688edc534a71c"
+    }
+  },
+  "portable": {
+    "exe": {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-v21-e2e-fresh-0910\\packages\\20260911T000006100Z\\portable\\RelayQaHubPreview-v21-e2e-fresh-0910-win32-x64\\RelayQaHubPreview-v21-e2e-fresh-0910.exe",
+      "bytes": 235871744,
+      "sha256": "47e3d83120f29a6b2e0dc1fa54a2de6327c15c21620999b421b615a346e1fbac"
+    },
+    "asar": {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-v21-e2e-fresh-0910\\packages\\20260911T000006100Z\\portable\\RelayQaHubPreview-v21-e2e-fresh-0910-win32-x64\\resources\\app.asar",
+      "bytes": 1304284,
+      "sha256": "beecc244ab14d52a4b05e3475926285fb8fed2769c17d18f5e34e970644bbf96"
+    },
+    "updater": {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-v21-e2e-fresh-0910\\packages\\20260911T000006100Z\\portable\\RelayQaHubPreview-v21-e2e-fresh-0910-win32-x64\\RelayQaHubUpdater.exe",
+      "bytes": 422326,
+      "sha256": "1e0ec8e4f74d9dbfca43639f90bb677d0e4d7df817a13331d0beef6c8affef28"
+    },
+    "config": {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-v21-e2e-fresh-0910\\packages\\20260911T000006100Z\\portable\\RelayQaHubPreview-v21-e2e-fresh-0910-win32-x64\\preview-instance.json",
+      "bytes": 809,
+      "sha256": "d3e0fdb023fde0ea84055d98d5b47a2ec985a14fb74c1740df37fa5d75d5cac2"
+    }
+  },
+  "rollback": {
+    "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview-v21-e2e-fresh-0910.backup-20260911T000006100Z",
+    "exe": {
+      "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview-v21-e2e-fresh-0910.backup-20260911T000006100Z\\RelayQaHubPreview-v21-e2e-fresh-0910.exe",
+      "bytes": 235871744,
+      "sha256": "28affaa88913a1aac78b6811cd05b271e46c470d987bd4b318eb0d2d38fa5273"
+    },
+    "asar": {
+      "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview-v21-e2e-fresh-0910.backup-20260911T000006100Z\\resources\\app.asar",
+      "bytes": 1304284,
+      "sha256": "06e4b4f4bab759c9f39bf0633a055714427406ff1cd1f1abcf72630adf5f4fa5"
+    },
+    "updater": {
+      "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview-v21-e2e-fresh-0910.backup-20260911T000006100Z\\RelayQaHubUpdater.exe",
+      "bytes": 422326,
+      "sha256": "1e0ec8e4f74d9dbfca43639f90bb677d0e4d7df817a13331d0beef6c8affef28"
+    },
+    "config": {
+      "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview-v21-e2e-fresh-0910.backup-20260911T000006100Z\\preview-instance.json",
+      "bytes": 742,
+      "sha256": "dbde6a7d32476ed526bce22af042fd5eab0e7abf1cd4b871513688edc534a71c"
+    }
+  },
+  "mcp": {
+    "jsonrpc": "2.0",
+    "id": 1,
+    "result": {
+      "protocolVersion": "2025-06-18",
+      "capabilities": {
+        "tools": {
+          "listChanged": false
+        },
+        "resources": {
+          "subscribe": false,
+          "listChanged": false
+        }
+      },
+      "serverInfo": {
+        "name": "qa-hub-desktop-preview",
+        "version": "0.2.0-preview.20"
+      },
+      "instructions": "先用项目姓名登录，再列出自己的项目。每个工具必须使用明确项目；本地 MCP 与独立服务端 MCP 共用 HTTP 业务。Bug 人工完成、验收通过、退回和关闭独立于五项可选组件。代码交付和第三方同步不代表验收关闭。附件 materialize 在本地校验后返回作用域隔离的文件。不要报告未执行的验证。"
+    }
+  },
+  "checks": {
+    "updaterDirectoryExact": true,
+    "iniExact": true,
+    "downloadedPackageExact": true,
+    "updaterBinaryExact": true,
+    "logSequenceExact": true,
+    "resultExact": true,
+    "markerExact": true,
+    "mainExact": true,
+    "installedMatchesPortable": true,
+    "preservedConfig": true,
+    "rollbackVersion19": true,
+    "desktopMcpOwned": true,
+    "cdpAbsent": true,
+    "mcpVersionExact": true,
+    "productionOwnersPreserved": true,
+    "isolatedServiceOwnersPreserved": true
+  },
+  "passed": true
+}

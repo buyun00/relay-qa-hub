@@ -1,0 +1,166 @@
+{
+  "schemaVersion": 1,
+  "kind": "relay-qa-hub-v21-postfix-final-evidence-summary",
+  "recordedAt": "2026-09-11T00:16:35.305Z",
+  "productSourceCommit": "fd0f0f850f907b8a77aac8ec8b6a71b308bdd711",
+  "overallStatus": "not_complete",
+  "completionAllowed": false,
+  "release": {
+    "releaseId": "20260911T000006100Z",
+    "version": "0.2.0-preview.20",
+    "sourceDirty": false,
+    "installer": {
+      "name": "qa-hub-preview-v21-e2e-fresh-0910-windows-0.2.0-preview.20-20260911T000006100Z.exe",
+      "bytes": 107992506,
+      "sha256": "e0e68a626657f4431447764d96f0cf95ded8b6b081c8b13f809ccacd252e7e41"
+    },
+    "manifest": {
+      "bytes": 480,
+      "sha256": "41083ceeaa88c7cbd115e258bc8d2cb2f3cc7e2f2105687bfd1246de842d0204",
+      "ed25519Verified": true
+    },
+    "receipt": {
+      "bytes": 93397,
+      "sha256": "5161bc558d5f6a32709b33601a18a32f3ad451be3848f360c4a7d51994e5ce5e"
+    },
+    "publication": {
+      "transactionId": "21de5e632f14ca7338abb8e16f0f644928e3f2da0735ffd36633df1e830f8460",
+      "contentCommitted": true,
+      "completed": true,
+      "recovered": false,
+      "stateValidation": "exact-single-link-receipt-latest-claim-history; temporary-and-active-absent"
+    }
+  },
+  "upgrade": {
+    "status": "pass",
+    "from": "0.2.0-preview.19",
+    "to": "0.2.0-preview.20",
+    "autoRelaunch": true,
+    "installed": {
+      "exe": {
+        "bytes": 235871744,
+        "sha256": "47e3d83120f29a6b2e0dc1fa54a2de6327c15c21620999b421b615a346e1fbac"
+      },
+      "asar": {
+        "bytes": 1304284,
+        "sha256": "beecc244ab14d52a4b05e3475926285fb8fed2769c17d18f5e34e970644bbf96"
+      }
+    },
+    "rollback": {
+      "version": "0.2.0-preview.19",
+      "exeSha256": "28affaa88913a1aac78b6811cd05b271e46c470d987bd4b318eb0d2d38fa5273",
+      "asarSha256": "06e4b4f4bab759c9f39bf0633a055714427406ff1cd1f1abcf72630adf5f4fa5"
+    },
+    "preserved": {
+      "previewConfigSha256": "dbde6a7d32476ed526bce22af042fd5eab0e7abf1cd4b871513688edc534a71c",
+      "projectId": "305b4def-ae7e-4a2d-ae96-a05d616390bf",
+      "primaryDraftSha256": "125cf35171bf74f353b590141b55f8b51d8c03f6bf9b7a66bb4da317832ac56c",
+      "fallbackDraftSha256": "4633cd88dc0b379c68827d385575105a4e24f407314a2c4ca3638a62918d0166"
+    },
+    "localMcp": {
+      "port": 4642,
+      "version": "0.2.0-preview.20"
+    }
+  },
+  "registration": {
+    "status": "pass",
+    "appUserModelId": "com.relayqahub.desktop.preview.v21.e2e.fresh.0910",
+    "toastActivatorClsid": "{27F8E9AF-5D78-5B08-8ED1-4E810F2046D5}",
+    "shortcutCount": 2,
+    "legacyShortcutsAbsent": true,
+    "protocolExact": true,
+    "uninstallVersion": "0.2.0-preview.20"
+  },
+  "authenticode": {
+    "required": true,
+    "status": "fail",
+    "observed": "NotSigned",
+    "signer": null,
+    "timestamper": null,
+    "completionImpact": "blocks_agent_scope_completion"
+  },
+  "notification": {
+    "gateId": "desktop-notification-project-route-live",
+    "runId": "81c44b26-5c6f-47c6-a56a-d4eb27f19d7a",
+    "status": "fail",
+    "classification": "environment_blocker",
+    "environmentOnly": true,
+    "productPass": false,
+    "errorCode": "WINDOWS_TOAST_SESSION_MISMATCH",
+    "runnerSessionId": 2,
+    "activeConsoleSessionId": 1,
+    "wpnDestinationSessionId": 1,
+    "businessFixturesCreated": 0,
+    "businessWriteRequests": 0,
+    "readOnlyReadinessRequests": 1,
+    "allRecordedChecksPassed": true,
+    "recordedCheckCount": 39,
+    "completionImpact": "blocks_agent_scope_completion"
+  },
+  "userOnlyGates": [
+    {
+      "id": "android-physical-device",
+      "status": "not_run",
+      "owner": "user",
+      "handoffStatus": "delegated_pending",
+      "agentExecuted": false,
+      "completionImpact": "blocks_final_acceptance",
+      "resultLabel": "用户自测／已移交，代理未执行"
+    },
+    {
+      "id": "external-build-terminal",
+      "status": "not_run",
+      "owner": "user",
+      "handoffStatus": "delegated_pending",
+      "agentExecuted": false,
+      "completionImpact": "blocks_final_acceptance",
+      "resultLabel": "用户自测／已移交，代理未执行"
+    },
+    {
+      "id": "external-single-build-upload-terminal",
+      "status": "not_run",
+      "owner": "user",
+      "handoffStatus": "delegated_pending",
+      "agentExecuted": false,
+      "completionImpact": "blocks_final_acceptance",
+      "resultLabel": "用户自测／已移交，代理未执行"
+    },
+    {
+      "id": "external-incremental-publication-terminal",
+      "status": "not_run",
+      "owner": "user",
+      "handoffStatus": "delegated_pending",
+      "agentExecuted": false,
+      "completionImpact": "blocks_final_acceptance",
+      "resultLabel": "用户自测／已移交，代理未执行"
+    },
+    {
+      "id": "external-relay-delivery-terminal",
+      "status": "not_run",
+      "owner": "user",
+      "handoffStatus": "delegated_pending",
+      "agentExecuted": false,
+      "completionImpact": "blocks_final_acceptance",
+      "resultLabel": "用户自测／已移交，代理未执行"
+    },
+    {
+      "id": "external-qingyu-order-terminal",
+      "status": "not_run",
+      "owner": "user",
+      "handoffStatus": "delegated_pending",
+      "agentExecuted": false,
+      "completionImpact": "blocks_final_acceptance",
+      "resultLabel": "用户自测／已移交，代理未执行"
+    }
+  ],
+  "evidence": {
+    "receipt": "continuation-20260911/postfix-fd0f0f8/package/receipt.json",
+    "publicationResult": "continuation-20260911/postfix-fd0f0f8/package/publication-result.json",
+    "signedManifest": "continuation-20260911/postfix-fd0f0f8/package/signed-manifest.json",
+    "autoRelaunch": "continuation-20260911/postfix-fd0f0f8/upgrade/auto-relaunch-verification.json",
+    "preUpgradeReadback": "continuation-20260911/postfix-fd0f0f8/upgrade/preupgrade-readonly.json",
+    "postUpgradeReadback": "continuation-20260911/postfix-fd0f0f8/upgrade/postupgrade-readonly.json",
+    "registration": "continuation-20260911/postfix-fd0f0f8/upgrade/registration-readonly.json",
+    "notificationProof": "../desktop-notification-project-route-live/81c44b26-5c6f-47c6-a56a-d4eb27f19d7a/proof.json"
+  }
+}

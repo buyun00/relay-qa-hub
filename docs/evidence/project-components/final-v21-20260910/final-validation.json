@@ -1,15 +1,69 @@
 {
   "schemaVersion": 2,
-  "validatedAt": "2026-09-10T16:24:40.201Z",
+  "validatedAt": "2026-09-11T00:33:08.224Z",
   "validationScope": "evidence_structure_and_declared_gate_consistency",
-  "sourceCommit": "c4e2eb7d9341a16d2430df9073a93f44f381dd2b",
-  "productSourceCommit": "c4e2eb7d9341a16d2430df9073a93f44f381dd2b",
+  "sourceCommit": "fd0f0f850f907b8a77aac8ec8b6a71b308bdd711",
+  "productSourceCommit": "fd0f0f850f907b8a77aac8ec8b6a71b308bdd711",
   "acceptanceOverallStatus": "not_complete",
   "agentScopeStatus": "incomplete_agent_revalidation_pending",
   "completionAllowed": false,
   "delegatedUserCases": 6,
   "delegatedCasesAllNotRun": true,
   "agentGatesAllPassed": false,
+  "postfixEvidence": {
+    "passed": true,
+    "releaseId": "20260911T000006100Z",
+    "version": "0.2.0-preview.20",
+    "packagePublicationPassed": true,
+    "installedUpgradePassed": true,
+    "registrationPassed": true
+  },
+  "agentBlockers": [
+    {
+      "id": "windows-authenticode",
+      "status": "fail",
+      "owner": "agent",
+      "completionImpact": "blocks_agent_scope_completion",
+      "evidence": [
+        "continuation-20260911/postfix-fd0f0f8/upgrade/registration-readonly.json",
+        "continuation-20260911/postfix-fd0f0f8/summary.json"
+      ],
+      "classification": "required_artifact_signature",
+      "required": true,
+      "observed": "NotSigned"
+    },
+    {
+      "id": "desktop-notification-project-route-live",
+      "status": "fail",
+      "owner": "agent",
+      "completionImpact": "blocks_agent_scope_completion",
+      "evidence": [
+        "../desktop-notification-project-route-live/81c44b26-5c6f-47c6-a56a-d4eb27f19d7a/proof.json",
+        "continuation-20260911/postfix-fd0f0f8/summary.json"
+      ],
+      "classification": "environment_blocker",
+      "productPass": false
+    }
+  ],
+  "authenticode": {
+    "required": true,
+    "status": "fail",
+    "observed": "NotSigned",
+    "signer": null,
+    "timestamper": null,
+    "completionImpact": "blocks_agent_scope_completion",
+    "evidence": [
+      "continuation-20260911/postfix-fd0f0f8/upgrade/registration-readonly.json",
+      "continuation-20260911/postfix-fd0f0f8/summary.json"
+    ]
+  },
+  "notificationGate": {
+    "id": "desktop-notification-project-route-live",
+    "status": "fail",
+    "classification": "environment_blocker",
+    "productPass": false,
+    "semanticProof": "../desktop-notification-project-route-live/81c44b26-5c6f-47c6-a56a-d4eb27f19d7a/proof.json"
+  },
   "fineGrainedCoverage": {
     "items": 1030,
     "retiredItems": 47,
@@ -17,8 +71,8 @@
   },
   "coverageSourceHead": "7b14dce3c981e56d5841ce38ea9025606fa44d0c",
   "coverageProductSourceMatches": false,
-  "indexedTrackedFiles": 355,
-  "parsedIndexedJsonFiles": 147,
+  "indexedTrackedFiles": 365,
+  "parsedIndexedJsonFiles": 155,
   "indexCompleteTrackedSetVerified": true,
   "serverMcpEvidenceScope": {
     "claim": "catalog_and_executed_business_subset",

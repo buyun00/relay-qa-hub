@@ -1,10 +1,10 @@
 {
   "schemaVersion": 1,
-  "recordedAt": "2026-09-10T16:24:28.894Z",
+  "recordedAt": "2026-09-11T00:33:05.391Z",
   "designVersion": "2.1",
   "overallStatus": "not_complete",
   "completionAllowed": false,
-  "productSourceCommit": "c4e2eb7d9341a16d2430df9073a93f44f381dd2b",
+  "productSourceCommit": "fd0f0f850f907b8a77aac8ec8b6a71b308bdd711",
   "coverageFixCommit": "04f22a5075fb6e534ab1303c8ff4e886296168ed",
   "isolatedRuntime": {
     "api": "http://127.0.0.1:4639",
@@ -31,13 +31,24 @@
       "sourceCommit": "88a6d0f9c31106f6cd3fc9edbadca0db6bf6397b"
     },
     "windows": {
-      "releaseId": "20260910T135324626Z",
-      "version": "0.2.0-preview.17",
-      "bytes": 108488136,
-      "sha256": "1c67b6555ffeeefff3ce885acfd09735dc6bc650570e3b53d109c8ad617d11d4",
+      "releaseId": "20260911T000006100Z",
+      "version": "0.2.0-preview.20",
+      "bytes": 107992506,
+      "sha256": "e0e68a626657f4431447764d96f0cf95ded8b6b081c8b13f809ccacd252e7e41",
       "manifestEd25519": true,
-      "authenticode": "not_revalidated_for_build17",
-      "sourceCommit": "c4e2eb7d9341a16d2430df9073a93f44f381dd2b"
+      "authenticode": {
+        "required": true,
+        "status": "fail",
+        "observed": "NotSigned",
+        "signer": null,
+        "timestamper": null,
+        "completionImpact": "blocks_agent_scope_completion",
+        "evidence": [
+          "continuation-20260911/postfix-fd0f0f8/upgrade/registration-readonly.json",
+          "continuation-20260911/postfix-fd0f0f8/summary.json"
+        ]
+      },
+      "sourceCommit": "fd0f0f850f907b8a77aac8ec8b6a71b308bdd711"
     },
     "web": {
       "asset": "/assets/index-BHhxArNW.js",
@@ -305,9 +316,16 @@
         "continuation-20260910/postfix-c4e2eb7/windows-build17-package/package-verification.json",
         "continuation-20260910/postfix-c4e2eb7/windows-build17-upgrade/auto-relaunch-verification.json",
         "continuation-20260910/postfix-c4e2eb7/windows-build17-upgrade/post-upgrade-readonly.json",
-        "continuation-20260910/postfix-c4e2eb7/final-runtime/canonical-relaunch-20260910T152101642Z-82efc9c9-66e9-44e1-8160-7a3af37b4fa2/07-final-runtime-verification.json"
+        "continuation-20260910/postfix-c4e2eb7/final-runtime/canonical-relaunch-20260910T152101642Z-82efc9c9-66e9-44e1-8160-7a3af37b4fa2/07-final-runtime-verification.json",
+        "continuation-20260911/postfix-fd0f0f8/summary.json",
+        "continuation-20260911/postfix-fd0f0f8/package/receipt.json",
+        "continuation-20260911/postfix-fd0f0f8/package/publication-result.json",
+        "continuation-20260911/postfix-fd0f0f8/package/signed-manifest.json",
+        "continuation-20260911/postfix-fd0f0f8/upgrade/auto-relaunch-verification.json",
+        "continuation-20260911/postfix-fd0f0f8/upgrade/postupgrade-readonly.json",
+        "continuation-20260911/postfix-fd0f0f8/upgrade/registration-readonly.json"
       ],
-      "detail": "The isolated signed updater completed 0.2.0-preview.16 to 0.2.0-preview.17, relaunched the exact installed executable, preserved its rollback backup, identity, project, drafts, and local MCP, and reconnected without INBOX_READ_FAILED. Desktop notification routing remains a separate agent revalidation gate."
+      "detail": "The isolated signed-manifest updater completed 0.2.0-preview.19 to 0.2.0-preview.20, relaunched the exact installed executable, preserved the version 19 rollback backup, preview configuration, project, drafts, and local MCP, and passed the post-upgrade read-only reload. Authenticode and desktop notification routing remain separate failed agent gates."
     },
     {
       "id": "android-build-feed-install",
@@ -386,9 +404,12 @@
       "evidence": [
         "coexistence-final.json",
         "coexistence-post-restart.json",
-        "continuation-20260910/postfix-c4e2eb7/final-runtime/canonical-relaunch-20260910T152101642Z-82efc9c9-66e9-44e1-8160-7a3af37b4fa2/07-final-runtime-verification.json"
+        "continuation-20260910/postfix-c4e2eb7/final-runtime/canonical-relaunch-20260910T152101642Z-82efc9c9-66e9-44e1-8160-7a3af37b4fa2/07-final-runtime-verification.json",
+        "continuation-20260911/postfix-fd0f0f8/upgrade/auto-relaunch-verification.json",
+        "../desktop-notification-project-route-live/81c44b26-5c6f-47c6-a56a-d4eb27f19d7a/proof.json",
+        "continuation-20260911/postfix-fd0f0f8/summary.json"
       ],
-      "detail": "The canonical build 17 trial runtime is running on the original isolated profile, owns only local MCP 4642 and CDP 9433, and retained the exact identity and drafts. Protected production and preview service listener tuples were byte-for-byte unchanged before and after read-only inspection. Native toast visibility remains a separate failed agent gate."
+      "detail": "Build 20 auto-relaunch preserved the production and isolated service owners while local MCP 4642 belonged to the upgraded preview. The later native-notification preflight started and gracefully stopped only its exact child, and its final host check kept the pre-existing QA Hub process and protected listener fingerprints unchanged. Native toast visibility itself remains failed."
     },
     {
       "id": "final-source-gate",
@@ -404,9 +425,11 @@
         "../desktop-notification-project-route-live/1f89daba-cf96-4138-b8d4-62b8377e38d7/proof.json",
         "../desktop-notification-project-route-live/9ca4df2d-11a7-4d1c-8707-c66884afb2a6/proof.json",
         "continuation-20260910/postfix-c4e2eb7/native-notification/session-routing-analysis.json",
-        "continuation-20260910/postfix-c4e2eb7/native-notification/session-routing-event-5638.json"
+        "continuation-20260910/postfix-c4e2eb7/native-notification/session-routing-event-5638.json",
+        "continuation-20260911/postfix-fd0f0f8/summary.json",
+        "../desktop-notification-project-route-live/81c44b26-5c6f-47c6-a56a-d4eb27f19d7a/proof.json"
       ],
-      "detail": "Product source is anchored at c4e2eb7d9341a16d2430df9073a93f44f381dd2b, but one or more required agent gates remain failed, pending, or unreported."
+      "detail": "Product source is anchored at fd0f0f850f907b8a77aac8ec8b6a71b308bdd711, but one or more required agent gates remain failed, pending, or unreported."
     },
     {
       "id": "final-api-runtime-restart-and-durable-readback",
@@ -428,21 +451,44 @@
         "../runs/server-mcp-core-2026-09-10T08-40-47-204Z.json",
         "../runs/desktop-mcp-core-2026-09-10T08-41-32-807Z.json"
       ]
+    },
+    {
+      "id": "windows-authenticode",
+      "evidence": [
+        "continuation-20260911/postfix-fd0f0f8/upgrade/registration-readonly.json",
+        "continuation-20260911/postfix-fd0f0f8/summary.json"
+      ],
+      "status": "fail",
+      "owner": "agent",
+      "completionImpact": "blocks_agent_scope_completion",
+      "detail": "Authenticode is required for final acceptance. The installed build 20 EXE was inspected after upgrade and returned NotSigned with no signer or timestamper, so this gate remains failed."
     }
   ],
   "blocking": [
+    {
+      "id": "windows-authenticode",
+      "status": "fail",
+      "owner": "agent",
+      "completionImpact": "blocks_agent_scope_completion",
+      "evidence": [
+        "continuation-20260911/postfix-fd0f0f8/upgrade/registration-readonly.json",
+        "continuation-20260911/postfix-fd0f0f8/summary.json"
+      ],
+      "classification": "required_artifact_signature",
+      "required": true,
+      "observed": "NotSigned"
+    },
     {
       "id": "desktop-notification-project-route-live",
       "status": "fail",
       "owner": "agent",
       "completionImpact": "blocks_agent_scope_completion",
       "evidence": [
-        "../desktop-notification-project-route-live/d77ea52e-f6c4-4e69-8259-06f2ce9e359d/proof.json",
-        "../desktop-notification-project-route-live/1f89daba-cf96-4138-b8d4-62b8377e38d7/proof.json",
-        "../desktop-notification-project-route-live/9ca4df2d-11a7-4d1c-8707-c66884afb2a6/proof.json",
-        "continuation-20260910/postfix-c4e2eb7/native-notification/session-routing-analysis.json",
-        "continuation-20260910/postfix-c4e2eb7/native-notification/session-routing-event-5638.json"
-      ]
+        "../desktop-notification-project-route-live/81c44b26-5c6f-47c6-a56a-d4eb27f19d7a/proof.json",
+        "continuation-20260911/postfix-fd0f0f8/summary.json"
+      ],
+      "classification": "environment_blocker",
+      "productPass": false
     },
     {
       "id": "android-physical-device",
@@ -500,17 +546,13 @@
     }
   ],
   "sourceGate": {
-    "productSourceCommit": "c4e2eb7d9341a16d2430df9073a93f44f381dd2b",
+    "productSourceCommit": "fd0f0f850f907b8a77aac8ec8b6a71b308bdd711",
     "status": "incomplete_agent_revalidation_pending",
     "agentGateReport": null,
     "allRequiredAgentGatesPassed": false,
     "evidence": [
-      "continuation-20260910/postfix-c4e2eb7/windows-build17-package/package-verification.json",
-      "../desktop-notification-project-route-live/d77ea52e-f6c4-4e69-8259-06f2ce9e359d/proof.json",
-      "../desktop-notification-project-route-live/1f89daba-cf96-4138-b8d4-62b8377e38d7/proof.json",
-      "../desktop-notification-project-route-live/9ca4df2d-11a7-4d1c-8707-c66884afb2a6/proof.json",
-      "continuation-20260910/postfix-c4e2eb7/native-notification/session-routing-analysis.json",
-      "continuation-20260910/postfix-c4e2eb7/native-notification/session-routing-event-5638.json"
+      "continuation-20260911/postfix-fd0f0f8/summary.json",
+      "../desktop-notification-project-route-live/81c44b26-5c6f-47c6-a56a-d4eb27f19d7a/proof.json"
     ]
   },
   "fineGrainedCoverage": {
@@ -523,26 +565,33 @@
   "agentScopeStatus": "incomplete_agent_revalidation_pending",
   "userAcceptanceStatus": "delegated_pending",
   "sourceProvenance": {
-    "productSourceAnchor": "c4e2eb7d9341a16d2430df9073a93f44f381dd2b",
+    "productSourceAnchor": "fd0f0f850f907b8a77aac8ec8b6a71b308bdd711",
     "windowsTrialArtifact": {
-      "sourceCommit": "c4e2eb7d9341a16d2430df9073a93f44f381dd2b",
+      "sourceCommit": "fd0f0f850f907b8a77aac8ec8b6a71b308bdd711",
+      "releaseId": "20260911T000006100Z",
+      "version": "0.2.0-preview.20",
       "evidence": [
-        "continuation-20260910/postfix-c4e2eb7/windows-build17-package/package-verification.json",
-        "continuation-20260910/postfix-c4e2eb7/windows-build17-upgrade/auto-relaunch-verification.json"
+        "continuation-20260911/postfix-fd0f0f8/summary.json",
+        "continuation-20260911/postfix-fd0f0f8/package/receipt.json",
+        "continuation-20260911/postfix-fd0f0f8/package/publication-result.json",
+        "continuation-20260911/postfix-fd0f0f8/package/signed-manifest.json"
       ]
     },
     "webInWindowsTrialArtifact": {
-      "sourceCommit": "c4e2eb7d9341a16d2430df9073a93f44f381dd2b",
+      "sourceCommit": "fd0f0f850f907b8a77aac8ec8b6a71b308bdd711",
       "packagedByteExact": true,
       "evidence": [
-        "continuation-20260910/postfix-c4e2eb7/windows-build17-package/package-verification.json"
+        "continuation-20260911/postfix-fd0f0f8/summary.json",
+        "continuation-20260911/postfix-fd0f0f8/package/receipt.json"
       ]
     },
     "windowsTrialRuntime": {
-      "sourceCommit": "c4e2eb7d9341a16d2430df9073a93f44f381dd2b",
-      "status": "trial_runtime_ready",
+      "sourceCommit": "fd0f0f850f907b8a77aac8ec8b6a71b308bdd711",
+      "status": "upgrade_verified",
       "evidence": [
-        "continuation-20260910/postfix-c4e2eb7/final-runtime/canonical-relaunch-20260910T152101642Z-82efc9c9-66e9-44e1-8160-7a3af37b4fa2/07-final-runtime-verification.json"
+        "continuation-20260911/postfix-fd0f0f8/upgrade/auto-relaunch-verification.json",
+        "continuation-20260911/postfix-fd0f0f8/upgrade/postupgrade-readonly.json",
+        "../desktop-notification-project-route-live/81c44b26-5c6f-47c6-a56a-d4eb27f19d7a/proof.json"
       ]
     },
     "retainedAndroidTrialArtifact": {
@@ -560,21 +609,33 @@
         "continuation-20260910/web-cua-readback.json"
       ]
     },
-    "note": "The product source anchor and Windows/Web build 17 package are c4e2eb7. The retained Android artifact predates that commit but its apps/android Git tree is identical. Historical browser evidence keeps its recorded source; current-source agent revalidation is tracked separately and cannot be inferred from source equivalence."
+    "note": "The product source anchor and Windows/Web build 20 package are fd0f0f8. The retained Android artifact predates that commit but its apps/android Git tree is identical. Historical browser evidence keeps its recorded source; current-source agent revalidation is tracked separately and cannot be inferred from source equivalence."
   },
   "agentBlocking": [
+    {
+      "id": "windows-authenticode",
+      "status": "fail",
+      "owner": "agent",
+      "completionImpact": "blocks_agent_scope_completion",
+      "evidence": [
+        "continuation-20260911/postfix-fd0f0f8/upgrade/registration-readonly.json",
+        "continuation-20260911/postfix-fd0f0f8/summary.json"
+      ],
+      "classification": "required_artifact_signature",
+      "required": true,
+      "observed": "NotSigned"
+    },
     {
       "id": "desktop-notification-project-route-live",
       "status": "fail",
       "owner": "agent",
       "completionImpact": "blocks_agent_scope_completion",
       "evidence": [
-        "../desktop-notification-project-route-live/d77ea52e-f6c4-4e69-8259-06f2ce9e359d/proof.json",
-        "../desktop-notification-project-route-live/1f89daba-cf96-4138-b8d4-62b8377e38d7/proof.json",
-        "../desktop-notification-project-route-live/9ca4df2d-11a7-4d1c-8707-c66884afb2a6/proof.json",
-        "continuation-20260910/postfix-c4e2eb7/native-notification/session-routing-analysis.json",
-        "continuation-20260910/postfix-c4e2eb7/native-notification/session-routing-event-5638.json"
-      ]
+        "../desktop-notification-project-route-live/81c44b26-5c6f-47c6-a56a-d4eb27f19d7a/proof.json",
+        "continuation-20260911/postfix-fd0f0f8/summary.json"
+      ],
+      "classification": "environment_blocker",
+      "productPass": false
     }
   ],
   "userAcceptancePending": [
@@ -644,7 +705,7 @@
   "productAcceptancePassed": false,
   "agentRevalidation": {
     "schemaVersion": 1,
-    "sourceCommit": "c4e2eb7d9341a16d2430df9073a93f44f381dd2b",
+    "sourceCommit": "fd0f0f850f907b8a77aac8ec8b6a71b308bdd711",
     "report": null,
     "reportSupplied": false,
     "requiredGateIds": [
@@ -654,14 +715,14 @@
       {
         "id": "desktop-notification-project-route-live",
         "status": "fail",
-        "detail": "Durable notification content reached Windows, but WPN routed it to SessionId 1 while the active RDP observer was in SessionId 2. The required visible toast plus InvokePattern route was not observed, so a passing rerun is still required; delivery logs are not UI proof.",
+        "classification": "environment_blocker",
+        "productPass": false,
+        "detail": "The build 20 preflight submitted and closed its native test notification, but WPN routed it to console SessionId 1 while the app and observer ran in RDP SessionId 2. No business fixture or business write request was created; only one read-only readiness request ran. The environment blocker is not a product pass.",
         "evidence": [
-          "../desktop-notification-project-route-live/d77ea52e-f6c4-4e69-8259-06f2ce9e359d/proof.json",
-          "../desktop-notification-project-route-live/1f89daba-cf96-4138-b8d4-62b8377e38d7/proof.json",
-          "../desktop-notification-project-route-live/9ca4df2d-11a7-4d1c-8707-c66884afb2a6/proof.json",
-          "continuation-20260910/postfix-c4e2eb7/native-notification/session-routing-analysis.json",
-          "continuation-20260910/postfix-c4e2eb7/native-notification/session-routing-event-5638.json"
-        ]
+          "../desktop-notification-project-route-live/81c44b26-5c6f-47c6-a56a-d4eb27f19d7a/proof.json",
+          "continuation-20260911/postfix-fd0f0f8/summary.json"
+        ],
+        "semanticProof": "../desktop-notification-project-route-live/81c44b26-5c6f-47c6-a56a-d4eb27f19d7a/proof.json"
       }
     ],
     "allRequiredGatesPassed": false

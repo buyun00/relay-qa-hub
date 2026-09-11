@@ -5,7 +5,7 @@ import { lstat, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-const productSourceCommit = "c4e2eb7d9341a16d2430df9073a93f44f381dd2b";
+const productSourceCommit = "fd0f0f850f907b8a77aac8ec8b6a71b308bdd711";
 const outputName = "evidence-index.json";
 const excludedPaths = [outputName, "final-validation.json"];
 

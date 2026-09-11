@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "kind": "relay-qa-hub-preview-publication-result",
+  "completedAt": "2026-09-11T00:03:10.419Z",
+  "receiptSha256": "5161bc558d5f6a32709b33601a18a32f3ad451be3848f360c4a7d51994e5ce5e",
+  "transactionId": "21de5e632f14ca7338abb8e16f0f644928e3f2da0735ffd36633df1e830f8460",
+  "recovered": false,
+  "recoveryReason": "direct-create-only-publication",
+  "latest": {
+    "name": "qa-hub-preview-v21-e2e-fresh-0910-windows-latest.json",
+    "url": "http://127.0.0.1:4640/downloads/qa-hub-preview-v21-e2e-fresh-0910-windows-latest.json",
+    "bytes": 480,
+    "sha256": "41083ceeaa88c7cbd115e258bc8d2cb2f3cc7e2f2105687bfd1246de842d0204",
+    "httpValidation": "exact-signed-bytes"
+  },
+  "installer": {
+    "name": "qa-hub-preview-v21-e2e-fresh-0910-windows-0.2.0-preview.20-20260911T000006100Z.exe",
+    "url": "http://127.0.0.1:4640/downloads/qa-hub-preview-v21-e2e-fresh-0910-windows-0.2.0-preview.20-20260911T000006100Z.exe",
+    "bytes": 107992506,
+    "sha256": "e0e68a626657f4431447764d96f0cf95ded8b6b081c8b13f809ccacd252e7e41",
+    "httpValidation": "exact-bytes",
+    "moveRecovered": false
+  },
+  "candidateManifestMoveRecovered": false,
+  "stateValidation": {
+    "schemaVersion": 1,
+    "transactionId": "21de5e632f14ca7338abb8e16f0f644928e3f2da0735ffd36633df1e830f8460",
+    "receiptSha256": "5161bc558d5f6a32709b33601a18a32f3ad451be3848f360c4a7d51994e5ce5e",
+    "replacementSha256": "41083ceeaa88c7cbd115e258bc8d2cb2f3cc7e2f2105687bfd1246de842d0204",
+    "previousSha256": "b9c16031603c3b3b820354f694c7643cebcb107bd0e936e95f4ed95c271392d9",
+    "markerSha256": "4d0cdd65a45b9c76d3e4da7b5993cc63a8b6afe365f26dd95c5cfca4c51e21c6",
+    "claimSha256": "b9c16031603c3b3b820354f694c7643cebcb107bd0e936e95f4ed95c271392d9",
+    "claimName": "qa-hub-preview-v21-e2e-fresh-0910-windows-latest.json.publication-claim-21de5e632f14ca7338abb8e16f0f644928e3f2da0735ffd36633df1e830f8460",
+    "historyName": "qa-hub-preview-v21-e2e-fresh-0910-windows-publication.sqlite.history-21de5e632f14ca7338abb8e16f0f644928e3f2da0735ffd36633df1e830f8460.json",
+    "contentCommitted": true,
+    "completed": true,
+    "recovered": false,
+    "stateValidation": "exact-single-link-receipt-latest-claim-history; temporary-and-active-absent"
+  },
+  "claimName": "qa-hub-preview-v21-e2e-fresh-0910-windows-latest.json.publication-claim-21de5e632f14ca7338abb8e16f0f644928e3f2da0735ffd36633df1e830f8460",
+  "historyName": "qa-hub-preview-v21-e2e-fresh-0910-windows-publication.sqlite.history-21de5e632f14ca7338abb8e16f0f644928e3f2da0735ffd36633df1e830f8460.json"
+}

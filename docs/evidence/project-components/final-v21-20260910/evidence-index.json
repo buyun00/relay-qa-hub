@@ -1,9 +1,9 @@
 {
   "schemaVersion": 2,
-  "recordedAt": "2026-09-10T16:24:39.366Z",
+  "recordedAt": "2026-09-11T00:33:06.837Z",
   "root": "docs/evidence/project-components/final-v21-20260910",
-  "sourceCommit": "c4e2eb7d9341a16d2430df9073a93f44f381dd2b",
-  "productSourceCommit": "c4e2eb7d9341a16d2430df9073a93f44f381dd2b",
+  "sourceCommit": "fd0f0f850f907b8a77aac8ec8b6a71b308bdd711",
+  "productSourceCommit": "fd0f0f850f907b8a77aac8ec8b6a71b308bdd711",
   "selection": {
     "method": "git ls-files",
     "trackedOnly": true,
@@ -13,19 +13,19 @@
     ],
     "completeTrackedSetVerified": true
   },
-  "files": 355,
-  "totalBytes": 46862696,
-  "aggregateSha256": "d564eebbcca6f9e697417f563b58b2258c99222ecd0b36c2e668d9cf44e61612",
+  "files": 365,
+  "totalBytes": 47034439,
+  "aggregateSha256": "0f2bc32875e122f61c0cee657bad78fdea171612f75a67516d2750782be7da38",
   "entries": [
     {
       "path": "acceptance-matrix.json",
-      "bytes": 24700,
-      "sha256": "7a33be067ed83507520d4daf5dac99e9ef9be44b9ab229137dfb70c2682edbbd"
+      "bytes": 26732,
+      "sha256": "d3c293fc79d5086d13d6753e4090047d547d3b0a9a9f49d39b8ba4d258675caa"
     },
     {
       "path": "acceptance-matrix.md",
-      "bytes": 12853,
-      "sha256": "c80fd45b634530102d6cf9a189daaf605006e29b308d196358c98b38971bdc31"
+      "bytes": 14065,
+      "sha256": "6ed7b74752d6d773d5ac347634594eff844091df12398d1cb80e722924516f8e"
     },
     {
       "path": "android/acceptance/android-code27-self-update/android-code27-feed-http.json",
@@ -1214,8 +1214,8 @@
     },
     {
       "path": "continuation-20260910/postfix-bb035c4/windows-build16-upgrade/build16-postupgrade-readonly.mjs",
-      "bytes": 9293,
-      "sha256": "09f5908e21c8d6064e73e3fbb4a134565d61ef4d2b7a7f9de2d723f76fd73d76"
+      "bytes": 9367,
+      "sha256": "6507b7d9431e5e3a80f9c98e3e76d5529bfb8e66ece8601e58cc5acd9a0c37d5"
     },
     {
       "path": "continuation-20260910/postfix-bb035c4/windows-build16-upgrade/cold-profile-after-downgrade.json",
@@ -1484,8 +1484,8 @@
     },
     {
       "path": "continuation-20260910/postfix-c4e2eb7/windows-build17-upgrade/inspect-installed-readonly.mjs",
-      "bytes": 10466,
-      "sha256": "4a9c4f278110e3133afea87a21199fa5a663a3785fc68e19c72f6c378a62d579"
+      "bytes": 10539,
+      "sha256": "b935c43aeba4938ac0ddd19c44341811d89d77d17c4b71136dfa6e4badb7b561"
     },
     {
       "path": "continuation-20260910/postfix-c4e2eb7/windows-build17-upgrade/install-request.json",
@@ -1563,6 +1563,56 @@
       "sha256": "ad83e700279fbb5f7a57fc1acace3975b40d38a1295c55bfd157f5c784b0b24e"
     },
     {
+      "path": "continuation-20260911/postfix-fd0f0f8/package/publication-result.json",
+      "bytes": 2564,
+      "sha256": "fe788e722763a445b3bbc4380aa90cd6bcd0d172c61df7019ea80fee5a195c70"
+    },
+    {
+      "path": "continuation-20260911/postfix-fd0f0f8/package/receipt.json",
+      "bytes": 93397,
+      "sha256": "5161bc558d5f6a32709b33601a18a32f3ad451be3848f360c4a7d51994e5ce5e"
+    },
+    {
+      "path": "continuation-20260911/postfix-fd0f0f8/package/signed-manifest.json",
+      "bytes": 480,
+      "sha256": "41083ceeaa88c7cbd115e258bc8d2cb2f3cc7e2f2105687bfd1246de842d0204"
+    },
+    {
+      "path": "continuation-20260911/postfix-fd0f0f8/README.md",
+      "bytes": 1456,
+      "sha256": "7bda97f0b18186f7489f8adff6d6dbfcea0404457088ee3baf777fb7c848f8c9"
+    },
+    {
+      "path": "continuation-20260911/postfix-fd0f0f8/summary.json",
+      "bytes": 6123,
+      "sha256": "74d4ce8a66100321c47058055872b20dcf2a15b941914eaaaaa28c4282c173f0"
+    },
+    {
+      "path": "continuation-20260911/postfix-fd0f0f8/upgrade/auto-relaunch-verification.json",
+      "bytes": 8418,
+      "sha256": "7ecf6926ef87bba2c946eef6585fcf20acc58bf291ef5f0c06306638e8ab001a"
+    },
+    {
+      "path": "continuation-20260911/postfix-fd0f0f8/upgrade/postupgrade-readonly.json",
+      "bytes": 6304,
+      "sha256": "a569aaef15607b069de2a4b40d2e2486a19250d53fc2052b6d22a7de0416449b"
+    },
+    {
+      "path": "continuation-20260911/postfix-fd0f0f8/upgrade/preupgrade-readonly.json",
+      "bytes": 6380,
+      "sha256": "74e9b7db334eec5b542c7f434e073fd0afbc588f926212f9844c4556ed91ac65"
+    },
+    {
+      "path": "continuation-20260911/postfix-fd0f0f8/upgrade/registration-readonly.json",
+      "bytes": 3046,
+      "sha256": "5fa14c67019f727c54cb36b9fad021bc4efc3f245c665d60698b5e183bfa6143"
+    },
+    {
+      "path": "continuation-20260911/postfix-fd0f0f8/validate-postfix-evidence.mjs",
+      "bytes": 21717,
+      "sha256": "ee54b8ed71d9819a9cf5d520eb286628d5ecb186b600599e4421c944fc91ec43"
+    },
+    {
       "path": "external/audit.json",
       "bytes": 2333,
       "sha256": "02a90bbc9e4feba11c5b8457a583c368054c3f6b014924286263292b8a40b346"
@@ -1575,7 +1625,7 @@
     {
       "path": "generate-evidence-index.mjs",
       "bytes": 4849,
-      "sha256": "7a9317f0c054a992f4f7a81035e48355780c38b1bc4cfda1ae441709babda203"
+      "sha256": "c33fd6fe42176e81000fcb833dc9da0b9cf702453e838ad3b08747298270c438"
     },
     {
       "path": "live-http-db-receipt.json",
@@ -1614,13 +1664,13 @@
     },
     {
       "path": "scan-evidence-secrets.mjs",
-      "bytes": 11285,
-      "sha256": "7e4625b2470853f05e249e4d8b8b8bbb61eeff199e6da52b90ac1e1242adb8f6"
+      "bytes": 11923,
+      "sha256": "f6ffdf5d8c16a6a4f5f6eff7da4b4699808237a6fcb3003eccea194c437055c8"
     },
     {
       "path": "secret-scan.json",
-      "bytes": 1273,
-      "sha256": "672b9284fcc3f33f6212907328792d9299e606a7f92ef515a064e81056a47fff"
+      "bytes": 1274,
+      "sha256": "348906b680cd261e8326b5387ed12b4723280bf329daed68e3b5f95d2ea6065b"
     },
     {
       "path": "source-gate/02-project-components-tests.result.json",
@@ -1689,8 +1739,8 @@
     },
     {
       "path": "update-acceptance-matrix.mjs",
-      "bytes": 44527,
-      "sha256": "f2d7998d0e847c6f2832dbc945eabe5f01ab1eed8fa780ce23c8cb26ef94644e"
+      "bytes": 52796,
+      "sha256": "fefe4b342bf6c40d04c8e4f5ff1f41159179e90f45edc0e3e0f9dad846170f5b"
     },
     {
       "path": "user-self-test-handoff.md",
@@ -1699,8 +1749,8 @@
     },
     {
       "path": "validate-final-evidence.mjs",
-      "bytes": 39580,
-      "sha256": "ce2bcff2a05d1b5ffe95c722c8163d6a89ccf4ad23adf855118632126b5d0e28"
+      "bytes": 49139,
+      "sha256": "7fd2b8b6175dbabfefe47c5fe1ef4f92211e64246f60f2719e5d97c07b7b0a55"
     },
     {
       "path": "verify-live-http-db-receipt.mjs",
