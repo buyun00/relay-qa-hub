@@ -729,7 +729,7 @@ private fun GameApkSection(
     val catalog = state.gameApkCatalog
     SectionCard(
         title = "最新游戏 APK",
-        subtitle = "来自 10.100.5.129:8000/apk，按上传时间显示最新 5 个",
+        subtitle = "Debug / Release 分别显示最新 5 个安装包，按版本与构建号排序",
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -785,7 +785,8 @@ private fun GameApkRow(
     ) {
         Column(Modifier.weight(1f)) {
             Text(
-                artifact.versionName?.let { "游戏版本 $it" } ?: artifact.displayName,
+                if (artifact.configuration != null) artifact.displayName
+                else artifact.versionName?.let { "游戏版本 $it" } ?: artifact.displayName,
                 style = MaterialTheme.typography.titleSmall,
                 fontWeight = FontWeight.ExtraBold,
             )
@@ -817,7 +818,7 @@ private fun GameApkRow(
         OutlinedButton(
             onClick = onDownload,
             enabled = download.phase != "downloading" && download.phase != "installing",
-            modifier = Modifier.testTag("download-game-apk-${artifact.versionName ?: artifact.fileName}"),
+            modifier = Modifier.testTag("download-game-apk-${artifact.configuration ?: "legacy"}-${artifact.buildNumber ?: artifact.versionName ?: artifact.fileName}"),
         ) {
             Text(
                 when {

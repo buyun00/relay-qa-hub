@@ -10,15 +10,15 @@ fun String.asBuildConfigString(): String =
 val qaHubApiBaseUrl = providers.gradleProperty("qaHubApiBaseUrl")
     .orElse("http://10.100.5.157:4319/api/v1/")
 val qaHubGameApkDirectoryUrl = providers.gradleProperty("qaHubGameApkDirectoryUrl")
-    .orElse("http://10.100.5.129:8000/apk/")
+    .orElse("http://10.100.5.129:8000/ozdqp/")
 val qaHubVersionCode = providers.gradleProperty("qaHubVersionCode")
-    .orElse("15")
+    .orElse("16")
     .map { value ->
         value.toIntOrNull()?.takeIf { it > 0 }
             ?: error("qaHubVersionCode must be a positive integer")
     }
 val qaHubVersionName = providers.gradleProperty("qaHubVersionName")
-    .orElse("0.1.14-debug")
+    .orElse("0.1.15-debug")
 val qaHubPocoPort = providers.gradleProperty("qaHubPocoPort")
     .orElse("5001")
     .map { value ->
