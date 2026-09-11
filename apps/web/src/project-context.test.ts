@@ -83,9 +83,9 @@ describe("project request and draft isolation", () => {
     );
     vi.stubGlobal("fetch", fetch);
     setActiveProject("a", "user");
-    await loginBrowserSession("Employee", "a");
+    await loginBrowserSession("Employee", "Project A", "0042");
     expect(JSON.parse(String((fetch.mock.calls[0]?.[1] as RequestInit | undefined)?.body))).toEqual(
-      { name: "Employee", projectId: "a", client: "web" },
+      { name: "Employee", projectName: "Project A", code: "0042", client: "web" },
     );
     const a = projectStorageKey("upload-draft");
     setActiveProject("b", "user");

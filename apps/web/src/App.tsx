@@ -2520,6 +2520,15 @@ export default function App({
               <strong>QA Hub</strong>
             </div>
           </div>
+          <img
+            key={`project-logo-${projectId}`}
+            className="project-logo active-project-logo"
+            src={`/api/v1/projects/${encodeURIComponent(projectId)}/logo`}
+            alt={`${currentProject?.name ?? "当前项目"} Logo`}
+            onError={(event) => {
+              event.currentTarget.hidden = true;
+            }}
+          />
           <span className="brand-divider" aria-hidden="true" />
           <label className="project-switcher">
             <span>项目</span>

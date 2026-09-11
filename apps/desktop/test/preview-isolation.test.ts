@@ -136,6 +136,52 @@ test("preview requires its own identity and rejects production endpoints without
   }
 });
 
+test("LAN desktop config derives a recipient-local profile and uses the shared Web origin", () => {
+  const root = mkdtempSync(path.join(tmpdir(), "desktop-lan-test-"));
+  try {
+    const instanceId = "qa-hub-lan-v22-0911";
+    const configFile = path.join(root, "preview-instance.json");
+    const localAppData = path.join(root, "recipient-local-app-data");
+    mkdirSync(localAppData);
+    const appUserModelId = "com.relayqahub.desktop.lan.v22.0911";
+    const publicKey = generateKeyPairSync("ed25519").publicKey.export({
+      type: "spki",
+      format: "pem",
+    });
+    writeFileSync(
+      configFile,
+      JSON.stringify({
+        schemaVersion: 2,
+        instanceId,
+        profileDirectoryName: instanceId,
+        apiBaseUrl: "http://10.100.5.157:4740",
+        csrfOrigin: "http://10.100.5.157:4740",
+        cookieName: `${instanceId}-session`,
+        appScheme: instanceId,
+        appUserModelId,
+        toastActivatorClsid: deriveToastActivatorClsid(appUserModelId),
+        mcpPort: 4742,
+        updateManifestUrl: `http://10.100.5.157:4740/downloads/${instanceId}-windows-latest.json`,
+        updatePublicKeyPem: publicKey,
+      }),
+    );
+
+    const identity = loadPreviewDesktopIdentity({
+      QA_HUB_PREVIEW_DESKTOP_CONFIG: configFile,
+      LOCALAPPDATA: localAppData,
+      APPDATA: path.join(root, "roaming"),
+    });
+    assert.equal(
+      identity.profileDirectory,
+      path.join(localAppData, "Relay QA Hub LAN", instanceId, "profile"),
+    );
+    assert.equal(identity.environment["QA_HUB_DESKTOP_API_BASE_URL"], "http://10.100.5.157:4740/");
+    assert.equal(identity.environment["QA_HUB_DESKTOP_MCP_PORT"], "4742");
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+});
+
 test("preview cookie and completed request scope remain isolated across a late project response", async () => {
   const session = new DesktopBrowserSessionCookieStore("qa-hub-preview-unit-session");
   session.captureSetCookie(`qa_hub_browser_session=${"P".repeat(43)}; Path=/`);

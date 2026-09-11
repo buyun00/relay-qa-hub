@@ -3,7 +3,7 @@ import { createHash } from "node:crypto";
 import { realpathSync } from "node:fs";
 import { resolve } from "node:path";
 
-const INSTANCE_PATTERN = /^qa-hub-preview-([a-z0-9](?:[a-z0-9-]{1,38}[a-z0-9]))$/u;
+const INSTANCE_PATTERN = /^qa-hub-(preview|lan)-([a-z0-9](?:[a-z0-9-]{1,38}[a-z0-9]))$/u;
 const LEGACY_INSTANCE_ID = "qa-hub-preview-7c86";
 const DNS_NAMESPACE = Buffer.from("6ba7b8109dad11d180b400c04fd430c8", "hex");
 const MAX_APP_USER_MODEL_ID_BYTES = 512;
@@ -42,23 +42,27 @@ export function deriveToastActivatorClsid(appUserModelId) {
 
 export function derivePreviewPackageIdentity(instanceId) {
   const match = INSTANCE_PATTERN.exec(instanceId);
-  const suffix = match?.[1];
+  const mode = match?.[1];
+  const suffix = match?.[2];
   if (!suffix || suffix.includes("--")) fail("PREVIEW_PACKAGE_INSTANCE_ID_INVALID");
   const legacy = instanceId === LEGACY_INSTANCE_ID;
-  const executableBaseName = legacy ? "RelayQaHubPreview" : `RelayQaHubPreview-${suffix}`;
+  const label = mode === "lan" ? "LAN" : "Preview";
+  const productLabel = mode === "lan" ? "QA Hub LAN" : "QA Hub Project Preview";
+  const identitySegment = mode === "lan" ? "lan" : "preview";
+  const executableBaseName = legacy ? "RelayQaHubPreview" : `RelayQaHub${label}-${suffix}`;
   const appUserModelId = legacy
     ? "com.relayqahub.desktop.preview"
-    : `com.relayqahub.desktop.preview.${suffix.replaceAll("-", ".")}`;
+    : `com.relayqahub.desktop.${identitySegment}.${suffix.replaceAll("-", ".")}`;
   return Object.freeze({
     instanceId,
     executableBaseName,
     installDirectoryName: executableBaseName,
     uninstallRegistryKey: executableBaseName,
-    shortcutName: legacy ? "QA Hub Project Preview" : `QA Hub Project Preview - ${suffix}`,
+    shortcutName: legacy ? "QA Hub Project Preview" : `${productLabel} - ${suffix}`,
     protocolScheme: legacy ? "qa-hub-preview" : instanceId,
     appUserModelId,
     toastActivatorClsid: deriveToastActivatorClsid(appUserModelId),
-    displayName: legacy ? "QA Hub Project Preview" : `QA Hub Project Preview (${suffix})`,
+    displayName: legacy ? "QA Hub Project Preview" : `${productLabel} (${suffix})`,
   });
 }
 

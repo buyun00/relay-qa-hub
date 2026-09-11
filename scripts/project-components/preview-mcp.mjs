@@ -30,13 +30,16 @@ export async function startPreviewMcp(config) {
   });
   await new Promise((accept, reject) => {
     server.once("error", reject);
-    server.listen(config.mcpPort, config.apiHost, accept);
+    server.listen(config.mcpPort, config.mcpHost, accept);
   });
   console.log(
     JSON.stringify({
       event: "preview-mcp.started",
       instanceId: config.instanceId,
-      address: `http://${config.apiHost}:${config.mcpPort}/mcp`,
+      address:
+        config.deploymentMode === "lan"
+          ? `${new URL(config.publicWebBaseUrl).protocol}//${new URL(config.publicWebBaseUrl).hostname}:${config.mcpPort}/mcp`
+          : `http://${config.mcpHost}:${config.mcpPort}/mcp`,
       authentication: "project session Bearer token",
     }),
   );

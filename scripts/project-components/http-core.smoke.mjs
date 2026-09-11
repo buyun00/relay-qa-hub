@@ -5,6 +5,8 @@ import assert from "node:assert/strict";
 import { readParallelInstanceConfig } from "../../apps/api/src/parallel-instance.ts";
 
 const config = readParallelInstanceConfig(process.argv[2]);
+if (config.deploymentMode === "lan")
+  throw new Error("LAN_ONBOARDING_SMOKE_REQUIRED: legacy projectId login is disabled");
 const api = `http://${config.apiHost}:${config.apiPort}`;
 const secrets = JSON.parse(readFileSync(config.secretsFile, "utf8"));
 const runId = new Date().toISOString().replace(/[:.]/gu, "-");
@@ -15,7 +17,7 @@ const clean = (value) => {
   if (!value || typeof value !== "object") return value;
   return Object.fromEntries(
     Object.entries(value)
-      .filter(([key]) => !/token|password|secret/iu.test(key))
+      .filter(([key]) => !/token|password|secret|joinCode|initializationLink/iu.test(key))
       .map(([key, item]) => [key, clean(item)]),
   );
 };

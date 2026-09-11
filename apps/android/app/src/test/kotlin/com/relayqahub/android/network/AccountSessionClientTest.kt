@@ -15,19 +15,34 @@ import org.junit.Test
 
 class AccountSessionClientTest {
     @Test
-    fun `login sends the untouched name to the backend account boundary`() {
+    fun `login sends project code as a string and preserves leading zero`() {
         val client = AccountSessionClient(
             baseUrl = "https://qa-hub.example/api/v1/",
             httpClient = OkHttpClient(),
         )
 
-        val request = client.buildLoginRequest("  新账号  ", "10000000-0000-4000-8000-000000000099")
+        val request = client.buildLoginRequest("Demo Project", "0007", "  新账号  ")
         val body = okio.Buffer().also { request.body?.writeTo(it) }.readUtf8()
 
         assertEquals("https://qa-hub.example/api/v1/auth/login", request.url.toString())
         assertEquals("POST", request.method)
         assertNull(request.header("Authorization"))
-        assertEquals("{\"name\":\"  新账号  \",\"client\":\"android\",\"projectId\":\"10000000-0000-4000-8000-000000000099\"}", body)
+        assertEquals("{\"projectName\":\"Demo Project\",\"code\":\"0007\",\"name\":\"  新账号  \",\"client\":\"android\"}", body)
+    }
+
+    @Test
+    fun `login request rejects non four digit project codes`() {
+        val client = AccountSessionClient(
+            baseUrl = "https://qa-hub.example/api/v1/",
+            httpClient = OkHttpClient(),
+        )
+
+        listOf("7", "000", "00007", "12a4").forEach { code ->
+            val failure = runCatching {
+                client.buildLoginRequest("Demo Project", code, "Alice")
+            }.exceptionOrNull()
+            assertTrue(failure is IllegalArgumentException)
+        }
     }
 
     @Test

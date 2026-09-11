@@ -18,7 +18,32 @@ data class ManagedPerson(val id: String, val name: String, val active: Boolean, 
 /** Every mutation uses an immutable project path and its own bearer token. */
 class ProjectOperationsClient(baseUrl: String, private val client: OkHttpClient) {
     private val base = QaHubApiEndpoint.parse(baseUrl, allowPrivateHttp = true)
-    suspend fun entry(projectId: String): QaProject = project(request("project-entry/${uuid(projectId)}"))
+    suspend fun logo(projectId: String, token: String): ByteArray? = withContext(Dispatchers.IO) {
+        val url = requireNotNull(base.resolve("projects/${uuid(projectId)}/logo"))
+        val request = Request.Builder()
+            .url(url)
+            .header("Authorization", "Bearer $token")
+            .header("x-qa-project-id", projectId)
+            .build()
+        client.newCall(request).execute().use { response ->
+            if (response.code == 404) return@withContext null
+            if (!response.isSuccessful) throw AccountSessionFailure("HTTP_${response.code}")
+            check(response.header("Content-Type")?.substringBefore(';') in PROJECT_LOGO_MEDIA_TYPES) {
+                "INVALID_PROJECT_LOGO"
+            }
+            val output = java.io.ByteArrayOutputStream()
+            response.body?.byteStream()?.use { input ->
+                val buffer = ByteArray(8192)
+                while (true) {
+                    val count = input.read(buffer)
+                    if (count < 0) break
+                    check(output.size() + count <= 524_288) { "INVALID_PROJECT_LOGO" }
+                    output.write(buffer, 0, count)
+                }
+            }
+            output.toByteArray().also { check(it.isNotEmpty()) { "INVALID_PROJECT_LOGO" } }
+        }
+    }
     suspend fun projects(token: String): List<QaProject> {
         val projects = mutableListOf<QaProject>()
         val ids = mutableSetOf<String>()
@@ -172,6 +197,7 @@ class ProjectOperationsClient(baseUrl: String, private val client: OkHttpClient)
         val PROJECT_KEY_PATTERN = Regex("^[A-Z][A-Z0-9]{1,15}$")
         val PROJECT_LIST_FIELDS = setOf("snapshotSequence", "items", "nextCursor")
         val PROJECT_ITEM_FIELDS = setOf("id", "key", "name", "roles", "active")
+        val PROJECT_LOGO_MEDIA_TYPES = setOf("image/png", "image/jpeg", "image/webp")
         val DIRECTORY_ROLES = setOf(
             "viewer", "reporter", "developer", "verifier", "triager", "release_manager",
             "project_admin",

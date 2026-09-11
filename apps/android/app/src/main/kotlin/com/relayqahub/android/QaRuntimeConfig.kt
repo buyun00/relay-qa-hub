@@ -78,12 +78,34 @@ object QaRuntimeConfigLoader {
         if (target.exists()) return target
 
         val seed = seedConfig(context, buildDefaultApiBaseUrl)
-        val bytes = (
-            "{\n" +
-                "  \"schemaVersion\": ${seed.schemaVersion},\n" +
-                "  \"apiBaseUrl\": ${JsonPrimitive(seed.apiBaseUrl)}\n" +
-                "}\n"
-        ).toByteArray(Charsets.UTF_8)
+        writeAtomically(target, serialize(seed), replaceExisting = false)
+        return target
+    }
+
+    /**
+     * Persists a validated endpoint for the next process start. This writes only
+     * qa-runtime.json; Room databases, drafts, and offline queue files are not
+     * touched when a user changes the server.
+     */
+    fun save(context: Context, apiBaseUrl: String): QaRuntimeConfig {
+        val config = parse(
+            "{\"schemaVersion\":$SCHEMA_VERSION,\"apiBaseUrl\":${JsonPrimitive(apiBaseUrl.trim())}}",
+        )
+        val target = externalFile(context)
+            ?: error("QA Hub runtime configuration storage is unavailable")
+        writeAtomically(target, serialize(config), replaceExisting = true)
+        return config
+    }
+
+    internal fun serialize(config: QaRuntimeConfig): String = (
+        "{\n" +
+            "  \"schemaVersion\": ${config.schemaVersion},\n" +
+            "  \"apiBaseUrl\": ${JsonPrimitive(config.apiBaseUrl)}\n" +
+            "}\n"
+        )
+
+    private fun writeAtomically(target: File, content: String, replaceExisting: Boolean) {
+        val bytes = content.toByteArray(Charsets.UTF_8)
         require(bytes.size <= MAX_CONFIG_BYTES)
         target.parentFile?.mkdirs()
         val temporary = File(target.parentFile, "${target.name}.tmp-${UUID.randomUUID()}")
@@ -93,18 +115,26 @@ object QaRuntimeConfigLoader {
                 output.fd.sync()
             }
             try {
-                Files.move(
-                    temporary.toPath(),
-                    target.toPath(),
-                    StandardCopyOption.ATOMIC_MOVE,
-                )
+                if (replaceExisting) {
+                    Files.move(
+                        temporary.toPath(),
+                        target.toPath(),
+                        StandardCopyOption.ATOMIC_MOVE,
+                        StandardCopyOption.REPLACE_EXISTING,
+                    )
+                } else {
+                    Files.move(temporary.toPath(), target.toPath(), StandardCopyOption.ATOMIC_MOVE)
+                }
             } catch (_: AtomicMoveNotSupportedException) {
-                Files.move(temporary.toPath(), target.toPath())
+                if (replaceExisting) {
+                    Files.move(temporary.toPath(), target.toPath(), StandardCopyOption.REPLACE_EXISTING)
+                } else {
+                    Files.move(temporary.toPath(), target.toPath())
+                }
             }
         } finally {
             temporary.delete()
         }
-        return target
     }
 
     private fun seedConfig(context: Context, buildDefaultApiBaseUrl: String): QaRuntimeConfig {

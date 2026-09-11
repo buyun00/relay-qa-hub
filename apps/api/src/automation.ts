@@ -25,6 +25,8 @@ const properties = {
   userId: textSchema,
   attachmentId: textSchema,
   name: textSchema,
+  projectName: { type: "string", minLength: 1, maxLength: 200 },
+  code: { type: "string", pattern: "^[0-9]{4}$" },
   idempotencyKey: textSchema,
   expectedVersion: { type: "integer", minimum: 1 },
   request: { type: "object" },
@@ -498,7 +500,24 @@ export function registerAutomationRoutes(
   app: FastifyInstance,
   publicApiOrigin: string,
   allowedOrigins: readonly string[] = [],
+  projectCodeLoginRequired = false,
 ): void {
+  const automationTools = projectCodeLoginRequired
+    ? AUTOMATION_TOOLS.map((tool) =>
+        tool.name === "qa_login"
+          ? {
+              ...tool,
+              title: "使用项目名称、固定四位验证码和姓名加入登录",
+              description:
+                "使用项目名称、固定四位验证码和姓名进入同一 HTTP 加入业务；验证码仅用于内部共享加入，不代表实名认证。",
+              inputSchema: {
+                ...tool.inputSchema,
+                required: ["projectName", "code", "name"],
+              },
+            }
+          : tool,
+      )
+    : AUTOMATION_TOOLS;
   const credentials = new WeakMap<FastifyRequest, Record<string, string>>();
   app.addHook("onRequest", (request, _reply, done) => {
     const headers: Record<string, string> = {};
@@ -511,7 +530,7 @@ export function registerAutomationRoutes(
   });
 
   async function dispatch(request: FastifyRequest, name: string, raw: unknown): Promise<unknown> {
-    const tool = AUTOMATION_TOOLS.find((item) => item.name === name);
+    const tool = automationTools.find((item) => item.name === name);
     if (!tool) throw new AutomationError("TOOL_NOT_FOUND", 404);
     const input = object(raw);
     for (const required of tool.inputSchema["required"] as string[])
@@ -936,7 +955,9 @@ export function registerAutomationRoutes(
       }
       case "qa_login":
         return send("POST", "/api/v1/auth/login", {
-          projectId: field(input, "projectId"),
+          ...(projectCodeLoginRequired
+            ? { projectName: field(input, "projectName"), code: field(input, "code") }
+            : { projectId: field(input, "projectId") }),
           name: field(input, "name"),
           client: "android",
         });
@@ -1157,7 +1178,7 @@ export function registerAutomationRoutes(
     }
   }
 
-  app.get("/api/v1/mcp/tools", async () => ({ tools: AUTOMATION_TOOLS }));
+  app.get("/api/v1/mcp/tools", async () => ({ tools: automationTools }));
   app.post("/api/v1/mcp/call", { bodyLimit: 36 * 1024 * 1024 }, async (request, reply) => {
     try {
       const body = object(request.body);
@@ -1309,7 +1330,7 @@ export function registerAutomationRoutes(
           return { jsonrpc: "2.0", id, error: { code: -32002, message: failure.code } };
         }
       }
-      if (rpc["method"] === "tools/list") return result({ tools: AUTOMATION_TOOLS });
+      if (rpc["method"] === "tools/list") return result({ tools: automationTools });
       if (rpc["method"] !== "tools/call") return rpcError(id, -32601, "Method not found");
       if (
         !params ||
@@ -1318,7 +1339,7 @@ export function registerAutomationRoutes(
         (params["arguments"] !== undefined && !isObject(params["arguments"]))
       )
         return rpcError(id, -32602, "Invalid tools/call params");
-      if (!AUTOMATION_TOOLS.some((tool) => tool.name === params["name"]))
+      if (!automationTools.some((tool) => tool.name === params["name"]))
         return rpcError(id, -32602, "Unknown tool");
       try {
         const value = await dispatch(request, field(params, "name"), params["arguments"] ?? {});

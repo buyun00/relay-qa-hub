@@ -6,6 +6,7 @@ import { test } from "node:test";
 import {
   readParallelInstanceConfig,
   applyParallelInstanceEnvironment,
+  validateLanNetwork,
 } from "../src/parallel-instance.ts";
 
 function fixture(t) {
@@ -184,4 +185,58 @@ test("overlapping data and backup paths are rejected", (t) => {
   f.config.backupRoot = join(f.config.dataRoot, "backup");
   f.save();
   assert.throws(() => readParallelInstanceConfig(f.configFile), /PATHS_OVERLAP/);
+});
+
+test("LAN config binds only public web and server MCP while enabling isolated backup archive", (t) => {
+  const f = fixture(t);
+  const backupArchiveRoot = join(f.root, "archive");
+  Object.assign(f.config, {
+    schemaVersion: 2,
+    deploymentMode: "lan",
+    instanceId: "qa-hub-lan-unit",
+    webHost: "0.0.0.0",
+    webPort: 4740,
+    apiPort: 4739,
+    mcpHost: "0.0.0.0",
+    mcpPort: 4741,
+    desktopMcpPort: 4742,
+    cookieName: "qa-hub-lan-unit-session",
+    releaseChannel: "qa-hub-lan-unit",
+    publicWebBaseUrl: "http://10.100.5.157:4740",
+    backupEnabled: true,
+    backupArchiveRoot,
+    backupIntervalMinutes: 60,
+    backupRetentionEnabled: true,
+    lanCidr: "10.100.0.0/21",
+  });
+  f.save();
+
+  const config = readParallelInstanceConfig(f.configFile);
+  assert.equal(config.apiHost, "127.0.0.1");
+  assert.equal(config.webHost, "0.0.0.0");
+  assert.equal(config.mcpHost, "0.0.0.0");
+  const env = { QA_HUB_INSTANCE_CONFIG_FILE: f.configFile };
+  applyParallelInstanceEnvironment(env);
+  assert.equal(env.QA_HUB_BACKUP_ON_START, "true");
+  assert.equal(env.QA_HUB_BACKUP_INTERVAL_MINUTES, "60");
+  assert.equal(env.QA_HUB_BACKUP_ARCHIVE_ROOT, backupArchiveRoot);
+  assert.equal(env.QA_HUB_BACKUP_RETENTION_ENABLED, "true");
+  assert.equal(env.QA_HUB_PUBLIC_WEB_BASE_URL, "http://10.100.5.157:4740");
+});
+
+test("LAN network validation refuses public, broad, noncanonical and mismatched ranges", () => {
+  assert.deepEqual(validateLanNetwork("10.100.5.157", "10.100.0.0/21"), {
+    address: "10.100.5.157",
+    cidr: "10.100.0.0/21",
+  });
+  for (const [address, cidr] of [
+    ["8.8.8.8", "8.0.0.0/8"],
+    ["10.100.5.157", "0.0.0.0/8"],
+    ["10.100.5.157", "10.100.0.0/0"],
+    ["10.100.5.157", "10.101.0.0/21"],
+    ["10.100.5.157", "10.100.1.1/21"],
+    ["10.100.0.0", "10.100.0.0/21"],
+  ]) {
+    assert.throws(() => validateLanNetwork(address, cidr), /INSTANCE_LAN_/u);
+  }
 });

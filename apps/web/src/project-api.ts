@@ -16,6 +16,20 @@ export interface ManagedProject {
   name: string;
   active: boolean;
   version: number;
+  initializationStatus?: "pending" | "ready";
+  joinName?: string | null;
+  joinCode?: string;
+  joinCodeVersion?: number;
+  initializationTokenStatus?: "absent" | "issued" | "used" | "revoked";
+  initializationLink?: string | null;
+  initializationIssuedAt?: string | null;
+  initializationUsedAt?: string | null;
+  onboardingVersion?: number;
+  logo?: {
+    mediaType: "image/png" | "image/jpeg" | "image/webp";
+    sha256: string;
+    size: number;
+  } | null;
 }
 export const componentLabels: Record<ComponentKey, string> = {
   build: "打包",
@@ -44,12 +58,63 @@ export async function listGmProjects(): Promise<ManagedProject[]> {
     { items?: ManagedProject[] } | ManagedProject[];
   return Array.isArray(value) ? value : (value.items ?? []);
 }
-export async function saveProject(input: { key: string; name: string }): Promise<ManagedProject> {
+export async function saveProject(): Promise<ManagedProject> {
   return (await requestJson("/api/v1/gm/projects", {
     method: "POST",
     headers: { "content-type": "application/json" },
-    body: JSON.stringify(input),
+    body: "{}",
   })) as ManagedProject;
+}
+export async function resetProjectJoinCode(projectId: string): Promise<ManagedProject> {
+  return (await requestJson(
+    `/api/v1/gm/projects/${encodeURIComponent(projectId)}/join-code/reset`,
+    { method: "POST" },
+  )) as ManagedProject;
+}
+export async function rotateInitializationLink(projectId: string): Promise<ManagedProject> {
+  return (await requestJson(
+    `/api/v1/gm/projects/${encodeURIComponent(projectId)}/initialization-link/rotate`,
+    { method: "POST" },
+  )) as ManagedProject;
+}
+export async function revokeInitializationLink(projectId: string): Promise<ManagedProject> {
+  return (await requestJson(
+    `/api/v1/gm/projects/${encodeURIComponent(projectId)}/initialization-link/revoke`,
+    { method: "POST" },
+  )) as ManagedProject;
+}
+export interface ProjectInitializationInput {
+  readonly token: string;
+  readonly name: string;
+  readonly initialMembers: readonly string[];
+  readonly logo?: {
+    mediaType: "image/png" | "image/jpeg" | "image/webp";
+    dataBase64: string;
+  } | null;
+}
+export async function inspectProjectInitialization(token: string): Promise<ManagedProject> {
+  return (await requestJson(
+    "/api/v1/project-initialization/inspect",
+    {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ token }),
+    },
+    false,
+  )) as ManagedProject;
+}
+export async function completeProjectInitialization(
+  input: ProjectInitializationInput,
+): Promise<ManagedProject> {
+  return (await requestJson(
+    "/api/v1/project-initialization/complete",
+    {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify(input),
+    },
+    false,
+  )) as ManagedProject;
 }
 export async function updateProject(
   project: ManagedProject,

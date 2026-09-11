@@ -304,6 +304,7 @@ export interface CreateApiAppOptions {
   readonly browserAuth?: BrowserAuthOptions;
   readonly androidUpdateRoot?: string;
   readonly androidUpdateChannel?: AndroidUpdateChannel;
+  readonly androidUpdatePackageName?: string;
   readonly jenkinsBuildService?: JenkinsBuildService;
   readonly incrementUploadRoot?: string;
   readonly incrementUploadService?: IncrementUploadService;
@@ -3184,7 +3185,12 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
         : null,
     );
   }
-  registerAndroidUpdateRoutes(app, options.androidUpdateRoot, options.androidUpdateChannel);
+  registerAndroidUpdateRoutes(
+    app,
+    options.androidUpdateRoot,
+    options.androidUpdateChannel,
+    options.androidUpdatePackageName,
+  );
   if (options.projectComponentsRuntime && options.projectRequestContext) {
     registerProjectComponentRoutes(app, {
       runtime: options.projectComponentsRuntime,
@@ -3197,6 +3203,7 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
       app,
       options.automationPublicApiOrigin,
       options.browserAuth?.webOrigins ?? [],
+      options.browserAuth?.projectCodeLogin !== undefined,
     );
   return app;
 }

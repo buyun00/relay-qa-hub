@@ -29,6 +29,19 @@ class QaRuntimeConfigTest {
     }
 
     @Test
+    fun `runtime config persistence round trip keeps a private LAN address`() {
+        val original = QaRuntimeConfig(
+            schemaVersion = 1,
+            apiBaseUrl = "http://10.100.5.157:4719/api/v1/",
+        )
+
+        val persisted = QaRuntimeConfigLoader.serialize(original)
+        val restored = QaRuntimeConfigLoader.parse(persisted)
+
+        assertEquals(original, restored)
+    }
+
+    @Test
     fun `endpoint policy permits private and link local literals only for cleartext`() {
         listOf(
             "http://localhost:4319/api/v1/",

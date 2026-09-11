@@ -1980,15 +1980,13 @@ describe("Bug detail API", () => {
   });
 });
 
-describe("permanent browser identity", () => {
-  it("silently recreates an invalid session from the remembered Chinese display name", async () => {
+describe("browser identity", () => {
+  it("does not recreate an expired session without the project code", async () => {
     installMemoryStorage();
     const current = principal();
     const responses = [
       new Response(JSON.stringify(current), { status: 200 }),
       new Response(JSON.stringify({ code: "UNAUTHENTICATED" }), { status: 401 }),
-      new Response(JSON.stringify(current), { status: 200 }),
-      new Response(JSON.stringify(current), { status: 200 }),
     ];
     const fetchMock = vi.fn(async (_path: string, _init?: RequestInit) => {
       void _path;
@@ -1999,18 +1997,12 @@ describe("permanent browser identity", () => {
     });
     vi.stubGlobal("fetch", fetchMock);
 
-    await loginBrowserSession("kaifazhe");
-    expect(await getBrowserSession()).toEqual(current);
+    await loginBrowserSession("kaifazhe", "QA 项目", "0042");
+    await expect(getBrowserSession()).rejects.toMatchObject({ code: "UNAUTHENTICATED" });
     expect(fetchMock.mock.calls.map(([path]) => path)).toEqual([
       "/api/v1/auth/login",
       "/api/v1/auth/me",
-      "/api/v1/auth/login",
-      "/api/v1/auth/me",
     ]);
-    const recoveryBody = JSON.parse(String(fetchMock.mock.calls[2]?.[1]?.body)) as {
-      name: string;
-    };
-    expect(recoveryBody.name).toBe("开发者");
   });
 
   it("forgets the permanent identity only after an explicit logout", async () => {
@@ -2028,7 +2020,7 @@ describe("permanent browser identity", () => {
       }),
     );
 
-    await loginBrowserSession("开发者");
+    await loginBrowserSession("开发者", "QA 项目", "0042");
     expect([...storage.values()]).toEqual(["开发者"]);
     await logoutBrowserSession();
     expect(storage.size).toBe(0);

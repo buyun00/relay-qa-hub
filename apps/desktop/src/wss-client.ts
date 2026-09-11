@@ -8,7 +8,7 @@ const MAX_HANDSHAKE_BYTES = 16 * 1024;
 const MAX_FRAME_BYTES = 256 * 1024;
 const WEBSOCKET_GUID = "258EAFA5-E914-47DA-95CA-C5AB0DC85B11";
 const BROWSER_SESSION_COOKIE_PATTERN =
-  /^(?:qa_hub_browser_session|qa-hub-preview-[a-z0-9-]+-session)=[A-Za-z0-9_-]{43}$/u;
+  /^(?:qa_hub_browser_session|qa-hub-(?:preview|lan)-[a-z0-9-]+-session)=[A-Za-z0-9_-]{43}$/u;
 
 type VoidListener = () => void;
 type ErrorListener = (code: string) => void;

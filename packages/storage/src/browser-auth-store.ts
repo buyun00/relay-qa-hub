@@ -382,7 +382,18 @@ export function resolveBrowserSession(
        WHERE session.token_digest = ?
          AND session.revoked_at IS NULL
          AND account.status = 'active'
-         AND user.status = 'active'`,
+         AND user.status = 'active'
+         AND (
+           session.is_gm = 1
+           OR session.login_project_id IS NULL
+           OR EXISTS (
+             SELECT 1 FROM memberships
+             WHERE memberships.account_id = session.account_id
+               AND memberships.project_id = session.login_project_id
+               AND memberships.user_id = session.user_id
+               AND memberships.status = 'active'
+           )
+         )`,
     )
     .get(input.tokenDigest) as
     | {

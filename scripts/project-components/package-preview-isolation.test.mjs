@@ -2758,6 +2758,15 @@ test("package identity preserves only the explicit legacy identity and isolates 
   assert.equal(final.toastActivatorClsid, "{447C6274-B710-5380-B7A1-1549E1EC5317}");
   assert.equal(final.displayName, "QA Hub Project Preview (final-sol-0909)");
 
+  const lan = derivePreviewPackageIdentity("qa-hub-lan-v22-0911");
+  assert.equal(lan.executableBaseName, "RelayQaHubLAN-v22-0911");
+  assert.equal(lan.installDirectoryName, "RelayQaHubLAN-v22-0911");
+  assert.equal(lan.uninstallRegistryKey, "RelayQaHubLAN-v22-0911");
+  assert.equal(lan.shortcutName, "QA Hub LAN - v22-0911");
+  assert.equal(lan.protocolScheme, "qa-hub-lan-v22-0911");
+  assert.equal(lan.appUserModelId, "com.relayqahub.desktop.lan.v22.0911");
+  assert.equal(lan.displayName, "QA Hub LAN (v22-0911)");
+
   assert.equal(
     deriveToastActivatorClsid("COM.Example.MixedCase"),
     "{6B29DA0C-B46A-5724-B37C-DB14009734BE}",

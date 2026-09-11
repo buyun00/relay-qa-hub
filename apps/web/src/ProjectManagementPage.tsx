@@ -4,6 +4,9 @@ import {
   componentLabels,
   listGmProjects,
   listProjectComponents,
+  resetProjectJoinCode,
+  revokeInitializationLink,
+  rotateInitializationLink,
   saveComponent,
   saveMembership,
   saveProject,
@@ -173,20 +176,24 @@ export default function ProjectManagementPage({
   const [selected, setSelected] = useState(projectId);
   const [components, setComponents] = useState<ProjectComponent[]>([]);
   const [users, setUsers] = useState<readonly ManagedProjectUser[]>([]);
-  const [name, setName] = useState("");
-  const [key, setKey] = useState("");
   const [memberId, setMemberId] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
   const revision = useRef(0);
   const current = projects.find((project) => project.id === selected);
+  const publicOrigin = typeof window === "undefined" ? "当前访问地址" : window.location.origin;
   const refresh = useCallback(async () => {
     const request = ++revision.current;
     const next = await listGmProjects();
     if (request !== revision.current) return;
     setProjects(next);
-    if (next.some((project) => project.id === selected && project.active)) {
+    if (
+      next.some(
+        (project) =>
+          project.id === selected && project.active && project.initializationStatus !== "pending",
+      )
+    ) {
       const [configuration, people] = await Promise.all([
         listProjectComponents(selected),
         listManagedProjectUsers(selected),
@@ -242,6 +249,15 @@ export default function ProjectManagementPage({
           刷新
         </button>
       </section>
+      <section className="project-settings-summary" aria-labelledby="lan-delivery-title">
+        <h2 id="lan-delivery-title">局域网交付</h2>
+        <p>
+          员工入口：<code>{publicOrigin}</code>
+        </p>
+        <a className="secondary-button" href="/downloads/" target="_blank" rel="noreferrer">
+          打开软件下载页
+        </a>
+      </section>
       {error && (
         <div className="banner error-banner" role="alert">
           {error}
@@ -257,38 +273,15 @@ export default function ProjectManagementPage({
         onSubmit={(event) => {
           event.preventDefault();
           void mutate(async () => {
-            const created = await saveProject({ key: key.trim(), name: name.trim() });
-            setKey("");
-            setName("");
+            const created = await saveProject();
             setSelected(created.id);
           }, "项目已创建，仅启用 Bug 管理。");
         }}
       >
         <h2>新建项目</h2>
-        <label>
-          项目名称
-          <input
-            value={name}
-            onChange={(event) => setName(event.target.value)}
-            required
-            maxLength={120}
-          />
-        </label>
-        <label>
-          入口短码
-          <input
-            value={key}
-            onChange={(event) => setKey(event.target.value.toUpperCase())}
-            placeholder="例如 QADEMO"
-            required
-            pattern="[A-Z][A-Z0-9]{1,15}"
-            minLength={2}
-            maxLength={16}
-            title="2–16 位大写字母或数字，以字母开头"
-          />
-        </label>
+        <p>先创建待初始化项目，再把一次性初始化链接交给项目负责人。</p>
         <button className="primary-button" disabled={busy}>
-          创建项目
+          创建待初始化项目
         </button>
       </form>
       <label className="project-settings-picker">
@@ -317,14 +310,70 @@ export default function ProjectManagementPage({
             <p>
               项目 ID：<code>{current.id}</code> · 入口短码：<code>{current.key}</code>
             </p>
+            <p>
+              初始化状态：
+              <strong>{current.initializationStatus === "pending" ? "未完成" : "已可使用"}</strong>
+            </p>
+            {current.joinCode && (
+              <p>
+                固定四位验证码：<code>{current.joinCode}</code>
+              </p>
+            )}
+            {current.initializationLink && (
+              <p>
+                初始化链接：<code>{current.initializationLink}</code>
+              </p>
+            )}
             <div className="project-action-row">
               <button
                 className="primary-button"
-                disabled={!current.active}
+                disabled={!current.active || current.initializationStatus === "pending"}
                 onClick={() => onSelectProject(current.id)}
               >
                 进入此项目
               </button>
+              {current.initializationLink && (
+                <button
+                  className="secondary-button"
+                  disabled={busy}
+                  onClick={() =>
+                    void mutate(async () => {
+                      await navigator.clipboard?.writeText(current.initializationLink ?? "");
+                    }, "初始化链接已复制。")
+                  }
+                >
+                  复制初始化链接
+                </button>
+              )}
+              <button
+                className="secondary-button"
+                disabled={busy}
+                onClick={() =>
+                  void mutate(() => resetProjectJoinCode(current.id), "四位验证码已重置。")
+                }
+              >
+                重置四位码
+              </button>
+              <button
+                className="secondary-button"
+                disabled={busy || current.initializationStatus !== "pending"}
+                onClick={() =>
+                  void mutate(() => rotateInitializationLink(current.id), "初始化链接已重新签发。")
+                }
+              >
+                重签初始化链接
+              </button>
+              {current.initializationTokenStatus !== "revoked" && (
+                <button
+                  className="secondary-button"
+                  disabled={busy || current.initializationTokenStatus === "absent"}
+                  onClick={() =>
+                    void mutate(() => revokeInitializationLink(current.id), "初始化链接已撤销。")
+                  }
+                >
+                  撤销初始化链接
+                </button>
+              )}
               <button
                 className="secondary-button"
                 disabled={busy}
@@ -356,7 +405,7 @@ export default function ProjectManagementPage({
           {!current.active && (
             <p>项目已停用，历史与人员归属保留。恢复项目后可继续管理组件和人员。</p>
           )}
-          {current.active && (
+          {current.active && current.initializationStatus !== "pending" && (
             <>
               <h2>组件设置</h2>
               <div className="project-component-grid">

@@ -102,21 +102,9 @@ export const APP_FIRST_API_MEDIA_TYPE = "application/vnd.relay-qa-hub.v1.1+json"
 const RECOVERABLE_SESSION_CODES = new Set(["UNAUTHENTICATED", "NATIVE_SESSION_INVALID"]);
 const API_REQUEST_TIMEOUT_MS = 25_000;
 const API_TRANSFER_TIMEOUT_MS = 65_000;
-let browserSessionRecovery: Promise<BrowserSessionPrincipal> | null = null;
 
 export function setBrowserCsrfToken(value: string | null): void {
   browserCsrfToken = value;
-}
-
-function rememberedLoginName(): string | null {
-  try {
-    const value = globalThis.localStorage
-      ?.getItem(projectStorageKey("login-name", getActiveProjectId(), ""))
-      ?.trim();
-    return value === undefined || value.length === 0 ? null : value;
-  } catch {
-    return null;
-  }
 }
 
 function rememberLoginName(value: string | null): void {
@@ -1361,16 +1349,17 @@ async function fetchJson(
 
 async function establishBrowserSession(
   name: string,
-  projectId = getActiveProjectId(),
+  projectName: string,
+  code: string,
 ): Promise<BrowserSessionPrincipal> {
   setBrowserCsrfToken(null);
   const init = projectRequestSnapshot(
     {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, projectId, client: "web" }),
+      body: JSON.stringify({ name, projectName, code, client: "web" }),
     },
-    projectId,
+    "",
   );
   const { response, body } = await fetchJson("/api/v1/auth/login", init);
   if (!response.ok) throw new QaHubApiError(response.status, readErrorCode(body));
@@ -1383,12 +1372,9 @@ async function establishBrowserSession(
 }
 
 async function recoverBrowserSession(): Promise<BrowserSessionPrincipal> {
-  const name = rememberedLoginName();
-  if (name === null) throw new QaHubApiError(401, "UNAUTHENTICATED");
-  browserSessionRecovery ??= establishBrowserSession(name).finally(() => {
-    browserSessionRecovery = null;
-  });
-  return browserSessionRecovery;
+  // The project code is deliberately never persisted, so an expired session
+  // cannot silently bypass the three-field project join form.
+  throw new QaHubApiError(401, "UNAUTHENTICATED");
 }
 
 export async function requestJson(
@@ -1454,9 +1440,10 @@ export async function getBrowserSession(): Promise<BrowserSessionPrincipal> {
 
 export async function loginBrowserSession(
   name: string,
-  projectId = getActiveProjectId(),
+  projectName: string,
+  code: string,
 ): Promise<BrowserSessionPrincipal> {
-  return establishBrowserSession(name, projectId);
+  return establishBrowserSession(name, projectName, code);
 }
 
 export async function loginGmSession(password: string): Promise<BrowserSessionPrincipal> {

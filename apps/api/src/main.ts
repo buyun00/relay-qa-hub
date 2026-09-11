@@ -289,6 +289,8 @@ async function run(): Promise<void> {
     worker,
     accountId: MOBILE_SCOPE.accountId,
     gmUserId: parallelInstance.gmUserId,
+    onboardingSecret: process.env["QA_HUB_PROJECT_ONBOARDING_SECRET"]!,
+    publicWebBaseUrl: parallelInstance.publicWebBaseUrl,
   });
 
   try {
@@ -455,6 +457,8 @@ async function run(): Promise<void> {
       ...(configuredBuildSha === undefined ? {} : { buildSha: configuredBuildSha }),
       androidUpdateRoot: readAndroidUpdateRoot(storage.dataRoot),
       androidUpdateChannel: parseAndroidUpdateChannel(process.env["QA_HUB_ANDROID_UPDATE_CHANNEL"]),
+      androidUpdatePackageName:
+        process.env["QA_HUB_ANDROID_PACKAGE_NAME"] ?? "com.relayqahub.android.preview.debug",
       incrementUploadRoot: join(storage.dataRoot, "integrations", "increment-upload"),
       ...(relayRuntime.endpoint && relayRuntime.bearerToken && relayRuntime.qaInstanceId
         ? {
@@ -528,8 +532,8 @@ async function run(): Promise<void> {
         ? {}
         : {
             browserAuth: {
-              projectLogin: (name, projectId, now) =>
-                projectManagementService.login(name, projectId, now),
+              projectCodeLogin: (name, projectName, joinCode, now, clientKey) =>
+                projectManagementService.joinWithCode(name, projectName, joinCode, now, clientKey),
               cookieName: parallelInstance.cookieName,
               gm: {
                 userId: parallelInstance.gmUserId,

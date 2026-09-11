@@ -13,8 +13,21 @@ val qaHubApiBaseUrl = providers.gradleProperty("qaHubApiBaseUrl")
     .orElse("")
 val qaHubProjectId = providers.gradleProperty("qaHubProjectId").orElse("")
 require(qaHubApiBaseUrl.get().isNotBlank()) { "Preview requires explicit -PqaHubApiBaseUrl; production fallback is forbidden" }
-require(qaHubProjectId.get().matches(Regex("[0-9a-fA-F]{8}(-[0-9a-fA-F]{4}){3}-[0-9a-fA-F]{12}"))) {
-    "Preview requires explicit -PqaHubProjectId UUID"
+require(
+    qaHubProjectId.get().isBlank() ||
+        qaHubProjectId.get().matches(Regex("[0-9a-fA-F]{8}(-[0-9a-fA-F]{4}){3}-[0-9a-fA-F]{12}")),
+) {
+    "qaHubProjectId must be empty for generic login or an explicit legacy project UUID"
+}
+val qaHubApplicationId = providers.gradleProperty("qaHubApplicationId")
+    .orElse("com.relayqahub.android.preview")
+val qaHubUpdateChannel = providers.gradleProperty("qaHubUpdateChannel")
+    .orElse("preview")
+require(qaHubApplicationId.get().matches(Regex("[a-z][a-z0-9_]*(\\.[a-z][a-z0-9_]*)+"))) {
+    "qaHubApplicationId must be a lowercase Android application ID"
+}
+require(qaHubUpdateChannel.get().matches(Regex("[a-z0-9][a-z0-9-]{2,63}"))) {
+    "qaHubUpdateChannel must be a lowercase isolated channel"
 }
 require(URI(qaHubApiBaseUrl.get()).port != 4319) { "Preview cannot use production API port 4319" }
 val qaHubGameApkDirectoryUrl = providers.gradleProperty("qaHubGameApkDirectoryUrl")
@@ -40,7 +53,7 @@ android {
     buildToolsVersion = "36.0.0"
 
     defaultConfig {
-        applicationId = "com.relayqahub.android.preview"
+        applicationId = qaHubApplicationId.get()
         minSdk = 29
         targetSdk = 37
         versionCode = qaHubVersionCode.get()
@@ -56,7 +69,7 @@ android {
         )
         buildConfigField("String", "QA_HUB_CONTRACT_VERSION", "\"1.1.0\"")
         buildConfigField("String", "QA_HUB_PROJECT_ID", qaHubProjectId.get().asBuildConfigString())
-        buildConfigField("String", "QA_HUB_UPDATE_CHANNEL", "\"preview\"")
+        buildConfigField("String", "QA_HUB_UPDATE_CHANNEL", qaHubUpdateChannel.get().asBuildConfigString())
         buildConfigField(
             "String",
             "QA_HUB_GAME_APK_DIRECTORY_URL",

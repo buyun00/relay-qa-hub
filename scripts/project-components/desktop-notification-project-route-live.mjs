@@ -793,7 +793,7 @@ export function redactEvidence(value, knownSecrets = new Set()) {
   return Object.fromEntries(
     Object.entries(value).map(([key, item]) => [
       key,
-      /authorization|cookie|password|secret|token|csrf/iu.test(key)
+      /authorization|cookie|password|secret|token|csrf|joinCode|initializationLink/iu.test(key)
         ? "[REDACTED]"
         : redactEvidence(item, knownSecrets),
     ]),

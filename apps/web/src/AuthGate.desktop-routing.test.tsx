@@ -6,6 +6,7 @@ import AuthGate from "./AuthGate";
 import * as api from "./api";
 import type { DesktopBugRoute } from "./desktop";
 import * as projectContext from "./project-context";
+import * as projectApi from "./project-api";
 import { readProjectDraft } from "./project-drafts";
 
 const appRender = vi.hoisted(() => vi.fn());
@@ -68,7 +69,11 @@ vi.mock("./api", async (importOriginal) => ({
   logoutBrowserSession: vi.fn(),
   setBrowserCsrfToken: vi.fn(),
 }));
-vi.mock("./project-api", () => ({ getProjectEntry: vi.fn() }));
+vi.mock("./project-api", () => ({
+  completeProjectInitialization: vi.fn(),
+  getProjectEntry: vi.fn(),
+  inspectProjectInitialization: vi.fn(),
+}));
 vi.mock("./project-context", () => ({
   entryProjectId: vi.fn(() => "30000000-0000-4000-8000-000000000001"),
   invalidateProjectRequests: vi.fn(),
@@ -152,6 +157,68 @@ afterEach(async () => {
 });
 
 describe("AuthGate desktop Bug routing", () => {
+  it("renders the one-use initialization page from a URL fragment without checking a session", async () => {
+    vi.stubGlobal("location", {
+      href: "http://127.0.0.1:4640/#initialize=token-value",
+      hash: "#initialize=token-value",
+      pathname: "/",
+      search: "",
+    });
+    vi.mocked(projectApi.inspectProjectInitialization).mockResolvedValue({
+      ...principal,
+      id: PROJECT_A,
+      key: "PROJECT-A",
+      name: "待初始化项目",
+      active: true,
+      version: 1,
+      initializationStatus: "pending",
+      joinName: null,
+      joinCode: "0042",
+      initializationTokenStatus: "issued",
+      initializationLink: "http://127.0.0.1:4640/#initialize=token-value",
+    });
+    let view!: ReactTestRenderer;
+    await act(async () => {
+      view = create(<AuthGate />);
+    });
+    await vi.waitFor(() =>
+      expect(view.root.findByProps({ id: "initialization-project-name" })).toBeTruthy(),
+    );
+    expect(projectApi.inspectProjectInitialization).toHaveBeenCalledWith("token-value");
+    expect(api.getBrowserSession).not.toHaveBeenCalled();
+    view.unmount();
+  });
+
+  it("uses the project name and four-digit code directly without probing project-entry", async () => {
+    vi.mocked(api.getBrowserSession).mockRejectedValue(
+      new api.QaHubApiError(401, "UNAUTHENTICATED"),
+    );
+    vi.mocked(api.loginBrowserSession).mockResolvedValue({
+      ...principal,
+      projectId: PROJECT_A,
+    });
+    let view!: ReactTestRenderer;
+    await act(async () => {
+      view = create(<AuthGate />);
+    });
+    await vi.waitFor(() => expect(view.root.findByProps({ id: "login-project" })).toBeTruthy());
+    const projectInput = view.root.findByProps({ id: "login-project" });
+    const codeInput = view.root.findByProps({ id: "login-code" });
+    const nameInput = view.root.findByProps({ id: "login-name" });
+    await act(async () => {
+      projectInput.props.onChange({ target: { value: "Project A" } });
+      codeInput.props.onChange({ target: { value: "0042" } });
+      nameInput.props.onChange({ target: { value: "Employee" } });
+    });
+    const form = view.root.findByProps({ className: "auth-form" });
+    await act(async () => {
+      await form.props.onSubmit({ preventDefault: vi.fn() });
+    });
+    expect(api.loginBrowserSession).toHaveBeenCalledWith("Employee", "Project A", "0042");
+    expect(projectApi.getProjectEntry).not.toHaveBeenCalled();
+    view.unmount();
+  });
+
   it("verifies visibility, switches project, remounts the keyed workspace, and consumes once", async () => {
     await mountAuthGate();
     expect(api.listVisibleProjects).toHaveBeenCalledTimes(1);

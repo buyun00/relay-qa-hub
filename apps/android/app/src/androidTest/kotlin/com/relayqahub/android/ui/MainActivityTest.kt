@@ -14,8 +14,10 @@ class MainActivityTest {
     val composeRule = createAndroidComposeRule<MainActivity>()
 
     @Test
-    fun backendNameIdentityGateAcceptsAName() {
-        composeRule.onNodeWithText("输入姓名；未登记的姓名会由后端自动创建账号").assertIsDisplayed()
+    fun projectCodeIdentityGateAcceptsThreeFields() {
+        composeRule.onNodeWithText("填写项目名称、四位项目码和姓名即可登记；项目码中的前导零会保留。").assertIsDisplayed()
+        composeRule.onNodeWithTag("identity-project-name").performTextInput("Demo Project")
+        composeRule.onNodeWithTag("identity-project-code").performTextInput("0007")
         composeRule.onNodeWithTag("identity-name").performTextInput("新账号")
         composeRule.onNodeWithTag("identity-login").assertIsDisplayed()
     }

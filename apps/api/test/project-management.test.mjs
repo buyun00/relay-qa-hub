@@ -165,7 +165,7 @@ test("real HTTP project name login, protected GM identity, scoped membership and
           headers: { authorization: `Bearer ${employee.data.accessToken}` },
         })
       ).response.status,
-      403,
+      401,
     );
     const settings = await request(
       `/api/v1/projects/${bId}/components/build`,

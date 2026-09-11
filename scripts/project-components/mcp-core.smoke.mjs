@@ -38,7 +38,7 @@ function redact(value, depth = 0) {
       Object.entries(value)
         .filter(
           ([key]) =>
-            !/token|secret|password|cookie|authorization|private.?key|api.?key|credential/iu.test(
+            !/token|secret|password|cookie|authorization|private.?key|api.?key|credential|joinCode|initializationLink/iu.test(
               key,
             ),
         )

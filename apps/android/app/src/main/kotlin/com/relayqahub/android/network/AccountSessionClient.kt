@@ -36,11 +36,19 @@ class AccountSessionClient(
 ) {
     private val apiBaseUrl: HttpUrl = QaHubApiEndpoint.parse(baseUrl, allowPrivateHttp)
 
-    internal fun buildLoginRequest(name: String, projectId: String): Request {
-        UUID.fromString(projectId)
+    internal fun buildLoginRequest(projectName: String, code: String, name: String): Request {
+        require(projectName.trim().isNotEmpty() && projectName.length <= 200) {
+            "projectName is invalid"
+        }
+        require(code.length == 4 && code.all(Char::isDigit)) {
+            "code is invalid"
+        }
+        require(name.isNotBlank() && name.length <= 100) { "name is invalid" }
         val url = apiBaseUrl.resolve("auth/login")
             ?: throw AccountSessionFailure("INVALID_LOGIN_PATH")
-        val body = "{\"name\":${name.toJsonString()},\"client\":\"android\",\"projectId\":${projectId.toJsonString()}}"
+        // Keep code as a string: values such as "0007" are meaningful and must
+        // not be coerced through an integer representation.
+        val body = "{\"projectName\":${projectName.toJsonString()},\"code\":${code.toJsonString()},\"name\":${name.toJsonString()},\"client\":\"android\"}"
             .toRequestBody(JSON_MEDIA_TYPE)
         return Request.Builder()
             .url(url)
@@ -49,9 +57,9 @@ class AccountSessionClient(
             .build()
     }
 
-    suspend fun login(name: String, projectId: String): QaHubAccountSession = withContext(Dispatchers.IO) {
+    suspend fun login(projectName: String, code: String, name: String): QaHubAccountSession = withContext(Dispatchers.IO) {
         val response = try {
-            httpClient.newCall(buildLoginRequest(name, projectId)).execute()
+            httpClient.newCall(buildLoginRequest(projectName, code, name)).execute()
         } catch (_: IOException) {
             throw AccountSessionFailure("NETWORK_IO")
         }
@@ -67,13 +75,15 @@ class AccountSessionClient(
             val userId = root.optString("userId")
             val displayName = root.optString("displayName")
             val accessToken = root.optString("accessToken")
+            val projectId = root.optString("projectId")
             val expiresAtEpochMs = runCatching {
                 Instant.parse(root.optString("expiresAt")).toEpochMilli()
             }.getOrNull()
             if (
                 runCatching { UUID.fromString(accountId) }.isFailure ||
                 runCatching { UUID.fromString(userId) }.isFailure ||
-                displayName.isBlank() || root.optString("projectId") != projectId ||
+                runCatching { UUID.fromString(projectId) }.isFailure ||
+                displayName.isBlank() ||
                 accessToken.length != 43 ||
                 expiresAtEpochMs == null ||
                 expiresAtEpochMs <= System.currentTimeMillis()

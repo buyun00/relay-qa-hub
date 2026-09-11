@@ -95,6 +95,13 @@ export interface BrowserAuthOptions {
     projectId: string,
     now: string,
   ) => Promise<{ readonly userId: string; readonly projectId: string }>;
+  readonly projectCodeLogin?: (
+    name: string,
+    projectName: string,
+    joinCode: string,
+    now: string,
+    clientKey: string,
+  ) => Promise<{ readonly userId: string; readonly projectId: string }>;
   readonly legacyProjectId?: string;
   readonly cookieName?: string;
   readonly gm?: { readonly userId: string; readonly password: string };
@@ -114,6 +121,29 @@ interface LoginBody {
   readonly name?: unknown;
   readonly client?: unknown;
   readonly projectId?: unknown;
+  readonly projectName?: unknown;
+  readonly code?: unknown;
+}
+
+function parseProjectCodeLoginBody(body: unknown): {
+  readonly name: string;
+  readonly projectName: string;
+  readonly code: string;
+  readonly client: "web" | "android";
+} {
+  if (body === null || typeof body !== "object" || Array.isArray(body))
+    throw new TypeError("login body is invalid");
+  const value = body as LoginBody;
+  for (const key of Object.keys(value))
+    if (!new Set(["name", "projectName", "code", "client"]).has(key))
+      throw new TypeError(`unexpected property: ${key}`);
+  const name = requireText(value.name, "name", 100);
+  const projectName = requireText(value.projectName, "projectName", 200);
+  const code = requireText(value.code, "code", 4);
+  if (!/^\d{4}$/u.test(code)) throw new TypeError("code is invalid");
+  if (value.client !== "web" && value.client !== "android")
+    throw new TypeError("client is invalid");
+  return { name, projectName, code, client: value.client };
 }
 
 function parsePasswordlessLoginBody(body: unknown): {
@@ -422,7 +452,9 @@ export function registerBrowserAuthRoutes(app: FastifyInstance, options: Browser
   app.post(BROWSER_LOGIN_PATH, async (request, reply) => {
     try {
       const passwordless = options.passwordlessLogin;
-      const passwordlessBody = parsePasswordlessLoginBody(request.body);
+      const passwordlessBody = options.projectCodeLogin
+        ? parseProjectCodeLoginBody(request.body)
+        : parsePasswordlessLoginBody(request.body);
       if (passwordlessBody.client === "web" && !originMatches(request, options.webOrigins)) {
         return writeJson(reply, 403, { code: "CSRF_ORIGIN_INVALID" });
       }
@@ -436,13 +468,24 @@ export function registerBrowserAuthRoutes(app: FastifyInstance, options: Browser
         issuedAt: issuedAt.toISOString(),
         expiresAt: expiresAt.toISOString(),
       };
-      const projectId = passwordlessBody.projectId ?? options.legacyProjectId;
-      if (options.projectLogin && !projectId)
-        return writeJson(reply, 400, { code: "PROJECT_REQUIRED", message: "请选择项目" });
       const identity =
-        options.projectLogin && projectId
-          ? await options.projectLogin(passwordlessBody.name, projectId, issuedAt.toISOString())
-          : await passwordless(passwordlessBody.name, issuedAt.toISOString());
+        options.projectCodeLogin && "projectName" in passwordlessBody
+          ? await options.projectCodeLogin(
+              passwordlessBody.name,
+              passwordlessBody.projectName,
+              passwordlessBody.code,
+              issuedAt.toISOString(),
+              request.ip,
+            )
+          : await (async () => {
+              const legacy = passwordlessBody as ReturnType<typeof parsePasswordlessLoginBody>;
+              const projectId = legacy.projectId ?? options.legacyProjectId;
+              if (options.projectLogin && !projectId)
+                throw Object.assign(new Error("请选择项目"), { code: "PROJECT_REQUIRED" });
+              return options.projectLogin && projectId
+                ? options.projectLogin(legacy.name, projectId, issuedAt.toISOString())
+                : passwordless(legacy.name, issuedAt.toISOString());
+            })();
       if (options.gm?.userId === identity.userId)
         return writeJson(reply, 403, { code: "GM_PASSWORD_REQUIRED" });
       const principal = await options.store.createBrowserSession({
@@ -473,6 +516,18 @@ export function registerBrowserAuthRoutes(app: FastifyInstance, options: Browser
         )
       )
         return writeJson(reply, 403, { code });
+      if (code === "RATE_LIMITED") {
+        const seconds = Number((error as { retryAfterSeconds?: unknown }).retryAfterSeconds);
+        return reply
+          .header(
+            "retry-after",
+            Number.isSafeInteger(seconds) && seconds > 0 ? String(seconds) : "30",
+          )
+          .code(429)
+          .header("content-type", MOBILE_API_CONTENT_TYPE)
+          .send({ code, message: "尝试次数过多，请稍后重试" });
+      }
+      if (code === "AUTHENTICATION_FAILED") return writeJson(reply, 401, AUTHENTICATION_FAILED);
       if (code === "NOT_FOUND") return writeJson(reply, 404, { code });
       if ((error as { readonly code?: unknown })?.code === "SQLITE_MOBILE_SCOPE_CONFLICT") {
         return writeJson(reply, 401, AUTHENTICATION_FAILED);

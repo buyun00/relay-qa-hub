@@ -164,7 +164,7 @@ export async function startPreviewWeb(config) {
     JSON.stringify({
       event: "preview-web.started",
       instanceId: config.instanceId,
-      address: `http://${config.webHost}:${config.webPort}`,
+      address: config.publicWebBaseUrl ?? `http://${config.webHost}:${config.webPort}`,
       sourceRoot: config.sourceRoot,
       downloadsRoot: config.downloadsRoot,
     }),

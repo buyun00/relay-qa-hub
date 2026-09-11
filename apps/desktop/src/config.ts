@@ -8,7 +8,7 @@ export const APP_HOST = "app";
 export const API_PATH = "/api/";
 export const NOTIFICATIONS_PATH = "/api/v1/notifications";
 export const EVENTS_PATH = "/api/v1/notifications/stream";
-const APP_SCHEME_PATTERN = /^qa-hub-preview(?:-[a-z0-9](?:[a-z0-9-]{1,38}[a-z0-9]))?$/u;
+const APP_SCHEME_PATTERN = /^qa-hub-(?:preview|lan)(?:-[a-z0-9](?:[a-z0-9-]{1,38}[a-z0-9]))?$/u;
 const BUG_ID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/iu;
 
 export interface DesktopConfig {
@@ -166,7 +166,7 @@ export function parseDesktopConfig(
   const appScheme = envValue(env, "QA_HUB_DESKTOP_APP_SCHEME") ?? APP_SCHEME;
   if (!APP_SCHEME_PATTERN.test(appScheme) || appScheme.includes("--")) {
     throw new DesktopConfigError(
-      "QA_HUB_DESKTOP_APP_SCHEME must be qa-hub-preview or a lowercase instance-specific qa-hub-preview-* scheme",
+      "QA_HUB_DESKTOP_APP_SCHEME must be a lowercase instance-specific qa-hub-preview-* or qa-hub-lan-* scheme",
     );
   }
   const configuredApiBaseUrl = envValue(env, "QA_HUB_DESKTOP_API_BASE_URL");

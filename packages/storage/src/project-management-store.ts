@@ -35,6 +35,29 @@ export interface ProjectRecord {
   readonly active: boolean;
   readonly version: number;
 }
+export interface ProjectLogoRecord {
+  readonly mediaType: "image/png" | "image/jpeg" | "image/webp";
+  readonly sha256: string;
+  readonly bytes: Uint8Array;
+}
+export interface ProjectInitialMemberInput {
+  readonly userId: string;
+  readonly nameKey: string;
+  readonly displayName: string;
+  readonly email: string;
+}
+export interface ProjectOnboardingRecord extends ProjectRecord {
+  readonly initializationStatus: "pending" | "ready";
+  readonly joinName: string | null;
+  readonly joinCodeCiphertext: string | null;
+  readonly joinCodeVersion: number;
+  readonly initializationTokenStatus: "absent" | "issued" | "used" | "revoked";
+  readonly initializationTokenCiphertext: string | null;
+  readonly initializationIssuedAt: string | null;
+  readonly initializationUsedAt: string | null;
+  readonly logo: ProjectLogoRecord | null;
+  readonly onboardingVersion: number;
+}
 export interface ProjectComponentRecord {
   readonly key: ProjectComponentKey;
   readonly displayName: string;
@@ -59,9 +82,18 @@ export interface ProjectManagementInput extends ProjectPrincipal {
     | "entry"
     | "list"
     | "create"
+    | "createOnboarding"
     | "update"
     | "login"
+    | "joinByCode"
     | "loginIdentities"
+    | "onboardingAdmin"
+    | "inspectInitialization"
+    | "initializeProject"
+    | "resetJoinCode"
+    | "rotateInitializationToken"
+    | "revokeInitializationToken"
+    | "projectLogo"
     | "membership"
     | "authorize"
     | "components"
@@ -72,11 +104,20 @@ export interface ProjectManagementInput extends ProjectPrincipal {
   readonly projectId?: string;
   readonly key?: string;
   readonly name?: string;
+  readonly nameKey?: string;
   readonly active?: boolean;
   readonly expectedVersion?: number;
   readonly userId?: string;
   readonly displayName?: string;
   readonly email?: string;
+  readonly memberNameKey?: string;
+  readonly joinCodeDigest?: string;
+  readonly joinCodeCiphertext?: string;
+  readonly initializationTokenDigest?: string;
+  readonly initializationTokenCiphertext?: string;
+  readonly submissionDigest?: string;
+  readonly initialMembers?: readonly ProjectInitialMemberInput[];
+  readonly logo?: ProjectLogoRecord | null;
   readonly now?: string;
   readonly componentKey?: ProjectComponentKey;
   readonly enabled?: boolean;
@@ -124,6 +165,193 @@ function requireGm(input: ProjectManagementInput): void {
 function requireVersion(actual: number, expected: number | undefined): void {
   if (!Number.isSafeInteger(expected) || expected !== actual)
     fail("VERSION_CONFLICT", "refresh the current version before saving");
+}
+function digest(value: unknown, label: string): string {
+  if (typeof value !== "string" || !/^[0-9a-f]{64}$/u.test(value))
+    fail("INVALID_REQUEST", `${label} must be a lowercase SHA-256 digest`);
+  return value;
+}
+function nameKey(value: unknown, label: string): string {
+  if (typeof value !== "string" || value.length < 1 || value.length > 200)
+    fail("INVALID_REQUEST", `${label} is invalid`);
+  return value;
+}
+function onboardingRow(
+  database: DatabaseSync,
+  accountId: string,
+  projectId: string,
+): ProjectOnboardingRecord {
+  const row = database
+    .prepare(
+      `SELECT project.id, project.project_key AS key, project.name, project.status, project.version,
+       onboarding.initialization_status, onboarding.join_name, onboarding.join_code_ciphertext,
+       onboarding.join_code_version, onboarding.initialization_token_status,
+       onboarding.initialization_token_ciphertext,
+       onboarding.initialization_issued_at, onboarding.initialization_used_at,
+       onboarding.logo_media_type, onboarding.logo_sha256, onboarding.logo_bytes,
+       onboarding.version AS onboarding_version
+       FROM projects AS project JOIN project_onboarding AS onboarding
+         ON onboarding.account_id = project.account_id AND onboarding.project_id = project.id
+       WHERE project.account_id = ? AND project.id = ?`,
+    )
+    .get(accountId, projectId) as
+    | {
+        id: string;
+        key: string;
+        name: string;
+        status: string;
+        version: number;
+        initialization_status: "pending" | "ready";
+        join_name: string | null;
+        join_code_ciphertext: string | null;
+        join_code_version: number;
+        initialization_token_status: "absent" | "issued" | "used" | "revoked";
+        initialization_token_ciphertext: string | null;
+        initialization_issued_at: string | null;
+        initialization_used_at: string | null;
+        logo_media_type: ProjectLogoRecord["mediaType"] | null;
+        logo_sha256: string | null;
+        logo_bytes: Uint8Array | null;
+        onboarding_version: number;
+      }
+    | undefined;
+  if (!row) fail("NOT_FOUND", "project onboarding was not found");
+  return {
+    id: row.id,
+    key: row.key,
+    name: row.name,
+    active: row.status === "active",
+    version: row.version,
+    initializationStatus: row.initialization_status,
+    joinName: row.join_name,
+    joinCodeCiphertext: row.join_code_ciphertext,
+    joinCodeVersion: row.join_code_version,
+    initializationTokenStatus: row.initialization_token_status,
+    initializationTokenCiphertext: row.initialization_token_ciphertext,
+    initializationIssuedAt: row.initialization_issued_at,
+    initializationUsedAt: row.initialization_used_at,
+    logo:
+      row.logo_media_type && row.logo_sha256 && row.logo_bytes
+        ? {
+            mediaType: row.logo_media_type,
+            sha256: row.logo_sha256,
+            bytes: row.logo_bytes,
+          }
+        : null,
+    onboardingVersion: row.onboarding_version,
+  };
+}
+function validateLogo(value: ProjectLogoRecord | null | undefined): ProjectLogoRecord | null {
+  if (value === undefined || value === null) return null;
+  if (!["image/png", "image/jpeg", "image/webp"].includes(value.mediaType))
+    fail("INVALID_REQUEST", "logo media type is invalid");
+  digest(value.sha256, "logo sha256");
+  if (
+    !(value.bytes instanceof Uint8Array) ||
+    value.bytes.byteLength < 1 ||
+    value.bytes.byteLength > 524288
+  )
+    fail("INVALID_REQUEST", "logo must contain 1 through 524288 bytes");
+  return value;
+}
+function ensureNamedProjectMember(
+  database: DatabaseSync,
+  input: ProjectManagementInput,
+  projectId: string,
+  member: ProjectInitialMemberInput,
+  timestamp: string,
+): { userId: string; displayName: string; membershipId: string; created: boolean } {
+  const normalized = nameKey(member.nameKey, "member name key");
+  const requestedUserId = uuid(member.userId, "userId");
+  if (!member.displayName?.trim() || member.displayName.length > 200 || !member.email?.trim())
+    fail("INVALID_REQUEST", "member identity is invalid");
+  const mapped = database
+    .prepare(
+      `SELECT names.user_id, names.display_name, users.status AS user_status,
+       memberships.id AS membership_id, memberships.status AS membership_status
+       FROM project_member_names AS names
+       JOIN users ON users.account_id = names.account_id AND users.id = names.user_id
+       JOIN memberships ON memberships.account_id = names.account_id
+         AND memberships.project_id = names.project_id AND memberships.user_id = names.user_id
+       WHERE names.account_id = ? AND names.project_id = ? AND names.name_key = ?`,
+    )
+    .get(input.accountId, projectId, normalized) as
+    | {
+        user_id: string;
+        display_name: string;
+        user_status: string;
+        membership_id: string;
+        membership_status: string;
+      }
+    | undefined;
+  if (mapped) {
+    if (mapped.user_status !== "active") fail("AUTHENTICATION_FAILED", "identity is disabled");
+    if (mapped.membership_status !== "active")
+      fail("PROJECT_MEMBERSHIP_DISABLED", "项目成员已停用，请联系项目人员恢复");
+    return {
+      userId: mapped.user_id,
+      displayName: mapped.display_name,
+      membershipId: mapped.membership_id,
+      created: false,
+    };
+  }
+  database
+    .prepare(
+      "INSERT OR IGNORE INTO users(id, account_id, email, display_name, status, created_at, updated_at, version) VALUES (?, ?, ?, ?, 'active', ?, ?, 1)",
+    )
+    .run(
+      requestedUserId,
+      input.accountId,
+      member.email.trim(),
+      member.displayName.trim(),
+      timestamp,
+      timestamp,
+    );
+  const user = database
+    .prepare("SELECT id, display_name, status FROM users WHERE account_id = ? AND id = ?")
+    .get(input.accountId, requestedUserId) as
+    { id: string; display_name: string; status: string } | undefined;
+  if (!user || user.status !== "active") fail("AUTHENTICATION_FAILED", "identity is disabled");
+  const membershipId = projectMembershipId(projectId, requestedUserId);
+  const priorMembership = database
+    .prepare(
+      "SELECT id, status FROM memberships WHERE account_id = ? AND project_id = ? AND user_id = ?",
+    )
+    .get(input.accountId, projectId, requestedUserId) as { id: string; status: string } | undefined;
+  if (priorMembership?.status === "revoked")
+    fail("PROJECT_MEMBERSHIP_DISABLED", "项目成员已停用，请联系项目人员恢复");
+  if (!priorMembership)
+    database
+      .prepare(
+        "INSERT INTO memberships(id, account_id, project_id, user_id, status, created_at, updated_at, version) VALUES (?, ?, ?, ?, 'active', ?, ?, 1)",
+      )
+      .run(membershipId, input.accountId, projectId, requestedUserId, timestamp, timestamp);
+  grantCapabilities(
+    database,
+    input.accountId,
+    projectId,
+    priorMembership?.id ?? membershipId,
+    timestamp,
+  );
+  database
+    .prepare(
+      "INSERT INTO project_member_names(account_id, project_id, name_key, display_name, user_id, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)",
+    )
+    .run(
+      input.accountId,
+      projectId,
+      normalized,
+      member.displayName.trim(),
+      requestedUserId,
+      timestamp,
+      timestamp,
+    );
+  return {
+    userId: requestedUserId,
+    displayName: user.display_name,
+    membershipId: priorMembership?.id ?? membershipId,
+    created: !priorMembership,
+  };
 }
 function project(database: DatabaseSync, input: ProjectManagementInput): ProjectRecord {
   const id = input.projectId;
@@ -322,6 +550,301 @@ function components(
 }
 export function projectManagement(database: DatabaseSync, input: ProjectManagementInput): unknown {
   uuid(input.accountId, "accountId");
+  if (input.operation === "createOnboarding") {
+    requireGm(input);
+    const projectId = uuid(input.projectId, "projectId");
+    const timestamp = now(input);
+    const codeDigest = digest(input.joinCodeDigest, "join code digest");
+    const tokenDigest = digest(input.initializationTokenDigest, "initialization token digest");
+    if (
+      !input.key ||
+      !/^[A-Z][A-Z0-9]{1,15}$/u.test(input.key) ||
+      !input.name?.trim() ||
+      input.name.length > 200 ||
+      !input.joinCodeCiphertext ||
+      input.joinCodeCiphertext.length > 500 ||
+      !input.initializationTokenCiphertext ||
+      input.initializationTokenCiphertext.length > 1000
+    )
+      fail("INVALID_REQUEST", "pending project details are invalid");
+    if (
+      database
+        .prepare("SELECT 1 FROM projects WHERE account_id = ? AND (id = ? OR project_key = ?)")
+        .get(input.accountId, projectId, input.key)
+    )
+      fail("VERSION_CONFLICT", "project ID or key already exists");
+    database
+      .prepare(
+        "INSERT INTO projects(id, account_id, project_key, name, status, created_at, updated_at, version) VALUES (?, ?, ?, ?, 'active', ?, ?, 1)",
+      )
+      .run(projectId, input.accountId, input.key, input.name.trim(), timestamp, timestamp);
+    const membershipId = projectMembershipId(projectId, input.actorId);
+    database
+      .prepare(
+        "INSERT INTO memberships(id, account_id, project_id, user_id, status, created_at, updated_at, version) VALUES (?, ?, ?, ?, 'active', ?, ?, 1)",
+      )
+      .run(membershipId, input.accountId, projectId, input.actorId, timestamp, timestamp);
+    grantCapabilities(database, input.accountId, projectId, membershipId, timestamp);
+    database
+      .prepare(
+        `UPDATE project_onboarding SET join_code_digest = ?, join_code_ciphertext = ?,
+          join_code_version = 1, initialization_token_digest = ?,
+          initialization_token_ciphertext = ?, initialization_token_status = 'issued',
+          initialization_issued_at = ?, updated_at = ?, version = version + 1
+         WHERE account_id = ? AND project_id = ?`,
+      )
+      .run(
+        codeDigest,
+        input.joinCodeCiphertext,
+        tokenDigest,
+        input.initializationTokenCiphertext,
+        timestamp,
+        timestamp,
+        input.accountId,
+        projectId,
+      );
+    audit(database, input, projectId, "project.onboarding_created", projectId, {
+      key: input.key,
+      initializationStatus: "pending",
+    });
+    return onboardingRow(database, input.accountId, projectId);
+  }
+  if (input.operation === "onboardingAdmin") {
+    requireGm(input);
+    uuid(input.actorId, "actorId");
+    if (input.projectId)
+      return onboardingRow(database, input.accountId, uuid(input.projectId, "projectId"));
+    const rows = database
+      .prepare(
+        "SELECT project_id FROM project_onboarding WHERE account_id = ? ORDER BY created_at, project_id",
+      )
+      .all(input.accountId) as { project_id: string }[];
+    return { items: rows.map((row) => onboardingRow(database, input.accountId, row.project_id)) };
+  }
+  if (input.operation === "inspectInitialization") {
+    const tokenDigest = digest(input.initializationTokenDigest, "initialization token digest");
+    const row = database
+      .prepare(
+        `SELECT project_id FROM project_onboarding
+         WHERE account_id = ? AND initialization_token_digest = ?
+           AND initialization_token_status = 'issued'`,
+      )
+      .get(input.accountId, tokenDigest) as { project_id: string } | undefined;
+    if (!row) fail("INITIALIZATION_LINK_INVALID", "初始化链接无效或已撤销");
+    return onboardingRow(database, input.accountId, row.project_id);
+  }
+  if (input.operation === "initializeProject") {
+    const tokenDigest = digest(input.initializationTokenDigest, "initialization token digest");
+    const requestDigest = digest(input.submissionDigest, "initialization submission digest");
+    const timestamp = now(input);
+    const token = database
+      .prepare(
+        `SELECT project_id, initialization_token_status, initialization_submission_digest
+         FROM project_onboarding WHERE account_id = ? AND initialization_token_digest = ?`,
+      )
+      .get(input.accountId, tokenDigest) as
+      | {
+          project_id: string;
+          initialization_token_status: "issued" | "used" | "revoked";
+          initialization_submission_digest: string | null;
+        }
+      | undefined;
+    if (!token || token.initialization_token_status === "revoked")
+      fail("INITIALIZATION_LINK_INVALID", "初始化链接无效或已撤销");
+    if (token.initialization_token_status === "used") {
+      fail("INITIALIZATION_ALREADY_COMPLETED", "项目已经完成初始化");
+    }
+    const normalizedName = input.name?.trim();
+    const normalizedNameKey = nameKey(input.nameKey, "project name key");
+    if (!normalizedName || normalizedName.length > 200)
+      fail("INVALID_REQUEST", "project name is invalid");
+    if (
+      database
+        .prepare(
+          "SELECT 1 FROM project_onboarding WHERE account_id = ? AND join_name_key = ? AND project_id <> ?",
+        )
+        .get(input.accountId, normalizedNameKey, token.project_id)
+    )
+      fail("PROJECT_NAME_CONFLICT", "项目名称已被使用，请联系 GM 处理");
+    const members = input.initialMembers ?? [];
+    if (
+      members.length > 500 ||
+      new Set(members.map((member) => member.nameKey)).size !== members.length
+    )
+      fail("INVALID_REQUEST", "initial members must be unique and no more than 500");
+    const logo = validateLogo(input.logo);
+    database
+      .prepare(
+        "UPDATE projects SET name = ?, updated_at = ?, version = version + 1 WHERE account_id = ? AND id = ?",
+      )
+      .run(normalizedName, timestamp, input.accountId, token.project_id);
+    database
+      .prepare(
+        `UPDATE project_onboarding SET join_name = ?, join_name_key = ?,
+          initialization_status = 'ready', initialization_token_status = 'used',
+          initialization_submission_digest = ?, initialization_used_at = ?,
+          initialization_revoked_at = NULL, logo_media_type = ?, logo_sha256 = ?, logo_bytes = ?,
+          updated_at = ?, version = version + 1
+         WHERE account_id = ? AND project_id = ?`,
+      )
+      .run(
+        normalizedName,
+        normalizedNameKey,
+        requestDigest,
+        timestamp,
+        logo?.mediaType ?? null,
+        logo?.sha256 ?? null,
+        logo?.bytes ?? null,
+        timestamp,
+        input.accountId,
+        token.project_id,
+      );
+    for (const member of members) {
+      const ensured = ensureNamedProjectMember(
+        database,
+        input,
+        token.project_id,
+        member,
+        timestamp,
+      );
+      if (ensured.created)
+        audit(
+          database,
+          { ...input, actorId: input.actorId },
+          token.project_id,
+          "membership.initialized",
+          ensured.userId,
+          { displayName: ensured.displayName },
+        );
+    }
+    audit(database, input, token.project_id, "project.initialized", token.project_id, {
+      name: normalizedName,
+      initialMemberCount: members.length,
+      hasLogo: logo !== null,
+    });
+    return onboardingRow(database, input.accountId, token.project_id);
+  }
+  if (input.operation === "joinByCode") {
+    const projectNameKey = nameKey(input.nameKey, "project name key");
+    const codeDigest = digest(input.joinCodeDigest, "join code digest");
+    const timestamp = now(input);
+    const match = database
+      .prepare(
+        `SELECT onboarding.project_id FROM project_onboarding AS onboarding
+         JOIN projects AS project ON project.account_id = onboarding.account_id
+           AND project.id = onboarding.project_id AND project.status = 'active'
+         WHERE onboarding.account_id = ? AND onboarding.join_name_key = ?
+           AND onboarding.join_code_digest = ? AND onboarding.initialization_status = 'ready'`,
+      )
+      .get(input.accountId, projectNameKey, codeDigest) as { project_id: string } | undefined;
+    if (!match) fail("AUTHENTICATION_FAILED", "项目名称或验证码不正确");
+    const member = ensureNamedProjectMember(
+      database,
+      input,
+      match.project_id,
+      {
+        userId: uuid(input.userId, "userId"),
+        nameKey: nameKey(input.memberNameKey, "member name key"),
+        displayName: input.displayName ?? "",
+        email: input.email ?? "",
+      },
+      timestamp,
+    );
+    if (member.created)
+      audit(
+        database,
+        { ...input, actorId: member.userId },
+        match.project_id,
+        "membership.joined_with_code",
+        member.userId,
+        { displayName: member.displayName },
+      );
+    return {
+      userId: member.userId,
+      displayName: member.displayName,
+      projectId: match.project_id,
+      projectName: onboardingRow(database, input.accountId, match.project_id).joinName,
+    };
+  }
+  if (input.operation === "resetJoinCode") {
+    requireGm(input);
+    uuid(input.actorId, "actorId");
+    const projectId = uuid(input.projectId, "projectId");
+    const current = onboardingRow(database, input.accountId, projectId);
+    const codeDigest = digest(input.joinCodeDigest, "join code digest");
+    if (!input.joinCodeCiphertext || input.joinCodeCiphertext.length > 500)
+      fail("INVALID_REQUEST", "join code ciphertext is invalid");
+    database
+      .prepare(
+        `UPDATE project_onboarding SET join_code_digest = ?, join_code_ciphertext = ?,
+         join_code_version = join_code_version + 1, updated_at = ?, version = version + 1
+         WHERE account_id = ? AND project_id = ?`,
+      )
+      .run(codeDigest, input.joinCodeCiphertext, now(input), input.accountId, projectId);
+    audit(database, input, projectId, "project.join_code_reset", projectId, {
+      previousVersion: current.joinCodeVersion,
+    });
+    return onboardingRow(database, input.accountId, projectId);
+  }
+  if (input.operation === "rotateInitializationToken") {
+    requireGm(input);
+    uuid(input.actorId, "actorId");
+    const projectId = uuid(input.projectId, "projectId");
+    const current = onboardingRow(database, input.accountId, projectId);
+    if (current.initializationStatus !== "pending")
+      fail("INITIALIZATION_ALREADY_COMPLETED", "项目已经完成初始化");
+    const tokenDigest = digest(input.initializationTokenDigest, "initialization token digest");
+    if (!input.initializationTokenCiphertext || input.initializationTokenCiphertext.length > 1000)
+      fail("INVALID_REQUEST", "initialization token ciphertext is invalid");
+    const tokenCiphertext = input.initializationTokenCiphertext;
+    const issuedAt = now(input);
+    const codeDigest = input.joinCodeDigest
+      ? digest(input.joinCodeDigest, "join code digest")
+      : undefined;
+    if ((codeDigest === undefined) !== (input.joinCodeCiphertext === undefined))
+      fail("INVALID_REQUEST", "join code replacement must be complete");
+    database
+      .prepare(
+        `UPDATE project_onboarding SET initialization_token_digest = ?,
+          initialization_token_ciphertext = ?,
+          initialization_token_status = 'issued', initialization_submission_digest = NULL,
+          initialization_issued_at = ?, initialization_used_at = NULL,
+          initialization_revoked_at = NULL,
+          join_code_digest = COALESCE(?, join_code_digest),
+          join_code_ciphertext = COALESCE(?, join_code_ciphertext),
+          join_code_version = CASE WHEN ? IS NULL THEN join_code_version ELSE join_code_version + 1 END,
+          updated_at = ?, version = version + 1
+         WHERE account_id = ? AND project_id = ?`,
+      )
+      .run(
+        tokenDigest,
+        tokenCiphertext,
+        issuedAt,
+        codeDigest ?? null,
+        input.joinCodeCiphertext ?? null,
+        codeDigest ?? null,
+        issuedAt,
+        input.accountId,
+        projectId,
+      );
+    audit(database, input, projectId, "project.initialization_link_rotated", projectId, {});
+    return onboardingRow(database, input.accountId, projectId);
+  }
+  if (input.operation === "revokeInitializationToken") {
+    requireGm(input);
+    uuid(input.actorId, "actorId");
+    const projectId = uuid(input.projectId, "projectId");
+    const timestamp = now(input);
+    database
+      .prepare(
+        `UPDATE project_onboarding SET initialization_token_status = 'revoked',
+          initialization_revoked_at = ?, updated_at = ?, version = version + 1
+         WHERE account_id = ? AND project_id = ? AND initialization_token_status <> 'absent'`,
+      )
+      .run(timestamp, timestamp, input.accountId, projectId);
+    audit(database, input, projectId, "project.initialization_link_revoked", projectId, {});
+    return onboardingRow(database, input.accountId, projectId);
+  }
   if (input.operation === "loginIdentities")
     return database
       .prepare(
@@ -385,6 +908,13 @@ export function projectManagement(database: DatabaseSync, input: ProjectManageme
     };
   }
   uuid(input.actorId, "actorId");
+  if (input.operation === "projectLogo") {
+    const selected = project(database, input);
+    requireProjectAccess(database, input, selected.id);
+    const logo = onboardingRow(database, input.accountId, selected.id).logo;
+    if (!logo) fail("NOT_FOUND", "project logo was not found");
+    return logo;
+  }
   if (input.operation === "recordProject") {
     const tables = {
       bug: "bugs",
@@ -493,6 +1023,27 @@ export function projectManagement(database: DatabaseSync, input: ProjectManageme
         selected.id,
         selected.version,
       );
+    const onboarding = database
+      .prepare(
+        "SELECT initialization_status FROM project_onboarding WHERE account_id = ? AND project_id = ?",
+      )
+      .get(input.accountId, selected.id) as { initialization_status: string } | undefined;
+    if (onboarding?.initialization_status === "ready" && name !== selected.name) {
+      const normalizedNameKey = nameKey(input.nameKey, "project name key");
+      if (
+        database
+          .prepare(
+            "SELECT 1 FROM project_onboarding WHERE account_id = ? AND join_name_key = ? AND project_id <> ?",
+          )
+          .get(input.accountId, normalizedNameKey, selected.id)
+      )
+        fail("PROJECT_NAME_CONFLICT", "项目名称已被使用，请联系 GM 处理");
+      database
+        .prepare(
+          "UPDATE project_onboarding SET join_name = ?, join_name_key = ?, updated_at = ?, version = version + 1 WHERE account_id = ? AND project_id = ?",
+        )
+        .run(name, normalizedNameKey, now(input), input.accountId, selected.id);
+    }
     audit(database, input, selected.id, "project.updated", selected.id, {
       name,
       active: input.active ?? selected.active,

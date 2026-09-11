@@ -1499,12 +1499,18 @@ export class QaHubMcpTools {
       }
       if (name === "qa_login") {
         const args = requireRecord(argumentsValue, "arguments");
-        onlyKeys(args, ["name", "projectId"]);
+        onlyKeys(args, ["name", "projectId", "projectName", "code"]);
+        const projectCodeLogin = args["projectName"] !== undefined || args["code"] !== undefined;
         return this.api.json("/api/v1/auth/login", {
           method: "POST",
           body: {
             name: requireString(args, "name", 1, 128),
-            projectId: requireUuid(args, "projectId"),
+            ...(projectCodeLogin
+              ? {
+                  projectName: requireString(args, "projectName", 1, 200),
+                  code: requireString(args, "code", 4, 4),
+                }
+              : { projectId: requireUuid(args, "projectId") }),
             client: "web",
           },
         });

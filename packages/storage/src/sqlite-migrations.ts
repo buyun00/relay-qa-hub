@@ -9,6 +9,7 @@ import { WORKFLOW_PROJECTION_SNAPSHOT_SQL } from "./workflow-projection-migratio
 import { REPAIR_ATTEMPT_TERMINAL_SNAPSHOT_SQL } from "./repair-attempt-terminal-migration.js";
 import { VERIFICATION_RESULT_EVIDENCE_SQL } from "./verification-result-evidence-migration.js";
 import { MOBILE_READ_SNAPSHOT_SQL } from "./mobile-read-snapshot-migration.js";
+import { PROJECT_ONBOARDING_SQL } from "./project-onboarding-migration.js";
 
 export interface SqliteMigration {
   readonly version: number;
@@ -7521,6 +7522,7 @@ export const SQLITE_MIGRATIONS: readonly SqliteMigration[] = Object.freeze([
   migration(18, "repair_attempt_terminal_receipts", REPAIR_ATTEMPT_TERMINAL_SNAPSHOT_SQL),
   migration(19, "verification_result_evidence", VERIFICATION_RESULT_EVIDENCE_SQL),
   migration(20, "durable_mobile_read_snapshots", MOBILE_READ_SNAPSHOT_SQL),
+  migration(21, "lan_project_onboarding", PROJECT_ONBOARDING_SQL),
 ]);
 
 export const SQLITE_SCHEMA_VERSION = SQLITE_MIGRATIONS.at(-1)?.version ?? 0;

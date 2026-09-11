@@ -248,6 +248,9 @@ export type {
   ProjectComponentRecord,
   ProjectComponentList,
   ProjectManagementInput,
+  ProjectInitialMemberInput,
+  ProjectLogoRecord,
+  ProjectOnboardingRecord,
   ProjectPrincipal,
   ProjectRecord,
 } from "./project-management-store.js";

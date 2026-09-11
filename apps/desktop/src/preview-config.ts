@@ -4,7 +4,7 @@ import path from "node:path";
 import { APP_SCHEME } from "./config.js";
 import { deriveToastActivatorClsid } from "./notification-activation.js";
 
-const INSTANCE_PATTERN = /^qa-hub-preview-([a-z0-9](?:[a-z0-9-]{1,38}[a-z0-9]))$/u;
+const INSTANCE_PATTERN = /^qa-hub-(preview|lan)-([a-z0-9](?:[a-z0-9-]{1,38}[a-z0-9]))$/u;
 const LEGACY_INSTANCE_ID = "qa-hub-preview-7c86";
 
 export interface PreviewDesktopIdentity {
@@ -54,11 +54,13 @@ export function loadPreviewDesktopIdentity(
     }
     return result;
   };
-  if (value["schemaVersion"] !== 1) throw new Error("PREVIEW_CONFIG_SCHEMA_INVALID");
+  if (value["schemaVersion"] !== 1 && value["schemaVersion"] !== 2)
+    throw new Error("PREVIEW_CONFIG_SCHEMA_INVALID");
   const instanceId = text("instanceId");
   const instanceMatch = INSTANCE_PATTERN.exec(instanceId);
   if (instanceMatch === null || instanceId.includes("--")) throw new Error("PREVIEW_ID_INVALID");
-  const suffix = instanceMatch[1];
+  const mode = instanceMatch[1];
+  const suffix = instanceMatch[2];
   if (suffix === undefined) throw new Error("PREVIEW_ID_INVALID");
   const expectedAppScheme = instanceId === LEGACY_INSTANCE_ID ? APP_SCHEME : instanceId;
   const appScheme =
@@ -66,10 +68,11 @@ export function loadPreviewDesktopIdentity(
       ? APP_SCHEME
       : text("appScheme");
   if (appScheme !== expectedAppScheme) throw new Error("PREVIEW_APP_SCHEME_MISMATCH");
+  const identitySegment = mode === "lan" ? "lan" : "preview";
   const expectedAppUserModelId =
     instanceId === LEGACY_INSTANCE_ID
       ? "com.relayqahub.desktop.preview"
-      : `com.relayqahub.desktop.preview.${suffix.replaceAll("-", ".")}`;
+      : `com.relayqahub.desktop.${identitySegment}.${suffix.replaceAll("-", ".")}`;
   const appUserModelId =
     value["appUserModelId"] === undefined && instanceId === LEGACY_INSTANCE_ID
       ? expectedAppUserModelId
@@ -83,7 +86,17 @@ export function loadPreviewDesktopIdentity(
       : text("toastActivatorClsid");
   if (toastActivatorClsid !== expectedToastActivatorClsid)
     throw new Error("PREVIEW_TOAST_ACTIVATOR_CLSID_MISMATCH");
-  const profile = text("profileDirectory");
+  const profile =
+    value["schemaVersion"] === 2
+      ? (() => {
+          const profileDirectoryName = text("profileDirectoryName");
+          if (profileDirectoryName !== instanceId) throw new Error("PREVIEW_PROFILE_ID_MISMATCH");
+          const localAppData = source["LOCALAPPDATA"]?.trim();
+          if (!localAppData || !path.isAbsolute(localAppData))
+            throw new Error("PREVIEW_LOCAL_APP_DATA_INVALID");
+          return path.join(localAppData, "Relay QA Hub LAN", profileDirectoryName, "profile");
+        })()
+      : text("profileDirectory");
   if (!path.isAbsolute(profile)) throw new Error("PREVIEW_PROFILE_MUST_BE_ABSOLUTE");
   const profileDirectory = canonical(profile);
   if (!profileDirectory.split(/[\\/]/u).includes(instanceId))
@@ -119,6 +132,8 @@ export function loadPreviewDesktopIdentity(
     )
       throw new Error("PREVIEW_ENDPOINT_INVALID");
   }
+  if (value["schemaVersion"] === 2 && api.origin !== csrf.origin)
+    throw new Error("PREVIEW_ENDPOINT_ORIGIN_MISMATCH");
   if (manifest.origin !== csrf.origin || !manifest.pathname.includes(instanceId))
     throw new Error("PREVIEW_UPDATE_CHANNEL_MISMATCH");
   const mcpPort = value["mcpPort"];

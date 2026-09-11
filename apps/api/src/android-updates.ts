@@ -80,7 +80,10 @@ function weakEtag(size: number, modifiedMs: number): string {
   return `W/"${size.toString(16)}-${Math.trunc(modifiedMs).toString(16)}"`;
 }
 
-async function previewMetadata(filePath: string): Promise<Buffer | null> {
+async function previewMetadata(
+  filePath: string,
+  expectedPackageName: string,
+): Promise<Buffer | null> {
   try {
     const bytes = await readFile(filePath);
     if (bytes.length > MAX_METADATA_BYTES) return null;
@@ -93,7 +96,7 @@ async function previewMetadata(filePath: string): Promise<Buffer | null> {
     if (
       record["schemaVersion"] !== 1 ||
       record["channel"] !== "preview" ||
-      record["packageName"] !== "com.relayqahub.android.preview.debug" ||
+      record["packageName"] !== expectedPackageName ||
       typeof versionCode !== "number" ||
       !Number.isSafeInteger(versionCode) ||
       versionCode <= 0 ||
@@ -121,8 +124,11 @@ export function registerAndroidUpdateRoutes(
   app: FastifyInstance,
   root: string | undefined,
   channel: AndroidUpdateChannel = "stable",
+  previewPackageName = "com.relayqahub.android.preview.debug",
 ): void {
   const configuredChannel = parseAndroidUpdateChannel(channel);
+  if (!/^[a-z][a-z0-9_]*(?:\.[a-z][a-z0-9_]*)+$/u.test(previewPackageName))
+    throw new Error("Android preview update package name is invalid");
   const handler = async (
     request: FastifyRequest<{ Params: { fileName: string } }>,
     reply: FastifyReply,
@@ -134,7 +140,9 @@ export function registerAndroidUpdateRoutes(
     const fileStat = await stat(filePath);
     const metadata = fileName === "latest.json";
     const metadataBytes =
-      metadata && configuredChannel === "preview" ? await previewMetadata(filePath) : undefined;
+      metadata && configuredChannel === "preview"
+        ? await previewMetadata(filePath, previewPackageName)
+        : undefined;
     if (metadataBytes === null) {
       return reply
         .code(503)

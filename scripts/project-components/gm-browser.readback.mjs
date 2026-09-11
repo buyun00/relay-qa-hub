@@ -14,7 +14,12 @@ const scrub = (value) =>
     : value && typeof value === "object"
       ? Object.fromEntries(
           Object.entries(value)
-            .filter(([key]) => !/token|password|secret|cookie|authorization/iu.test(key))
+            .filter(
+              ([key]) =>
+                !/token|password|secret|cookie|authorization|joinCode|initializationLink/iu.test(
+                  key,
+                ),
+            )
             .map(([key, item]) => [key, scrub(item)]),
         )
       : value;

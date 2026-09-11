@@ -4,6 +4,7 @@ import { type FormEvent, useCallback, useEffect, useRef, useState } from "react"
 import App, { type AppDraft, type PendingDesktopBugRoute } from "./App";
 import DesktopUpdateNotice from "./DesktopUpdateNotice";
 import ProjectManagementPage from "./ProjectManagementPage";
+import ProjectInitializationPage from "./ProjectInitializationPage";
 import type { DesktopBugRoute } from "./desktop";
 import {
   getBrowserSession,
@@ -15,7 +16,6 @@ import {
   setBrowserCsrfToken,
   type BrowserSessionPrincipal,
 } from "./api";
-import { getProjectEntry } from "./project-api";
 import {
   entryProjectId,
   invalidateProjectRequests,
@@ -132,17 +132,34 @@ interface QueuedDesktopBugRoute {
   readonly route: DesktopBugRoute;
 }
 
+function initializationTokenFromLocation(): string | null {
+  if (
+    typeof location === "undefined" ||
+    typeof location.hash !== "string" ||
+    !location.hash.startsWith("#initialize=")
+  )
+    return null;
+  const value = location.hash.slice("#initialize=".length);
+  if (!value || value.includes("&") || value.includes("?")) return null;
+  try {
+    return decodeURIComponent(value);
+  } catch {
+    return null;
+  }
+}
+
 export default function AuthGate() {
   const authRevision = useRef(0);
-  const entryRevision = useRef(0);
   const desktopBugRouteSequence = useRef(0);
+  const initializationToken = initializationTokenFromLocation();
   const [state, setState] = useState<"checking" | "signed-out" | "signed-in" | "unavailable">(
     "checking",
   );
   const [principal, setPrincipal] = useState<BrowserSessionPrincipal | null>(null);
   const [projectId, setProjectId] = useState(entryProjectId);
-  const [projectInput, setProjectInput] = useState(entryProjectId);
+  const [projectInput, setProjectInput] = useState("");
   const [projectName, setProjectName] = useState("");
+  const [code, setCode] = useState("");
   const [name, setName] = useState("");
   const [gm, setGm] = useState(false);
   const [password, setPassword] = useState("");
@@ -160,7 +177,7 @@ export default function AuthGate() {
     (id: string) => {
       setActiveProject(id, principal?.userId ?? "");
       setProjectId(id);
-      setProjectInput(id);
+      setProjectInput("");
       const url = new URL(location.href);
       if (id) url.searchParams.set("projectId", id);
       else url.searchParams.delete("projectId");
@@ -169,6 +186,7 @@ export default function AuthGate() {
     [principal?.userId],
   );
   useEffect(() => {
+    if (initializationToken !== null) return;
     const bridge = window.qaHubDesktop;
     if (bridge === undefined) return;
     return bridge.onOpenBug((route) => {
@@ -177,7 +195,7 @@ export default function AuthGate() {
         route,
       });
     });
-  }, []);
+  }, [initializationToken]);
   const consumeDesktopBugRoute = useCallback((sequence: number) => {
     setPendingDesktopBugRoute((current) => (current?.sequence === sequence ? null : current));
   }, []);
@@ -278,7 +296,6 @@ export default function AuthGate() {
       }
       const entry = entryProjectId();
       setActiveProject(entry);
-      setProjectInput(entry);
       const current = await getBrowserSession();
       if (request !== authRevision.current) return;
       const available = await listVisibleProjects();
@@ -309,53 +326,38 @@ export default function AuthGate() {
     }
   };
   useEffect(() => {
+    if (initializationToken !== null) return;
     void checkSession();
     const revisionRef = authRevision;
     return () => {
       revisionRef.current++;
     };
-  }, []);
-  const verifyEntry = useCallback(async () => {
-    const request = ++entryRevision.current;
-    if (!projectInput.trim()) return;
-    try {
-      const entry = await getProjectEntry(projectInput.trim());
-      if (request !== entryRevision.current) return;
-      setProjectId(entry.id);
-      setProjectName(entry.name);
-      setMessage("");
-    } catch (cause) {
-      if (request !== entryRevision.current) return;
-      setProjectName("");
-      setMessage(
-        cause instanceof QaHubApiError && cause.status === 404
-          ? "此项目入口不存在或已停用。"
-          : "暂时无法读取项目入口。",
-      );
-    }
-  }, [projectInput]);
-  useEffect(() => {
-    if (state !== "signed-out" || gm || !projectInput.trim()) return;
-    const timer = setTimeout(() => void verifyEntry(), 250);
-    return () => clearTimeout(timer);
-  }, [state, gm, projectInput, verifyEntry]);
+  }, [initializationToken]);
   const submit = async (event: FormEvent) => {
     event.preventDefault();
     setBusy(true);
     setMessage("");
     try {
-      let id = projectId;
+      let id = "";
       if (!gm) {
-        const entry = await getProjectEntry(projectInput.trim());
-        id = entry.id;
-        setProjectName(entry.name);
-        setActiveProject(id);
+        const current = await loginBrowserSession(name.trim(), projectInput.trim(), code.trim());
+        id = current.projectId ?? "";
+        if (!id) throw new QaHubApiError(200, "INVALID_AUTH_RESPONSE");
+        setProjectName(projectInput.trim());
+        setPrincipal(current);
+        setActiveProject(id, current.userId);
+        setProjectId(id);
+        const url = new URL(location.href);
+        url.searchParams.set("projectId", id);
+        history.replaceState(null, "", `${url.pathname}${url.search}${url.hash}`);
+        setState("signed-in");
+        return;
       }
-      const current = gm ? await loginGmSession(password) : await loginBrowserSession(name, id);
+      const current = await loginGmSession(password);
       setPassword("");
       setPrincipal(current);
-      setActiveProject(gm ? "" : id, current.userId);
-      setProjectId(gm ? "" : id);
+      setActiveProject("", current.userId);
+      setProjectId("");
       const url = new URL(location.href);
       if (gm) url.searchParams.delete("projectId");
       else url.searchParams.set("projectId", id);
@@ -366,9 +368,13 @@ export default function AuthGate() {
         cause instanceof QaHubApiError &&
           ["PROJECT_MEMBERSHIP_DISABLED", "PROJECT_NOT_ACCESSIBLE"].includes(cause.code ?? "")
           ? "你在此项目的资格已停用，请联系 GM 或项目人员恢复。"
-          : cause instanceof QaHubApiError
-            ? `登录未完成：${cause.code ?? cause.status}`
-            : "登录服务暂时不可用。",
+          : cause instanceof QaHubApiError && cause.code === "RATE_LIMITED"
+            ? "尝试次数过多，请稍后重试。"
+            : cause instanceof QaHubApiError && cause.code === "AUTHENTICATION_FAILED"
+              ? "项目名称、验证码或姓名不正确。"
+              : cause instanceof QaHubApiError
+                ? `登录未完成：${cause.code ?? cause.status}`
+                : "登录服务暂时不可用。",
       );
     } finally {
       setBusy(false);
@@ -385,12 +391,15 @@ export default function AuthGate() {
       setPrincipal(null);
       setState("signed-out");
       setName("");
+      setCode("");
     } catch {
       setMessage("退出失败，请稍后重试。");
     } finally {
       setBusy(false);
     }
   };
+  if (initializationToken !== null)
+    return <ProjectInitializationPage token={initializationToken} />;
   if (state === "checking") return <main className="auth-status">正在核对项目会话…</main>;
   if (state === "unavailable")
     return (
@@ -416,7 +425,7 @@ export default function AuthGate() {
           <p>
             {gm
               ? "使用服务端配置的唯一 GM 管理口令。"
-              : "从项目入口填写姓名；首次登录仅登记到此项目。"}
+              : "填写项目名称、固定四位验证码和姓名加入项目。"}
           </p>
           <form className="auth-form" onSubmit={(event) => void submit(event)}>
             {gm ? (
@@ -433,17 +442,31 @@ export default function AuthGate() {
               </>
             ) : (
               <>
-                <label htmlFor="login-project">项目 ID 或入口短码</label>
+                <label htmlFor="login-project">项目名称</label>
                 <input
                   id="login-project"
                   value={projectInput}
                   onChange={(event) => {
-                    entryRevision.current++;
                     setProjectInput(event.target.value);
                     setProjectName("");
                   }}
-                  onBlur={() => void verifyEntry()}
-                  placeholder="使用 GM 提供的项目入口"
+                  placeholder="输入项目名称"
+                  maxLength={200}
+                  autoComplete="organization"
+                  required
+                />
+                <label htmlFor="login-code">固定四位验证码</label>
+                <input
+                  id="login-code"
+                  inputMode="numeric"
+                  pattern="[0-9]{4}"
+                  maxLength={4}
+                  value={code}
+                  onChange={(event) =>
+                    setCode(event.target.value.replace(/[^0-9]/gu, "").slice(0, 4))
+                  }
+                  placeholder="例如 0042"
+                  autoComplete="off"
                   required
                 />
                 <label htmlFor="login-name">姓名</label>
@@ -477,6 +500,9 @@ export default function AuthGate() {
           >
             {gm ? "返回项目姓名登录" : "GM 管理入口"}
           </button>
+          <a className="project-login-mode" href="/downloads/" target="_blank" rel="noreferrer">
+            下载 Windows / Android 客户端
+          </a>
         </section>
       </main>
     );

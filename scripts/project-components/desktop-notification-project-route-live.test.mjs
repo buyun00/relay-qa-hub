@@ -856,7 +856,12 @@ test("evidence redaction removes auth material from keys and free text", () => {
   const value = redactEvidence(
     {
       authorization: `Bearer ${secret}`,
-      nested: { accessToken: "token-value", safe: `prefix ${secret} suffix` },
+      nested: {
+        accessToken: "token-value",
+        joinCode: "0042",
+        initializationLink: "http://lan/#initialize=credential-value",
+        safe: `prefix ${secret} suffix`,
+      },
       line: "Bearer abc.def_123",
     },
     new Set([secret]),
@@ -864,6 +869,8 @@ test("evidence redaction removes auth material from keys and free text", () => {
   const serialized = JSON.stringify(value);
   assert.equal(serialized.includes(secret), false);
   assert.equal(serialized.includes("token-value"), false);
+  assert.equal(serialized.includes("0042"), false);
+  assert.equal(serialized.includes("credential-value"), false);
   assert.match(serialized, /REDACTED/u);
 });
 

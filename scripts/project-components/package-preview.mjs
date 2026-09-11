@@ -75,7 +75,7 @@ const {
   writeFileExclusiveDurable,
 } = releaseContent;
 const releaseId = new Date().toISOString().replace(/[-:.]/gu, "");
-const version = `0.2.0-preview.${buildNumber}`;
+const version = `0.2.0-${config.deploymentMode}.${buildNumber}`;
 const packagesRoot = join(config.runtimeRoot, "packages");
 mkdirSync(packagesRoot, { recursive: true });
 const root = join(packagesRoot, releaseId);
@@ -153,7 +153,7 @@ const buildArtifacts = {
 const save = (file, value) =>
   writeFileSync(file, JSON.stringify(value, null, 2) + "\n", { flag: "wx" });
 save(join(stage, "package.json"), {
-  name: `qa-hub-project-preview-${config.instanceId.slice("qa-hub-preview-".length)}`,
+  name: packageIdentity.executableBaseName.toLowerCase(),
   version,
   type: "module",
   main: "dist/main.js",
@@ -297,17 +297,22 @@ const packagedReleaseBytes = asar.extractFile(packagedAsarPath, "release.json");
 if (!packagedReleaseBytes.equals(stageReleaseBytes))
   throw new Error("PACKAGED_RELEASE_BINDING_MISMATCH");
 const packagedPreviewConfig = {
-  schemaVersion: 1,
+  schemaVersion: config.deploymentMode === "lan" ? 2 : 1,
   instanceId: config.instanceId,
-  profileDirectory: join(config.desktopRoot, "profile"),
-  apiBaseUrl: `http://${config.apiHost}:${config.apiPort}`,
-  csrfOrigin: `http://${config.webHost}:${config.webPort}`,
+  ...(config.deploymentMode === "lan"
+    ? { profileDirectoryName: config.instanceId }
+    : { profileDirectory: join(config.desktopRoot, "profile") }),
+  apiBaseUrl:
+    config.deploymentMode === "lan"
+      ? config.publicWebBaseUrl
+      : `http://${config.apiHost}:${config.apiPort}`,
+  csrfOrigin: config.publicWebBaseUrl,
   cookieName: config.cookieName,
   appScheme: packageIdentity.protocolScheme,
   appUserModelId: packageIdentity.appUserModelId,
   toastActivatorClsid: packageIdentity.toastActivatorClsid,
   mcpPort: config.desktopMcpPort,
-  updateManifestUrl: `http://${config.webHost}:${config.webPort}/downloads/${config.instanceId}-windows-latest.json`,
+  updateManifestUrl: `${config.publicWebBaseUrl}/downloads/${config.instanceId}-windows-latest.json`,
   updatePublicKeyPem,
 };
 const packagedPreviewConfigBytes = Buffer.from(
@@ -484,7 +489,7 @@ assertCleanPreviewPackageSource(config.sourceRoot, sourceCommit);
 const installer = join(config.downloadsRoot, installerName);
 const manifestUrl = new URL(
   `/downloads/${config.instanceId}-windows-latest.json`,
-  `http://${config.webHost}:${config.webPort}`,
+  config.publicWebBaseUrl,
 );
 const candidateManifestUrl = new URL(`/downloads/${candidateManifestName}`, manifestUrl);
 const createReceipt = ({
