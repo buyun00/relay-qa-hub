@@ -2,8 +2,8 @@
   "schemaVersion": 2,
   "lock": {
     "path": "package-lock.json",
-    "bytes": 244880,
-    "sha256": "5978aa3aa73c45a6028656ba4f5a3c496f2add4dcacb06cfc69b1b0405001c09"
+    "bytes": 244912,
+    "sha256": "ffaf907f6d2ed5d1420d5cedbec2a6b09a8bb85e624b8aba61ac5cf9cc24d544"
   },
   "node": {
     "version": "v24.19.0",
