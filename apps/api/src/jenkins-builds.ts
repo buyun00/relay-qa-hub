@@ -1,11 +1,19 @@
 import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import {
   QUICK_JOB_NAME,
+  COMPATIBILITY_JOB_NAME,
   QUICK_BUILD_PRESETS,
   quickBuildPreset,
   type QuickBuildPresetId,
 } from "@relay-qa-hub/upload-contract";
 import { artifactCatalog, validateBuildResult, type BuildResult } from "./build-artifacts.js";
+import {
+  COMPATIBILITY_TARGETS,
+  compatibilitySource,
+  validateCompatibilityReport,
+  type CompatibilityTarget,
+  type CompatibilityCheck,
+} from "./jenkins-compatibility.js";
 import {
   applyBuildHistory,
   describeBuild,
@@ -19,6 +27,7 @@ import {
 const JENKINS_ORIGIN = "http://10.100.5.129:8080";
 const DOWNLOAD_ORIGIN = "http://10.100.5.129:8000";
 const JOB_PATH = `/job/${encodeURIComponent(QUICK_JOB_NAME)}/`;
+const CHECK_JOB_PATH = `/job/${encodeURIComponent(COMPATIBILITY_JOB_NAME)}/`;
 const LEGACY_JOB_PATH = `/job/${encodeURIComponent("01-【OZDQP】【Android】")}/`;
 const JENKINS_AUTH = `Basic ${Buffer.from("admin:admin").toString("base64")}`;
 const TIMEOUT_MS = 8_000;
@@ -81,6 +90,31 @@ function presetForParameters(actions: JenkinsParameters[] = []): BuildPreset | n
   if (values["networkScope"] === "外网_保留原参数") return "external";
   if (values["networkScope"] !== "内网_自动判断") return null;
   return values["internalUseSdk"] === "接入SDK" ? "internal-sdk" : "internal-nosdk";
+}
+function isCompatibilityBuild(actions: JenkinsParameters[] = []): boolean {
+  const purpose = actions
+    .flatMap((a) => a.parameters ?? [])
+    .find((p) => p.name === "打包用途")?.value;
+  return COMPATIBILITY_TARGETS.some(
+    (t) => purpose === `${t.platform} ${t.configuration} · 快捷检测`,
+  );
+}
+function sameJenkinsUrl(value: unknown, expected: string): boolean {
+  if (typeof value !== "string") return false;
+  try {
+    const actual = new URL(value),
+      wanted = new URL(expected);
+    return (
+      actual.origin === wanted.origin &&
+      !actual.username &&
+      !actual.password &&
+      !actual.search &&
+      !actual.hash &&
+      decodeURI(actual.pathname) === decodeURI(wanted.pathname)
+    );
+  } catch {
+    return false;
+  }
 }
 
 export function packageFiles(files: DirectoryFile[], kind: "apk" | "ipa"): PackageFile[] {
@@ -242,16 +276,18 @@ export class JenkinsBuildService {
     return this.crumbLoading;
   }
 
-  private async submit(preset: BuildPreset): Promise<{ queueId: number; preset: BuildPreset }> {
+  private async submitParameters(
+    parameters: Record<string, string>,
+    jobPath = JOB_PATH,
+  ): Promise<number> {
     const signal = AbortSignal.timeout(15_000);
-    const job = await this.job(signal);
+    const job = await this.job(signal, false, jobPath);
     if (!job.buildable) throw new PackagingError("JENKINS_JOB_DISABLED", 409);
-    const parameters = buildParameters(preset);
     const definitions = job.property?.flatMap((p) => p.parameterDefinitions ?? []) ?? [];
     if (!definitions.some((p) => p.name === "打包用途"))
       throw new PackagingError("JENKINS_PARAMETERS_CHANGED", 409);
     // Active Choices does not expose choices in api/json. Read its installed script without executing it.
-    const configResponse = await this.request(`${JOB_PATH}config.xml`, { signal });
+    const configResponse = await this.request(`${jobPath}config.xml`, { signal });
     if (!configResponse.ok) {
       await configResponse.body?.cancel();
       throw new PackagingError("JENKINS_PARAMETERS_CHANGED", 409);
@@ -264,7 +300,7 @@ export class JenkinsBuildService {
       const crumb = this.crumb!;
       let response: Response;
       try {
-        response = await this.request(`${JOB_PATH}buildWithParameters`, {
+        response = await this.request(`${jobPath}buildWithParameters`, {
           method: "POST",
           signal,
           headers: {
@@ -294,9 +330,124 @@ export class JenkinsBuildService {
       if (response.status !== 201 || !queue)
         throw new PackagingError("JENKINS_SUBMISSION_UNKNOWN", 502);
       this.cachedStatus = null;
-      return { preset, queueId: Number(queue[1]) };
+      return Number(queue[1]);
     }
     throw new PackagingError("JENKINS_AUTH_FAILED");
+  }
+
+  private async submit(preset: BuildPreset): Promise<{ queueId: number; preset: BuildPreset }> {
+    return { preset, queueId: await this.submitParameters(buildParameters(preset)) };
+  }
+
+  async startCompatibility(target: CompatibilityTarget): Promise<number> {
+    if (
+      !COMPATIBILITY_TARGETS.some(
+        (t) =>
+          t.id === target.id &&
+          t.platform === target.platform &&
+          t.configuration === target.configuration,
+      )
+    )
+      throw new PackagingError("INVALID_REQUEST", 400);
+    const sourceResponse = await this.request(`${JOB_PATH}config.xml`);
+    if (!sourceResponse.ok) {
+      await sourceResponse.body?.cancel();
+      throw new PackagingError("CHECK_SOURCE_UNAVAILABLE", 502);
+    }
+    const config = await sourceResponse.text();
+    if (config.length > MAX_JSON_BYTES) throw new PackagingError("CHECK_SOURCE_CHANGED", 502);
+    let source: string;
+    try {
+      source = compatibilitySource(config);
+    } catch {
+      throw new PackagingError("CHECK_SOURCE_CHANGED", 502);
+    }
+    return this.submitParameters(
+      {
+        打包用途: `${target.platform} ${target.configuration} · 快捷检测`,
+        参考版本: "自动：最新成功版本",
+        CHECK_SOURCE: source,
+      },
+      CHECK_JOB_PATH,
+    );
+  }
+
+  async compatibilityProgress(check: CompatibilityCheck): Promise<CompatibilityCheck> {
+    const expected = `${check.target.platform} ${check.target.configuration} · 快捷检测`;
+    let number = check.buildNumber;
+    if (!number) {
+      const response = await this.request(`/queue/item/${check.queueId}/api/json`);
+      if (response.status === 404) {
+        await response.body?.cancel();
+        const recent = await this.job(undefined, true, CHECK_JOB_PATH);
+        number = recent.builds.find((b) => b.queueId === check.queueId)?.number ?? null;
+        if (!number) throw new PackagingError("CHECK_QUEUE_UNKNOWN");
+      } else {
+        const q = await this.readJson<{
+          id: number;
+          cancelled?: boolean;
+          task?: { url?: string };
+          executable?: { number?: number; url?: string };
+        }>(response);
+        if (q.id !== check.queueId || !sameJenkinsUrl(q.task?.url, JENKINS_ORIGIN + CHECK_JOB_PATH))
+          throw new PackagingError("CHECK_IDENTITY_MISMATCH");
+        if (q.cancelled) throw new PackagingError("CHECK_CANCELLED");
+        if (!q.executable) return { ...check, state: "queued", errorCode: null };
+        number = q.executable.number ?? null;
+        if (
+          !number ||
+          !Number.isSafeInteger(number) ||
+          !sameJenkinsUrl(q.executable.url, JENKINS_ORIGIN + CHECK_JOB_PATH + number + "/")
+        )
+          throw new PackagingError("CHECK_IDENTITY_MISMATCH");
+      }
+    }
+    const b = await this.readJson<{
+      number: number;
+      queueId: number;
+      building: boolean;
+      result: string | null;
+      timestamp: number;
+      duration: number;
+      actions?: JenkinsParameters[];
+    }>(
+      await this.request(
+        `${CHECK_JOB_PATH}${number}/api/json?tree=number,queueId,building,result,timestamp,duration,actions[parameters[name,value]]`,
+      ),
+    );
+    const params = Object.fromEntries(
+      (b.actions ?? []).flatMap((a) => a.parameters ?? []).map((p) => [p.name, p.value]),
+    );
+    if (
+      b.number !== number ||
+      b.queueId !== check.queueId ||
+      params["打包用途"] !== expected ||
+      !["自动：最新成功版本", "latest"].includes(String(params["参考版本"]))
+    )
+      throw new PackagingError("CHECK_IDENTITY_MISMATCH");
+    if (b.building) return { ...check, buildNumber: number, state: "running", errorCode: null };
+    if (!["SUCCESS", "UNSTABLE"].includes(b.result ?? "")) throw new PackagingError("CHECK_FAILED");
+    const value = await this.readJson<unknown>(
+      await this.request(`${CHECK_JOB_PATH}${number}/artifact/compatibility.json`),
+    );
+    let report;
+    try {
+      report = validateCompatibilityReport(value, check.target);
+    } catch {
+      throw new PackagingError("CHECK_INVALID_REPORT");
+    }
+    const finishedAt = b.timestamp + b.duration;
+    if (!Number.isFinite(finishedAt) || finishedAt <= 0 || finishedAt > Date.now() + 60_000)
+      throw new PackagingError("CHECK_INVALID_REPORT");
+    return {
+      ...check,
+      buildNumber: number,
+      state: "complete",
+      checkedAt: new Date(finishedAt).toISOString(),
+      reportUrl: `${JENKINS_ORIGIN}${CHECK_JOB_PATH}${number}/artifact/compatibility.html`,
+      report,
+      errorCode: null,
+    };
   }
 
   trigger(
@@ -347,13 +498,16 @@ export class JenkinsBuildService {
         ]);
         return {
           buildable: job.buildable,
-          builds: job.builds.map((build) => ({
-            number: build.number,
-            startedAt: new Date(build.timestamp).toISOString(),
-            status: build.building ? "BUILDING" : (build.result ?? "UNKNOWN"),
-            preset: presetForParameters(build.actions),
-          })),
+          builds: job.builds
+            .filter((build) => !isCompatibilityBuild(build.actions))
+            .map((build) => ({
+              number: build.number,
+              startedAt: new Date(build.timestamp).toISOString(),
+              status: build.building ? "BUILDING" : (build.result ?? "UNKNOWN"),
+              preset: presetForParameters(build.actions),
+            })),
           queue: queue.items
+            .filter((q) => !isCompatibilityBuild(q.actions))
             .filter(
               (q) =>
                 q.task?.url === `${JENKINS_ORIGIN}${JOB_PATH}` ||
@@ -541,6 +695,10 @@ export class JenkinsBuildService {
         }
       }),
     );
+    // Compatibility checks have their own progress; they are not package builds
+    // and must not enter duration baselines or build-completion notifications.
+    for (let i = builds.length - 1; i >= 0; i--)
+      if (isCompatibilityBuild(builds[i]!.actions)) builds.splice(i, 1);
     const descriptions: ReturnType<typeof describeBuild>[] = [];
     let index = 0;
     // Cap concurrent console reads so inspecting history does not flood Jenkins.

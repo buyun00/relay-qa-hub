@@ -1,4 +1,6 @@
 import AppIcon from "./AppIcon";
+import BuildCompatibilitySummary from "./BuildCompatibilitySummary";
+import type { CompatibilityCheck } from "./packaging-api";
 import { serverUploader, createUploadRequestId } from "./increment-upload-api";
 import { useCallback, useEffect, useRef, useState } from "react";
 import type {
@@ -54,12 +56,20 @@ export default function BuildUploadControls({
   onBuildOnly,
   onSubmitted,
   onOpenUpload,
+  checks,
+  checking = false,
+  checkError = false,
+  onRefreshChecks,
 }: {
   userId?: string;
   disabled: boolean;
   onBuildOnly: (preset: QuickBuildPresetId) => void;
   onSubmitted: (queueId: number) => void;
   onOpenUpload?: ((jobId?: string) => void) | undefined;
+  checks?: CompatibilityCheck[] | undefined;
+  checking?: boolean;
+  checkError?: boolean;
+  onRefreshChecks?: (() => void) | undefined;
 }) {
   const bridge = serverUploader;
   const [open, setOpen] = useState(false);
@@ -180,84 +190,143 @@ export default function BuildUploadControls({
     (c) => !["failed", "cancelled", "upload_started"].includes(c.status),
   );
   const latest = activeChain ?? chains[0];
+  const renderChoice = (selection: (typeof QUICK_BUILD_PRESETS)[number]) => (
+    <div className="package-external-control" key={selection.id} data-mode={selection.mode}>
+      <button
+        ref={preset === selection.id ? trigger : undefined}
+        className="package-build-button"
+        data-build-preset={selection.id}
+        aria-label={selection.label}
+        type="button"
+        disabled={disabled || busy}
+        aria-expanded={open && preset === selection.id}
+        aria-controls={`build-options-${selection.id}`}
+        onClick={() => void toggle(selection.id)}
+      >
+        <span className="package-choice-title">
+          <span>
+            <AppIcon name={selection.mode === "App" ? "package" : "folder"} />
+            {selection.mode === "App" ? "完整包" : "增量热更"}
+          </span>
+          <AppIcon name={open && preset === selection.id ? "up" : "down"} size={15} />
+        </span>
+        <span className="package-choice-files">
+          {selection.mode === "Res"
+            ? "热更 ZIP"
+            : selection.platform === "iOS"
+              ? "IPA + 完整热更 ZIP"
+              : selection.configuration === "Release"
+                ? "APK / AAB + 完整热更 ZIP"
+                : "APK + 完整热更 ZIP"}
+        </span>
+      </button>
+      {open && preset === selection.id ? (
+        <div
+          id={`build-options-${selection.id}`}
+          className="package-build-options"
+          role="region"
+          aria-label={`${selection.label} 操作选项`}
+        >
+          <strong>选择本次操作</strong>
+          <button
+            type="button"
+            disabled={busy || disabled}
+            onClick={() => {
+              setOpen(false);
+              onBuildOnly(selection.id);
+            }}
+          >
+            只构建
+          </button>
+          <button
+            className="package-combined-action"
+            type="button"
+            disabled={
+              busy ||
+              disabled ||
+              !bridge?.buildAndUpload ||
+              !snapshot?.configured ||
+              !snapshot.available
+            }
+            onClick={() => void combined()}
+          >
+            {busy ? "正在检查并提交…" : "构建完自动上传增量"}
+          </button>
+          <p>
+            产品 {input.productId} · 渠道 {input.channelId} · 测试人 {input.testerId}
+          </p>
+          <p>版本与本次构建完全一致 · {UPLOAD_MODES.find((m) => m.id === input.mode)?.label}</p>
+          <small>
+            更新说明只写版本号。服务端在打包成功后自动上传，退出客户端或关闭电脑不影响执行。
+          </small>
+          {!bridge?.buildAndUpload ? (
+            <p>服务端上传暂时不可用。</p>
+          ) : !snapshot?.configured ? (
+            <p>请先登录上传平台账号。</p>
+          ) : null}
+          {onOpenUpload ? (
+            <button
+              type="button"
+              className="package-settings-link"
+              disabled={busy}
+              onClick={() => {
+                setOpen(false);
+                onOpenUpload();
+              }}
+            >
+              修改上传设置 / 登录账号
+            </button>
+          ) : null}
+        </div>
+      ) : null}
+    </div>
+  );
   return (
     <div className="package-quick-controls" ref={root}>
-      <div className="package-build-buttons">
-        {QUICK_BUILD_PRESETS.map((selection) => (
-          <div className="package-external-control" key={selection.id}>
-            <button
-              ref={preset === selection.id ? trigger : undefined}
-              className="package-build-button"
-              type="button"
-              disabled={disabled || busy}
-              aria-expanded={open && preset === selection.id}
-              aria-controls={`build-options-${selection.id}`}
-              onClick={() => void toggle(selection.id)}
-            >
-              {selection.label} <AppIcon name={open && preset === selection.id ? "up" : "down"} />
-            </button>
-            {open && preset === selection.id ? (
+      <div className="package-check-toolbar">
+        <span>按对应安装包与最新代码判断 · 每次进入自动刷新</span>
+        {onRefreshChecks ? (
+          <button type="button" onClick={onRefreshChecks} disabled={checking}>
+            <AppIcon name="refresh" busy={checking} size={15} />
+            {checking ? "正在检测四组…" : "刷新判断"}
+          </button>
+        ) : null}
+      </div>
+      <div className="package-platform-grid">
+        {(["Android", "iOS"] as const).map((platform) => (
+          <section
+            className="package-platform-group"
+            key={platform}
+            aria-label={platform + " 打包"}
+            data-platform={platform}
+          >
+            <h2>{platform}</h2>
+            {(["Debug", "Release"] as const).map((configuration) => (
               <div
-                id={`build-options-${selection.id}`}
-                className="package-build-options"
-                role="region"
-                aria-label={`${selection.label} 操作选项`}
+                className="package-configuration-group"
+                key={configuration}
+                aria-label={platform + " " + configuration}
               >
-                <strong>选择本次操作</strong>
-                <button
-                  type="button"
-                  disabled={busy || disabled}
-                  onClick={() => {
-                    setOpen(false);
-                    onBuildOnly(selection.id);
-                  }}
-                >
-                  只构建
-                </button>
-                <button
-                  className="package-combined-action"
-                  type="button"
-                  disabled={
-                    busy ||
-                    disabled ||
-                    !bridge?.buildAndUpload ||
-                    !snapshot?.configured ||
-                    !snapshot.available
-                  }
-                  onClick={() => void combined()}
-                >
-                  {busy ? "正在检查并提交…" : "构建完自动上传增量"}
-                </button>
-                <p>
-                  产品 {input.productId} · 渠道 {input.channelId} · 测试人 {input.testerId}
-                </p>
-                <p>
-                  版本与本次构建完全一致 · {UPLOAD_MODES.find((m) => m.id === input.mode)?.label}
-                </p>
-                <small>
-                  更新说明只写版本号。服务端在打包成功后自动上传，退出客户端或关闭电脑不影响执行。
-                </small>
-                {!bridge?.buildAndUpload ? (
-                  <p>服务端上传暂时不可用。</p>
-                ) : !snapshot?.configured ? (
-                  <p>请先登录上传平台账号。</p>
-                ) : null}
-                {onOpenUpload ? (
-                  <button
-                    type="button"
-                    className="package-settings-link"
-                    disabled={busy}
-                    onClick={() => {
-                      setOpen(false);
-                      onOpenUpload();
-                    }}
-                  >
-                    修改上传设置 / 登录账号
-                  </button>
-                ) : null}
+                <h3>
+                  <span className="package-configuration-tag" data-configuration={configuration}>
+                    {configuration}
+                  </span>
+                </h3>
+                <BuildCompatibilitySummary
+                  check={checks?.find(
+                    (c) =>
+                      c.target.platform === platform && c.target.configuration === configuration,
+                  )}
+                  unavailable={checkError}
+                />
+                <div className="package-build-buttons">
+                  {QUICK_BUILD_PRESETS.filter(
+                    (p) => p.platform === platform && p.configuration === configuration,
+                  ).map(renderChoice)}
+                </div>
               </div>
-            ) : null}
-          </div>
+            ))}
+          </section>
         ))}
       </div>
       {latest ? (

@@ -20,6 +20,7 @@ export interface QuickBuildPreset {
   childJob: string;
 }
 export declare const QUICK_JOB_NAME: string;
+export declare const COMPATIBILITY_JOB_NAME: string;
 export declare const BUILD_DOWNLOAD_ROOT: string;
 export declare const QUICK_BUILD_PRESETS: readonly Readonly<QuickBuildPreset>[];
 export declare function quickBuildPreset(id: unknown): Readonly<QuickBuildPreset> | undefined;

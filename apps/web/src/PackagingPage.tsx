@@ -2,9 +2,11 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { QRCodeSVG } from "qrcode.react";
 import PackagingProgressPanel from "./PackagingProgress";
 import BuildUploadControls from "./BuildUploadControls";
+import { useBuildCompatibility } from "./useBuildCompatibility";
 import { usePackagingProgress } from "./usePackagingProgress";
 import { requestPackagingNotificationPermission } from "./packaging-notifications";
 import { QaHubApiError } from "./api";
+import { createUploadRequestId } from "./increment-upload-api";
 import {
   BUILD_PRESETS,
   getPackagingStatus,
@@ -154,6 +156,7 @@ export default function PackagingPage({
   }, [refresh]);
   useEffect(() => () => clearTimeout(completedRefresh.current), []);
   const monitor = usePackagingProgress(userId, active, refreshRevision, onCompleted, onOpen);
+  const compatibility = useBuildCompatibility(active, refreshRevision);
   useEffect(() => {
     if (!active) return;
     const controller = new AbortController();
@@ -176,7 +179,7 @@ export default function PackagingPage({
     setPending(preset);
     setNotice(null);
     try {
-      const receipt = await triggerJenkinsBuild(preset, crypto.randomUUID());
+      const receipt = await triggerJenkinsBuild(preset, createUploadRequestId());
       monitor.watch(receipt.queueId);
       setNotice(`${packageLabel(preset)}已提交，排队编号 #${receipt.queueId}。`);
     } catch (cause) {
@@ -209,6 +212,10 @@ export default function PackagingPage({
           </div>
           <BuildUploadControls
             userId={userId}
+            checks={compatibility.batch?.checks}
+            checking={compatibility.refreshing}
+            checkError={compatibility.error}
+            onRefreshChecks={compatibility.refresh}
             disabled={pending !== null || !status?.jenkins?.buildable || error !== null}
             onBuildOnly={(id) => void build(id)}
             onSubmitted={(queueId) => {

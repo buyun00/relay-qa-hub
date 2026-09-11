@@ -1,4 +1,5 @@
 export const QUICK_JOB_NAME = "00-【OZDQP】【快捷打包】";
+export const COMPATIBILITY_JOB_NAME = "00-【OZDQP】【兼容性检测】";
 export const BUILD_DOWNLOAD_ROOT = "http://10.100.5.129:8000/ozdqp/";
 export const QUICK_BUILD_PRESETS = Object.freeze(
   [

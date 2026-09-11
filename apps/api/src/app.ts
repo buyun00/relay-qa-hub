@@ -181,6 +181,7 @@ import {
 } from "./qingyu-integration.js";
 import { QingyuError } from "./qingyu-client.js";
 import { JenkinsBuildService, registerPackagingRoutes } from "./jenkins-builds.js";
+import { BuildCompatibilityService, registerCompatibilityRoutes } from "./build-compatibility.js";
 import { IncrementUploadService, registerIncrementUploadRoutes } from "./increment-upload.js";
 import {
   ProductionTasks,
@@ -2541,6 +2542,19 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
   );
 
   const jenkinsBuildService = options.jenkinsBuildService ?? new JenkinsBuildService();
+  registerCompatibilityRoutes(
+    app,
+    new BuildCompatibilityService(
+      jenkinsBuildService,
+      options.incrementUploadRoot
+        ? options.incrementUploadRoot + "/../build-compatibility"
+        : undefined,
+    ),
+    (request) =>
+      readHeader(request.headers.authorization) === `Bearer ${debugBearerToken}`
+        ? authenticatedActorId(request, debugActorId)
+        : null,
+  );
   registerIncrementUploadRoutes(
     app,
     options.incrementUploadService ??

@@ -6,7 +6,10 @@ import { type PackagingStatus } from "./packaging-api";
 describe("packaging page", () => {
   it("has precisely eight build purposes and no editable Jenkins settings", () => {
     const markup = renderToStaticMarkup(<PackagingPage active={true} refreshRevision={0} />);
-    expect(markup.match(/<button /gu)).toHaveLength(8);
+    expect(markup.match(/data-build-preset=/gu)).toHaveLength(8);
+    expect(markup).toContain("刷新判断");
+    expect(markup.match(/package-platform-group"/gu)).toHaveLength(2);
+    expect(markup.match(/class="package-configuration-group"/gu)).toHaveLength(4);
     for (const label of ["Android Debug", "Android Release", "iOS Debug", "iOS Release"])
       expect(markup).toContain(label);
     expect(markup).toContain("APK、AAB、完整热更");
