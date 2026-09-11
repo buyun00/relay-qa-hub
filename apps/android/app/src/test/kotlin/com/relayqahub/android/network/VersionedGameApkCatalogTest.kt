@@ -3,6 +3,7 @@ package com.relayqahub.android.network
 import com.sun.net.httpserver.HttpServer
 import java.net.InetSocketAddress
 import java.util.Collections
+import java.util.concurrent.atomic.AtomicBoolean
 import kotlinx.coroutines.runBlocking
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.OkHttpClient
@@ -42,10 +43,15 @@ class VersionedGameApkCatalogTest {
 
     @Test fun `live HTTP traversal skips resource-only builds and returns newest APKs for both configurations`() = runBlocking {
         val requests = Collections.synchronizedList(mutableListOf<String>())
+        val dropNextConnection = AtomicBoolean(false)
         val server = HttpServer.create(InetSocketAddress("127.0.0.1", 0), 0)
         server.createContext("/") { exchange ->
             val uri = exchange.requestURI.toString()
             requests += uri
+            if (uri == "/ozdqp/Android/Debug/?json=true" && dropNextConnection.compareAndSet(true, false)) {
+                exchange.close()
+                return@createContext
+            }
             val body = when (uri) {
                 "/ozdqp/Android/Debug/?json=true" -> """{"files":[{"type":"dir","name":"2.5.10/14"},{"type":"dir","name":"2.5.9/13"}]}"""
                 "/ozdqp/Android/Release/?json=true" -> """{"files":[{"type":"dir","name":"2.5.1"}]}"""
@@ -61,11 +67,15 @@ class VersionedGameApkCatalogTest {
         }
         server.start()
         try {
-            val items = GameApkCatalogClient("http://127.0.0.1:${server.address.port}/ozdqp/", OkHttpClient(), true).latest(1)
+            val client = GameApkCatalogClient("http://127.0.0.1:${server.address.port}/ozdqp/", OkHttpClient.Builder().retryOnConnectionFailure(false).build(), true)
+            val items = client.latest(1)
             assertEquals(listOf("Debug", "Release"), items.map { it.configuration })
             assertEquals(listOf("2.5.9", "2.5.1"), items.map { it.versionName })
             assertTrue(items.all { it.expectedSha256 != null && it.downloadUrl.endsWith("/packages/game.apk") })
             assertTrue(requests.none { it.startsWith("/apk/") || it.contains("iOS") || it.endsWith(".apk") })
+            dropNextConnection.set(true)
+            assertEquals(items, client.latest(1))
+            assertTrue(requests.count { it == "/ozdqp/Android/Debug/?json=true" } >= 3)
         } finally { server.stop(0) }
     }
 }

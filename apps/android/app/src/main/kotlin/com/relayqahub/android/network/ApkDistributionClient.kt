@@ -109,7 +109,10 @@ class GameApkCatalogClient(
     httpClient: OkHttpClient,
     allowPrivateHttp: Boolean = false,
 ) {
-    private val httpClient = httpClient.newBuilder().callTimeout(15, TimeUnit.SECONDS).build()
+    private val httpClient = httpClient.newBuilder()
+        .callTimeout(15, TimeUnit.SECONDS)
+        .retryOnConnectionFailure(true)
+        .build()
     private val directoryUrl = parseControlledDistributionUrl(directoryUrl, allowPrivateHttp)
         .newBuilder()
         .query(null)
@@ -192,8 +195,10 @@ class GameApkCatalogClient(
 
 class ApkDownloadClient(
     context: Context,
-    private val httpClient: OkHttpClient,
+    httpClient: OkHttpClient,
 ) {
+    // These requests are GETs. Recover a pooled connection closed by the file server.
+    private val httpClient = httpClient.newBuilder().retryOnConnectionFailure(true).build()
     private val downloadDirectory = File(context.filesDir, DOWNLOAD_DIRECTORY_NAME)
 
     suspend fun download(
