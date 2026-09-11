@@ -33,6 +33,18 @@ const MAX_INSTALLER_BYTES = 350 * 1024 * 1024;
 const sha256 = (value) => createHash("sha256").update(value).digest("hex");
 const require = createRequire(import.meta.url);
 
+function isPrivateLanHostname(hostname) {
+  const parts = hostname.split(".");
+  if (parts.length !== 4 || parts.some((part) => !/^(?:0|[1-9]\d{0,2})$/u.test(part))) return false;
+  const octets = parts.map(Number);
+  if (octets.some((part) => part > 255)) return false;
+  return (
+    octets[0] === 10 ||
+    (octets[0] === 172 && octets[1] >= 16 && octets[1] <= 31) ||
+    (octets[0] === 192 && octets[1] === 168)
+  );
+}
+
 function fileIdentity(file, code = "FILE_IDENTITY_INVALID") {
   const stat = lstatSync(file, { bigint: true });
   assert.ok(stat.isFile() && !stat.isSymbolicLink(), `${code}_TYPE`);
@@ -412,7 +424,13 @@ export function validatePreparedPreviewPublicationReceipt({ transaction, phase }
   const expectedManifestPathname = `/downloads/${transaction.destinationName}`;
   const expectedInstallerPathname = `/downloads/${installerName}`;
   assert.equal(manifestUrl.protocol, "http:", "PREPARED_RECEIPT_MANIFEST_URL_INVALID");
-  assert.equal(manifestUrl.hostname, "127.0.0.1", "PREPARED_RECEIPT_MANIFEST_URL_INVALID");
+  assert.equal(
+    receipt.version.includes("-lan.")
+      ? isPrivateLanHostname(manifestUrl.hostname)
+      : manifestUrl.hostname === "127.0.0.1",
+    true,
+    "PREPARED_RECEIPT_MANIFEST_URL_INVALID",
+  );
   assert.equal(manifestUrl.username, "", "PREPARED_RECEIPT_MANIFEST_URL_INVALID");
   assert.equal(manifestUrl.password, "", "PREPARED_RECEIPT_MANIFEST_URL_INVALID");
   assert.ok(
