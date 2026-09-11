@@ -3,7 +3,7 @@ import path from "node:path";
 import type { FastifyInstance, FastifyRequest } from "fastify";
 import { JenkinsBuildService, PackagingError } from "./jenkins-builds.js";
 import { COMPATIBILITY_TARGETS, type CompatibilityCheck } from "./jenkins-compatibility.js";
-import { writeJson } from "./uploader-host.js";
+import { writeCompatibilityState } from "./build-compatibility-store.js";
 
 export interface CompatibilityBatch {
   id: string;
@@ -77,8 +77,9 @@ export class BuildCompatibilityService {
     const write = this.writes.then(async () => {
       if (!this.root) return;
       await fs.mkdir(path.join(this.root, "runs"), { recursive: true });
-      await writeJson(path.join(this.root, "runs", b.id + ".json"), b);
-      if (this.current?.id === b.id) await writeJson(path.join(this.root, "current.json"), b);
+      await writeCompatibilityState(path.join(this.root, "runs", b.id + ".json"), b);
+      if (this.current?.id === b.id)
+        await writeCompatibilityState(path.join(this.root, "current.json"), b);
     });
     this.writes = write.catch(() => undefined);
     return write;
