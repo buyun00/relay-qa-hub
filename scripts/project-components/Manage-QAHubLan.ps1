@@ -2,19 +2,22 @@
 param(
   [Parameter(Mandatory=$true)][ValidateSet('Install','Start','Stop','Status','Uninstall')][string]$Action,
   [string]$ConfigFile = 'C:\Users\lin0\.codex\parallel-runtimes\qa-hub-lan-v22-0911\instance.json',
+  [string]$NodePath,
   [ValidateSet('api','web','mcp')][string[]]$Services = @('api','web','mcp')
 )
 
 $ErrorActionPreference = 'Stop'
 $configPath = (Resolve-Path -LiteralPath $ConfigFile).Path
-$nodePath = (Get-Command node -ErrorAction Stop).Source
+$nodeCommand = if ($NodePath) { $null } else { Get-Command node -ErrorAction SilentlyContinue }
+$nodePath = if ($NodePath) { [IO.Path]::GetFullPath($NodePath) } elseif ($nodeCommand) { $nodeCommand.Source } else { Join-Path $env:ProgramFiles 'nodejs\node.exe' }
+if (-not (Test-Path -LiteralPath $nodePath -PathType Leaf)) { throw 'NODE_RUNTIME_NOT_FOUND' }
 $config = (& $nodePath (Join-Path $PSScriptRoot 'inspect-preview.mjs') $configPath) | ConvertFrom-Json
 if ($LASTEXITCODE -ne 0 -or $config.deploymentMode -ne 'lan') { throw 'LAN_CONFIGURATION_VALIDATION_FAILED' }
 $taskName = "Relay QA Hub LAN - $($config.instanceId)"
 $previewManager = Join-Path $PSScriptRoot 'Manage-QAHubPreview.ps1'
 
 function Invoke-ServiceAction([string]$ServiceAction) {
-  & $previewManager -Action $ServiceAction -ConfigFile $configPath -Services $Services
+  & $previewManager -Action $ServiceAction -ConfigFile $configPath -NodePath $nodePath -Services $Services
   if ($LASTEXITCODE -ne 0) { throw "LAN_SERVICE_ACTION_FAILED: $ServiceAction" }
 }
 
@@ -66,7 +69,7 @@ if (-not $principal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administra
 }
 if ($Action -eq 'Install') {
   $powerShell = (Get-Command powershell.exe -ErrorAction Stop).Source
-  $arguments = "-NoProfile -NonInteractive -WindowStyle Hidden -ExecutionPolicy Bypass -File `"$PSCommandPath`" -Action Start -ConfigFile `"$configPath`""
+  $arguments = "-NoProfile -NonInteractive -WindowStyle Hidden -ExecutionPolicy Bypass -File `"$PSCommandPath`" -Action Start -ConfigFile `"$configPath`" -NodePath `"$nodePath`""
   $taskAction = New-ScheduledTaskAction -Execute $powerShell -Argument $arguments -WorkingDirectory $config.sourceRoot
   $startup = New-ScheduledTaskTrigger -AtStartup
   $watchdog = New-ScheduledTaskTrigger -Once -At ([DateTime]::Now.AddMinutes(1)) -RepetitionInterval (New-TimeSpan -Minutes 5) -RepetitionDuration (New-TimeSpan -Days 3650)
@@ -85,4 +88,3 @@ if ($Action -eq 'Uninstall') {
   }
   Write-Output "scheduled task removed; runtime data, logs, downloads, and backups retained"
 }
-

@@ -8,7 +8,9 @@ param(
 
 $ErrorActionPreference = 'Stop'
 $sourcePath = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..\..'))
-$nodePath = (Get-Command node -ErrorAction Stop).Source
+$nodeCommand = Get-Command node -ErrorAction SilentlyContinue
+$nodePath = if ($nodeCommand) { $nodeCommand.Source } else { Join-Path $env:ProgramFiles 'nodejs\node.exe' }
+if (-not (Test-Path -LiteralPath $nodePath -PathType Leaf)) { throw 'NODE_RUNTIME_NOT_FOUND' }
 if (-not $Address -or -not $Cidr) {
   $candidate = @(& (Join-Path $PSScriptRoot 'Get-QAHubLanAddress.ps1') -WebPort 4740) | Select-Object -First 1
   if (-not $candidate) { throw 'LAN_ADDRESS_NOT_FOUND' }

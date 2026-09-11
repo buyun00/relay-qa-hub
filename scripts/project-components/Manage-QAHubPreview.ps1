@@ -2,11 +2,14 @@
 param(
   [Parameter(Mandatory=$true)][ValidateSet('Start','Stop','Status')][string]$Action,
   [Parameter(Mandatory=$true)][string]$ConfigFile,
+  [string]$NodePath,
   [ValidateSet('api','web','mcp')][string[]]$Services = @('api','web','mcp')
 )
 $ErrorActionPreference = 'Stop'
 $sourcePath = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..\..'))
-$nodePath = (Get-Command node -ErrorAction Stop).Source
+$nodeCommand = if ($NodePath) { $null } else { Get-Command node -ErrorAction SilentlyContinue }
+$nodePath = if ($NodePath) { [IO.Path]::GetFullPath($NodePath) } elseif ($nodeCommand) { $nodeCommand.Source } else { Join-Path $env:ProgramFiles 'nodejs\node.exe' }
+if (-not (Test-Path -LiteralPath $nodePath -PathType Leaf)) { throw 'NODE_RUNTIME_NOT_FOUND' }
 $configPath = (Resolve-Path -LiteralPath $ConfigFile).Path
 $configText = & $nodePath (Join-Path $PSScriptRoot 'inspect-preview.mjs') $configPath
 if ($LASTEXITCODE -ne 0) { throw 'Preview configuration validation failed' }
