@@ -322,11 +322,11 @@ export default function BuildUploadControls({
         </p>
       ) : null}
       <div className="package-check-toolbar">
-        <span>按对应安装包与最新代码判断 · 每次进入自动刷新</span>
+        <span>四组并行检测 · 切回本页停留 2 秒自动检测，也可手动开始</span>
         {onRefreshChecks ? (
           <button type="button" onClick={onRefreshChecks} disabled={checking}>
             <AppIcon name="refresh" busy={checking} size={15} />
-            {checking ? "正在检测四组…" : "刷新判断"}
+            {checking ? "正在检测四组…" : checks?.length ? "重新检测" : "开始检测"}
           </button>
         ) : null}
       </div>
@@ -356,6 +356,7 @@ export default function BuildUploadControls({
                       c.target.platform === platform && c.target.configuration === configuration,
                   )}
                   unavailable={checkError}
+                  checking={checking}
                 />
                 <div className="package-build-buttons">
                   {QUICK_BUILD_PRESETS.filter(

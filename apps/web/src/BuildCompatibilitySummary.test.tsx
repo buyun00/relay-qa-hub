@@ -24,6 +24,11 @@ const check: CompatibilityCheck = {
 const report = check.report;
 if (!report) throw new Error("Missing comparison fixture");
 describe("packaging compatibility evidence", () => {
+  it("shows an idle manual action until a check is actually submitted", () => {
+    expect(compatibilityVerdict()).toBe("尚未检测，点击开始检测");
+    expect(compatibilityVerdict(undefined, false, true)).toBe("正在提交检测…");
+    expect(renderToStaticMarkup(<BuildCompatibilitySummary />)).not.toContain("正在");
+  });
   it("distinguishes comparison progress, no baseline and failures from permission to hot-update", () => {
     expect(compatibilityVerdict({ ...check, state: "queued" })).toContain("排队");
     expect(compatibilityVerdict({ ...check, state: "error" })).not.toContain("可只打热更");

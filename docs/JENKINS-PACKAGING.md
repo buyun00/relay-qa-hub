@@ -1,29 +1,29 @@
-# OZDQP 统一快捷打包与下载（3.5.0）
+# OZDQP 统一快捷打包与下载（3.5.2）
 
 Web、Windows 和 MCP 共用 Jenkins `00-【OZDQP】【快捷打包】`。点击下列任一项，选择“只构建”或“构建并上传增量”。API 仅提交 `打包用途`，其他参数沿用该任务当前默认值。Jenkins 凭据始终留在 API 服务端。
 
-| preset | Jenkins 打包用途 | 产品 / 渠道 |
-| --- | --- | --- |
-| android-debug-app | Android Debug · APK、完整热更 | 2001 / 1002 |
-| android-debug-res | Android Debug · 增量热更 | 2001 / 1002 |
+| preset              | Jenkins 打包用途                     | 产品 / 渠道 |
+| ------------------- | ------------------------------------ | ----------- |
+| android-debug-app   | Android Debug · APK、完整热更        | 2001 / 1002 |
+| android-debug-res   | Android Debug · 增量热更             | 2001 / 1002 |
 | android-release-app | Android Release · APK、AAB、完整热更 | 2002 / 1002 |
-| android-release-res | Android Release · 增量热更 | 2002 / 1002 |
-| ios-debug-app | iOS Debug · IPA、完整热更 | 2001 / 2004 |
-| ios-debug-res | iOS Debug · 增量热更 | 2001 / 2004 |
-| ios-release-app | iOS Release · IPA、完整热更 | 2002 / 2004 |
-| ios-release-res | iOS Release · 增量热更 | 2002 / 2004 |
+| android-release-res | Android Release · 增量热更           | 2002 / 1002 |
+| ios-debug-app       | iOS Debug · IPA、完整热更            | 2001 / 2004 |
+| ios-debug-res       | iOS Debug · 增量热更                 | 2001 / 2004 |
+| ios-release-app     | iOS Release · IPA、完整热更          | 2002 / 2004 |
+| ios-release-res     | iOS Release · 增量热更               | 2002 / 2004 |
 
 增量构建缺少兼容基线时，打包脚本可能升级为完整构建；以最终清单的实际热更方式为准。
 
 ## 四组自动判断
 
-页面按 Android / iOS 两列排列，每列分 Debug、Release，每组并排显示完整包与增量热更。窄窗口改为上下排列。每次进入打包页刷新四组判断；“刷新判断”可手动重查。检测期间继续显示排队、比较累计修改等状态，失败或未知不会沿用旧的绿色结论。
+页面按 Android / iOS 两列排列，每列分 Debug、Release，每组并排显示完整包与增量热更。窄窗口改为上下排列。默认显示“开始检测”，普通刷新只更新页面数据。从其他分页切入并连续停留 2 秒后自动检测一次；2 秒内离开取消。手动点击立即检测并取消待执行的自动检测；进行中的批次不会因再次点击、切页或刷新重复提交。检测期间继续显示排队、比较累计修改等状态，失败或未知不会沿用旧的绿色结论。
 
-检测在 Jenkins 的独立 `00-【OZDQP】【兼容性检测】` 任务中串行执行，使用自己的工作目录、队列和历史记录，不占用原快捷构建的串行锁和历史名额。它仍需要打包机 executor。后端每次读取原 `00-【OZDQP】【快捷打包】` 配置中当前嵌入的两个 Python 检测模块，校验模块名与大小后传给沙箱 Pipeline，未复制或重新解释用户的业务判断规则。页面关闭后 Jenkins 检测继续，服务端保留 queueId；多人同时进入时共用尚未结束的这一批检测。
+检测在 Jenkins 的独立 `【OZDQP】【兼容性检测】` 任务中执行，已去掉序号并保留原任务历史。每批只提交一个任务，占一个 executor，内部以 4 个线程同时运行四个 Python 检测进程。先同步一次 main，再为各组准备独立 Git 引用和报告目录，避免缺失基线补拉时争用 Git 锁；全局 executor 数量和正式打包的调度保持原样。后端每次读取原 `00-【OZDQP】【快捷打包】` 配置中当前嵌入的两个 Python 检测模块，校验模块名与大小后传给沙箱 Pipeline，未复制或重新解释用户的业务判断规则。页面关闭后 Jenkins 检测继续，服务端保留 queueId；多人同时进入时共用尚未结束的这一批检测。
 
-该任务的 Pipeline 为仓库 `scripts/jenkins-compatibility.groovy`，必须启用 Groovy Sandbox、禁止同任务并行、quietPeriod=0；参数为四个 `{Android|iOS} {Debug|Release} · 快捷检测` 的 `打包用途` Choice、默认 `自动：最新成功版本` 的 `参考版本` String、空默认值的 `CHECK_SOURCE` Text。通过 QA Hub 启动时自动传入最新源码；Jenkins 页面直接启动且未提供源码会明确失败。检测源码格式发生变化时停止检测并提示重试，需要重新核对接口；不会改用旧规则。最初非沙箱方案被 Jenkins 审批机制拒绝，正式版本已改用沙箱，不放开内部 Jenkins API 权限。
+该任务的 Pipeline 为仓库 `scripts/jenkins-compatibility.groovy`，必须启用 Groovy Sandbox、禁止同任务并行、quietPeriod=0；参数为 `四组并行 · 快捷检测` 及保留的四个 `{Android|iOS} {Debug|Release} · 快捷检测` 的 `打包用途` Choice、默认 `自动：最新成功版本` 的 `参考版本` String、空默认值的 `CHECK_SOURCE` Text。通过 QA Hub 启动时自动传入最新源码；Jenkins 页面直接启动且未提供源码会明确失败。检测源码格式发生变化时停止检测并提示重试，需要重新核对接口；不会改用旧规则。最初非沙箱方案被 Jenkins 审批机制拒绝，正式版本已改用沙箱，不放开内部 Jenkins API 权限。
 
-登录后 POST `/api/v1/packaging/compatibility`，携带 UUID `Idempotency-Key`，不接受构建预设或命令；返回四项检测及批次 id。GET `/api/v1/packaging/compatibility?id={id}` 查询状态。每个新页面入口使用新 id，正在运行的批次合并；同一 id 重试不会重投已确认任务。服务端状态保存在生产 integrations 下 `build-compatibility/current.json` 与 `runs/{id}.json`。提交结果未知时不盲目重发。检测只读代码和产物并归档报告，不分配发布版本、不构建、不上传。
+登录后 POST `/api/v1/packaging/compatibility`，携带 UUID `Idempotency-Key`，不接受构建预设或命令；返回四项检测及批次 id。GET `/api/v1/packaging/compatibility?id={id}` 查询状态。每次手动检测或停留满 2 秒的页面入口使用新 id，正在运行的批次合并；同一 id 重试不会重投已确认任务。四项共用 queueId/buildNumber，按 `checks/{android-debug|android-release|ios-debug|ios-release}/compatibility.json` 读取各自报告，继续校验平台、配置与安装包 lineage。单项报告缺失只标记该项失败。服务端状态保存在生产 integrations 下 `build-compatibility/current.json` 与 `runs/{id}.json`。提交结果未知时不盲目重发。检测只读代码和产物并归档报告，不分配发布版本、不构建、不上传。
 
 原脚本先找到该平台配置的最新成功版本，再沿 `playerLineage` 回溯到实际 APK/IPA，比较该安装包源码至最新 main 的全部变化。页面显示参考版本、实际安装包、两端源码 SHA、累计提交及文件数、检测时间和完整报告链接。结论有：必须重新打完整包、允许只打热更、缺少安装包基线、无法判断。**允许热更只表示安装包兼容；能否生成纯增量 ZIP 还需要已确认上传的资源基线**，不能混为一个结论。
 

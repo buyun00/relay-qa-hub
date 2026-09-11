@@ -22,6 +22,7 @@ export function compatibilitySource(config: string): string {
   return encoded;
 }
 
+export const COMPATIBILITY_BATCH_PURPOSE = "四组并行 · 快捷检测";
 export const COMPATIBILITY_TARGETS = [
   { id: "android-debug", platform: "Android", configuration: "Debug" },
   { id: "android-release", platform: "Android", configuration: "Release" },

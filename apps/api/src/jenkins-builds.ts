@@ -9,9 +9,9 @@ import {
 import { artifactCatalog, validateBuildResult, type BuildResult } from "./build-artifacts.js";
 import {
   COMPATIBILITY_TARGETS,
+  COMPATIBILITY_BATCH_PURPOSE,
   compatibilitySource,
   validateCompatibilityReport,
-  type CompatibilityTarget,
   type CompatibilityCheck,
 } from "./jenkins-compatibility.js";
 import {
@@ -95,8 +95,9 @@ function isCompatibilityBuild(actions: JenkinsParameters[] = []): boolean {
   const purpose = actions
     .flatMap((a) => a.parameters ?? [])
     .find((p) => p.name === "打包用途")?.value;
-  return COMPATIBILITY_TARGETS.some(
-    (t) => purpose === `${t.platform} ${t.configuration} · 快捷检测`,
+  return (
+    purpose === COMPATIBILITY_BATCH_PURPOSE ||
+    COMPATIBILITY_TARGETS.some((t) => purpose === `${t.platform} ${t.configuration} · 快捷检测`)
   );
 }
 function sameJenkinsUrl(value: unknown, expected: string): boolean {
@@ -339,16 +340,7 @@ export class JenkinsBuildService {
     return { preset, queueId: await this.submitParameters(buildParameters(preset)) };
   }
 
-  async startCompatibility(target: CompatibilityTarget): Promise<number> {
-    if (
-      !COMPATIBILITY_TARGETS.some(
-        (t) =>
-          t.id === target.id &&
-          t.platform === target.platform &&
-          t.configuration === target.configuration,
-      )
-    )
-      throw new PackagingError("INVALID_REQUEST", 400);
+  async startCompatibilityBatch(): Promise<number> {
     const sourceResponse = await this.request(`${JOB_PATH}config.xml`);
     if (!sourceResponse.ok) {
       await sourceResponse.body?.cancel();
@@ -364,7 +356,7 @@ export class JenkinsBuildService {
     }
     return this.submitParameters(
       {
-        打包用途: `${target.platform} ${target.configuration} · 快捷检测`,
+        打包用途: COMPATIBILITY_BATCH_PURPOSE,
         参考版本: "自动：最新成功版本",
         CHECK_SOURCE: source,
       },
@@ -421,15 +413,23 @@ export class JenkinsBuildService {
     if (
       b.number !== number ||
       b.queueId !== check.queueId ||
-      params["打包用途"] !== expected ||
+      ![expected, COMPATIBILITY_BATCH_PURPOSE].includes(String(params["打包用途"])) ||
       !["自动：最新成功版本", "latest"].includes(String(params["参考版本"]))
     )
       throw new PackagingError("CHECK_IDENTITY_MISMATCH");
     if (b.building) return { ...check, buildNumber: number, state: "running", errorCode: null };
     if (!["SUCCESS", "UNSTABLE"].includes(b.result ?? "")) throw new PackagingError("CHECK_FAILED");
-    const value = await this.readJson<unknown>(
-      await this.request(`${CHECK_JOB_PATH}${number}/artifact/compatibility.json`),
+    // Old single-target history remains readable after the job is renamed.
+    const artifactDirectory =
+      params["打包用途"] === COMPATIBILITY_BATCH_PURPOSE ? `checks/${check.target.id}/` : "";
+    const reportResponse = await this.request(
+      `${CHECK_JOB_PATH}${number}/artifact/${artifactDirectory}compatibility.json`,
     );
+    if (reportResponse.status === 404) {
+      await reportResponse.body?.cancel();
+      throw new PackagingError("CHECK_FAILED");
+    }
+    const value = await this.readJson<unknown>(reportResponse);
     let report;
     try {
       report = validateCompatibilityReport(value, check.target);
@@ -444,7 +444,7 @@ export class JenkinsBuildService {
       buildNumber: number,
       state: "complete",
       checkedAt: new Date(finishedAt).toISOString(),
-      reportUrl: `${JENKINS_ORIGIN}${CHECK_JOB_PATH}${number}/artifact/compatibility.html`,
+      reportUrl: `${JENKINS_ORIGIN}${CHECK_JOB_PATH}${number}/artifact/${artifactDirectory}compatibility.html`,
       report,
       errorCode: null,
     };

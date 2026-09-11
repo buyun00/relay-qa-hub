@@ -1,8 +1,13 @@
 import AppIcon from "./AppIcon";
 import type { CompatibilityCheck } from "./packaging-api";
-export function compatibilityVerdict(check?: CompatibilityCheck, unavailable = false) {
+export function compatibilityVerdict(
+  check?: CompatibilityCheck,
+  unavailable = false,
+  checking = false,
+) {
   if (unavailable || check?.state === "error") return "检测未完成，请重试";
-  if (!check || check.state === "pending" || check.state === "submitting") return "正在刷新判断…";
+  if (!check) return checking ? "正在提交检测…" : "尚未检测，点击开始检测";
+  if (check.state === "pending" || check.state === "submitting") return "正在提交检测…";
   if (check.errorCode) return "检测连接暂时中断，正在重试…";
   if (check.state === "queued") return "检测排队中…";
   if (check.state === "running") return "正在比较累计修改…";
@@ -24,13 +29,15 @@ function versionLabel(reference: string | null) {
 export default function BuildCompatibilitySummary({
   check,
   unavailable = false,
+  checking = false,
 }: {
   check?: CompatibilityCheck | undefined;
   unavailable?: boolean;
+  checking?: boolean;
 }) {
   const report = !unavailable && check?.state === "complete" ? check.report : null;
   const result = report?.result ?? "UNKNOWN";
-  const loading = !unavailable && (!check || !["complete", "error"].includes(check.state));
+  const loading = !unavailable && (check ? !["complete", "error"].includes(check.state) : checking);
   return (
     <div className="package-compatibility" data-result={result}>
       <div className="package-compatibility-verdict" role="status">
@@ -39,7 +46,7 @@ export default function BuildCompatibilitySummary({
           busy={loading}
           size={15}
         />
-        <span>{compatibilityVerdict(check, unavailable)}</span>
+        <span>{compatibilityVerdict(check, unavailable, checking)}</span>
       </div>
       {report && check?.checkedAt ? (
         <details className="package-compatibility-detail">

@@ -9,6 +9,7 @@ import { BuildCompatibilityService } from "../dist/build-compatibility.js";
 import { JenkinsBuildService, PackagingError } from "../dist/jenkins-builds.js";
 import {
   COMPATIBILITY_TARGETS,
+  COMPATIBILITY_BATCH_PURPOSE,
   validateCompatibilityReport,
   compatibilitySource,
 } from "../dist/jenkins-compatibility.js";
@@ -100,8 +101,8 @@ test("four checks dispatch once, survive restart, and a completed page entry req
   const root = await temp(t),
     posts = [];
   const jenkins = {
-    startCompatibility: async (target) => {
-      posts.push(target.id);
+    startCompatibilityBatch: async () => {
+      posts.push("batch");
       return posts.length;
     },
     compatibilityProgress: async (c) => ({
@@ -116,20 +117,17 @@ test("four checks dispatch once, survive restart, and a completed page entry req
     first = await service.start(id);
   assert.equal(first.checks.length, 4);
   await service.close();
-  assert.deepEqual(
-    posts,
-    COMPATIBILITY_TARGETS.map((t) => t.id),
-  );
+  assert.deepEqual(posts, ["batch"]);
   service = new BuildCompatibilityService(jenkins, root);
   const restored = await service.status(id);
   assert.ok(restored.checks.every((c) => c.state === "complete"));
-  assert.equal(posts.length, 4);
+  assert.equal(posts.length, 1);
   await service.start(id);
   await service.close();
-  assert.equal(posts.length, 4);
+  assert.equal(posts.length, 1);
   await service.start(randomUUID());
   await service.close();
-  assert.equal(posts.length, 8);
+  assert.equal(posts.length, 2);
 });
 test("overlapping page entries share in-flight checks while an uncertain POST is never replayed", async (t) => {
   const root = await temp(t);
@@ -139,7 +137,7 @@ test("overlapping page entries share in-flight checks while an uncertain POST is
   });
   let posts = 0;
   const jenkins = {
-    startCompatibility: async () => {
+    startCompatibilityBatch: async () => {
       posts++;
       await held;
       return posts;
@@ -152,7 +150,7 @@ test("overlapping page entries share in-flight checks while an uncertain POST is
   assert.equal(two.id, one.id);
   unlock();
   await service.close();
-  assert.equal(posts, 4);
+  assert.equal(posts, 1);
   const file = path.join(root, "current.json"),
     saved = JSON.parse(await fs.readFile(file, "utf8"));
   saved.checks[0].state = "submitting";
@@ -162,12 +160,12 @@ test("overlapping page entries share in-flight checks while an uncertain POST is
   const result = await restarted.status(one.id);
   await restarted.close();
   assert.equal(result.checks[0].errorCode, "JENKINS_SUBMISSION_UNKNOWN");
-  assert.equal(posts, 4);
+  assert.equal(posts, 1);
 });
 test("temporary Jenkins read failure remains queued and a failed checker never permits incremental output", async () => {
   let offline = true;
   const service = new BuildCompatibilityService({
-    startCompatibility: async () => 1,
+    startCompatibilityBatch: async () => 1,
     compatibilityProgress: async (c) => {
       if (offline) throw new PackagingError("PACKAGING_UNAVAILABLE");
       return {
@@ -192,7 +190,7 @@ test("temporary Jenkins read failure remains queued and a failed checker never p
 function fixture(overrides = {}) {
   const posts = [];
   const target = COMPATIBILITY_TARGETS[0],
-    label = "Android Debug · 快捷检测";
+    label = overrides.batch ? COMPATIBILITY_BATCH_PURPOSE : "Android Debug · 快捷检测";
   const fetcher = async (value, init = {}) => {
     const url = new URL(value);
     const headers = new Headers(init.headers);
@@ -209,9 +207,11 @@ function fixture(overrides = {}) {
       });
     if (url.pathname === jobPath + "config.xml")
       return new Response(
-        COMPATIBILITY_TARGETS.map((t) => t.platform + " " + t.configuration + " · 快捷检测").join(
-          "\n",
-        ),
+        COMPATIBILITY_BATCH_PURPOSE +
+          "\n" +
+          COMPATIBILITY_TARGETS.map((t) => t.platform + " " + t.configuration + " · 快捷检测").join(
+            "\n",
+          ),
       );
     if (url.pathname === "/crumbIssuer/api/json")
       return Response.json({ crumbRequestField: "Jenkins-Crumb", crumb: "test" });
@@ -246,16 +246,23 @@ function fixture(overrides = {}) {
       });
     if (url.pathname === jobPath + "14/artifact/compatibility.json")
       return Response.json({ ...report(), ...overrides.report });
+    const artifactTarget = COMPATIBILITY_TARGETS.find(
+      (t) => url.pathname === jobPath + `14/artifact/checks/${t.id}/compatibility.json`,
+    );
+    if (artifactTarget)
+      return overrides.missingReport
+        ? new Response(null, { status: 404 })
+        : Response.json({ ...report(artifactTarget), ...overrides.report });
     throw new Error("Unexpected fixture route");
   };
   return { service: new JenkinsBuildService(fetcher), posts, target };
 }
 test("Jenkins adapter submits only Check purposes and verifies queue, build and archived report identity", async () => {
   const { service, posts, target } = fixture();
-  assert.equal(await service.startCompatibility(target), 17);
+  assert.equal(await service.startCompatibilityBatch(), 17);
   assert.deepEqual(posts, [
     {
-      打包用途: "Android Debug · 快捷检测",
+      打包用途: COMPATIBILITY_BATCH_PURPOSE,
       参考版本: "自动：最新成功版本",
       CHECK_SOURCE: checkerSource,
     },
@@ -329,6 +336,59 @@ test("refresh endpoint requires authentication and accepts no build choice or ar
   } finally {
     await app.close();
   }
-  assert.equal(f.posts.length, 4);
+  assert.equal(f.posts.length, 1);
   assert.ok(f.posts.every((p) => p["打包用途"].endsWith(" · 快捷检测")));
+});
+
+test("one parallel job maps four separate reports and does not reuse another target's artifact", async () => {
+  const { service } = fixture({ batch: true });
+  for (const target of COMPATIBILITY_TARGETS) {
+    const check = {
+      target,
+      state: "queued",
+      queueId: 17,
+      buildNumber: null,
+      checkedAt: null,
+      reportUrl: null,
+      errorCode: null,
+      report: null,
+    };
+    const result = await service.compatibilityProgress(check);
+    assert.equal(result.state, "complete");
+    assert.match(
+      result.report.playerVersion,
+      new RegExp("^" + target.platform + "/" + target.configuration + "/"),
+    );
+    assert.ok(result.reportUrl.endsWith("/checks/" + target.id + "/compatibility.html"));
+    await assert.rejects(
+      fixture({ batch: true, missingReport: true }).service.compatibilityProgress(check),
+      /CHECK_FAILED/,
+    );
+  }
+});
+
+test("an uncertain batch acknowledgement marks every check unresolved and is never resubmitted", async (t) => {
+  const root = await temp(t);
+  let posts = 0;
+  const adapter = {
+    startCompatibilityBatch: async () => {
+      posts++;
+      throw new PackagingError("JENKINS_SUBMISSION_UNKNOWN");
+    },
+    compatibilityProgress: async (c) => c,
+  };
+  const service = new BuildCompatibilityService(adapter, root),
+    id = randomUUID();
+  await service.start(id);
+  await service.close();
+  const restarted = new BuildCompatibilityService(adapter, root);
+  const batch = await restarted.start(id);
+  await restarted.close();
+  assert.equal(posts, 1);
+  assert.ok(
+    batch.checks.every(
+      (c) =>
+        c.state === "error" && c.errorCode === "JENKINS_SUBMISSION_UNKNOWN" && c.queueId === null,
+    ),
+  );
 });

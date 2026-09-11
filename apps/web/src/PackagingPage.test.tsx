@@ -7,7 +7,7 @@ describe("packaging page", () => {
   it("has precisely eight build purposes and no editable Jenkins settings", () => {
     const markup = renderToStaticMarkup(<PackagingPage active={true} refreshRevision={0} />);
     expect(markup.match(/data-build-preset=/gu)).toHaveLength(8);
-    expect(markup).toContain("刷新判断");
+    expect(markup).toContain("开始检测");
     expect(markup.match(/package-platform-group"/gu)).toHaveLength(2);
     expect(markup.match(/class="package-configuration-group"/gu)).toHaveLength(4);
     for (const label of ["Android Debug", "Android Release", "iOS Debug", "iOS Release"])

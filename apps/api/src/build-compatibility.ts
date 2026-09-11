@@ -27,7 +27,7 @@ export class BuildCompatibilityService {
   constructor(
     private readonly jenkins: Pick<
       JenkinsBuildService,
-      "startCompatibility" | "compatibilityProgress"
+      "startCompatibilityBatch" | "compatibilityProgress"
     >,
     private readonly root?: string,
   ) {
@@ -86,20 +86,26 @@ export class BuildCompatibilityService {
   private launch(b: CompatibilityBatch) {
     if (this.launches.has(b.id)) return;
     const work = (async () => {
-      for (const c of b.checks) {
-        if (c.state !== "pending") continue;
-        c.state = "submitting";
-        await this.persist(b);
-        try {
-          c.queueId = await this.jenkins.startCompatibility(c.target);
+      const pending = b.checks.filter((c) => c.state === "pending");
+      if (!pending.length) return;
+      for (const c of pending) c.state = "submitting";
+      // Persist the whole intent before the single POST. Jenkins fans out all four
+      // checks inside one executor, so they do not queue behind each other.
+      await this.persist(b);
+      try {
+        const queueId = await this.jenkins.startCompatibilityBatch();
+        for (const c of pending) {
+          c.queueId = queueId;
           c.state = "queued";
           c.errorCode = null;
-        } catch (e) {
+        }
+      } catch (e) {
+        for (const c of pending) {
           c.state = "error";
           c.errorCode = code(e);
         }
-        await this.persist(b);
       }
+      await this.persist(b);
     })().finally(() => this.launches.delete(b.id));
     this.launches.set(b.id, work);
     void work.catch(() => undefined); // Durable state remains unresolved if storage fails.

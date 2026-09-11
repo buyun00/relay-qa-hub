@@ -156,7 +156,7 @@ export default function PackagingPage({
   }, [refresh]);
   useEffect(() => () => clearTimeout(completedRefresh.current), []);
   const monitor = usePackagingProgress(userId, active, refreshRevision, onCompleted, onOpen);
-  const compatibility = useBuildCompatibility(active, refreshRevision);
+  const compatibility = useBuildCompatibility(active);
   useEffect(() => {
     if (!active) return;
     const controller = new AbortController();
