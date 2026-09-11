@@ -10,6 +10,7 @@ import {
 import { basename, join } from "node:path";
 
 import { readParallelInstanceConfig } from "../../apps/api/src/parallel-instance.ts";
+import { publishVersionedJson } from "./versioned-json-publication.mjs";
 
 const [configFile, apkSource, versionCodeText, versionName] = process.argv.slice(2);
 if (!configFile || !apkSource || !versionCodeText || !versionName)
@@ -32,8 +33,13 @@ const apkName = `Relay-QA-Hub-Android-${versionCode}-${versionName}.apk`;
 const androidRoot = join(config.downloadsRoot, "android", config.releaseChannel);
 mkdirSync(androidRoot, { recursive: true });
 const apkTarget = join(androidRoot, apkName);
-if (existsSync(apkTarget)) throw new Error("ANDROID_APK_ALREADY_PUBLISHED");
-copyFileSync(apkSource, apkTarget);
+if (existsSync(apkTarget)) {
+  if (sha256(readFileSync(apkTarget)) !== apkSha256) {
+    throw new Error("ANDROID_APK_ALREADY_PUBLISHED");
+  }
+} else {
+  copyFileSync(apkSource, apkTarget);
+}
 if (sha256(readFileSync(apkTarget)) !== apkSha256) throw new Error("ANDROID_APK_COPY_MISMATCH");
 const androidManifest = {
   schemaVersion: 1,
@@ -45,8 +51,10 @@ const androidManifest = {
   size: apk.length,
   sha256: apkSha256,
 };
-writeFileSync(join(androidRoot, "latest.json"), `${JSON.stringify(androidManifest, null, 2)}\n`, {
-  flag: "wx",
+publishVersionedJson({
+  target: join(androidRoot, "latest.json"),
+  bytes: Buffer.from(`${JSON.stringify(androidManifest, null, 2)}\n`),
+  versionCode,
 });
 
 const windowsManifestName = `${config.instanceId}-windows-latest.json`;
