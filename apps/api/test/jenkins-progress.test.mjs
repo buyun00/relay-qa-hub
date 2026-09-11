@@ -304,3 +304,100 @@ test("monitor follows the precise queue executable, handles canceled/expired que
   assert.deepEqual(await service.progress([104, 103, 101]), result);
   assert.equal(seen.length, before, "identical watches share cached requests");
 });
+
+test("successful total durations drive overall progress when historical stage timestamps are absent", () => {
+  const ios = QUICK_BUILD_PRESETS.find((p) => p.id === "ios-release-app");
+  const actions = [{ parameters: [{ name: "打包用途", value: ios.label }] }];
+  const log =
+    "[iOSPlayerPolicy] profile=sdk-external requested=App effective=App reason=requested_player\n[buildIPA] 检测到 Podfile，执行 pod install";
+  const history = [
+    describe(meta(21, { actions, duration: 697909 }), log),
+    describe(meta(12, { actions, duration: 695504 }), log),
+  ];
+  const live = describe(meta(22, { actions, building: true, result: null }), log, 1_441_721);
+  const result = applyBuildHistory([...history, live]).at(-1);
+  assert.equal(result.expectedMs, 696706.5);
+  assert.equal(result.historySampleCount, 2);
+  assert.equal(result.progressBasis, "build_history");
+  assert.equal(result.percent, 63);
+  assert.equal(result.stages.find((s) => s.id === "apk").state, "running");
+  assert.equal(result.stages.find((s) => s.id === "apk").expectedMs, null);
+  assert.equal(result.stages.find((s) => s.id === "apk").sampleCount, 0);
+  assert.equal(
+    applyBuildHistory([
+      ...history,
+      { ...live, elapsedMs: 9_000_000, executionElapsedMs: 9_000_000 },
+    ]).at(-1).percent,
+    95,
+  );
+});
+
+test("overall history cannot progress an active queue or an unknown execution timer", () => {
+  const historical = describe(meta(1));
+  const live = describe(
+    meta(2, { building: true, result: null }),
+    timed.split("\n").slice(0, 3).join("\n"),
+  );
+  const waiting = {
+    ...live,
+    queueWait: { active: true, elapsedMs: 900000, timing: "recorded", blockingBuild: null },
+    stages: live.stages.map((s) => ({ ...s, state: "waiting", elapsedMs: null, percent: null })),
+  };
+  const queued = applyBuildHistory([historical, waiting]).at(-1);
+  assert.equal(queued.percent, 0);
+  assert.equal(queued.progressBasis, "stages");
+  const unknown = applyBuildHistory([historical, { ...live, executionElapsedMs: null }]).at(-1);
+  assert.equal(unknown.progressBasis, "stages");
+  const mixed = applyBuildHistory([{ ...historical, preset: "internal-nosdk" }, live]).at(-1);
+  assert.equal(mixed.expectedMs, null);
+  assert.equal(mixed.historySampleCount, 0);
+});
+
+test("a verified downstream completion recovers the last timed stage despite an untimed wrapper log", async () => {
+  const parentPath = "/job/" + encodeURIComponent("00-【OZDQP】【快捷打包】") + "/";
+  const childPath = "/job/" + encodeURIComponent("01-【OZDQP】【Android】") + "/";
+  const preset = QUICK_BUILD_PRESETS.find((p) => p.id === "android-debug-res");
+  const actions = [{ parameters: [{ name: "打包用途", value: preset.label }] }];
+  const parents = [
+    meta(1, { actions, duration: 650000 }),
+    meta(2, { actions, building: true, result: null, timestamp: Date.now() - 300000 }),
+  ];
+  const service = new JenkinsBuildService(async (value) => {
+    const url = new URL(value);
+    if (url.pathname === parentPath + "api/json")
+      return Response.json({ buildable: true, builds: parents });
+    const parent = parents.find((p) => url.pathname === parentPath + p.number + "/timestamps/");
+    if (parent)
+      return new Response(
+        "Starting building: 01-【OZDQP】【Android】 #" +
+          (parent.number + 100) +
+          (parent.building ? "" : "\n[Pipeline] { (核对产物并提供下载)"),
+      );
+    const owner = parents.find((p) => url.pathname === childPath + (p.number + 100) + "/api/json");
+    if (owner)
+      return Response.json({
+        ...owner,
+        number: owner.number + 100,
+        timestamp: owner.timestamp + 10000,
+        duration: 600000,
+        actions: [
+          {
+            causes: [{ upstreamProject: "00-【OZDQP】【快捷打包】", upstreamBuild: owner.number }],
+          },
+        ],
+      });
+    if (parents.some((p) => url.pathname === childPath + (p.number + 100) + "/timestamps/"))
+      return new Response(
+        "00:00:01.000 [JenkinsPlayerPolicy] requested=Res effective=Res\n00:00:01.100 [init] MAKE_PKG_ZIP_VAL=true\n00:00:10.000 [build] Unity 导出中",
+      );
+    throw Error("Unexpected test route " + url.pathname);
+  });
+  const result = await service.progress();
+  const historical = result.builds.find((b) => b.number === 1),
+    live = result.builds.find((b) => b.number === 2);
+  assert.equal(historical.stages.find((s) => s.id === "unity").elapsedMs, 590000);
+  assert.equal(historical.stages.find((s) => s.id === "finalize").elapsedMs, 40000);
+  assert.equal(live.stages.find((s) => s.id === "unity").expectedMs, 590000);
+  assert.equal(live.historySampleCount, 1);
+  assert.ok(live.percent > 0 && live.percent < 100);
+});

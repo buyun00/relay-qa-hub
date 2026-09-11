@@ -96,6 +96,8 @@ export interface BuildProgress {
   };
   expectedMs: number | null;
   triggeredBy: string;
+  historySampleCount?: number;
+  progressBasis?: "build_history" | "stages";
   executor: string;
   mode: "App" | "Res" | "Script" | null;
   includesZip: boolean | null;

@@ -130,7 +130,11 @@ export function BuildStages({ build }: { build: BuildProgress }) {
                 </small>
               ) : (
                 <small>
-                  {stage.timing === "observed" ? "从首次观测开始计时" : "暂无同类阶段计时样本"}
+                  {stage.timing === "observed"
+                    ? "从首次观测开始计时"
+                    : (build.historySampleCount ?? 0) > 0
+                      ? "历史记录未提供本阶段耗时"
+                      : "暂无同类阶段计时样本"}
                 </small>
               )}
               {build.status === "BUILDING" && stage.state !== "skipped" ? (
@@ -282,12 +286,14 @@ export default function PackagingProgressPanel({
             <span>发起人：{build.triggeredBy}</span>
             <span>
               {build.expectedMs !== null
-                ? `同类构建通常 ${duration(build.expectedMs)}`
+                ? `同类构建通常 ${duration(build.expectedMs)}${build.historySampleCount ? ` · ${build.historySampleCount} 次成功记录` : ""}`
                 : "正在积累同类构建耗时"}
             </span>
             <span>
               {build.status === "BUILDING"
-                ? "百分比按已完成阶段与历史耗时估算"
+                ? build.progressBasis === "build_history"
+                  ? "整体进度按同类成功构建总耗时估算"
+                  : "百分比按已完成阶段与历史耗时估算"
                 : "状态已由 Jenkins 确认"}
             </span>
           </div>

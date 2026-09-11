@@ -83,6 +83,8 @@ export interface BuildProgress {
   };
   expectedMs: number | null;
   triggeredBy: string;
+  historySampleCount?: number;
+  progressBasis?: "build_history" | "stages";
   executor: string;
   mode: "App" | "Res" | "Script" | null;
   includesZip: boolean | null;
@@ -163,7 +165,8 @@ export function parseBuildLog(log: string): ParsedBuildLog {
     else if (
       /^(?:\+ notify_stage ['"]|\[build\] ).*(开始编译 APK|开始编译 IPA|Xcode 编译)/u.test(line) ||
       /^> (?:Configure project|Task) :(?:launcher|unityLibrary)\b/u.test(line) ||
-      /^\[buildIPA\] xcodebuild (?:archive|-exportArchive) 开始$/u.test(line)
+      /^\[buildIPA\] xcodebuild (?:archive|-exportArchive) 开始$/u.test(line) ||
+      line === "[buildIPA] 检测到 Podfile，执行 pod install"
     )
       stage = "apk";
     else if (/^(?:\+ notify_stage ['"]|\[build\] ).*上传热更资源到 CDN/u.test(line))
@@ -350,6 +353,11 @@ export function applyBuildHistory(builds: BuildProgress[]): BuildProgress[] {
         other.mode === build.mode &&
         other.includesZip === build.includesZip,
     );
+    const durationSamples = peers.flatMap((p) => {
+      const elapsed = p.executionElapsedMs === undefined ? p.elapsedMs : p.executionElapsedMs;
+      return elapsed !== null && Number.isFinite(elapsed) && elapsed > 0 ? [elapsed] : [];
+    });
+    const expectedMs = median(durationSamples);
     const stages = build.stages.map((stage) => {
       const samples = peers.flatMap((p) =>
         p.stages
@@ -392,7 +400,7 @@ export function applyBuildHistory(builds: BuildProgress[]): BuildProgress[] {
       };
     });
     const required = stages.filter((s) => s.state !== "skipped");
-    const percent =
+    const stagePercent =
       build.status === "SUCCESS"
         ? 100
         : Math.min(
@@ -408,16 +416,30 @@ export function applyBuildHistory(builds: BuildProgress[]): BuildProgress[] {
                 100,
             ),
           );
+    const executionMs =
+      build.executionElapsedMs === undefined ? build.elapsedMs : build.executionElapsedMs;
+    // A valid total-duration sample remains useful even when older logs did not
+    // record individual stage boundaries. Keep this explicitly an estimate;
+    // only Jenkins SUCCESS can set 100%, and queue time cannot advance it.
+    const useTotalHistory =
+      expectedMs !== null &&
+      executionMs !== null &&
+      Number.isFinite(executionMs) &&
+      executionMs >= 0 &&
+      !build.queueWait?.active;
+    const percent =
+      build.status === "SUCCESS"
+        ? 100
+        : useTotalHistory
+          ? Math.min(95, Math.floor((executionMs / expectedMs) * 100))
+          : stagePercent;
     return {
       ...build,
       stages,
       percent,
-      expectedMs: median(
-        peers.flatMap((p) => {
-          const elapsed = p.executionElapsedMs === undefined ? p.elapsedMs : p.executionElapsedMs;
-          return elapsed === null ? [] : [elapsed];
-        }),
-      ),
+      expectedMs,
+      historySampleCount: durationSamples.length,
+      progressBasis: useTotalHistory ? "build_history" : "stages",
     };
   });
 }
