@@ -7,7 +7,7 @@ import {
   readdirSync,
   readFileSync,
 } from "node:fs";
-import { basename, join, resolve } from "node:path";
+import { basename, dirname, join, resolve } from "node:path";
 import { spawnSync } from "node:child_process";
 
 import {
@@ -27,6 +27,7 @@ if (config.deploymentMode !== "lan" || config.backupArchiveRoot === null)
   throw new Error("LAN_ARCHIVE_CONFIGURATION_REQUIRED");
 const restoreRoot = resolve(restoreArgument);
 if (existsSync(restoreRoot)) throw new Error("RESTORE_ROOT_ALREADY_EXISTS");
+mkdirSync(dirname(restoreRoot), { recursive: true });
 const secureRestoreRoot = () => {
   if (process.platform !== "win32") {
     chmodSync(restoreRoot, 0o700);
@@ -92,7 +93,7 @@ console.log(
     sourceBackupSha256: archived.backupSha256,
     restoredDatabasePath: restored.databasePath,
     restoredEvidenceRoot: restoredEvidence.restoreRoot,
-    restoredAttachmentCount: restoredEvidence.entryCount,
+    restoredAttachmentCount: restoredEvidence.manifest.entries.length,
     retainedConfigurationRoot: configRoot,
   }),
 );

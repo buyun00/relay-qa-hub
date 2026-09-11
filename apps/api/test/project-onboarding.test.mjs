@@ -15,9 +15,38 @@ import {
   ProjectManagementService,
   registerProjectManagementRoutes,
 } from "../dist/project-management.js";
+import { ProjectRequestContext } from "../dist/project-request-context.js";
 
 const PNG_1X1 =
   "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=";
+
+test("project request context permits anonymous initialization routes", async () => {
+  const app = Fastify({ logger: false });
+  const context = new ProjectRequestContext();
+  context.register(app, {
+    options: {
+      worker: {
+        runWithRequestAuthorization: (_authorization, done) => done(),
+      },
+    },
+    execute: async () => {
+      throw new Error("public initialization must not resolve a project session");
+    },
+  });
+  app.post("/api/v1/project-initialization/inspect", async () => ({ ok: true }));
+  app.post("/api/v1/project-initialization/complete", async () => ({ ok: true }));
+  try {
+    for (const path of [
+      "/api/v1/project-initialization/inspect",
+      "/api/v1/project-initialization/complete",
+    ]) {
+      const response = await app.inject({ method: "POST", url: path, payload: {} });
+      assert.equal(response.statusCode, 200);
+    }
+  } finally {
+    await app.close();
+  }
+});
 
 test("LAN onboarding keeps secrets scoped and name-code join is idempotent", async () => {
   const directory = await mkdtemp(join(tmpdir(), "qa-project-onboarding-http-"));

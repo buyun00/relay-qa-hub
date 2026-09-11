@@ -29,6 +29,7 @@ async function http(label, method, path, options = {}) {
     method,
     headers: {
       accept: "application/vnd.relay-qa-hub.v1.1+json",
+      origin: config.publicWebBaseUrl,
       ...(options.body !== undefined ? { "content-type": "application/json" } : {}),
       ...(options.token ? { authorization: `Bearer ${options.token}` } : {}),
       ...(options.projectId ? { "x-qa-project-id": options.projectId } : {}),
@@ -52,7 +53,11 @@ async function http(label, method, path, options = {}) {
     expectedStatus: options.status ?? 200,
     ...(options.binary ? { bytes: bytes.length, sha256: sha256(bytes) } : {}),
   });
-  assert.equal(response.status, options.status ?? 200, `${label}: unexpected HTTP status`);
+  assert.equal(
+    response.status,
+    options.status ?? 200,
+    `${label}: unexpected HTTP status${!options.binary && value?.code ? ` (${value.code})` : ""}`,
+  );
   return { value, headers: response.headers };
 }
 
@@ -179,8 +184,10 @@ async function uploadAttachment(project, principal) {
     projectId: project.id,
     key: bindKey,
     body: {
-      ...base,
+      submissionContractVersion: "1.1.0",
       projectId: project.id,
+      clientSubmissionId: submissionId,
+      clientAttachmentId,
       leaseGeneration: 1,
       expectedVersion: finalized.version,
       intent: "bug_create",

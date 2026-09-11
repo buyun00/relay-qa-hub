@@ -55,6 +55,7 @@ export class ProjectRequestContext {
         !path.startsWith("/api/v1/") ||
         path.startsWith("/api/v1/health/") ||
         path.startsWith("/api/v1/auth/") ||
+        path.startsWith("/api/v1/project-initialization/") ||
         path.startsWith("/api/v1/project-entry/") ||
         path.startsWith("/api/v1/updates/")
       )
