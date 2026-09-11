@@ -1,4 +1,5 @@
 import {
+  constants,
   existsSync,
   mkdirSync,
   readFileSync,
@@ -9,6 +10,7 @@ import {
   statSync,
 } from "node:fs";
 import { basename, join } from "node:path";
+import { pathToFileURL } from "node:url";
 import { execFileSync, spawnSync } from "node:child_process";
 import { createHash, createPublicKey, generateKeyPairSync, sign, verify } from "node:crypto";
 import { readParallelInstanceConfig } from "../../apps/api/src/parallel-instance.ts";
@@ -159,7 +161,25 @@ save(join(stage, "package.json"), {
   main: "dist/main.js",
   productName: packageIdentity.displayName,
   private: true,
+  dependencies: { "@relay-qa-hub/upload-contract": "0.1.0" },
 });
+const runtimeContractSource = join(config.sourceRoot, "packages", "upload-contract");
+const runtimeContractTarget = join(stage, "node_modules", "@relay-qa-hub", "upload-contract");
+mkdirSync(runtimeContractTarget, { recursive: true });
+for (const file of [
+  "package.json",
+  "index.js",
+  "index.d.ts",
+  "quick-build.js",
+  "quick-build.d.ts",
+]) {
+  const source = join(runtimeContractSource, file);
+  const sourceStat = lstatSync(source);
+  if (!sourceStat.isFile() || sourceStat.isSymbolicLink()) {
+    throw new Error("RUNTIME_UPLOAD_CONTRACT_SOURCE_INVALID");
+  }
+  copyFileSync(source, join(runtimeContractTarget, file), constants.COPYFILE_EXCL);
+}
 const assets = join(stage, "assets");
 mkdirSync(assets);
 const icon = join(assets, "RelayQaHub.ico");
@@ -293,6 +313,33 @@ const packagedPackageContent = assertReleaseContentBinding(
   snapshotReleasePackageAsar(packagedAsarPath),
   "PACKAGED_PACKAGE_CONTENT",
 );
+const packagedExecutable = join(packageDirectory, `${packageIdentity.executableBaseName}.exe`);
+const runtimeProbeModule = pathToFileURL(
+  join(packageDirectory, "resources", "app.asar", "dist", "package-downloads.js"),
+).href;
+const runtimeProbe = spawnSync(
+  packagedExecutable,
+  ["--input-type=module", "--eval", `await import(${JSON.stringify(runtimeProbeModule)})`],
+  {
+    env: { ...process.env, ELECTRON_RUN_AS_NODE: "1" },
+    encoding: "utf8",
+    windowsHide: true,
+    timeout: 30_000,
+    maxBuffer: 4 * 1024 * 1024,
+  },
+);
+writeFileSync(
+  join(root, "runtime-module-probe.log"),
+  [runtimeProbe.stdout ?? "", runtimeProbe.stderr ?? ""].filter(Boolean).join("\n"),
+  { flag: "wx" },
+);
+if (runtimeProbe.error || runtimeProbe.status !== 0 || runtimeProbe.signal !== null) {
+  const error = new Error("PACKAGED_RUNTIME_MODULE_RESOLUTION_FAILED", {
+    cause: runtimeProbe.error,
+  });
+  error.code = "PACKAGED_RUNTIME_MODULE_RESOLUTION_FAILED";
+  throw error;
+}
 const packagedReleaseBytes = asar.extractFile(packagedAsarPath, "release.json");
 if (!packagedReleaseBytes.equals(stageReleaseBytes))
   throw new Error("PACKAGED_RELEASE_BINDING_MISMATCH");

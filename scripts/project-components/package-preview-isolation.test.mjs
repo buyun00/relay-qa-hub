@@ -676,6 +676,19 @@ test("preview packaging has a clean-source gate and no shared Windows install id
   assert.match(packageSource, /"--sourcemap=false"/u);
   assert.match(packageSource, /snapshotReleaseDirectory\(join\(stage, "dist"\)\)/u);
   assert.match(packageSource, /snapshotReleaseDirectory\(join\(stage, "web"\)\)/u);
+  assert.match(packageSource, /dependencies: \{ "@relay-qa-hub\/upload-contract": "0\.1\.0" \}/u);
+  for (const file of [
+    "package.json",
+    "index.js",
+    "index.d.ts",
+    "quick-build.js",
+    "quick-build.d.ts",
+  ]) {
+    assert.match(packageSource, new RegExp(`"${file.replaceAll(".", "\\.")}"`, "u"));
+  }
+  assert.match(packageSource, /constants\.COPYFILE_EXCL/u);
+  assert.match(packageSource, /ELECTRON_RUN_AS_NODE: "1"/u);
+  assert.match(packageSource, /PACKAGED_RUNTIME_MODULE_RESOLUTION_FAILED/u);
   assert.match(packageSource, /schemaVersion: 1,[\s\S]+producer: "package-preview\.mjs"/u);
   assert.match(packageSource, /appScheme: packageIdentity\.protocolScheme/u);
   assert.match(packageSource, /appUserModelId: packageIdentity\.appUserModelId/u);
