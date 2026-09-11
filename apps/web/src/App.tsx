@@ -249,6 +249,17 @@ export function updateQingyuDefectSelection(
   return current.filter((id) => id !== defectId);
 }
 
+export function workspaceChromeForDesktop(bridge: Window["qaHubDesktop"]): {
+  readonly showProjectSwitcher: boolean;
+  readonly showComponentHistory: boolean;
+} {
+  const desktop = bridge !== undefined;
+  return {
+    showProjectSwitcher: !desktop,
+    showComponentHistory: !desktop,
+  };
+}
+
 function createBugImageKey(file: File): string {
   return `${file.name}\u0000${file.size}\u0000${file.type}\u0000${file.lastModified}`;
 }
@@ -646,6 +657,7 @@ export default function App({
     "checking",
   );
   const desktop = useDesktopStatus();
+  const workspaceChrome = workspaceChromeForDesktop(desktop.bridge);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
@@ -2529,25 +2541,29 @@ export default function App({
               event.currentTarget.hidden = true;
             }}
           />
-          <span className="brand-divider" aria-hidden="true" />
-          <label className="project-switcher">
-            <span>项目</span>
-            <select
-              aria-label="切换项目"
-              value={projectId}
-              onChange={(event) => onProjectChange?.(event.target.value)}
-            >
-              {!projects.some((project) => project.id === projectId) && (
-                <option value={projectId}>{currentProject?.name ?? "当前项目"}</option>
-              )}
-              {projects.map((project) => (
-                <option value={project.id} key={project.id}>
-                  {project.name}
-                </option>
-              ))}
-            </select>
-            <small>预览</small>
-          </label>
+          {workspaceChrome.showProjectSwitcher ? (
+            <>
+              <span className="brand-divider" aria-hidden="true" />
+              <label className="project-switcher">
+                <span>项目</span>
+                <select
+                  aria-label="切换项目"
+                  value={projectId}
+                  onChange={(event) => onProjectChange?.(event.target.value)}
+                >
+                  {!projects.some((project) => project.id === projectId) && (
+                    <option value={projectId}>{currentProject?.name ?? "当前项目"}</option>
+                  )}
+                  {projects.map((project) => (
+                    <option value={project.id} key={project.id}>
+                      {project.name}
+                    </option>
+                  ))}
+                </select>
+                <small>预览</small>
+              </label>
+            </>
+          ) : null}
         </div>
         {view === "workbench" ? (
           <label className="global-search">
@@ -2702,7 +2718,7 @@ export default function App({
               <span>上传增量</span>
             </button>
           )}
-          {
+          {workspaceChrome.showComponentHistory && (
             <button
               type="button"
               className={`nav-item${view === "history" ? " is-active" : ""}`}
@@ -2711,7 +2727,7 @@ export default function App({
               <AppIcon name="overview" className="nav-icon" />
               <span>组件历史</span>
             </button>
-          }
+          )}
           {principal.isGm && (
             <button
               className={`nav-item${view === "settings" ? " is-active" : ""}`}
@@ -2932,7 +2948,7 @@ export default function App({
             projectId={projectId}
             refreshRevision={userManagementRevision}
           />
-        ) : view === "history" ? (
+        ) : view === "history" && workspaceChrome.showComponentHistory ? (
           <ComponentHistoryPage projectId={projectId} components={components} />
         ) : view === "settings" && principal.isGm ? (
           <ProjectManagementPage
