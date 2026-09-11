@@ -1,0 +1,373 @@
+{
+  "runId": "2026-09-11T01-27-51-810Z",
+  "instanceId": "qa-hub-preview-fd0f0f8-cdd86698",
+  "api": "http://127.0.0.1:57378",
+  "passed": true,
+  "note": "Real running API and isolated SQLite. This smoke is a subset, not full E2E acceptance.",
+  "checks": [
+    {
+      "label": "new API ready",
+      "method": "GET",
+      "path": "/api/v1/health/ready",
+      "expectedStatus": 200,
+      "status": 200,
+      "response": {
+        "status": "ready",
+        "schemaVersion": "20",
+        "checks": [
+          {
+            "name": "database",
+            "status": "ok"
+          },
+          {
+            "name": "evidence",
+            "status": "ok"
+          },
+          {
+            "name": "worker",
+            "status": "ok"
+          }
+        ]
+      },
+      "recordedAt": "2026-09-11T01:27:51.842Z"
+    },
+    {
+      "label": "GM password login",
+      "method": "POST",
+      "path": "/api/v1/auth/gm/login",
+      "expectedStatus": 200,
+      "status": 200,
+      "response": {
+        "accountId": "10000000-0000-4000-8000-000000000020",
+        "userId": "b29d8959-a143-473c-9ac3-4f88ecb54d9f",
+        "email": "qa-b92dcb64da744e5245c8ad99ceeca75c6d719402fc65e323ea07fff842e5d657@local.invalid",
+        "displayName": "Preview GM",
+        "isGm": true,
+        "expiresAt": "2094-09-29T04:41:58.846Z"
+      },
+      "recordedAt": "2026-09-11T01:27:51.848Z"
+    },
+    {
+      "label": "GM create A",
+      "method": "POST",
+      "path": "/api/v1/gm/projects",
+      "expectedStatus": 200,
+      "status": 200,
+      "response": {
+        "id": "6e864955-815f-4ac2-a3c3-53f6c6895f72",
+        "key": "TA1789090071848",
+        "name": "真实HTTP验收A 2026-09-11T01-27-51-810Z",
+        "active": true,
+        "version": 1
+      },
+      "recordedAt": "2026-09-11T01:27:51.853Z"
+    },
+    {
+      "label": "GM create B",
+      "method": "POST",
+      "path": "/api/v1/gm/projects",
+      "expectedStatus": 200,
+      "status": 200,
+      "response": {
+        "id": "d1f2216b-8bad-4d63-93f2-ee60646b5462",
+        "key": "TB1789090071853",
+        "name": "真实HTTP验收B 2026-09-11T01-27-51-810Z",
+        "active": true,
+        "version": 1
+      },
+      "recordedAt": "2026-09-11T01:27:51.860Z"
+    },
+    {
+      "label": "A first name login",
+      "method": "POST",
+      "path": "/api/v1/auth/login",
+      "expectedStatus": 200,
+      "status": 200,
+      "response": {
+        "accountId": "10000000-0000-4000-8000-000000000020",
+        "userId": "502d8055-0bf6-4dd3-8fa1-16f3b7787ba1",
+        "email": "qa-ed3edbf63b1784df484213385668d362cf1d59033ef82e8926039cb0a8c6e021@local.invalid",
+        "displayName": "仅甲1789090071860",
+        "projectId": "6e864955-815f-4ac2-a3c3-53f6c6895f72",
+        "isGm": false,
+        "expiresAt": "2094-09-29T04:41:58.864Z"
+      },
+      "recordedAt": "2026-09-11T01:27:51.869Z"
+    },
+    {
+      "label": "A employee sees only A",
+      "method": "GET",
+      "path": "/api/v1/projects",
+      "expectedStatus": 200,
+      "status": 200,
+      "response": {
+        "snapshotSequence": 1789090071872,
+        "items": [
+          {
+            "id": "6e864955-815f-4ac2-a3c3-53f6c6895f72",
+            "key": "TA1789090071848",
+            "name": "真实HTTP验收A 2026-09-11T01-27-51-810Z",
+            "active": true,
+            "roles": [
+              "developer",
+              "project_admin",
+              "release_manager",
+              "reporter",
+              "triager",
+              "verifier",
+              "viewer"
+            ]
+          }
+        ],
+        "nextCursor": null
+      },
+      "recordedAt": "2026-09-11T01:27:51.874Z"
+    },
+    {
+      "label": "all optional components disabled",
+      "method": "GET",
+      "path": "/api/v1/projects/6e864955-815f-4ac2-a3c3-53f6c6895f72/components",
+      "expectedStatus": 200,
+      "status": 200,
+      "response": {
+        "projectId": "6e864955-815f-4ac2-a3c3-53f6c6895f72",
+        "items": [
+          {
+            "key": "build",
+            "displayName": "打包",
+            "enabled": false,
+            "status": "disabled",
+            "version": 0,
+            "config": {},
+            "updatedBy": null,
+            "updatedAt": null
+          },
+          {
+            "key": "build_upload.single",
+            "displayName": "单次打包上传",
+            "enabled": false,
+            "status": "disabled",
+            "version": 0,
+            "config": {},
+            "updatedBy": null,
+            "updatedAt": null
+          },
+          {
+            "key": "upload.incremental",
+            "displayName": "增量上传",
+            "enabled": false,
+            "status": "disabled",
+            "version": 0,
+            "config": {},
+            "updatedBy": null,
+            "updatedAt": null
+          },
+          {
+            "key": "relay.production",
+            "displayName": "Relay AI 制作",
+            "enabled": false,
+            "status": "disabled",
+            "version": 0,
+            "config": {},
+            "updatedBy": null,
+            "updatedAt": null
+          },
+          {
+            "key": "qingyu.sync",
+            "displayName": "第三方订单同步",
+            "enabled": false,
+            "status": "disabled",
+            "version": 0,
+            "config": {},
+            "updatedBy": null,
+            "updatedAt": null
+          }
+        ]
+      },
+      "recordedAt": "2026-09-11T01:27:51.878Z"
+    },
+    {
+      "label": "unjoined project list refused",
+      "method": "GET",
+      "path": "/api/v1/bugs?projectId=d1f2216b-8bad-4d63-93f2-ee60646b5462",
+      "expectedStatus": 403,
+      "status": 403,
+      "response": {
+        "code": "PROJECT_NOT_ACCESSIBLE"
+      },
+      "recordedAt": "2026-09-11T01:27:51.881Z"
+    },
+    {
+      "label": "create real Bug with components off",
+      "method": "POST",
+      "path": "/api/v1/bugs",
+      "expectedStatus": 201,
+      "status": 201,
+      "response": {
+        "clientSubmissionId": "9a5813a6-d3d2-4374-adc7-f247a2d7bea8",
+        "qaItem": {
+          "type": "bug",
+          "id": "c94edd5b-64f3-4652-bb5f-23d65bdfd072",
+          "key": "TA1789090071848-1"
+        },
+        "disposition": "created",
+        "bug": {
+          "id": "c94edd5b-64f3-4652-bb5f-23d65bdfd072",
+          "projectId": "6e864955-815f-4ac2-a3c3-53f6c6895f72",
+          "number": 1,
+          "key": "TA1789090071848-1",
+          "title": "独立预览真实Bug创建",
+          "description": "本记录只存在新版测试库",
+          "expectedBehavior": "项目归属准确",
+          "moduleId": null,
+          "state": "reported",
+          "severity": "S3",
+          "priority": "P3",
+          "reporterId": "502d8055-0bf6-4dd3-8fa1-16f3b7787ba1",
+          "ownerId": null,
+          "verificationOwnerId": null,
+          "duplicateOfBugId": null,
+          "occurrenceCount": 1,
+          "reopenCount": 0,
+          "version": 1,
+          "createdAt": "2026-09-11T01:27:51.884Z",
+          "updatedAt": "2026-09-11T01:27:51.884Z",
+          "closedAt": null
+        },
+        "occurrenceId": "fbbc972b-b68d-47f5-966f-98ba3fa7cfb0",
+        "attachmentIds": [],
+        "captureBundleId": null,
+        "eventId": "81ce36da-e2e4-496c-b73e-8013b79f1c9f",
+        "replayed": false
+      },
+      "recordedAt": "2026-09-11T01:27:51.889Z"
+    },
+    {
+      "label": "read back stable Bug",
+      "method": "GET",
+      "path": "/api/v1/bugs/c94edd5b-64f3-4652-bb5f-23d65bdfd072",
+      "expectedStatus": 200,
+      "status": 200,
+      "response": {
+        "id": "c94edd5b-64f3-4652-bb5f-23d65bdfd072",
+        "projectId": "6e864955-815f-4ac2-a3c3-53f6c6895f72",
+        "number": 1,
+        "key": "TA1789090071848-1",
+        "title": "独立预览真实Bug创建",
+        "description": "本记录只存在新版测试库",
+        "expectedBehavior": "项目归属准确",
+        "moduleId": null,
+        "state": "reported",
+        "severity": "S3",
+        "priority": "P3",
+        "reporterId": "502d8055-0bf6-4dd3-8fa1-16f3b7787ba1",
+        "ownerId": null,
+        "verificationOwnerId": null,
+        "duplicateOfBugId": null,
+        "occurrenceCount": 1,
+        "reopenCount": 0,
+        "version": 1,
+        "createdAt": "2026-09-11T01:27:51.884Z",
+        "updatedAt": "2026-09-11T01:27:51.884Z",
+        "closedAt": null
+      },
+      "recordedAt": "2026-09-11T01:27:51.892Z"
+    },
+    {
+      "label": "conflicting project header refused",
+      "method": "GET",
+      "path": "/api/v1/bugs/c94edd5b-64f3-4652-bb5f-23d65bdfd072",
+      "projectId": "d1f2216b-8bad-4d63-93f2-ee60646b5462",
+      "expectedStatus": 404,
+      "status": 404,
+      "response": {
+        "code": "NOT_FOUND"
+      },
+      "recordedAt": "2026-09-11T01:27:51.895Z"
+    },
+    {
+      "label": "shared user joins A",
+      "method": "POST",
+      "path": "/api/v1/auth/login",
+      "expectedStatus": 200,
+      "status": 200,
+      "response": {
+        "accountId": "10000000-0000-4000-8000-000000000020",
+        "userId": "ff53258f-4517-4af7-88ff-218dee166fad",
+        "email": "qa-fea4150144769d8637cc532e8ec2530f13c1975f7cd7d9dc65f78d8e6f6be82b@local.invalid",
+        "displayName": "双项目1789090071895",
+        "projectId": "6e864955-815f-4ac2-a3c3-53f6c6895f72",
+        "isGm": false,
+        "expiresAt": "2094-09-29T04:41:58.895Z"
+      },
+      "recordedAt": "2026-09-11T01:27:51.900Z"
+    },
+    {
+      "label": "shared user joins B",
+      "method": "POST",
+      "path": "/api/v1/auth/login",
+      "expectedStatus": 200,
+      "status": 200,
+      "response": {
+        "accountId": "10000000-0000-4000-8000-000000000020",
+        "userId": "ff53258f-4517-4af7-88ff-218dee166fad",
+        "email": "qa-fea4150144769d8637cc532e8ec2530f13c1975f7cd7d9dc65f78d8e6f6be82b@local.invalid",
+        "displayName": "双项目1789090071895",
+        "projectId": "d1f2216b-8bad-4d63-93f2-ee60646b5462",
+        "isGm": false,
+        "expiresAt": "2094-09-29T04:41:58.902Z"
+      },
+      "recordedAt": "2026-09-11T01:27:51.906Z"
+    },
+    {
+      "label": "concurrent A query",
+      "method": "GET",
+      "path": "/api/v1/bugs?projectId=6e864955-815f-4ac2-a3c3-53f6c6895f72",
+      "expectedStatus": 200,
+      "status": 200,
+      "response": {
+        "snapshotSequence": 18,
+        "items": [
+          {
+            "id": "c94edd5b-64f3-4652-bb5f-23d65bdfd072",
+            "projectId": "6e864955-815f-4ac2-a3c3-53f6c6895f72",
+            "number": 1,
+            "key": "TA1789090071848-1",
+            "title": "独立预览真实Bug创建",
+            "description": "本记录只存在新版测试库",
+            "expectedBehavior": "项目归属准确",
+            "moduleId": null,
+            "state": "reported",
+            "severity": "S3",
+            "priority": "P3",
+            "reporterId": "502d8055-0bf6-4dd3-8fa1-16f3b7787ba1",
+            "ownerId": null,
+            "verificationOwnerId": null,
+            "duplicateOfBugId": null,
+            "occurrenceCount": 1,
+            "reopenCount": 0,
+            "version": 1,
+            "createdAt": "2026-09-11T01:27:51.884Z",
+            "updatedAt": "2026-09-11T01:27:51.884Z",
+            "closedAt": null
+          }
+        ],
+        "nextCursor": null
+      },
+      "recordedAt": "2026-09-11T01:27:51.909Z"
+    },
+    {
+      "label": "concurrent B query",
+      "method": "GET",
+      "path": "/api/v1/bugs?projectId=d1f2216b-8bad-4d63-93f2-ee60646b5462",
+      "expectedStatus": 200,
+      "status": 200,
+      "response": {
+        "snapshotSequence": 18,
+        "items": [],
+        "nextCursor": null
+      },
+      "recordedAt": "2026-09-11T01:27:51.909Z"
+    }
+  ]
+}

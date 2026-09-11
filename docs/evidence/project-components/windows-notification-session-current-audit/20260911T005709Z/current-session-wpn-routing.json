@@ -1,0 +1,538 @@
+{
+  "schemaVersion": 2,
+  "kind": "windows-notification-session-routing-readonly-sanitized-audit",
+  "capturedAt": "2026-09-11T00:57:11.1173588Z",
+  "redaction": {
+    "profile": "local-identity-and-paths-v1",
+    "transformation": "allowlisted-field-copy",
+    "rawUserNameDomainAndClientNameOmitted": true,
+    "absolutePathsOmitted": true,
+    "processCommandLinesOmitted": true,
+    "proofErrorMessageAndDetailsOmitted": true
+  },
+  "sourceCapture": {
+    "rawAudit": {
+      "bytes": 20399,
+      "sha256": "7247e02728ca6cbe9eaf7153809b2535bf8ba265b5788fac494c73bdedf96a16",
+      "tracked": false,
+      "reason": "Contains local identity and absolute paths; retained only in ignored work output."
+    },
+    "rawCaptureScript": {
+      "bytes": 19443,
+      "sha256": "ef66e79b1561781499afd6a89724a47520b83d78a20f9c5b61d846d442d9f70c",
+      "tracked": false,
+      "reason": "Superseded by the directly sanitized tracked reproducer."
+    }
+  },
+  "capture": {
+    "startedAt": "2026-09-11T00:57:09.4753126Z",
+    "processId": 8196,
+    "sessionId": 2,
+    "readOnlyQueries": [
+      "WTSEnumerateSessionsW",
+      "WTSQuerySessionInformationW",
+      "WTSGetActiveConsoleSessionId",
+      "Win32_Process",
+      "Win32_Service",
+      "Get-WinEvent"
+    ],
+    "productActionsPerformed": [],
+    "sessionActionsPerformed": [],
+    "serviceActionsPerformed": [],
+    "productProcessesStartedOrStopped": [],
+    "notificationsSubmitted": 0,
+    "artifactWrites": [
+      {
+        "kind": "local-audit-json",
+        "tracked": false,
+        "pathOmitted": true
+      }
+    ]
+  },
+  "proofAnchor": {
+    "fingerprint": {
+      "pathTail": "desktop-notification-project-route-live/81c44b26-5c6f-47c6-a56a-d4eb27f19d7a/proof.json",
+      "bytes": 56423,
+      "sha256": "1c571b31b9152a653ad1ce25ab6fb7c80a1be7735cb01207c6fe61cf3751db3d"
+    },
+    "runId": "81c44b26-5c6f-47c6-a56a-d4eb27f19d7a",
+    "version": "0.2.0-preview.20",
+    "sourceCommit": "fd0f0f850f907b8a77aac8ec8b6a71b308bdd711",
+    "passed": false,
+    "error": {
+      "name": "Error",
+      "code": "WINDOWS_TOAST_SESSION_MISMATCH",
+      "classification": "environment_blocker"
+    },
+    "sessionPreflight": {
+      "environmentOnly": true,
+      "productPass": false,
+      "status": "blocked",
+      "notificationId": "dbf5af71-247f-4955-8741-5131ad0944ed",
+      "completedAt": "2026-09-11T00:10:04.227Z",
+      "error": "WINDOWS_TOAST_SESSION_MISMATCH"
+    },
+    "watcherReady": {
+      "schemaVersion": 1,
+      "ready": true,
+      "readyAt": "2026-09-11T00:10:02.9271185Z",
+      "observerPid": 8420,
+      "observerSessionId": 2,
+      "appPid": 10688,
+      "appSessionId": 2,
+      "activeConsoleSessionId": 1,
+      "wtsSessions": [
+        {
+          "sessionId": 0,
+          "state": 4
+        },
+        {
+          "sessionId": 1,
+          "state": 1
+        },
+        {
+          "sessionId": 2,
+          "state": 0
+        },
+        {
+          "sessionId": 65536,
+          "state": 6
+        }
+      ],
+      "explorer": [
+        {
+          "pid": 12460,
+          "sessionId": 2,
+          "name": "explorer.exe"
+        }
+      ],
+      "shellExperienceHost": [
+        {
+          "pid": 9176,
+          "sessionId": 2,
+          "name": "ShellExperienceHost.exe"
+        }
+      ]
+    },
+    "wpnCorrelation": [
+      {
+        "label": "session-preflight",
+        "appUserModelId": "com.relayqahub.desktop.preview.v21.e2e.fresh.0910",
+        "trackingId": "5747",
+        "messageId": "{ec5a2173-30ee-480d-be6c-fc91fe2b985b}",
+        "destinationSessionId": 1,
+        "boundary": {
+          "capturedAt": "2026-09-11T00:10:03.4918116Z",
+          "newestRecordId": 73495
+        },
+        "queriedAt": "2026-09-11T00:10:04.1940521Z",
+        "events": [
+          {
+            "eventId": 2418,
+            "recordId": 73497,
+            "timeCreated": "2026-09-11T00:10:03.5386782Z",
+            "providerProcessId": 7204,
+            "appUserModelId": "com.relayqahub.desktop.preview.v21.e2e.fresh.0910",
+            "notificationType": "toast",
+            "trackingId": "5747",
+            "sessionId": null,
+            "messageId": ""
+          },
+          {
+            "eventId": 3052,
+            "recordId": 73498,
+            "timeCreated": "2026-09-11T00:10:03.5401993Z",
+            "providerProcessId": 7204,
+            "appUserModelId": "com.relayqahub.desktop.preview.v21.e2e.fresh.0910",
+            "notificationType": "",
+            "trackingId": "5747",
+            "sessionId": 1,
+            "messageId": "{ec5a2173-30ee-480d-be6c-fc91fe2b985b}"
+          },
+          {
+            "eventId": 3153,
+            "recordId": 73499,
+            "timeCreated": "2026-09-11T00:10:03.5402673Z",
+            "providerProcessId": 7204,
+            "appUserModelId": "com.relayqahub.desktop.preview.v21.e2e.fresh.0910",
+            "notificationType": "",
+            "trackingId": "5747",
+            "sessionId": 1,
+            "messageId": "{ec5a2173-30ee-480d-be6c-fc91fe2b985b}"
+          }
+        ]
+      }
+    ]
+  },
+  "target": {
+    "appUserModelId": "com.relayqahub.desktop.preview.v21.e2e.fresh.0910",
+    "executableFileName": "RelayQaHubPreview-v21-e2e-fresh-0910.exe",
+    "executablePathSource": "proof.inputFingerprints exact path comparison; raw path omitted",
+    "observedProcesses": [
+      {
+        "pid": 15516,
+        "parentPid": 22020,
+        "sessionId": 2,
+        "name": "RelayQaHubPreview-v21-e2e-fresh-0910.exe",
+        "startedAt": "2026-09-11T00:11:51.0331300Z"
+      },
+      {
+        "pid": 22020,
+        "parentPid": 24648,
+        "sessionId": 2,
+        "name": "RelayQaHubPreview-v21-e2e-fresh-0910.exe",
+        "startedAt": "2026-09-11T00:11:50.8889420Z"
+      },
+      {
+        "pid": 26612,
+        "parentPid": 22020,
+        "sessionId": 2,
+        "name": "RelayQaHubPreview-v21-e2e-fresh-0910.exe",
+        "startedAt": "2026-09-11T00:11:51.1248820Z"
+      },
+      {
+        "pid": 26808,
+        "parentPid": 22020,
+        "sessionId": 2,
+        "name": "RelayQaHubPreview-v21-e2e-fresh-0910.exe",
+        "startedAt": "2026-09-11T00:11:51.0223310Z"
+      }
+    ],
+    "preExistingAtCapture": true
+  },
+  "currentSessionTopology": {
+    "runnerSessionId": 2,
+    "activeConsoleSessionId": 1,
+    "sessions": [
+      {
+        "sessionId": 0,
+        "state": 4,
+        "stateName": "Disconnected",
+        "hasLoggedOnUser": false,
+        "protocolType": 0,
+        "protocolName": "Console"
+      },
+      {
+        "sessionId": 1,
+        "state": 1,
+        "stateName": "Connected",
+        "hasLoggedOnUser": false,
+        "protocolType": 0,
+        "protocolName": "Console"
+      },
+      {
+        "sessionId": 2,
+        "state": 0,
+        "stateName": "Active",
+        "hasLoggedOnUser": true,
+        "protocolType": 2,
+        "protocolName": "RDP"
+      },
+      {
+        "sessionId": 65536,
+        "state": 6,
+        "stateName": "Listen",
+        "hasLoggedOnUser": false,
+        "protocolType": 0,
+        "protocolName": "Console"
+      }
+    ],
+    "selectedProcesses": [
+      {
+        "pid": 8,
+        "parentPid": 1464,
+        "sessionId": 1,
+        "name": "dwm.exe",
+        "startedAt": "2026-09-07T09:35:40.2833980Z"
+      },
+      {
+        "pid": 1260,
+        "parentPid": 1464,
+        "sessionId": 1,
+        "name": "LogonUI.exe",
+        "startedAt": "2026-09-07T09:35:40.2821560Z"
+      },
+      {
+        "pid": 1464,
+        "parentPid": 1356,
+        "sessionId": 1,
+        "name": "winlogon.exe",
+        "startedAt": "2026-09-07T09:35:39.7317370Z"
+      },
+      {
+        "pid": 12216,
+        "parentPid": 12080,
+        "sessionId": 2,
+        "name": "dwm.exe",
+        "startedAt": "2026-09-07T09:36:17.7238940Z"
+      },
+      {
+        "pid": 12460,
+        "parentPid": 11504,
+        "sessionId": 2,
+        "name": "explorer.exe",
+        "startedAt": "2026-09-07T09:36:22.6906140Z"
+      },
+      {
+        "pid": 15516,
+        "parentPid": 22020,
+        "sessionId": 2,
+        "name": "RelayQaHubPreview-v21-e2e-fresh-0910.exe",
+        "startedAt": "2026-09-11T00:11:51.0331300Z"
+      },
+      {
+        "pid": 22020,
+        "parentPid": 24648,
+        "sessionId": 2,
+        "name": "RelayQaHubPreview-v21-e2e-fresh-0910.exe",
+        "startedAt": "2026-09-11T00:11:50.8889420Z"
+      },
+      {
+        "pid": 26612,
+        "parentPid": 22020,
+        "sessionId": 2,
+        "name": "RelayQaHubPreview-v21-e2e-fresh-0910.exe",
+        "startedAt": "2026-09-11T00:11:51.1248820Z"
+      },
+      {
+        "pid": 26808,
+        "parentPid": 22020,
+        "sessionId": 2,
+        "name": "RelayQaHubPreview-v21-e2e-fresh-0910.exe",
+        "startedAt": "2026-09-11T00:11:51.0223310Z"
+      },
+      {
+        "pid": 4872,
+        "parentPid": 1728,
+        "sessionId": 2,
+        "name": "RuntimeBroker.exe",
+        "startedAt": "2026-09-07T09:39:18.5073020Z"
+      },
+      {
+        "pid": 13036,
+        "parentPid": 1728,
+        "sessionId": 2,
+        "name": "RuntimeBroker.exe",
+        "startedAt": "2026-09-07T09:36:24.6267310Z"
+      },
+      {
+        "pid": 25484,
+        "parentPid": 1728,
+        "sessionId": 2,
+        "name": "RuntimeBroker.exe",
+        "startedAt": "2026-09-10T07:37:19.7036860Z"
+      },
+      {
+        "pid": 9176,
+        "parentPid": 1728,
+        "sessionId": 2,
+        "name": "ShellExperienceHost.exe",
+        "startedAt": "2026-09-07T09:39:18.1028100Z"
+      },
+      {
+        "pid": 11292,
+        "parentPid": 2464,
+        "sessionId": 2,
+        "name": "sihost.exe",
+        "startedAt": "2026-09-07T09:36:19.6289610Z"
+      },
+      {
+        "pid": 11808,
+        "parentPid": 1728,
+        "sessionId": 2,
+        "name": "StartMenuExperienceHost.exe",
+        "startedAt": "2026-09-07T09:36:24.2572930Z"
+      },
+      {
+        "pid": 7204,
+        "parentPid": 1484,
+        "sessionId": 2,
+        "name": "svchost.exe",
+        "startedAt": "2026-09-07T09:36:19.7354290Z"
+      },
+      {
+        "pid": 12080,
+        "parentPid": 12016,
+        "sessionId": 2,
+        "name": "winlogon.exe",
+        "startedAt": "2026-09-07T09:36:17.3864910Z"
+      }
+    ],
+    "wpnUserServices": [
+      {
+        "serviceFamily": "WpnUserService_*",
+        "state": "Running",
+        "pid": 7204,
+        "sessionId": 2
+      }
+    ]
+  },
+  "currentWpnAudit": {
+    "logName": "Microsoft-Windows-PushNotification-Platform/Operational",
+    "queryStartedAt": "2026-09-11T00:09:55.2500000Z",
+    "queryFinishedAt": "2026-09-11T00:57:11.1235488Z",
+    "retainedEventCount": 825,
+    "eventCounts": {
+      "accepted2418": 275,
+      "delivered3052": 275,
+      "presented3153": 275
+    },
+    "completeChainCount": 275,
+    "invalidChainCount": 0,
+    "destinationSessionCounts": [
+      {
+        "sessionId": 1,
+        "count": 275
+      }
+    ],
+    "firstRetainedChain": {
+      "trackingId": "5859",
+      "valid": true,
+      "destinationSessionId": 1,
+      "messageId": "{0f027eed-073b-4984-866d-0c4e36500724}",
+      "acceptedRecordId": 74247,
+      "deliveredRecordId": 74248,
+      "presentedRecordId": 74249,
+      "acceptedAt": "2026-09-11T00:24:20.8439604Z",
+      "deliveredAt": "2026-09-11T00:24:20.8448411Z",
+      "presentedAt": "2026-09-11T00:24:20.8448858Z"
+    },
+    "lastRetainedChain": {
+      "trackingId": "6133",
+      "valid": true,
+      "destinationSessionId": 1,
+      "messageId": "{65ba6f48-6c98-401b-86e9-5263af062af6}",
+      "acceptedRecordId": 76137,
+      "deliveredRecordId": 76138,
+      "presentedRecordId": 76139,
+      "acceptedAt": "2026-09-11T00:56:55.5093888Z",
+      "deliveredAt": "2026-09-11T00:56:55.5101637Z",
+      "presentedAt": "2026-09-11T00:56:55.5102010Z"
+    },
+    "lastFiveCompleteChains": [
+      {
+        "trackingId": "6129",
+        "valid": true,
+        "destinationSessionId": 1,
+        "messageId": "{2bc38676-7ce5-4a6f-84bc-29ea0c076275}",
+        "acceptedRecordId": 76121,
+        "deliveredRecordId": 76122,
+        "presentedRecordId": 76123,
+        "acceptedAt": "2026-09-11T00:56:55.4950437Z",
+        "deliveredAt": "2026-09-11T00:56:55.4962121Z",
+        "presentedAt": "2026-09-11T00:56:55.4962673Z"
+      },
+      {
+        "trackingId": "6130",
+        "valid": true,
+        "destinationSessionId": 1,
+        "messageId": "{ac887e05-ad04-4b92-915d-129d6c41fc7a}",
+        "acceptedRecordId": 76125,
+        "deliveredRecordId": 76126,
+        "presentedRecordId": 76127,
+        "acceptedAt": "2026-09-11T00:56:55.4985742Z",
+        "deliveredAt": "2026-09-11T00:56:55.4997662Z",
+        "presentedAt": "2026-09-11T00:56:55.4998200Z"
+      },
+      {
+        "trackingId": "6131",
+        "valid": true,
+        "destinationSessionId": 1,
+        "messageId": "{d59f47a4-6d0b-4a40-9a38-2a80c48db6e8}",
+        "acceptedRecordId": 76129,
+        "deliveredRecordId": 76130,
+        "presentedRecordId": 76131,
+        "acceptedAt": "2026-09-11T00:56:55.5024972Z",
+        "deliveredAt": "2026-09-11T00:56:55.5034421Z",
+        "presentedAt": "2026-09-11T00:56:55.5035054Z"
+      },
+      {
+        "trackingId": "6132",
+        "valid": true,
+        "destinationSessionId": 1,
+        "messageId": "{20bda3e2-c4bc-4873-a3b3-1b0441f90d93}",
+        "acceptedRecordId": 76133,
+        "deliveredRecordId": 76134,
+        "presentedRecordId": 76135,
+        "acceptedAt": "2026-09-11T00:56:55.5055772Z",
+        "deliveredAt": "2026-09-11T00:56:55.5066860Z",
+        "presentedAt": "2026-09-11T00:56:55.5067453Z"
+      },
+      {
+        "trackingId": "6133",
+        "valid": true,
+        "destinationSessionId": 1,
+        "messageId": "{65ba6f48-6c98-401b-86e9-5263af062af6}",
+        "acceptedRecordId": 76137,
+        "deliveredRecordId": 76138,
+        "presentedRecordId": 76139,
+        "acceptedAt": "2026-09-11T00:56:55.5093888Z",
+        "deliveredAt": "2026-09-11T00:56:55.5101637Z",
+        "presentedAt": "2026-09-11T00:56:55.5102010Z"
+      }
+    ],
+    "note": "The operational log is bounded and older records may already have rolled over; proofAnchor preserves the earlier exact 81c44 chain.",
+    "eventSessionIdSemantics": "SessionId is the provider EventData field used by the equality gate; public provider documentation defining deeper semantics was not found."
+  },
+  "assertions": {
+    "runnerSessionHasLoggedOnUser": true,
+    "runnerSessionHasExplorerAndShellExperienceHost": true,
+    "activeConsoleSessionHasLoggedOnUser": false,
+    "activeConsoleSessionHasExplorerAndShellExperienceHost": false,
+    "activeConsoleSessionHasLogonUi": true,
+    "targetExecutableProcessesOnlyInRunnerSession": true,
+    "wpnCompleteChainsPresent": true,
+    "allWpnDestinationsEqualActiveConsoleSession": true,
+    "allWpnDestinationsEqualRunnerSession": false,
+    "appObserverWpnSameSessionGateReady": false
+  },
+  "conclusion": {
+    "status": "environment_blocker",
+    "productPass": false,
+    "code": "WINDOWS_TOAST_SESSION_MISMATCH",
+    "exactBlocker": "The installed app and UIAutomation observer were in runner session 2, while correlated WPN Operational 3052/3153 events reported SessionId 1; active physical-console session 1 had no logged-on user or notification shell.",
+    "supportedPerToastTerminalSessionOverrideFound": false,
+    "supportedPerToastTerminalSessionOverrideFindingIsInference": true,
+    "safeAutomaticRemediationUnderCurrentConstraints": false
+  },
+  "safeRetestPrerequisites": [
+    "Run the installed EXE, native submit, and UIAutomation observer in one unlocked interactive user session that has Explorer and ShellExperienceHost.",
+    "Require the correlated WPN 3052 and 3153 SessionId to equal both the app and observer session before any business fixture is created.",
+    "Use a test host already in the required topology, or arrange an operator-controlled console login outside this audit; do not switch, disconnect, log off, or restart the current host as part of this run.",
+    "The owner of the pre-existing isolated installed instance must close it gracefully before a new runner-owned attempt; leave production and daily EXEs untouched."
+  ],
+  "references": [
+    {
+      "url": "https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-wtsgetactiveconsolesessionid",
+      "finding": "Returns the session attached to the physical console."
+    },
+    {
+      "url": "https://learn.microsoft.com/en-us/windows/win32/termserv/terminal-services-sessions",
+      "finding": "Each RDP session has its own WinSta0 and desktops."
+    },
+    {
+      "url": "https://learn.microsoft.com/en-us/windows/win32/api/wtsapi32/nf-wtsapi32-wtsqueryusertoken",
+      "finding": "Cross-session logged-on user token lookup requires LocalSystem and SE_TCB_NAME."
+    },
+    {
+      "url": "https://learn.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-createprocessasuserw",
+      "finding": "Interactive launch requires winsta0\\\\default, access, profile, and environment handling."
+    },
+    {
+      "url": "https://learn.microsoft.com/en-us/dotnet/api/system.windows.automation.automationelement.rootelement?view=windowsdesktop-9.0",
+      "finding": "UIAutomation RootElement is rooted at the current desktop."
+    },
+    {
+      "url": "https://learn.microsoft.com/en-us/uwp/api/windows.ui.notifications.toastnotificationmanager.createtoastnotifier",
+      "finding": "The desktop overload accepts an AppUserModelID, not a terminal-session ID."
+    },
+    {
+      "url": "https://learn.microsoft.com/en-us/windows/windows-app-sdk/api/winrt/microsoft.windows.appnotifications.appnotificationmanager.show?view=windows-app-sdk-1.8",
+      "finding": "Show accepts an AppNotification, not a terminal-session target."
+    },
+    {
+      "url": "https://github.com/electron/electron/blob/v43.4.1/shell/browser/notifications/win/windows_toast_notification.cc",
+      "finding": "Electron 43.4.1 uses CreateToastNotifierWithId(AppUserModelID) for unpackaged Windows notifications."
+    }
+  ]
+}

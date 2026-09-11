@@ -1,0 +1,68 @@
+{
+  "schemaVersion": 1,
+  "kind": "windows-notification-session-current-audit-validation",
+  "createdAt": "2026-09-11T01:11:52.206Z",
+  "sourceCapture": {
+    "rawAudit": {
+      "bytes": 20399,
+      "sha256": "7247e02728ca6cbe9eaf7153809b2535bf8ba265b5788fac494c73bdedf96a16",
+      "tracked": false
+    },
+    "rawCaptureScript": {
+      "bytes": 19443,
+      "sha256": "ef66e79b1561781499afd6a89724a47520b83d78a20f9c5b61d846d442d9f70c",
+      "tracked": false
+    }
+  },
+  "privateExactScan": {
+    "performed": true,
+    "mode": "in-memory exact-value comparison; compared values omitted",
+    "trackedFileCount": 5,
+    "rawIdentityCandidateCount": 3,
+    "rawAbsolutePathCandidateCount": 11,
+    "canonicalSecretValueCount": 3,
+    "exactHits": [],
+    "passed": true
+  },
+  "trackedArtifacts": [
+    {
+      "path": "README.md",
+      "bytes": 4953,
+      "sha256": "c0f15ad5da6774408104920c769367c9503aa6390938cbcbd7e6a328caefaae2"
+    },
+    {
+      "path": "capture-readonly.ps1",
+      "bytes": 22987,
+      "sha256": "535a84b4adffbdc14be2012406fa062928ef857aadfd52a067346887ab73d4be"
+    },
+    {
+      "path": "current-session-wpn-routing.json",
+      "bytes": 17984,
+      "sha256": "574e8562949ca4979e488cde96c5344605c27a0c8fb5c7574717076dc841681c"
+    },
+    {
+      "path": "validate-evidence.mjs",
+      "bytes": 14871,
+      "sha256": "4de5ef56aa9aa82e300fe16cd6fd044d510f89ae917808319e5f7a963b63849e"
+    }
+  ],
+  "validations": {
+    "directoryInventoryComplete": true,
+    "artifactHashesMatched": true,
+    "externalProofAnchorMatched": true,
+    "sessionAndWpnFactsInternallyConsistent": true,
+    "noProductSessionServiceOrProcessActions": true,
+    "notificationsSubmittedZero": true,
+    "failClosedVerdictPreserved": true,
+    "safeRetestPrerequisitesPreserved": true,
+    "sensitiveValueSlotsAbsent": true,
+    "secretAndAbsolutePathPatternScanClean": true,
+    "privateExactValueScanClean": true
+  },
+  "verdict": {
+    "status": "pass",
+    "evidenceStatus": "environment_blocker",
+    "productPass": false,
+    "code": "WINDOWS_TOAST_SESSION_MISMATCH"
+  }
+}

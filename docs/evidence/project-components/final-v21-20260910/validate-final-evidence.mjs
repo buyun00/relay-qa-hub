@@ -97,6 +97,69 @@ const registrationVerificationPath =
   "continuation-20260911/postfix-fd0f0f8/upgrade/registration-readonly.json";
 const notificationProofPath =
   "../desktop-notification-project-route-live/81c44b26-5c6f-47c6-a56a-d4eb27f19d7a/proof.json";
+const currentSourceRoot = "continuation-20260911/current-source-revalidation-fd0f0f8";
+const historicalCurrentSourceSummaryPath = `${currentSourceRoot}/summary.json`;
+const historicalCurrentSourceValidatorPath = `${currentSourceRoot}/verify-current-source-revalidation.mjs`;
+const freshApiMcpProofPath =
+  `${currentSourceRoot}/fresh-api-mcp/cdd86698-1b45-4b1a-bb64-0a03c42b9b66/proof.json`;
+const freshApiMcpAttemptsPath = `${currentSourceRoot}/fresh-api-mcp/attempts-summary.json`;
+const freshApiMcpValidatorPath = `${currentSourceRoot}/verify-fresh-current-source-api-mcp.mjs`;
+const installedLocalMcpProofPath =
+  `${currentSourceRoot}/desktop-local-mcp/0c1282e0-72ed-444d-922f-ca94492a21dd/proof.json`;
+const installedLocalMcpValidatorPath = `${currentSourceRoot}/verify-isolated-installed-local-mcp.mjs`;
+const preexistingRunEvidencePaths = [
+  "../runs/management-2026-09-11T00-47-48-121Z.json",
+  "../runs/http-core-2026-09-11T00-47-56-276Z.json",
+  "../runs/server-mcp-core-2026-09-11T00-48-06-698Z.json",
+];
+const freshRunEvidencePaths = [
+  "../runs/management-2026-09-11T01-27-51-000Z.json",
+  "../runs/http-core-2026-09-11T01-27-51-810Z.json",
+  "../runs/server-mcp-core-2026-09-11T01-27-52-020Z.json",
+];
+const installedLocalMcpRunPath =
+  "../runs/desktop-mcp-core-2026-09-11T00-59-30-586Z.json";
+const authenticodeAuditPath =
+  "../windows-authenticode-current-audit/20260911T005413530Z/audit.json";
+const authenticodeAuditValidatorPath =
+  "../windows-authenticode-current-audit/20260911T005413530Z/validate-audit.mjs";
+const notificationAuditPaths = [
+  "../windows-notification-session-current-audit/20260911T005709Z/current-session-wpn-routing.json",
+  "../windows-notification-session-current-audit/20260911T005709Z/validation.json",
+  "../windows-notification-session-current-audit/20260911T005709Z/README.md",
+  "../windows-notification-session-current-audit/20260911T005709Z/validate-evidence.mjs",
+  "../windows-notification-session-current-audit/20260911T005709Z/capture-readonly.ps1",
+];
+const lunaNotificationAttemptPaths = [
+  "../windows-notification-luna-acceptance/20260911T014720Z/luna-acceptance-attempt.json",
+  "../windows-notification-luna-acceptance/20260911T014720Z/validation.json",
+  "../windows-notification-luna-acceptance/20260911T014720Z/README.md",
+  "../windows-notification-luna-acceptance/20260911T014720Z/validate-evidence.mjs",
+];
+const currentAgentGateReportPath = `${currentSourceRoot}/agent-gates-current.json`;
+const notificationGateEvidencePaths = [
+  notificationProofPath,
+  ...notificationAuditPaths,
+  ...lunaNotificationAttemptPaths,
+];
+const authenticodeLimitationEvidencePaths = [
+  registrationVerificationPath,
+  continuationSummaryPath,
+  authenticodeAuditPath,
+  authenticodeAuditValidatorPath,
+];
+const currentSourceScopedEvidencePaths = [
+  historicalCurrentSourceSummaryPath,
+  historicalCurrentSourceValidatorPath,
+  ...preexistingRunEvidencePaths,
+  freshApiMcpProofPath,
+  freshApiMcpAttemptsPath,
+  freshApiMcpValidatorPath,
+  ...freshRunEvidencePaths,
+  installedLocalMcpProofPath,
+  installedLocalMcpValidatorPath,
+  installedLocalMcpRunPath,
+];
 const retainedAndroidArtifactPath =
   "android/acceptance/android-code28-self-update/artifact-verification.json";
 
@@ -168,6 +231,23 @@ async function assertEvidenceFile(owner, relative) {
 async function regularJson(relative, label) {
   await assertEvidenceFile(label, relative);
   return json(relative);
+}
+
+async function runJsonValidator(relative, label) {
+  const absolute = await repoRegularFile(relative, label);
+  const processResult = spawnSync(process.execPath, [absolute], {
+    cwd: repoRoot,
+    encoding: "utf8",
+    maxBuffer: 32 * 1024 * 1024,
+  });
+  assert.equal(
+    processResult.status,
+    0,
+    `${label} failed: ${processResult.stderr || processResult.stdout}`,
+  );
+  const parsed = JSON.parse(processResult.stdout);
+  assert.equal(parsed.passed, true, `${label} did not pass`);
+  return parsed;
 }
 
 async function validatePassingDesktopNotificationEvidence(evidence) {
@@ -614,6 +694,14 @@ const index = await json("evidence-index.json");
 const continuationSummary = await json(continuationSummaryPath);
 const packageReceipt = await json(packageReceiptPath);
 const registrationVerification = await json(registrationVerificationPath);
+const historicalCurrentSourceSummary = await json(historicalCurrentSourceSummaryPath);
+const freshApiMcpProof = await json(freshApiMcpProofPath);
+const freshApiMcpAttempts = await json(freshApiMcpAttemptsPath);
+const freshServerMcpRun = await json(freshRunEvidencePaths[2]);
+const installedLocalMcpProof = await json(installedLocalMcpProofPath);
+const authenticodeAudit = await json(authenticodeAuditPath);
+const notificationCurrentAudit = await json(notificationAuditPaths[0]);
+const lunaNotificationAttempt = await json(lunaNotificationAttemptPaths[0]);
 const postfixValidatorAbsolute = await repoRegularFile(
   continuationValidatorPath,
   "postfix evidence validator",
@@ -629,20 +717,135 @@ assert.equal(
   `postfix evidence validation failed: ${postfixValidationProcess.stderr}`,
 );
 const postfixValidation = JSON.parse(postfixValidationProcess.stdout);
+const historicalCurrentSourceValidation = await runJsonValidator(
+  historicalCurrentSourceValidatorPath,
+  "historical current-source coexistence validator",
+);
+const freshApiMcpValidation = await runJsonValidator(
+  freshApiMcpValidatorPath,
+  "fresh current-source API/server MCP validator",
+);
+const installedLocalMcpValidation = await runJsonValidator(
+  installedLocalMcpValidatorPath,
+  "installed local MCP validator",
+);
+const authenticodeAuditValidation = await runJsonValidator(
+  authenticodeAuditValidatorPath,
+  "Authenticode limitation audit validator",
+);
+const notificationAuditValidation = await runJsonValidator(
+  notificationAuditPaths[3],
+  "current notification session audit validator",
+);
+const lunaNotificationValidation = await runJsonValidator(
+  lunaNotificationAttemptPaths[3],
+  "Luna native-notification acceptance-attempt validator",
+);
 assert.equal(postfixValidation.passed, true);
 assert.equal(postfixValidation.productSourceCommit, productSourceCommit);
 assert.equal(postfixValidation.releaseId, "20260911T000006100Z");
 assert.equal(postfixValidation.version, "0.2.0-preview.20");
 assert.equal(postfixValidation.notification.productPass, false);
 assert.equal(postfixValidation.notification.classification, "environment_blocker");
-assert.equal(postfixValidation.authenticode.required, true);
-assert.equal(postfixValidation.authenticode.status, "fail");
+assert.equal(historicalCurrentSourceSummary.sourceBinding.runtimeBytesBoundToPinnedSource, false);
+assert.equal(historicalCurrentSourceSummary.scope.currentSourceRevalidationStatus, "not_proven");
+assert.equal(historicalCurrentSourceValidation.passed, true);
+assert.equal(historicalCurrentSourceValidation.overallAcceptanceStatus, "not_complete");
+assert.deepEqual(
+  historicalCurrentSourceValidation.runs.map((run) => run.checks),
+  [96, 15, 13],
+);
+assert.equal(freshApiMcpProof.source.productSourceCommit, productSourceCommit);
+assert.equal(freshApiMcpProof.scope.currentSourceRuntimeBinding, "pass");
+assert.equal(freshApiMcpProof.scope.overallAcceptanceStatus, "not_complete");
+assert.equal(freshApiMcpProof.coverage.eligibleNeedsRevalidationClearCount, 0);
+assert.equal(freshApiMcpValidation.checks, 29);
+assert.equal(freshApiMcpValidation.runId, "cdd86698-1b45-4b1a-bb64-0a03c42b9b66");
+assert.deepEqual(
+  freshApiMcpValidation.runs.map((run) => run.checks),
+  [96, 15, 13],
+);
+assert.equal(freshApiMcpValidation.eligibleNeedsRevalidationClearCount, 0);
+assert.equal(freshApiMcpValidation.overallAcceptanceStatus, "not_complete");
+assert.equal(freshApiMcpValidation.limitations.buildOutputDirectoryWasEmptyBeforeBuild, false);
+assert.equal(freshApiMcpValidation.limitations.fullExpectedOutputsWereEmittedAndByteStable, true);
+assert.equal(freshApiMcpValidation.limitations.safeForUnattendedRerun, false);
+assert.equal(freshApiMcpAttempts.scope.passingAttemptCount, 1);
+assert.equal(freshApiMcpAttempts.scope.eligibleNeedsRevalidationClearCount, 0);
+assert.equal(installedLocalMcpProof.productSourceCommit, productSourceCommit);
+assert.equal(installedLocalMcpProof.scope.localMcpCurrentSourceStatus, "pass");
+assert.equal(installedLocalMcpProof.scope.overallAcceptanceStatus, "not_complete");
+assert.equal(installedLocalMcpValidation.installedVersion, "0.2.0-preview.20");
+assert.equal(installedLocalMcpValidation.localMcpChecks, 13);
+assert.equal(installedLocalMcpValidation.cleanup.exitCode, 0);
+assert.equal(installedLocalMcpValidation.overallAcceptanceStatus, "not_complete");
+assert.equal(authenticodeAuditValidation.checks, 16);
+assert.equal(authenticodeAuditValidation.trustedCodeSigningIdentityCount, 0);
+assert.equal(authenticodeAuditValidation.trialReleaseRequirementEstablishedByV21, false);
+assert.equal(authenticodeAuditValidation.distributionLimitationRecorded, true);
+assert.deepEqual(
+  authenticodeAuditValidation.artifacts.map((artifact) => ({
+    role: artifact.role,
+    sha256: artifact.sha256,
+    status: artifact.authenticodeStatus,
+  })),
+  [
+    {
+      role: "installer",
+      sha256: continuationSummary.release.installer.sha256,
+      status: "NotSigned",
+    },
+    { role: "main", sha256: build20ExeSha256, status: "NotSigned" },
+    {
+      role: "updater",
+      sha256: "1e0ec8e4f74d9dbfca43639f90bb677d0e4d7df817a13331d0beef6c8affef28",
+      status: "NotSigned",
+    },
+    {
+      role: "uninstaller",
+      sha256: "d5b8e3216da3eca98d1e21b388b6dfe020177223ca12424abadc375ede34bf7b",
+      status: "NotSigned",
+    },
+  ],
+);
+assert.equal(authenticodeAudit.certificateAudit.acceptableTrustedCodeSigningIdentityCount, 0);
+assert.equal(authenticodeAudit.conclusion.existingTrustedCodeSigningMaterialUsable, false);
+assert.equal(authenticodeAudit.conclusion.currentArtifactsMayBeSignedInPlace, false);
+assert.equal(notificationAuditValidation.checkCount, 18);
+assert.equal(notificationCurrentAudit.capture.notificationsSubmitted, 0);
+assert.deepEqual(notificationCurrentAudit.capture.productActionsPerformed, []);
+assert.deepEqual(notificationCurrentAudit.capture.sessionActionsPerformed, []);
+assert.deepEqual(notificationCurrentAudit.capture.serviceActionsPerformed, []);
+assert.deepEqual(notificationCurrentAudit.capture.productProcessesStartedOrStopped, []);
+assert.equal(notificationCurrentAudit.conclusion.productPass, false);
+assert.equal(notificationCurrentAudit.conclusion.code, "WINDOWS_TOAST_SESSION_MISMATCH");
+assert.equal(lunaNotificationValidation.checkCount, 9);
+assert.equal(lunaNotificationAttempt.method.computerUseSurface.nativeWindowControlAvailable, false);
+assert.equal(lunaNotificationAttempt.actions.runnerStarted, false);
+assert.equal(lunaNotificationAttempt.actions.notificationsSubmitted, 0);
+assert.equal(lunaNotificationAttempt.actions.nativeToastObserved, false);
+assert.equal(lunaNotificationAttempt.actions.nativeToastClicked, false);
+assert.equal(lunaNotificationAttempt.actions.projectDetailReadback, false);
+assert.deepEqual(lunaNotificationAttempt.actions.sessionActions, []);
+assert.deepEqual(lunaNotificationAttempt.actions.productionOrDailyActions, []);
+assert.equal(lunaNotificationAttempt.verdict.status, "environment_blocker");
+assert.equal(lunaNotificationAttempt.verdict.productPass, false);
+assert.equal(lunaNotificationAttempt.verdict.repeatObservationSuppressed, true);
 assert.equal(
   new Set(acceptance.cases.map((item) => item.id)).size,
   acceptance.cases.length,
   "acceptance case ids must be globally unique",
 );
 const indexedPaths = new Set(index.entries.map((entry) => entry.path));
+const trackedRepoPaths = new Set(
+  execFileSync("git", ["ls-files", "-z"], {
+    cwd: repoRoot,
+    encoding: "utf8",
+    maxBuffer: 32 * 1024 * 1024,
+  })
+    .split("\0")
+    .filter(Boolean),
+);
 const assertIndexedWhenInRoot = (owner, evidence) => {
   const absolute = repoContainedPath(evidence, owner);
   const relativeToRoot = path.relative(root, absolute).split(path.sep).join("/");
@@ -650,6 +853,25 @@ const assertIndexedWhenInRoot = (owner, evidence) => {
     assert.equal(indexedPaths.has(relativeToRoot), true, `${owner}: evidence omitted from index: ${evidence}`);
   }
 };
+const assertTrackedEvidence = (owner, evidence) => {
+  const absolute = repoContainedPath(evidence, owner);
+  const relativeToRepo = path.relative(repoRoot, absolute).split(path.sep).join("/");
+  assert.equal(
+    trackedRepoPaths.has(relativeToRepo),
+    true,
+    `${owner}: evidence is not tracked: ${evidence}`,
+  );
+};
+for (const evidence of [
+  ...currentSourceScopedEvidencePaths,
+  currentAgentGateReportPath,
+  ...authenticodeLimitationEvidencePaths,
+  ...notificationGateEvidencePaths,
+]) {
+  await assertEvidenceFile("current integration evidence", evidence);
+  assertTrackedEvidence("current integration evidence", evidence);
+  assertIndexedWhenInRoot("current integration evidence", evidence);
+}
 
 assert.equal(acceptance.productSourceCommit, productSourceCommit);
 assert.equal(acceptance.overallStatus, "not_complete");
@@ -667,13 +889,13 @@ assert.equal(acceptance.artifacts.windows.releaseId, continuationSummary.release
 assert.equal(acceptance.artifacts.windows.version, continuationSummary.release.version);
 assert.equal(acceptance.artifacts.windows.sha256, continuationSummary.release.installer.sha256);
 assert.deepEqual(acceptance.artifacts.windows.authenticode, {
-  required: true,
-  status: "fail",
+  requiredForV21InternalTrial: false,
+  status: "not_signed",
   observed: "NotSigned",
   signer: null,
   timestamper: null,
-  completionImpact: "blocks_agent_scope_completion",
-  evidence: [registrationVerificationPath, continuationSummaryPath],
+  completionImpact: "does_not_block_internal_isolated_trial",
+  evidence: authenticodeLimitationEvidencePaths,
 });
 assert.equal(packageReceipt.sourceCommit, productSourceCommit);
 assert.equal(packageReceipt.sourceDirty, false);
@@ -719,13 +941,27 @@ assert.deepEqual(
   "only the six named cases may be delegated to the user",
 );
 
-const authenticodeCase = acceptance.cases.find((item) => item.id === "windows-authenticode");
-assert.ok(authenticodeCase, "missing required Windows Authenticode gate");
-assert.equal(authenticodeCase.status, "fail");
-assert.equal(authenticodeCase.owner, "agent");
-assert.equal(authenticodeCase.completionImpact, "blocks_agent_scope_completion");
-assert.match(authenticodeCase.detail, /NotSigned/u);
-assert.deepEqual(authenticodeCase.evidence, [registrationVerificationPath, continuationSummaryPath]);
+assert.equal(
+  acceptance.cases.some((item) => item.id === "windows-authenticode"),
+  false,
+  "Authenticode is not a v2.1 internal-trial acceptance gate",
+);
+assert.equal(acceptance.knownLimitations.length, 1);
+const authenticodeLimitation = acceptance.knownLimitations[0];
+assert.equal(authenticodeLimitation.id, "windows-authenticode");
+assert.equal(authenticodeLimitation.status, "not_signed");
+assert.equal(authenticodeLimitation.requiredForV21InternalTrial, false);
+assert.equal(
+  authenticodeLimitation.completionImpact,
+  "does_not_block_internal_isolated_trial",
+);
+assert.match(authenticodeLimitation.detail, /NotSigned/u);
+assert.match(authenticodeLimitation.detail, /do not make Authenticode a required/u);
+assert.deepEqual(authenticodeLimitation.evidence, authenticodeLimitationEvidencePaths);
+for (const evidence of authenticodeLimitation.evidence) {
+  await assertEvidenceFile("windows-authenticode limitation", evidence);
+  assertIndexedWhenInRoot("windows-authenticode limitation", evidence);
+}
 
 const serverMcp = acceptance.cases.find(
   (item) => item.id === "server-mcp-catalog-and-business-subset",
@@ -739,7 +975,76 @@ assert.equal(
 assert.equal(serverMcp.claimScope, "catalog_and_executed_business_subset");
 assert.equal(serverMcp.catalogToolCountObserved, 96);
 assert.ok(serverMcp.executedBusinessSubset.length > 0 && serverMcp.executedBusinessSubset.length < 96);
-assert.match(serverMcp.detail, /catalog size does not establish per-tool business E2E/u);
+assert.match(serverMcp.detail, /does not establish per-tool business E2E/u);
+
+const currentSourceRevalidation = acceptance.currentSourceRevalidation;
+assert.equal(currentSourceRevalidation.schemaVersion, 1);
+assert.equal(currentSourceRevalidation.sourceCommit, productSourceCommit);
+assert.deepEqual(currentSourceRevalidation.historicalPreexistingRuntime, {
+  status: "not_proven",
+  reason: historicalCurrentSourceSummary.sourceBinding.runtimeBindingStatus,
+  evidence: [
+    historicalCurrentSourceSummaryPath,
+    historicalCurrentSourceValidatorPath,
+    ...preexistingRunEvidencePaths,
+  ],
+});
+assert.deepEqual(currentSourceRevalidation.freshApiAndServerMcp, {
+  status: "pass",
+  runId: freshApiMcpValidation.runId,
+  checks: 124,
+  buildOutputMode: "shared_existing_dist_full_expected_emit",
+  emptyOutputDirectoryBuild: false,
+  fullExpectedOutputsEmittedAndByteStable: true,
+  evidence: [
+    freshApiMcpProofPath,
+    freshApiMcpAttemptsPath,
+    freshApiMcpValidatorPath,
+    ...freshRunEvidencePaths,
+  ],
+});
+assert.deepEqual(currentSourceRevalidation.installedLocalMcp, {
+  status: "pass",
+  runId: installedLocalMcpValidation.runId,
+  version: "0.2.0-preview.20",
+  checks: 13,
+  evidence: [installedLocalMcpProofPath, installedLocalMcpValidatorPath, installedLocalMcpRunPath],
+});
+assert.deepEqual(currentSourceRevalidation.coverageDisposition, {
+  eligibleNeedsRevalidationClearCount: 0,
+  clearsWholeCoverageMatrix: false,
+  inventoryNeedsRevalidationCount: 637,
+  reason:
+    "The inventory is cumulative and item-level. Scoped runtime passes are retained as evidence but do not silently relabel historical, delegated, duplicate, or branch-specific rows.",
+});
+assert.equal(currentSourceRevalidation.externalComponentsExecuted, false);
+assert.equal(currentSourceRevalidation.userOnlyGatesExecuted, false);
+assert.equal(currentSourceRevalidation.overallAcceptanceStatus, "not_complete");
+assert.equal(currentSourceRevalidation.completionAllowed, false);
+assert.deepEqual(currentSourceRevalidation.evidence, currentSourceScopedEvidencePaths);
+const httpApiCase = acceptance.cases.find((item) => item.id === "http-api-schema20-business");
+assert.ok(httpApiCase);
+assert.ok(httpApiCase.evidence.includes(freshApiMcpProofPath));
+assert.ok(httpApiCase.evidence.includes(freshApiMcpValidatorPath));
+assert.ok(httpApiCase.evidence.includes(freshRunEvidencePaths[1]));
+assert.ok(serverMcp.evidence.includes(freshApiMcpProofPath));
+assert.ok(serverMcp.evidence.includes(freshApiMcpValidatorPath));
+assert.ok(serverMcp.evidence.includes(freshRunEvidencePaths[2]));
+const windowsLocalMcpCase = acceptance.cases.find(
+  (item) => item.id === "windows-built-in-update-and-local-mcp",
+);
+assert.ok(windowsLocalMcpCase);
+assert.ok(windowsLocalMcpCase.evidence.includes(installedLocalMcpProofPath));
+assert.ok(windowsLocalMcpCase.evidence.includes(installedLocalMcpValidatorPath));
+assert.ok(windowsLocalMcpCase.evidence.includes(installedLocalMcpRunPath));
+const coexistenceCase = acceptance.cases.find(
+  (item) => item.id === "production-and-preview-coexistence",
+);
+assert.ok(coexistenceCase);
+assert.ok(coexistenceCase.evidence.includes(freshApiMcpProofPath));
+assert.ok(coexistenceCase.evidence.includes(freshApiMcpAttemptsPath));
+assert.ok(coexistenceCase.evidence.includes(installedLocalMcpProofPath));
+assert.ok(coexistenceCase.evidence.includes(lunaNotificationAttemptPaths[0]));
 
 assert.equal(acceptance.agentRevalidation.sourceCommit, productSourceCommit);
 assert.ok(acceptance.agentRevalidation.requiredGateIds.length > 0);
@@ -790,6 +1095,12 @@ if (acceptance.agentRevalidation.reportSupplied) {
     })),
   );
   assert.equal(report.passed, report.gates.every((gate) => gate.status === "pass"));
+  assert.equal(report.passed, false);
+  assert.equal(report.overallAcceptanceStatus, "not_complete");
+  assert.equal(report.completionAllowed, false);
+  assert.equal(report.gates[0].classification, "environment_blocker");
+  assert.equal(report.gates[0].productPass, false);
+  assert.deepEqual(report.gates[0].evidence, notificationGateEvidencePaths);
 }
 for (const gate of acceptance.agentRevalidation.gates) {
   assert.ok(["pass", "fail", "not_run", "pending"].includes(gate.status));
@@ -820,15 +1131,24 @@ assert.ok(notificationGate);
 assert.equal(notificationGate.status, "fail");
 assert.equal(notificationGate.classification, "environment_blocker");
 assert.equal(notificationGate.productPass, false);
-assert.deepEqual(notificationGate.evidence, [notificationProofPath, continuationSummaryPath]);
+assert.deepEqual(notificationGate.evidence, notificationGateEvidencePaths);
 assert.equal(notificationGate.semanticProof, notificationProofPath);
-assert.equal(acceptance.agentRevalidation.reportSupplied, false);
-assert.equal(acceptance.agentRevalidation.report, null);
+assert.equal(acceptance.agentRevalidation.reportSupplied, true);
+assert.equal(acceptance.agentRevalidation.report, currentAgentGateReportPath);
 assert.equal(acceptance.agentRevalidation.allRequiredGatesPassed, false);
 const delegatedSet = new Set(delegatedIds);
 const nonUserCaseFailures = acceptance.cases.filter(
   (item) =>
     !delegatedSet.has(item.id) && item.id !== "final-source-gate" && item.status !== "pass",
+);
+assert.deepEqual(nonUserCaseFailures, []);
+assert.equal(
+  acceptance.agentRevalidation.gates.some((gate) => gate.id === "windows-authenticode"),
+  false,
+);
+assert.equal(
+  acceptance.agentRevalidation.requiredGateIds.includes("windows-authenticode"),
+  false,
 );
 const allReportedAgentGatesPassed = acceptance.agentRevalidation.gates.every(
   (gate) => gate.status === "pass",
@@ -859,9 +1179,6 @@ const expectedAgentBlocking = [
     owner: "agent",
     completionImpact: "blocks_agent_scope_completion",
     evidence: [...(item.evidence ?? [])],
-    ...(item.id === "windows-authenticode"
-      ? { classification: "required_artifact_signature", required: true, observed: "NotSigned" }
-      : {}),
   })),
   ...acceptance.agentRevalidation.gates
     .filter((gate) => gate.status !== "pass")
@@ -888,7 +1205,14 @@ assert.equal(acceptance.sourceGate.allRequiredAgentGatesPassed, false);
 assert.equal(finalSourceCase.status, "partial");
 assert.deepEqual(
   acceptance.agentBlocking.map((item) => item.id).sort(),
-  ["desktop-notification-project-route-live", "windows-authenticode"],
+  ["desktop-notification-project-route-live"],
+);
+assert.equal(acceptance.agentBlocking.some((item) => item.id === "windows-authenticode"), false);
+assert.equal(
+  acceptance.blocking.some(
+    (item) => item.id === "windows-authenticode" && item.owner === "agent",
+  ),
+  false,
 );
 assert.ok(
   acceptance.blocking.some(
@@ -910,11 +1234,25 @@ for (const evidence of acceptance.sourceGate.evidence) {
   await assertEvidenceFile("source-gate", evidence);
   assertIndexedWhenInRoot("source-gate", evidence);
 }
+for (const evidence of [
+  ...currentSourceScopedEvidencePaths,
+  currentAgentGateReportPath,
+  ...notificationGateEvidencePaths,
+]) {
+  assert.ok(acceptance.sourceGate.evidence.includes(evidence), `source gate omitted ${evidence}`);
+  assert.ok(finalSourceCase.evidence.includes(evidence), `final source case omitted ${evidence}`);
+}
 
 const coverage = await json("../coverage-matrix.json", "coverage matrix");
 assert.match(coverage.sourceHead, /^[a-f0-9]{40}$/u);
 assert.equal(coverage.summary.itemCount, coverage.items.length);
 assert.ok(Array.isArray(coverage.retiredItems));
+assert.equal(coverage.items.length, 1030);
+assert.equal(coverage.retiredItems.length, 47);
+assert.equal(coverage.items.filter((item) => item.needsRevalidation === true).length, 637);
+assert.equal(acceptance.fineGrainedCoverage.items, 1030);
+assert.equal(acceptance.fineGrainedCoverage.retiredItems, 47);
+assert.equal(acceptance.fineGrainedCoverage.needsRevalidation, 637);
 const coverageDiff = spawnSync(
   "git",
   ["diff", "--quiet", productSourceCommit, coverage.sourceHead, "--", ...productSourceRoots],
@@ -1026,15 +1364,22 @@ assert.deepEqual(
   [96, 96],
   "MCP tool counts validate catalog size only",
 );
-const executedMcpTools = [
+const historicalExecutedMcpTools = [
   ...new Set(
     mcp.results.flatMap((result) =>
       result.calls.filter((call) => call.toolName).map((call) => call.toolName),
     ),
   ),
 ].sort();
-assert.deepEqual(executedMcpTools, ["qa_list_bugs", "qa_list_projects", "qa_login"]);
-assert.deepEqual([...serverMcp.executedBusinessSubset].sort(), executedMcpTools);
+assert.deepEqual(historicalExecutedMcpTools, ["qa_list_bugs", "qa_list_projects", "qa_login"]);
+const currentExecutedMcpTools = [
+  ...new Set(
+    freshServerMcpRun.checks
+      .filter((check) => check.method === "tools/call" && check.tool)
+      .map((check) => check.tool),
+  ),
+].sort();
+assert.deepEqual([...serverMcp.executedBusinessSubset].sort(), currentExecutedMcpTools);
 
 assert.equal(index.schemaVersion, 2);
 assert.equal(index.root, rootFromRepo);
@@ -1124,7 +1469,8 @@ const result = {
   serverMcpEvidenceScope: {
     claim: "catalog_and_executed_business_subset",
     catalogToolCountsObserved: mcp.results.map((item) => item.toolCount),
-    executedTools: executedMcpTools,
+    historicalExecutedTools: historicalExecutedMcpTools,
+    currentSourceExecutedTools: currentExecutedMcpTools,
     allCatalogToolsBusinessValidated: false,
   },
   credentialsPersisted: false,

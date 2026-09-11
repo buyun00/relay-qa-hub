@@ -1,0 +1,351 @@
+{
+  "schemaVersion": 1,
+  "auditType": "windows_authenticode_current_state",
+  "capturedAtUtc": "2026-09-11T00:54:13.5305856Z",
+  "source": {
+    "repository": "Relay-QA-Hub",
+    "head": "5bfc60fe4f8fcf2f5cbe15b14184b1ba28229084",
+    "evidencePath": "docs/evidence/project-components/windows-authenticode-current-audit/20260911T005413530Z/audit.json"
+  },
+  "safety": {
+    "productExecuted": false,
+    "artifactModified": false,
+    "certificateCreated": false,
+    "certificateStoreModified": false,
+    "privateKeyReadOrExported": false,
+    "secretEnvironmentValuesRecorded": false,
+    "repackaged": false
+  },
+  "certificateAudit": {
+    "standardPersonalStores": [
+      {
+        "store": "Cert:\\CurrentUser\\My",
+        "totalCertificates": 1,
+        "certificatesWithPrivateKey": 1,
+        "privateKeyCertificatesAllowingCodeSigning": 0,
+        "currentlyValidTrustedPrivateKeyCandidates": 0
+      },
+      {
+        "store": "Cert:\\LocalMachine\\My",
+        "totalCertificates": 0,
+        "certificatesWithPrivateKey": 0,
+        "privateKeyCertificatesAllowingCodeSigning": 0,
+        "currentlyValidTrustedPrivateKeyCandidates": 0
+      }
+    ],
+    "allPrivateKeyCertificatePublicMetadata": [
+      {
+        "store": "CurrentUser\\Root",
+        "subject": "CN=win11-lin-main",
+        "issuer": "CN=win11-lin-main",
+        "thumbprint": "AC95504B683894F30B66113EBBED56505AFEC351",
+        "notBefore": "2026-07-21T04:27:25.0000000Z",
+        "notAfter": "3025-11-21T04:27:25.0000000Z",
+        "currentlyValid": true,
+        "hasPrivateKey": true,
+        "selfSignedSubjectIssuerMatch": true,
+        "eku": {
+          "extensionPresent": true,
+          "oids": [
+            "1.3.6.1.5.5.7.3.1"
+          ],
+          "allowsCodeSigning": false,
+          "basis": "different_eku"
+        },
+        "trustChain": {
+          "trusted": true,
+          "revocationMode": "NoCheck",
+          "status": []
+        },
+        "acceptableTrustedCodeSigningIdentity": false
+      },
+      {
+        "store": "CurrentUser\\My",
+        "subject": "CN=localhost",
+        "issuer": "CN=localhost",
+        "thumbprint": "46F0CFDF2637416BA5B157A52A2E27B4D08BA228",
+        "notBefore": "2026-07-28T09:00:43.0000000Z",
+        "notAfter": "2027-07-28T09:00:43.0000000Z",
+        "currentlyValid": true,
+        "hasPrivateKey": true,
+        "selfSignedSubjectIssuerMatch": true,
+        "eku": {
+          "extensionPresent": true,
+          "oids": [
+            "1.3.6.1.5.5.7.3.1"
+          ],
+          "allowsCodeSigning": false,
+          "basis": "different_eku"
+        },
+        "trustChain": {
+          "trusted": false,
+          "revocationMode": "NoCheck",
+          "status": [
+            "UntrustedRoot"
+          ]
+        },
+        "acceptableTrustedCodeSigningIdentity": false
+      },
+      {
+        "store": "LocalMachine\\Remote Desktop",
+        "subject": "CN=win11-lin-main",
+        "issuer": "CN=win11-lin-main",
+        "thumbprint": "89709AE1FC556E5531C2300777AF1AA0DA7FC0EE",
+        "notBefore": "2026-07-21T03:03:13.0000000Z",
+        "notAfter": "2027-01-20T03:03:13.0000000Z",
+        "currentlyValid": true,
+        "hasPrivateKey": true,
+        "selfSignedSubjectIssuerMatch": true,
+        "eku": {
+          "extensionPresent": true,
+          "oids": [
+            "1.3.6.1.5.5.7.3.1"
+          ],
+          "allowsCodeSigning": false,
+          "basis": "different_eku"
+        },
+        "trustChain": {
+          "trusted": false,
+          "revocationMode": "NoCheck",
+          "status": [
+            "UntrustedRoot"
+          ]
+        },
+        "acceptableTrustedCodeSigningIdentity": false
+      },
+      {
+        "store": "LocalMachine\\Shielded VM Local Certificates",
+        "subject": "CN=Shielded VM Encryption Certificate (UntrustedGuardian) (win11-lin-main)",
+        "issuer": "CN=Shielded VM Encryption Certificate (UntrustedGuardian) (win11-lin-main)",
+        "thumbprint": "C5A046FEA5C78A31760037909F063502202CB6A0",
+        "notBefore": "2026-07-22T07:27:47.0000000Z",
+        "notAfter": "2036-07-22T07:27:47.0000000Z",
+        "currentlyValid": true,
+        "hasPrivateKey": true,
+        "selfSignedSubjectIssuerMatch": true,
+        "eku": {
+          "extensionPresent": false,
+          "oids": [],
+          "allowsCodeSigning": true,
+          "basis": "no_eku_restriction"
+        },
+        "trustChain": {
+          "trusted": false,
+          "revocationMode": "NoCheck",
+          "status": [
+            "UntrustedRoot"
+          ]
+        },
+        "acceptableTrustedCodeSigningIdentity": false
+      },
+      {
+        "store": "LocalMachine\\Shielded VM Local Certificates",
+        "subject": "CN=Shielded VM Signing Certificate (UntrustedGuardian) (win11-lin-main)",
+        "issuer": "CN=Shielded VM Signing Certificate (UntrustedGuardian) (win11-lin-main)",
+        "thumbprint": "311A679807D7BEBB03E8BF1BEAC0122C6F05CAD4",
+        "notBefore": "2026-07-22T07:27:47.0000000Z",
+        "notAfter": "2036-07-22T07:27:47.0000000Z",
+        "currentlyValid": true,
+        "hasPrivateKey": true,
+        "selfSignedSubjectIssuerMatch": true,
+        "eku": {
+          "extensionPresent": false,
+          "oids": [],
+          "allowsCodeSigning": true,
+          "basis": "no_eku_restriction"
+        },
+        "trustChain": {
+          "trusted": false,
+          "revocationMode": "NoCheck",
+          "status": [
+            "UntrustedRoot"
+          ]
+        },
+        "acceptableTrustedCodeSigningIdentity": false
+      },
+      {
+        "store": "LocalMachine\\Root",
+        "subject": "CN=win11-lin-main",
+        "issuer": "CN=win11-lin-main",
+        "thumbprint": "AC95504B683894F30B66113EBBED56505AFEC351",
+        "notBefore": "2026-07-21T04:27:25.0000000Z",
+        "notAfter": "3025-11-21T04:27:25.0000000Z",
+        "currentlyValid": true,
+        "hasPrivateKey": true,
+        "selfSignedSubjectIssuerMatch": true,
+        "eku": {
+          "extensionPresent": true,
+          "oids": [
+            "1.3.6.1.5.5.7.3.1"
+          ],
+          "allowsCodeSigning": false,
+          "basis": "different_eku"
+        },
+        "trustChain": {
+          "trusted": true,
+          "revocationMode": "NoCheck",
+          "status": []
+        },
+        "acceptableTrustedCodeSigningIdentity": false
+      }
+    ],
+    "acceptableTrustedCodeSigningIdentityCount": 0,
+    "chainEvaluationNote": "Trust-chain checks use NoCheck revocation mode only; no candidate reached trusted code-signing eligibility."
+  },
+  "signingConfiguration": {
+    "matchingEnvironmentVariableNames": [],
+    "matchingEnvironmentVariableCount": 0,
+    "environmentVariableValuesInspectedOrRecorded": false,
+    "repositoryCredentialFiles": [],
+    "repositoryCredentialFileCount": 0,
+    "authenticodeBuildConfigurationPresent": false,
+    "buildFlowReferences": [
+      "apps/desktop/scripts/package-windows.ps1:113",
+      "apps/desktop/scripts/package-windows.ps1:121",
+      "apps/desktop/scripts/build-installer.ps1:51",
+      "apps/desktop/scripts/build-installer.ps1:63"
+    ],
+    "separateEd25519UpdateManifestKey": {
+      "configuredPathExists": true,
+      "keyContentOrDigestRead": false,
+      "providesAuthenticodeIdentity": false,
+      "documentation": [
+        "README.md:199",
+        "README.md:202",
+        "PROGRESS.md:21"
+      ]
+    }
+  },
+  "tooling": {
+    "signToolOnPath": false,
+    "pathSignTool": null,
+    "vendoredMicrosoftSignedSignTool": {
+      "path": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\node_modules\\@electron\\windows-sign\\vendor\\signtool.exe",
+      "repoRelativePath": "node_modules/@electron/windows-sign/vendor/signtool.exe",
+      "bytes": 459216,
+      "sha256": "a36f5e81ce208137acc8fa9c00547c020fa10f044583002ccd23799b7f64078e",
+      "fileVersion": "4.00 (WinBuild.160101.0800)",
+      "productName": "Microsoft® Windows® Operating System",
+      "companyName": "Microsoft Corporation",
+      "authenticodeStatus": "Valid",
+      "signerSubject": "CN=Microsoft Corporation, O=Microsoft Corporation, L=Redmond, S=Washington, C=US",
+      "signerThumbprint": "914A09C2E02C696AF394048BCB8D95449BCD5B9E",
+      "capabilities": {
+        "fileDigest": true,
+        "rfc3161Timestamp": true,
+        "timestampDigest": true,
+        "certificateThumbprintSelection": true
+      }
+    },
+    "setAuthenticodeSignatureAvailable": true,
+    "setAuthenticodeSignatureSource": "Microsoft.PowerShell.Security",
+    "missingAlternativeCommands": [
+      "AzureSignTool.exe",
+      "osslsigncode.exe",
+      "jsign.exe"
+    ]
+  },
+  "artifacts": [
+    {
+      "role": "installer",
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-v21-e2e-fresh-0910\\downloads\\qa-hub-preview-v21-e2e-fresh-0910-windows-0.2.0-preview.20-20260911T000006100Z.exe",
+      "exists": true,
+      "bytes": 107992506,
+      "sha256": "e0e68a626657f4431447764d96f0cf95ded8b6b081c8b13f809ccacd252e7e41",
+      "getAuthenticodeSignature": {
+        "status": "NotSigned",
+        "signerSubject": null,
+        "signerThumbprint": null,
+        "timestamperSubject": null
+      },
+      "signToolVerify": {
+        "policy": "/pa",
+        "allSignatures": true,
+        "exitCode": 1,
+        "noSignatureFound": true
+      }
+    },
+    {
+      "role": "main",
+      "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview-v21-e2e-fresh-0910\\RelayQaHubPreview-v21-e2e-fresh-0910.exe",
+      "exists": true,
+      "bytes": 235871744,
+      "sha256": "47e3d83120f29a6b2e0dc1fa54a2de6327c15c21620999b421b615a346e1fbac",
+      "getAuthenticodeSignature": {
+        "status": "NotSigned",
+        "signerSubject": null,
+        "signerThumbprint": null,
+        "timestamperSubject": null
+      },
+      "signToolVerify": {
+        "policy": "/pa",
+        "allSignatures": true,
+        "exitCode": 1,
+        "noSignatureFound": true
+      }
+    },
+    {
+      "role": "updater",
+      "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview-v21-e2e-fresh-0910\\RelayQaHubUpdater.exe",
+      "exists": true,
+      "bytes": 422326,
+      "sha256": "1e0ec8e4f74d9dbfca43639f90bb677d0e4d7df817a13331d0beef6c8affef28",
+      "getAuthenticodeSignature": {
+        "status": "NotSigned",
+        "signerSubject": null,
+        "signerThumbprint": null,
+        "timestamperSubject": null
+      },
+      "signToolVerify": {
+        "policy": "/pa",
+        "allSignatures": true,
+        "exitCode": 1,
+        "noSignatureFound": true
+      }
+    },
+    {
+      "role": "uninstaller",
+      "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview-v21-e2e-fresh-0910\\Uninstall-Preview.exe",
+      "exists": true,
+      "bytes": 419609,
+      "sha256": "d5b8e3216da3eca98d1e21b388b6dfe020177223ca12424abadc375ede34bf7b",
+      "getAuthenticodeSignature": {
+        "status": "NotSigned",
+        "signerSubject": null,
+        "signerThumbprint": null,
+        "timestamperSubject": null
+      },
+      "signToolVerify": {
+        "policy": "/pa",
+        "allSignatures": true,
+        "exitCode": 1,
+        "noSignatureFound": true
+      }
+    }
+  ],
+  "conclusion": {
+    "existingTrustedCodeSigningMaterialUsable": false,
+    "requiresUserOrCaProvidedExternalSigningIdentity": true,
+    "blockerCode": "TRUSTED_CODE_SIGNING_IDENTITY_MISSING",
+    "toolingBlocker": false,
+    "artifactStatus": "all_required_windows_executables_not_signed",
+    "currentArtifactsMayBeSignedInPlace": false,
+    "reason": "Signing changes released bytes; the product must be rebuilt and all manifests, hashes, receipts and publication evidence regenerated."
+  },
+  "missingMaterials": [
+    "CA-issued certificate with Code Signing EKU and a currently valid trusted chain, or an approved hardware/cloud signing identity",
+    "Secure private-key access mechanism; no private key or password may be committed to the repository or evidence",
+    "Approved RFC3161 timestamp service URL",
+    "Expected signer identity binding (certificate thumbprint or signing-service profile)"
+  ],
+  "nextFailClosedGates": [
+    "Provision only a secure reference to the external signing identity; never place private-key bytes or passwords in source, command output, logs or evidence.",
+    "Before signing, verify Code Signing EKU, validity interval, trusted chain and private-key/provider accessibility; abort if any check fails.",
+    "Sign the packaged main executable and RelayQaHubUpdater.exe before creating the release archive or installer.",
+    "Configure NSIS uninstaller signing and require the installed uninstaller signature to validate.",
+    "Sign the final installer after NSIS creation with SHA-256 and an RFC3161 SHA-256 timestamp.",
+    "Require Get-AuthenticodeSignature status Valid and SignTool verify /pa /all success for installer, main, updater and installed uninstaller, with the expected signer identity and a timestamp.",
+    "Rebuild and republish from the frozen source; regenerate archive and installer SHA-256, Ed25519 manifest, receipts and publication evidence after Authenticode signing.",
+    "Do not mutate or relabel the currently published unsigned artifacts."
+  ]
+}

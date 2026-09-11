@@ -1,0 +1,88 @@
+{
+  "schemaVersion": 1,
+  "kind": "windows-notification-luna-acceptance-attempt",
+  "capturedAt": "2026-09-11T01:47:20.1417025Z",
+  "scope": {
+    "version": "0.2.0-preview.20",
+    "sourceCommit": "fd0f0f850f907b8a77aac8ec8b6a71b308bdd711",
+    "instanceId": "qa-hub-preview-v21-e2e-fresh-0910",
+    "installedAppPid": 22020,
+    "installedAppSessionId": 2,
+    "desktopMcpPort": 4642,
+    "cdpPort": 9433
+  },
+  "method": {
+    "intended": [
+      "real native Windows toast visible",
+      "real toast click",
+      "click-driven project detail/API readback"
+    ],
+    "runnerReuse": "desktop-notification-project-route-live",
+    "computerUseSurface": {
+      "api": "cua.getState",
+      "appsReturned": 0,
+      "browserSurfacesReturned": 1,
+      "nativeWindowControlAvailable": false
+    }
+  },
+  "actions": {
+    "runnerStarted": false,
+    "notificationsSubmitted": 0,
+    "nativeToastObserved": false,
+    "nativeToastClicked": false,
+    "projectDetailReadback": false,
+    "projectApiReadback": false,
+    "sessionActions": [],
+    "productionOrDailyActions": [],
+    "reasonStopped": "WINDOWS_TOAST_SESSION_MISMATCH"
+  },
+  "observations": {
+    "installedPreviewProcesses": [
+      { "pid": 22020, "parentPid": 24648, "sessionId": 2 },
+      { "pid": 26808, "parentPid": 22020, "sessionId": 2 },
+      { "pid": 15516, "parentPid": 22020, "sessionId": 2 },
+      { "pid": 26612, "parentPid": 22020, "sessionId": 2 }
+    ],
+    "listeners": [
+      { "port": 4642, "ownerPid": 22020 },
+      { "port": 9433, "ownerPid": 22020 }
+    ],
+    "currentSessionAudit": {
+      "runnerSessionId": 2,
+      "activeConsoleSessionId": 1,
+      "runnerHasExplorerAndShellExperienceHost": true,
+      "activeConsoleHasLoggedOnUser": false,
+      "activeConsoleHasExplorerAndShellExperienceHost": false,
+      "wpnCompleteChainCount": 275,
+      "wpnDestinationSessionCounts": [{ "sessionId": 1, "count": 275 }],
+      "appObserverWpnSameSessionGateReady": false
+    }
+  },
+  "verdict": {
+    "status": "environment_blocker",
+    "productPass": false,
+    "code": "WINDOWS_TOAST_SESSION_MISMATCH",
+    "exactBlocker": "Installed app and observer are in RDP Session 2, while correlated WPN delivery/presentation events target physical console Session 1.",
+    "repeatObservationSuppressed": true,
+    "finalMatrixModified": false
+  },
+  "minimumRetestConditions": [
+    "Use one unlocked interactive user session with the installed EXE, native submitter, and UIAutomation observer together.",
+    "Require correlated WPN 3052 and 3153 SessionId to equal both app and observer session before creating business fixtures.",
+    "Have the owner gracefully close the pre-existing isolated preview before a runner-owned attempt; leave production and daily clients untouched."
+  ],
+  "evidenceAnchors": {
+    "runnerProof": {
+      "pathTail": "desktop-notification-project-route-live/81c44b26-5c6f-47c6-a56a-d4eb27f19d7a/proof.json",
+      "bytes": 56423,
+      "sha256": "1c571b31b9152a653ad1ce25ab6fb7c80a1be7735cb01207c6fe61cf3751db3d",
+      "passed": false
+    },
+    "sessionAudit": {
+      "pathTail": "windows-notification-session-current-audit/20260911T005709Z/current-session-wpn-routing.json",
+      "bytes": 17984,
+      "sha256": "574e8562949ca4979e488cde96c5344605c27a0c8fb5c7574717076dc841681c",
+      "productPass": false
+    }
+  }
+}

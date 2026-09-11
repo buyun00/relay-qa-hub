@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "kind": "windows-notification-luna-acceptance-validation",
+  "passed": true,
+  "checkCount": 9,
+  "failureCount": 0,
+  "checks": [
+    { "id": "schema", "passed": true },
+    { "id": "scope", "passed": true },
+    { "id": "no-product-action", "passed": true },
+    { "id": "current-process-session", "passed": true },
+    { "id": "current-wpn-session-gate", "passed": true },
+    { "id": "fail-closed-verdict", "passed": true },
+    { "id": "minimum-conditions", "passed": true },
+    { "id": "runner-proof-anchor", "passed": true },
+    { "id": "session-audit-anchor", "passed": true }
+  ],
+  "validatedBy": "validate-evidence.mjs",
+  "validatedAt": "2026-09-11T01:47:20.1417025Z"
+}

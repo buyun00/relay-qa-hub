@@ -1,0 +1,49 @@
+{
+  "schemaVersion": 1,
+  "kind": "fresh-current-source-failed-attempt-post-shell-finalization",
+  "runId": "d3b792a6-7837-4c60-ba91-fe78b2d5dbd1",
+  "observedAt": "2026-09-11T01:35:25.207Z",
+  "originalFailure": {
+    "path": "docs/evidence/project-components/final-v21-20260910/continuation-20260911/current-source-revalidation-fd0f0f8/fresh-api-mcp/d3b792a6-7837-4c60-ba91-fe78b2d5dbd1/failed-attempt.json",
+    "bytes": 1190,
+    "sha256": "a372eecc6e0621e73b461d2ad4f725189690bd96587e22971e2b47a9a209ca48"
+  },
+  "originalState": {
+    "processPresentAfterHarnessCleanup": true,
+    "ownedPortsRemaining": [
+      57066,
+      57070
+    ],
+    "cleanupReceipt": null
+  },
+  "laterReadOnlyObservation": {
+    "ownedPid": 18628,
+    "processPresent": false,
+    "ownedPorts": [
+      57066,
+      57067,
+      57068,
+      57069,
+      57070,
+      57071
+    ],
+    "listenersPresent": [],
+    "stdout": {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-fd0f0f8-current-source\\d3b792a6-7837-4c60-ba91-fe78b2d5dbd1\\qa-hub-preview-fd0f0f8-d3b792a6\\logs\\api.stdout.log",
+      "bytes": 807,
+      "sha256": "48b49a08bfbb0680ccb05d191115d652b4044b32c590ffe01cc0f7061138211b"
+    },
+    "stderr": {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-fd0f0f8-current-source\\d3b792a6-7837-4c60-ba91-fe78b2d5dbd1\\qa-hub-preview-fd0f0f8-d3b792a6\\logs\\api.stderr.log",
+      "bytes": 168,
+      "sha256": "b25f666de4cf86f7cbb35dae2f38fd36737009a0f2042b4edcb1cd964e3acf95"
+    },
+    "apiStartLogPresent": true,
+    "gracefulShutdownLogPresent": false
+  },
+  "finalizationAssessment": "The PTY ended after the harness failure and the owned process later disappeared, but no product shutdown log or cleanup receipt exists. Finalization is therefore recorded as abrupt_or_unknown rather than graceful.",
+  "runtimeRetained": true,
+  "userOnlyGatesExecuted": false,
+  "completionAllowed": false,
+  "passed": false
+}

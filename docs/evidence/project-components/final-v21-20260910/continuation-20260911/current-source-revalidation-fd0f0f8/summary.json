@@ -1,0 +1,221 @@
+{
+  "schemaVersion": 1,
+  "kind": "preexisting-isolated-runtime-behavior-with-current-worktree-coexistence",
+  "capturedAt": "2026-09-11T01:04:26.478Z",
+  "worktreeProductSourceCommit": "fd0f0f850f907b8a77aac8ec8b6a71b308bdd711",
+  "evidenceHead": "5bfc60fe4f8fcf2f5cbe15b14184b1ba28229084",
+  "remoteHead": "5bfc60fe4f8fcf2f5cbe15b14184b1ba28229084",
+  "sourceBinding": {
+    "productPaths": [
+      "apps/api/src",
+      "apps/web/src",
+      "apps/desktop/src",
+      "apps/android/app/src/main",
+      "apps/worker/src",
+      "packages/domain/src"
+    ],
+    "worktreeCommittedProductPathsMatchPinnedSource": true,
+    "productPathsWorktreeClean": true,
+    "runtimeBytesBoundToPinnedSource": false,
+    "runtimeBindingStatus": "insufficient_preexisting_process_started_before_latest_dist_build",
+    "comparison": "git diff --quiet fd0f0f850f907b8a77aac8ec8b6a71b308bdd711 5bfc60fe4f8fcf2f5cbe15b14184b1ba28229084 -- apps/api/src apps/web/src apps/desktop/src apps/android/app/src/main apps/worker/src packages/domain/src"
+  },
+  "scope": {
+    "isolatedBehaviorBatchStatus": "pass",
+    "currentSourceRevalidationStatus": "not_proven",
+    "overallAcceptanceStatus": "not_complete",
+    "completionAllowed": false,
+    "clearsWholeCoverageMatrix": false,
+    "externalComponentsExecuted": false,
+    "userOnlyGatesExecuted": false,
+    "isolatedPreviewBusinessDataMutatedBySmokes": true,
+    "productionBusinessRequestsSentBySmokes": false,
+    "note": "This records three executed smoke runs on a pre-existing isolated runtime and verifies coexistence with the current worktree. The runtime process predates the latest dist build, so this record does not bind those runs to the pinned product source and clears zero revalidation flags."
+  },
+  "runEvidence": [
+    {
+      "id": "management",
+      "file": "docs/evidence/project-components/runs/management-2026-09-11T00-47-48-121Z.json",
+      "runId": "2026-09-11T00-47-48-121Z",
+      "instanceId": "qa-hub-preview-v21-e2e-fresh-0910",
+      "passed": true,
+      "checks": 96,
+      "bytes": 142506,
+      "sha256": "54a7ef58415dc3e3968fa281a3027da669ec2d91edb86316bddb83c84abd9247"
+    },
+    {
+      "id": "http-core",
+      "file": "docs/evidence/project-components/runs/http-core-2026-09-11T00-47-56-276Z.json",
+      "runId": "2026-09-11T00-47-56-276Z",
+      "instanceId": "qa-hub-preview-v21-e2e-fresh-0910",
+      "passed": true,
+      "checks": 15,
+      "bytes": 11712,
+      "sha256": "c52e1eafd9c3230080f1d7033868d3d250d4a7a1501803bcbbe82e98145b5d3c"
+    },
+    {
+      "id": "server-mcp-core",
+      "file": "docs/evidence/project-components/runs/server-mcp-core-2026-09-11T00-48-06-698Z.json",
+      "runId": "2026-09-11T00-48-06-698Z",
+      "instanceId": "qa-hub-preview-v21-e2e-fresh-0910",
+      "passed": true,
+      "checks": 13,
+      "bytes": 488263,
+      "sha256": "762fc4ccd3d2b3be2ffae6553123ef3bdc29f00cfe35b7ffd0e55f493ece5825"
+    }
+  ],
+  "coexistence": {
+    "baseline": {
+      "file": "docs/evidence/project-components/desktop-notification-project-route-live/81c44b26-5c6f-47c6-a56a-d4eb27f19d7a/raw/host-before.json",
+      "capturedAt": "2026-09-11T00:10:01.5642647Z",
+      "bytes": 10911,
+      "sha256": "f83eb1446c23554b5a75ff7345edd1c7ca62dcd2d57d90d4994176b4509b37d3"
+    },
+    "productionPortsUnchanged": [
+      {
+        "port": 4174,
+        "pid": 7420
+      },
+      {
+        "port": 4319,
+        "pid": 14044
+      },
+      {
+        "port": 4320,
+        "pid": 17160
+      }
+    ],
+    "foreignDailyClientUnchanged": {
+      "port": 9333,
+      "pid": 26828,
+      "executablePath": "D:\\Relay-QA-Hub\\apps\\desktop\\release\\RelayQaHub-win32-x64\\RelayQaHub.exe"
+    },
+    "currentListeners": [
+      {
+        "port": 4174,
+        "address": "0.0.0.0",
+        "pid": 7420,
+        "sessionId": 0,
+        "name": "node.exe",
+        "executablePath": null,
+        "startedAt": "2026-09-07T09:37:15.3473300Z"
+      },
+      {
+        "port": 4319,
+        "address": "0.0.0.0",
+        "pid": 14044,
+        "sessionId": 2,
+        "name": "node.exe",
+        "executablePath": null,
+        "startedAt": "2026-09-10T12:57:00.0497220Z"
+      },
+      {
+        "port": 4320,
+        "address": "127.0.0.1",
+        "pid": 17160,
+        "sessionId": 2,
+        "name": "RelayQaHub.exe",
+        "executablePath": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHub\\RelayQaHub.exe",
+        "startedAt": "2026-09-08T10:24:12.5269520Z"
+      },
+      {
+        "port": 4639,
+        "address": "127.0.0.1",
+        "pid": 19004,
+        "sessionId": 2,
+        "name": "node.exe",
+        "executablePath": "C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+        "startedAt": "2026-09-10T13:46:32.1784740Z"
+      },
+      {
+        "port": 4640,
+        "address": "127.0.0.1",
+        "pid": 20452,
+        "sessionId": 2,
+        "name": "node.exe",
+        "executablePath": "C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+        "startedAt": "2026-09-10T10:35:31.7067030Z"
+      },
+      {
+        "port": 4641,
+        "address": "127.0.0.1",
+        "pid": 19112,
+        "sessionId": 2,
+        "name": "node.exe",
+        "executablePath": "C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+        "startedAt": "2026-09-10T10:35:32.9388530Z"
+      },
+      {
+        "port": 4642,
+        "address": "127.0.0.1",
+        "pid": 22020,
+        "sessionId": 2,
+        "name": "RelayQaHubPreview-v21-e2e-fresh-0910.exe",
+        "executablePath": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview-v21-e2e-fresh-0910\\RelayQaHubPreview-v21-e2e-fresh-0910.exe",
+        "startedAt": "2026-09-11T00:11:50.8889420Z"
+      },
+      {
+        "port": 9333,
+        "address": "127.0.0.1",
+        "pid": 26828,
+        "sessionId": 2,
+        "name": "RelayQaHub.exe",
+        "executablePath": "D:\\Relay-QA-Hub\\apps\\desktop\\release\\RelayQaHub-win32-x64\\RelayQaHub.exe",
+        "startedAt": "2026-09-10T10:48:47.3434440Z"
+      },
+      {
+        "port": 9433,
+        "address": "127.0.0.1",
+        "pid": 22020,
+        "sessionId": 2,
+        "name": "RelayQaHubPreview-v21-e2e-fresh-0910.exe",
+        "executablePath": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview-v21-e2e-fresh-0910\\RelayQaHubPreview-v21-e2e-fresh-0910.exe",
+        "startedAt": "2026-09-11T00:11:50.8889420Z"
+      }
+    ],
+    "health": [
+      {
+        "id": "production-api",
+        "url": "http://127.0.0.1:4319/api/v1/health/ready",
+        "httpStatus": 200,
+        "declaredStatus": "ready"
+      },
+      {
+        "id": "isolated-api",
+        "url": "http://127.0.0.1:4639/api/v1/health/ready",
+        "httpStatus": 200,
+        "declaredStatus": "ready"
+      },
+      {
+        "id": "isolated-web",
+        "url": "http://127.0.0.1:4640/",
+        "httpStatus": 200,
+        "declaredStatus": null
+      },
+      {
+        "id": "isolated-server-mcp",
+        "url": "http://127.0.0.1:4641/health",
+        "httpStatus": 200,
+        "declaredStatus": "ready"
+      },
+      {
+        "id": "isolated-local-mcp",
+        "url": "http://127.0.0.1:4642/health",
+        "httpStatus": 200,
+        "declaredStatus": "ready"
+      }
+    ]
+  },
+  "checks": {
+    "allRunsPassed": true,
+    "exactRunHashes": true,
+    "localRemoteEvidenceHeadExact": true,
+    "currentWorktreeProductSourceExact": true,
+    "runtimeSourceBindingProven": false,
+    "productionListenerPidsUnchanged": true,
+    "foreignDailyClientUnchanged": true,
+    "allHealthProbesHttp200": true,
+    "allDeclaredHealthReady": true
+  },
+  "passed": true
+}

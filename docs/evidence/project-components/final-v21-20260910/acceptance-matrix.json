@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "recordedAt": "2026-09-11T00:33:05.391Z",
+  "recordedAt": "2026-09-11T01:53:09.619Z",
   "designVersion": "2.1",
   "overallStatus": "not_complete",
   "completionAllowed": false,
@@ -17,7 +17,8 @@
     "fail": "real execution exposed a failure",
     "unrun": "required resource or reachable entry unavailable",
     "partial": "a subset passed and another mandatory aspect failed or was unrun",
-    "user_handoff": "用户自测／已移交，代理未执行"
+    "user_handoff": "用户自测／已移交，代理未执行",
+    "known_limitation": "observed distribution constraint that is outside the required v2.1 internal-trial acceptance gates"
   },
   "artifacts": {
     "android": {
@@ -37,15 +38,17 @@
       "sha256": "e0e68a626657f4431447764d96f0cf95ded8b6b081c8b13f809ccacd252e7e41",
       "manifestEd25519": true,
       "authenticode": {
-        "required": true,
-        "status": "fail",
+        "requiredForV21InternalTrial": false,
+        "status": "not_signed",
         "observed": "NotSigned",
         "signer": null,
         "timestamper": null,
-        "completionImpact": "blocks_agent_scope_completion",
+        "completionImpact": "does_not_block_internal_isolated_trial",
         "evidence": [
           "continuation-20260911/postfix-fd0f0f8/upgrade/registration-readonly.json",
-          "continuation-20260911/postfix-fd0f0f8/summary.json"
+          "continuation-20260911/postfix-fd0f0f8/summary.json",
+          "../windows-authenticode-current-audit/20260911T005413530Z/audit.json",
+          "../windows-authenticode-current-audit/20260911T005413530Z/validate-audit.mjs"
         ]
       },
       "sourceCommit": "fd0f0f850f907b8a77aac8ec8b6a71b308bdd711"
@@ -276,7 +279,10 @@
         "live-http-e2e.json",
         "live-http-db-receipt.json",
         "../runs/management-2026-09-10T08-40-27-258Z.json",
-        "../runs/http-core-2026-09-10T08-41-40-684Z.json"
+        "../runs/http-core-2026-09-10T08-41-40-684Z.json",
+        "continuation-20260911/current-source-revalidation-fd0f0f8/fresh-api-mcp/cdd86698-1b45-4b1a-bb64-0a03c42b9b66/proof.json",
+        "continuation-20260911/current-source-revalidation-fd0f0f8/verify-fresh-current-source-api-mcp.mjs",
+        "../runs/http-core-2026-09-11T01-27-51-810Z.json"
       ],
       "detail": "The restarted commit-88a6d0f API completed upload lost-ack reconciliation, metadata unbound/reserved/claimed transitions, exact notification replay, authorization/CAS negatives, and retained the read receipt in SQLite."
     },
@@ -289,7 +295,10 @@
       "evidence": [
         "web/core-e2e-report.md",
         "post-restart-mcp-check.json",
-        "../runs/server-mcp-core-2026-09-10T08-40-47-204Z.json"
+        "../runs/server-mcp-core-2026-09-10T08-40-47-204Z.json",
+        "continuation-20260911/current-source-revalidation-fd0f0f8/fresh-api-mcp/cdd86698-1b45-4b1a-bb64-0a03c42b9b66/proof.json",
+        "continuation-20260911/current-source-revalidation-fd0f0f8/verify-fresh-current-source-api-mcp.mjs",
+        "../runs/server-mcp-core-2026-09-11T01-27-52-020Z.json"
       ],
       "legacyId": "server-mcp-96-tools-business",
       "claimScope": "catalog_and_executed_business_subset",
@@ -297,9 +306,13 @@
       "executedBusinessSubset": [
         "qa_login",
         "qa_list_projects",
-        "qa_list_bugs"
+        "qa_create_bug",
+        "qa_add_comment",
+        "qa_list_comments",
+        "qa_bug_action",
+        "qa_get_bug_context"
       ],
-      "detail": "The server and local MCP catalogs each exposed 96 entries. The executed business scope is limited to initialize, catalog, login, project-list, Bug-list, and the retained attachment parity subset; catalog size does not establish per-tool business E2E."
+      "detail": "The server and local MCP catalogs each exposed 96 entries. A fresh runtime compiled from the pinned source executed 13 server-MCP checks covering initialize, catalog, login, project list, Bug creation, comments, manual completion, verification lifecycle, close, and context readback. Catalog size still does not establish per-tool business E2E."
     },
     {
       "id": "windows-built-in-update-and-local-mcp",
@@ -323,9 +336,12 @@
         "continuation-20260911/postfix-fd0f0f8/package/signed-manifest.json",
         "continuation-20260911/postfix-fd0f0f8/upgrade/auto-relaunch-verification.json",
         "continuation-20260911/postfix-fd0f0f8/upgrade/postupgrade-readonly.json",
-        "continuation-20260911/postfix-fd0f0f8/upgrade/registration-readonly.json"
+        "continuation-20260911/postfix-fd0f0f8/upgrade/registration-readonly.json",
+        "continuation-20260911/current-source-revalidation-fd0f0f8/desktop-local-mcp/0c1282e0-72ed-444d-922f-ca94492a21dd/proof.json",
+        "continuation-20260911/current-source-revalidation-fd0f0f8/verify-isolated-installed-local-mcp.mjs",
+        "../runs/desktop-mcp-core-2026-09-11T00-59-30-586Z.json"
       ],
-      "detail": "The isolated signed-manifest updater completed 0.2.0-preview.19 to 0.2.0-preview.20, relaunched the exact installed executable, preserved the version 19 rollback backup, preview configuration, project, drafts, and local MCP, and passed the post-upgrade read-only reload. Authenticode and desktop notification routing remain separate failed agent gates."
+      "detail": "The isolated signed-manifest updater completed 0.2.0-preview.19 to 0.2.0-preview.20, relaunched the exact installed executable, preserved the version 19 rollback backup, preview configuration, project, drafts, and local MCP, and passed the post-upgrade read-only reload. A separate fresh profile then executed 13 installed local-MCP checks and exited only its owned process with code 0. Native notification routing remains an environment-blocked acceptance gate; NotSigned is recorded separately as a distribution limitation."
     },
     {
       "id": "android-build-feed-install",
@@ -407,9 +423,13 @@
         "continuation-20260910/postfix-c4e2eb7/final-runtime/canonical-relaunch-20260910T152101642Z-82efc9c9-66e9-44e1-8160-7a3af37b4fa2/07-final-runtime-verification.json",
         "continuation-20260911/postfix-fd0f0f8/upgrade/auto-relaunch-verification.json",
         "../desktop-notification-project-route-live/81c44b26-5c6f-47c6-a56a-d4eb27f19d7a/proof.json",
-        "continuation-20260911/postfix-fd0f0f8/summary.json"
+        "continuation-20260911/postfix-fd0f0f8/summary.json",
+        "continuation-20260911/current-source-revalidation-fd0f0f8/fresh-api-mcp/cdd86698-1b45-4b1a-bb64-0a03c42b9b66/proof.json",
+        "continuation-20260911/current-source-revalidation-fd0f0f8/fresh-api-mcp/attempts-summary.json",
+        "continuation-20260911/current-source-revalidation-fd0f0f8/desktop-local-mcp/0c1282e0-72ed-444d-922f-ca94492a21dd/proof.json",
+        "../windows-notification-luna-acceptance/20260911T014720Z/luna-acceptance-attempt.json"
       ],
-      "detail": "Build 20 auto-relaunch preserved the production and isolated service owners while local MCP 4642 belonged to the upgraded preview. The later native-notification preflight started and gracefully stopped only its exact child, and its final host check kept the pre-existing QA Hub process and protected listener fingerprints unchanged. Native toast visibility itself remains failed."
+      "detail": "Build 20 auto-relaunch preserved the production and isolated service owners while local MCP 4642 belonged to the upgraded preview. The fresh current-source API/MCP batch and installed local-MCP batch used separate roots and released only their owned processes and ports while protected listener and health snapshots remained exact. Luna's later notification attempt stopped before any toast or product action. Native toast visibility itself remains unexecuted and failed as an acceptance gate."
     },
     {
       "id": "final-source-gate",
@@ -427,7 +447,31 @@
         "continuation-20260910/postfix-c4e2eb7/native-notification/session-routing-analysis.json",
         "continuation-20260910/postfix-c4e2eb7/native-notification/session-routing-event-5638.json",
         "continuation-20260911/postfix-fd0f0f8/summary.json",
-        "../desktop-notification-project-route-live/81c44b26-5c6f-47c6-a56a-d4eb27f19d7a/proof.json"
+        "../desktop-notification-project-route-live/81c44b26-5c6f-47c6-a56a-d4eb27f19d7a/proof.json",
+        "continuation-20260911/current-source-revalidation-fd0f0f8/summary.json",
+        "continuation-20260911/current-source-revalidation-fd0f0f8/verify-current-source-revalidation.mjs",
+        "../runs/management-2026-09-11T00-47-48-121Z.json",
+        "../runs/http-core-2026-09-11T00-47-56-276Z.json",
+        "../runs/server-mcp-core-2026-09-11T00-48-06-698Z.json",
+        "continuation-20260911/current-source-revalidation-fd0f0f8/fresh-api-mcp/cdd86698-1b45-4b1a-bb64-0a03c42b9b66/proof.json",
+        "continuation-20260911/current-source-revalidation-fd0f0f8/fresh-api-mcp/attempts-summary.json",
+        "continuation-20260911/current-source-revalidation-fd0f0f8/verify-fresh-current-source-api-mcp.mjs",
+        "../runs/management-2026-09-11T01-27-51-000Z.json",
+        "../runs/http-core-2026-09-11T01-27-51-810Z.json",
+        "../runs/server-mcp-core-2026-09-11T01-27-52-020Z.json",
+        "continuation-20260911/current-source-revalidation-fd0f0f8/desktop-local-mcp/0c1282e0-72ed-444d-922f-ca94492a21dd/proof.json",
+        "continuation-20260911/current-source-revalidation-fd0f0f8/verify-isolated-installed-local-mcp.mjs",
+        "../runs/desktop-mcp-core-2026-09-11T00-59-30-586Z.json",
+        "continuation-20260911/current-source-revalidation-fd0f0f8/agent-gates-current.json",
+        "../windows-notification-session-current-audit/20260911T005709Z/current-session-wpn-routing.json",
+        "../windows-notification-session-current-audit/20260911T005709Z/validation.json",
+        "../windows-notification-session-current-audit/20260911T005709Z/README.md",
+        "../windows-notification-session-current-audit/20260911T005709Z/validate-evidence.mjs",
+        "../windows-notification-session-current-audit/20260911T005709Z/capture-readonly.ps1",
+        "../windows-notification-luna-acceptance/20260911T014720Z/luna-acceptance-attempt.json",
+        "../windows-notification-luna-acceptance/20260911T014720Z/validation.json",
+        "../windows-notification-luna-acceptance/20260911T014720Z/README.md",
+        "../windows-notification-luna-acceptance/20260911T014720Z/validate-evidence.mjs"
       ],
       "detail": "Product source is anchored at fd0f0f850f907b8a77aac8ec8b6a71b308bdd711, but one or more required agent gates remain failed, pending, or unreported."
     },
@@ -451,33 +495,9 @@
         "../runs/server-mcp-core-2026-09-10T08-40-47-204Z.json",
         "../runs/desktop-mcp-core-2026-09-10T08-41-32-807Z.json"
       ]
-    },
-    {
-      "id": "windows-authenticode",
-      "evidence": [
-        "continuation-20260911/postfix-fd0f0f8/upgrade/registration-readonly.json",
-        "continuation-20260911/postfix-fd0f0f8/summary.json"
-      ],
-      "status": "fail",
-      "owner": "agent",
-      "completionImpact": "blocks_agent_scope_completion",
-      "detail": "Authenticode is required for final acceptance. The installed build 20 EXE was inspected after upgrade and returned NotSigned with no signer or timestamper, so this gate remains failed."
     }
   ],
   "blocking": [
-    {
-      "id": "windows-authenticode",
-      "status": "fail",
-      "owner": "agent",
-      "completionImpact": "blocks_agent_scope_completion",
-      "evidence": [
-        "continuation-20260911/postfix-fd0f0f8/upgrade/registration-readonly.json",
-        "continuation-20260911/postfix-fd0f0f8/summary.json"
-      ],
-      "classification": "required_artifact_signature",
-      "required": true,
-      "observed": "NotSigned"
-    },
     {
       "id": "desktop-notification-project-route-live",
       "status": "fail",
@@ -485,7 +505,15 @@
       "completionImpact": "blocks_agent_scope_completion",
       "evidence": [
         "../desktop-notification-project-route-live/81c44b26-5c6f-47c6-a56a-d4eb27f19d7a/proof.json",
-        "continuation-20260911/postfix-fd0f0f8/summary.json"
+        "../windows-notification-session-current-audit/20260911T005709Z/current-session-wpn-routing.json",
+        "../windows-notification-session-current-audit/20260911T005709Z/validation.json",
+        "../windows-notification-session-current-audit/20260911T005709Z/README.md",
+        "../windows-notification-session-current-audit/20260911T005709Z/validate-evidence.mjs",
+        "../windows-notification-session-current-audit/20260911T005709Z/capture-readonly.ps1",
+        "../windows-notification-luna-acceptance/20260911T014720Z/luna-acceptance-attempt.json",
+        "../windows-notification-luna-acceptance/20260911T014720Z/validation.json",
+        "../windows-notification-luna-acceptance/20260911T014720Z/README.md",
+        "../windows-notification-luna-acceptance/20260911T014720Z/validate-evidence.mjs"
       ],
       "classification": "environment_blocker",
       "productPass": false
@@ -548,11 +576,35 @@
   "sourceGate": {
     "productSourceCommit": "fd0f0f850f907b8a77aac8ec8b6a71b308bdd711",
     "status": "incomplete_agent_revalidation_pending",
-    "agentGateReport": null,
+    "agentGateReport": "continuation-20260911/current-source-revalidation-fd0f0f8/agent-gates-current.json",
     "allRequiredAgentGatesPassed": false,
     "evidence": [
       "continuation-20260911/postfix-fd0f0f8/summary.json",
-      "../desktop-notification-project-route-live/81c44b26-5c6f-47c6-a56a-d4eb27f19d7a/proof.json"
+      "continuation-20260911/current-source-revalidation-fd0f0f8/summary.json",
+      "continuation-20260911/current-source-revalidation-fd0f0f8/verify-current-source-revalidation.mjs",
+      "../runs/management-2026-09-11T00-47-48-121Z.json",
+      "../runs/http-core-2026-09-11T00-47-56-276Z.json",
+      "../runs/server-mcp-core-2026-09-11T00-48-06-698Z.json",
+      "continuation-20260911/current-source-revalidation-fd0f0f8/fresh-api-mcp/cdd86698-1b45-4b1a-bb64-0a03c42b9b66/proof.json",
+      "continuation-20260911/current-source-revalidation-fd0f0f8/fresh-api-mcp/attempts-summary.json",
+      "continuation-20260911/current-source-revalidation-fd0f0f8/verify-fresh-current-source-api-mcp.mjs",
+      "../runs/management-2026-09-11T01-27-51-000Z.json",
+      "../runs/http-core-2026-09-11T01-27-51-810Z.json",
+      "../runs/server-mcp-core-2026-09-11T01-27-52-020Z.json",
+      "continuation-20260911/current-source-revalidation-fd0f0f8/desktop-local-mcp/0c1282e0-72ed-444d-922f-ca94492a21dd/proof.json",
+      "continuation-20260911/current-source-revalidation-fd0f0f8/verify-isolated-installed-local-mcp.mjs",
+      "../runs/desktop-mcp-core-2026-09-11T00-59-30-586Z.json",
+      "continuation-20260911/current-source-revalidation-fd0f0f8/agent-gates-current.json",
+      "../desktop-notification-project-route-live/81c44b26-5c6f-47c6-a56a-d4eb27f19d7a/proof.json",
+      "../windows-notification-session-current-audit/20260911T005709Z/current-session-wpn-routing.json",
+      "../windows-notification-session-current-audit/20260911T005709Z/validation.json",
+      "../windows-notification-session-current-audit/20260911T005709Z/README.md",
+      "../windows-notification-session-current-audit/20260911T005709Z/validate-evidence.mjs",
+      "../windows-notification-session-current-audit/20260911T005709Z/capture-readonly.ps1",
+      "../windows-notification-luna-acceptance/20260911T014720Z/luna-acceptance-attempt.json",
+      "../windows-notification-luna-acceptance/20260911T014720Z/validation.json",
+      "../windows-notification-luna-acceptance/20260911T014720Z/README.md",
+      "../windows-notification-luna-acceptance/20260911T014720Z/validate-evidence.mjs"
     ]
   },
   "fineGrainedCoverage": {
@@ -613,26 +665,21 @@
   },
   "agentBlocking": [
     {
-      "id": "windows-authenticode",
-      "status": "fail",
-      "owner": "agent",
-      "completionImpact": "blocks_agent_scope_completion",
-      "evidence": [
-        "continuation-20260911/postfix-fd0f0f8/upgrade/registration-readonly.json",
-        "continuation-20260911/postfix-fd0f0f8/summary.json"
-      ],
-      "classification": "required_artifact_signature",
-      "required": true,
-      "observed": "NotSigned"
-    },
-    {
       "id": "desktop-notification-project-route-live",
       "status": "fail",
       "owner": "agent",
       "completionImpact": "blocks_agent_scope_completion",
       "evidence": [
         "../desktop-notification-project-route-live/81c44b26-5c6f-47c6-a56a-d4eb27f19d7a/proof.json",
-        "continuation-20260911/postfix-fd0f0f8/summary.json"
+        "../windows-notification-session-current-audit/20260911T005709Z/current-session-wpn-routing.json",
+        "../windows-notification-session-current-audit/20260911T005709Z/validation.json",
+        "../windows-notification-session-current-audit/20260911T005709Z/README.md",
+        "../windows-notification-session-current-audit/20260911T005709Z/validate-evidence.mjs",
+        "../windows-notification-session-current-audit/20260911T005709Z/capture-readonly.ps1",
+        "../windows-notification-luna-acceptance/20260911T014720Z/luna-acceptance-attempt.json",
+        "../windows-notification-luna-acceptance/20260911T014720Z/validation.json",
+        "../windows-notification-luna-acceptance/20260911T014720Z/README.md",
+        "../windows-notification-luna-acceptance/20260911T014720Z/validate-evidence.mjs"
       ],
       "classification": "environment_blocker",
       "productPass": false
@@ -706,8 +753,8 @@
   "agentRevalidation": {
     "schemaVersion": 1,
     "sourceCommit": "fd0f0f850f907b8a77aac8ec8b6a71b308bdd711",
-    "report": null,
-    "reportSupplied": false,
+    "report": "continuation-20260911/current-source-revalidation-fd0f0f8/agent-gates-current.json",
+    "reportSupplied": true,
     "requiredGateIds": [
       "desktop-notification-project-route-live"
     ],
@@ -715,16 +762,107 @@
       {
         "id": "desktop-notification-project-route-live",
         "status": "fail",
-        "classification": "environment_blocker",
-        "productPass": false,
-        "detail": "The build 20 preflight submitted and closed its native test notification, but WPN routed it to console SessionId 1 while the app and observer ran in RDP SessionId 2. No business fixture or business write request was created; only one read-only readiness request ran. The environment blocker is not a product pass.",
         "evidence": [
           "../desktop-notification-project-route-live/81c44b26-5c6f-47c6-a56a-d4eb27f19d7a/proof.json",
-          "continuation-20260911/postfix-fd0f0f8/summary.json"
+          "../windows-notification-session-current-audit/20260911T005709Z/current-session-wpn-routing.json",
+          "../windows-notification-session-current-audit/20260911T005709Z/validation.json",
+          "../windows-notification-session-current-audit/20260911T005709Z/README.md",
+          "../windows-notification-session-current-audit/20260911T005709Z/validate-evidence.mjs",
+          "../windows-notification-session-current-audit/20260911T005709Z/capture-readonly.ps1",
+          "../windows-notification-luna-acceptance/20260911T014720Z/luna-acceptance-attempt.json",
+          "../windows-notification-luna-acceptance/20260911T014720Z/validation.json",
+          "../windows-notification-luna-acceptance/20260911T014720Z/README.md",
+          "../windows-notification-luna-acceptance/20260911T014720Z/validate-evidence.mjs"
         ],
+        "detail": "GPT-5.6 Luna performed the one permitted acceptance attempt and stopped before creating a fixture or submitting another toast. The installed app and observer are in interactive RDP Session 2, while the retained WPN delivery and presentation events report Session 1; the available computer-use surface exposes no native Windows window control, so a visible toast click and project-detail readback cannot be operated in the current session. EventData semantics alone are not treated as a product verdict. The gate remains failed because the required visible and click behavior was not executed.",
+        "classification": "environment_blocker",
+        "productPass": false,
         "semanticProof": "../desktop-notification-project-route-live/81c44b26-5c6f-47c6-a56a-d4eb27f19d7a/proof.json"
       }
     ],
     "allRequiredGatesPassed": false
+  },
+  "knownLimitations": [
+    {
+      "id": "windows-authenticode",
+      "status": "not_signed",
+      "requiredForV21InternalTrial": false,
+      "completionImpact": "does_not_block_internal_isolated_trial",
+      "detail": "The v2.1 design and current user scope do not make Authenticode a required internal-trial gate. All four Windows PE artifacts are byte-bound and currently NotSigned. Ed25519 protects the update manifest and artifact hash, but it does not provide Windows publisher identity or reputation.",
+      "evidence": [
+        "continuation-20260911/postfix-fd0f0f8/upgrade/registration-readonly.json",
+        "continuation-20260911/postfix-fd0f0f8/summary.json",
+        "../windows-authenticode-current-audit/20260911T005413530Z/audit.json",
+        "../windows-authenticode-current-audit/20260911T005413530Z/validate-audit.mjs"
+      ]
+    }
+  ],
+  "currentSourceRevalidation": {
+    "schemaVersion": 1,
+    "sourceCommit": "fd0f0f850f907b8a77aac8ec8b6a71b308bdd711",
+    "historicalPreexistingRuntime": {
+      "status": "not_proven",
+      "reason": "insufficient_preexisting_process_started_before_latest_dist_build",
+      "evidence": [
+        "continuation-20260911/current-source-revalidation-fd0f0f8/summary.json",
+        "continuation-20260911/current-source-revalidation-fd0f0f8/verify-current-source-revalidation.mjs",
+        "../runs/management-2026-09-11T00-47-48-121Z.json",
+        "../runs/http-core-2026-09-11T00-47-56-276Z.json",
+        "../runs/server-mcp-core-2026-09-11T00-48-06-698Z.json"
+      ]
+    },
+    "freshApiAndServerMcp": {
+      "status": "pass",
+      "runId": "cdd86698-1b45-4b1a-bb64-0a03c42b9b66",
+      "checks": 124,
+      "buildOutputMode": "shared_existing_dist_full_expected_emit",
+      "emptyOutputDirectoryBuild": false,
+      "fullExpectedOutputsEmittedAndByteStable": true,
+      "evidence": [
+        "continuation-20260911/current-source-revalidation-fd0f0f8/fresh-api-mcp/cdd86698-1b45-4b1a-bb64-0a03c42b9b66/proof.json",
+        "continuation-20260911/current-source-revalidation-fd0f0f8/fresh-api-mcp/attempts-summary.json",
+        "continuation-20260911/current-source-revalidation-fd0f0f8/verify-fresh-current-source-api-mcp.mjs",
+        "../runs/management-2026-09-11T01-27-51-000Z.json",
+        "../runs/http-core-2026-09-11T01-27-51-810Z.json",
+        "../runs/server-mcp-core-2026-09-11T01-27-52-020Z.json"
+      ]
+    },
+    "installedLocalMcp": {
+      "status": "pass",
+      "runId": "0c1282e0-72ed-444d-922f-ca94492a21dd",
+      "version": "0.2.0-preview.20",
+      "checks": 13,
+      "evidence": [
+        "continuation-20260911/current-source-revalidation-fd0f0f8/desktop-local-mcp/0c1282e0-72ed-444d-922f-ca94492a21dd/proof.json",
+        "continuation-20260911/current-source-revalidation-fd0f0f8/verify-isolated-installed-local-mcp.mjs",
+        "../runs/desktop-mcp-core-2026-09-11T00-59-30-586Z.json"
+      ]
+    },
+    "coverageDisposition": {
+      "eligibleNeedsRevalidationClearCount": 0,
+      "clearsWholeCoverageMatrix": false,
+      "inventoryNeedsRevalidationCount": 637,
+      "reason": "The inventory is cumulative and item-level. Scoped runtime passes are retained as evidence but do not silently relabel historical, delegated, duplicate, or branch-specific rows."
+    },
+    "externalComponentsExecuted": false,
+    "userOnlyGatesExecuted": false,
+    "overallAcceptanceStatus": "not_complete",
+    "completionAllowed": false,
+    "evidence": [
+      "continuation-20260911/current-source-revalidation-fd0f0f8/summary.json",
+      "continuation-20260911/current-source-revalidation-fd0f0f8/verify-current-source-revalidation.mjs",
+      "../runs/management-2026-09-11T00-47-48-121Z.json",
+      "../runs/http-core-2026-09-11T00-47-56-276Z.json",
+      "../runs/server-mcp-core-2026-09-11T00-48-06-698Z.json",
+      "continuation-20260911/current-source-revalidation-fd0f0f8/fresh-api-mcp/cdd86698-1b45-4b1a-bb64-0a03c42b9b66/proof.json",
+      "continuation-20260911/current-source-revalidation-fd0f0f8/fresh-api-mcp/attempts-summary.json",
+      "continuation-20260911/current-source-revalidation-fd0f0f8/verify-fresh-current-source-api-mcp.mjs",
+      "../runs/management-2026-09-11T01-27-51-000Z.json",
+      "../runs/http-core-2026-09-11T01-27-51-810Z.json",
+      "../runs/server-mcp-core-2026-09-11T01-27-52-020Z.json",
+      "continuation-20260911/current-source-revalidation-fd0f0f8/desktop-local-mcp/0c1282e0-72ed-444d-922f-ca94492a21dd/proof.json",
+      "continuation-20260911/current-source-revalidation-fd0f0f8/verify-isolated-installed-local-mcp.mjs",
+      "../runs/desktop-mcp-core-2026-09-11T00-59-30-586Z.json"
+    ]
   }
 }

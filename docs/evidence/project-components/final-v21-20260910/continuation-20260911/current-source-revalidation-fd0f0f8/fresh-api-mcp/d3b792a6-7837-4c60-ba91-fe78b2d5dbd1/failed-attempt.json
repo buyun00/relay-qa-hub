@@ -1,0 +1,44 @@
+{
+  "schemaVersion": 1,
+  "kind": "fresh-current-source-api-mcp-failed-attempt",
+  "runId": "d3b792a6-7837-4c60-ba91-fe78b2d5dbd1",
+  "recordedAt": "2026-09-11T01:24:44.639Z",
+  "productSourceCommit": "fd0f0f850f907b8a77aac8ec8b6a71b308bdd711",
+  "evidenceHead": "5bfc60fe4f8fcf2f5cbe15b14184b1ba28229084",
+  "instanceId": "qa-hub-preview-fd0f0f8-d3b792a6",
+  "runtimeRoot": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-fd0f0f8-current-source\\d3b792a6-7837-4c60-ba91-fe78b2d5dbd1\\qa-hub-preview-fd0f0f8-d3b792a6",
+  "ownedPorts": [
+    57066,
+    57067,
+    57068,
+    57069,
+    57070,
+    57071
+  ],
+  "error": {
+    "name": "Error",
+    "message": "CDP_-32000_Promise was collected"
+  },
+  "processes": [
+    {
+      "id": "api",
+      "pid": 18628,
+      "startedAt": null,
+      "identity": null,
+      "cleanup": null,
+      "processPresentAfterCleanup": true
+    }
+  ],
+  "smokeRuns": [],
+  "ownedPortsRemaining": [
+    57066,
+    57070
+  ],
+  "protectedListenersUnchanged": true,
+  "existingHealthUnchanged": true,
+  "externalComponentsExecuted": false,
+  "userOnlyGatesExecuted": false,
+  "completionAllowed": false,
+  "runtimeRetained": true,
+  "passed": false
+}

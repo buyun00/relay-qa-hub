@@ -1,0 +1,206 @@
+{
+  "schemaVersion": 1,
+  "kind": "fresh-current-source-api-mcp-attempt-history",
+  "recordedAt": "2026-09-11T01:35:25.207Z",
+  "productSourceCommit": "fd0f0f850f907b8a77aac8ec8b6a71b308bdd711",
+  "attempts": [
+    {
+      "runId": "7b3c290d-dc55-48ae-b9e6-3416c8de15a2",
+      "outcome": "interrupted",
+      "stage": "host-state-snapshot-loop-before-smokes",
+      "productSuitesExecuted": [],
+      "evidenceAssessment": "The original harness did not write a proof. Retained logs show only the self-owned API started and then handled SIGINT after the PTY was interrupted.",
+      "ownedProcess": {
+        "pid": 11576,
+        "presentAtSummaryCapture": false
+      },
+      "ownedPorts": [
+        59957,
+        59958,
+        59959,
+        59960,
+        59961,
+        59962
+      ],
+      "listenersPresentAtSummaryCapture": [],
+      "runtimeRoot": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-fd0f0f8-current-source\\7b3c290d-dc55-48ae-b9e6-3416c8de15a2\\qa-hub-preview-fd0f0f8-7b3c290d",
+      "retainedArtifacts": [
+        {
+          "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-fd0f0f8-current-source\\7b3c290d-dc55-48ae-b9e6-3416c8de15a2\\qa-hub-preview-fd0f0f8-7b3c290d\\instance.json",
+          "bytes": 1903,
+          "sha256": "85e3b80294cd778bda19d8af949ba77ca8ea3e12761cee2e5f227e08f5eab594"
+        },
+        {
+          "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-fd0f0f8-current-source\\7b3c290d-dc55-48ae-b9e6-3416c8de15a2\\qa-hub-preview-fd0f0f8-7b3c290d\\logs\\api.stdout.log",
+          "bytes": 1347,
+          "sha256": "0d69c5475426687a6257542d613d254097f20b714065dd3759687ffeb3aff1d7"
+        },
+        {
+          "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-fd0f0f8-current-source\\7b3c290d-dc55-48ae-b9e6-3416c8de15a2\\qa-hub-preview-fd0f0f8-7b3c290d\\logs\\api.stderr.log",
+          "bytes": 168,
+          "sha256": "cb20323423abb00a0d41a7ce092a40cb32c2a32ca47ad40064cf7a8fa51b0fca"
+        }
+      ],
+      "apiStartLogPresent": true,
+      "shutdownLog": {
+        "present": true,
+        "signal": "SIGINT"
+      },
+      "runtimeRetained": true,
+      "acceptedAsPassingEvidence": false
+    },
+    {
+      "runId": "3f4a482c-69db-40e1-85ce-5f289eb38702",
+      "outcome": "failed",
+      "stage": "pre-service-runtime-binding-path-check",
+      "productSuitesExecuted": [],
+      "error": "The harness referenced the nonexistent packages/storage/dist/sqlite-worker-client.js path and exited before service startup.",
+      "runtimeParent": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-fd0f0f8-current-source\\3f4a482c-69db-40e1-85ce-5f289eb38702",
+      "runtimeParentExists": true,
+      "runtimeParentFileCount": 0,
+      "serviceStarted": false,
+      "runtimeRetained": true,
+      "acceptedAsPassingEvidence": false
+    },
+    {
+      "runId": "d3b792a6-7837-4c60-ba91-fe78b2d5dbd1",
+      "outcome": "failed",
+      "stage": "owned-api-inspector-metadata-read-before-smokes",
+      "productSuitesExecuted": [],
+      "originalFailure": {
+        "path": "docs/evidence/project-components/final-v21-20260910/continuation-20260911/current-source-revalidation-fd0f0f8/fresh-api-mcp/d3b792a6-7837-4c60-ba91-fe78b2d5dbd1/failed-attempt.json",
+        "bytes": 1190,
+        "sha256": "a372eecc6e0621e73b461d2ad4f725189690bd96587e22971e2b47a9a209ca48"
+      },
+      "postShellFinalization": "docs/evidence/project-components/final-v21-20260910/continuation-20260911/current-source-revalidation-fd0f0f8/fresh-api-mcp/d3b792a6-7837-4c60-ba91-fe78b2d5dbd1/post-shell-finalization.json",
+      "runtimeRoot": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-fd0f0f8-current-source\\d3b792a6-7837-4c60-ba91-fe78b2d5dbd1\\qa-hub-preview-fd0f0f8-d3b792a6",
+      "retainedArtifacts": [
+        {
+          "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-fd0f0f8-current-source\\d3b792a6-7837-4c60-ba91-fe78b2d5dbd1\\qa-hub-preview-fd0f0f8-d3b792a6\\instance.json",
+          "bytes": 1903,
+          "sha256": "df4e868981260c3b6c854ef50bc9339b19aa85a718a2fa35ff8cc1cd5de02e30"
+        },
+        {
+          "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-fd0f0f8-current-source\\d3b792a6-7837-4c60-ba91-fe78b2d5dbd1\\qa-hub-preview-fd0f0f8-d3b792a6\\logs\\api.stdout.log",
+          "bytes": 807,
+          "sha256": "48b49a08bfbb0680ccb05d191115d652b4044b32c590ffe01cc0f7061138211b"
+        },
+        {
+          "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-fd0f0f8-current-source\\d3b792a6-7837-4c60-ba91-fe78b2d5dbd1\\qa-hub-preview-fd0f0f8-d3b792a6\\logs\\api.stderr.log",
+          "bytes": 168,
+          "sha256": "b25f666de4cf86f7cbb35dae2f38fd36737009a0f2042b4edcb1cd964e3acf95"
+        }
+      ],
+      "finalization": "abrupt_or_unknown",
+      "runtimeRetained": true,
+      "acceptedAsPassingEvidence": false
+    },
+    {
+      "runId": "cdd86698-1b45-4b1a-bb64-0a03c42b9b66",
+      "outcome": "passed",
+      "stage": "fresh-build-api-server-mcp-scoped-revalidation",
+      "productSuitesExecuted": [
+        {
+          "id": "management",
+          "checks": 96
+        },
+        {
+          "id": "http-core",
+          "checks": 15
+        },
+        {
+          "id": "server-mcp-core",
+          "checks": 13
+        }
+      ],
+      "proof": {
+        "path": "docs/evidence/project-components/final-v21-20260910/continuation-20260911/current-source-revalidation-fd0f0f8/fresh-api-mcp/cdd86698-1b45-4b1a-bb64-0a03c42b9b66/proof.json",
+        "bytes": 339086,
+        "sha256": "238bbbd3d94d6ae6c881677ac9275b909689c3ba6d547c56bd3ea6c9390c9409"
+      },
+      "ownedProcessesGracefullyExited": [
+        {
+          "id": "api",
+          "pid": 24220,
+          "method": "inspector process.emit(SIGTERM)",
+          "exitCode": 0
+        },
+        {
+          "id": "mcp",
+          "pid": 5952,
+          "method": "inspector process.emit(SIGTERM)",
+          "exitCode": 0
+        }
+      ],
+      "runtimeRoot": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-fd0f0f8-current-source\\cdd86698-1b45-4b1a-bb64-0a03c42b9b66\\qa-hub-preview-fd0f0f8-cdd86698",
+      "runtimeRetained": true,
+      "acceptedAsPassingEvidence": true
+    }
+  ],
+  "finalReadOnlyObservation": {
+    "lingeringOwnedProcesses": [],
+    "lingeringOwnedListeners": [],
+    "currentProtectedListeners": [
+      {
+        "port": 4174,
+        "address": "0.0.0.0",
+        "pid": 7420
+      },
+      {
+        "port": 4319,
+        "address": "0.0.0.0",
+        "pid": 14044
+      },
+      {
+        "port": 4320,
+        "address": "127.0.0.1",
+        "pid": 17160
+      },
+      {
+        "port": 4639,
+        "address": "127.0.0.1",
+        "pid": 19004
+      },
+      {
+        "port": 4640,
+        "address": "127.0.0.1",
+        "pid": 20452
+      },
+      {
+        "port": 4641,
+        "address": "127.0.0.1",
+        "pid": 19112
+      },
+      {
+        "port": 4642,
+        "address": "127.0.0.1",
+        "pid": 22020
+      },
+      {
+        "port": 9333,
+        "address": "127.0.0.1",
+        "pid": 26828
+      },
+      {
+        "port": 9433,
+        "address": "127.0.0.1",
+        "pid": 22020
+      }
+    ],
+    "matchesPassingProofPostState": true
+  },
+  "safety": {
+    "noFailedAttemptWasDeleted": true,
+    "failedRuntimeDataRetained": true,
+    "productionProcessesChangedByThisCapture": false,
+    "externalComponentsExecutedByTheseAttempts": false,
+    "userOnlyGatesExecutedByTheseAttempts": false
+  },
+  "scope": {
+    "passingAttemptCount": 1,
+    "passingAttempt": "cdd86698-1b45-4b1a-bb64-0a03c42b9b66",
+    "eligibleNeedsRevalidationClearCount": 0,
+    "overallAcceptanceStatus": "not_complete",
+    "completionAllowed": false
+  }
+}

@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "validatedAt": "2026-09-11T00:33:08.224Z",
+  "validatedAt": "2026-09-11T02:05:05.324Z",
   "validationScope": "evidence_structure_and_declared_gate_consistency",
   "sourceCommit": "fd0f0f850f907b8a77aac8ec8b6a71b308bdd711",
   "productSourceCommit": "fd0f0f850f907b8a77aac8ec8b6a71b308bdd711",
@@ -20,41 +20,38 @@
   },
   "agentBlockers": [
     {
-      "id": "windows-authenticode",
-      "status": "fail",
-      "owner": "agent",
-      "completionImpact": "blocks_agent_scope_completion",
-      "evidence": [
-        "continuation-20260911/postfix-fd0f0f8/upgrade/registration-readonly.json",
-        "continuation-20260911/postfix-fd0f0f8/summary.json"
-      ],
-      "classification": "required_artifact_signature",
-      "required": true,
-      "observed": "NotSigned"
-    },
-    {
       "id": "desktop-notification-project-route-live",
       "status": "fail",
       "owner": "agent",
       "completionImpact": "blocks_agent_scope_completion",
       "evidence": [
         "../desktop-notification-project-route-live/81c44b26-5c6f-47c6-a56a-d4eb27f19d7a/proof.json",
-        "continuation-20260911/postfix-fd0f0f8/summary.json"
+        "../windows-notification-session-current-audit/20260911T005709Z/current-session-wpn-routing.json",
+        "../windows-notification-session-current-audit/20260911T005709Z/validation.json",
+        "../windows-notification-session-current-audit/20260911T005709Z/README.md",
+        "../windows-notification-session-current-audit/20260911T005709Z/validate-evidence.mjs",
+        "../windows-notification-session-current-audit/20260911T005709Z/capture-readonly.ps1",
+        "../windows-notification-luna-acceptance/20260911T014720Z/luna-acceptance-attempt.json",
+        "../windows-notification-luna-acceptance/20260911T014720Z/validation.json",
+        "../windows-notification-luna-acceptance/20260911T014720Z/README.md",
+        "../windows-notification-luna-acceptance/20260911T014720Z/validate-evidence.mjs"
       ],
       "classification": "environment_blocker",
       "productPass": false
     }
   ],
   "authenticode": {
-    "required": true,
-    "status": "fail",
+    "requiredForV21InternalTrial": false,
+    "status": "not_signed",
     "observed": "NotSigned",
     "signer": null,
     "timestamper": null,
-    "completionImpact": "blocks_agent_scope_completion",
+    "completionImpact": "does_not_block_internal_isolated_trial",
     "evidence": [
       "continuation-20260911/postfix-fd0f0f8/upgrade/registration-readonly.json",
-      "continuation-20260911/postfix-fd0f0f8/summary.json"
+      "continuation-20260911/postfix-fd0f0f8/summary.json",
+      "../windows-authenticode-current-audit/20260911T005413530Z/audit.json",
+      "../windows-authenticode-current-audit/20260911T005413530Z/validate-audit.mjs"
     ]
   },
   "notificationGate": {
@@ -71,8 +68,8 @@
   },
   "coverageSourceHead": "7b14dce3c981e56d5841ce38ea9025606fa44d0c",
   "coverageProductSourceMatches": false,
-  "indexedTrackedFiles": 365,
-  "parsedIndexedJsonFiles": 155,
+  "indexedTrackedFiles": 379,
+  "parsedIndexedJsonFiles": 162,
   "indexCompleteTrackedSetVerified": true,
   "serverMcpEvidenceScope": {
     "claim": "catalog_and_executed_business_subset",
@@ -80,8 +77,17 @@
       96,
       96
     ],
-    "executedTools": [
+    "historicalExecutedTools": [
       "qa_list_bugs",
+      "qa_list_projects",
+      "qa_login"
+    ],
+    "currentSourceExecutedTools": [
+      "qa_add_comment",
+      "qa_bug_action",
+      "qa_create_bug",
+      "qa_get_bug_context",
+      "qa_list_comments",
       "qa_list_projects",
       "qa_login"
     ],

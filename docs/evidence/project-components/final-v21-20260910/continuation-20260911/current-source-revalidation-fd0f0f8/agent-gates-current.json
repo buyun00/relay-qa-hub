@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "kind": "qa-hub-v2.1-current-source-agent-gate-report",
+  "recordedAt": "2026-09-11T01:47:20.1417025Z",
+  "sourceCommit": "fd0f0f850f907b8a77aac8ec8b6a71b308bdd711",
+  "requiredGateIds": [
+    "desktop-notification-project-route-live"
+  ],
+  "gates": [
+    {
+      "id": "desktop-notification-project-route-live",
+      "status": "fail",
+      "classification": "environment_blocker",
+      "productPass": false,
+      "detail": "GPT-5.6 Luna performed the one permitted acceptance attempt and stopped before creating a fixture or submitting another toast. The installed app and observer are in interactive RDP Session 2, while the retained WPN delivery and presentation events report Session 1; the available computer-use surface exposes no native Windows window control, so a visible toast click and project-detail readback cannot be operated in the current session. EventData semantics alone are not treated as a product verdict. The gate remains failed because the required visible and click behavior was not executed.",
+      "evidence": [
+        "../desktop-notification-project-route-live/81c44b26-5c6f-47c6-a56a-d4eb27f19d7a/proof.json",
+        "../windows-notification-session-current-audit/20260911T005709Z/current-session-wpn-routing.json",
+        "../windows-notification-session-current-audit/20260911T005709Z/validation.json",
+        "../windows-notification-session-current-audit/20260911T005709Z/README.md",
+        "../windows-notification-session-current-audit/20260911T005709Z/validate-evidence.mjs",
+        "../windows-notification-session-current-audit/20260911T005709Z/capture-readonly.ps1",
+        "../windows-notification-luna-acceptance/20260911T014720Z/luna-acceptance-attempt.json",
+        "../windows-notification-luna-acceptance/20260911T014720Z/validation.json",
+        "../windows-notification-luna-acceptance/20260911T014720Z/README.md",
+        "../windows-notification-luna-acceptance/20260911T014720Z/validate-evidence.mjs"
+      ]
+    }
+  ],
+  "passed": false,
+  "overallAcceptanceStatus": "not_complete",
+  "completionAllowed": false
+}
