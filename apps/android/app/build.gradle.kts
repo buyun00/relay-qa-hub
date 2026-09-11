@@ -31,7 +31,7 @@ require(qaHubUpdateChannel.get().matches(Regex("[a-z0-9][a-z0-9-]{2,63}"))) {
 }
 require(URI(qaHubApiBaseUrl.get()).port != 4319) { "Preview cannot use production API port 4319" }
 val qaHubGameApkDirectoryUrl = providers.gradleProperty("qaHubGameApkDirectoryUrl")
-    .orElse("http://10.100.5.129:8000/ozdqp/")
+    .orElse("https://qa-hub.invalid/disabled/")
 val qaHubVersionCode = providers.gradleProperty("qaHubVersionCode")
     .orElse("16")
     .map { value ->

@@ -1,3 +1,4 @@
+import BuildTasksPanel from "./BuildTasksPanel";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { QRCodeSVG } from "qrcode.react";
 import PackagingProgressPanel from "./PackagingProgress";
@@ -124,9 +125,9 @@ export default function PackagingPage({
   onOpen,
   onOpenUpload,
   buildUploadEnabled = false,
-  presetOptions,
-  singleBuildPreset,
-  uploadDefaults,
+  presetOptions = BUILD_PRESETS.map((preset) => preset.id),
+  singleBuildPreset = "android-release-app",
+  uploadDefaults = {},
 }: {
   active: boolean;
   refreshRevision: number;
@@ -134,9 +135,9 @@ export default function PackagingPage({
   onOpen?: () => void;
   onOpenUpload?: (jobId?: string) => void;
   buildUploadEnabled?: boolean;
-  presetOptions: string[];
-  singleBuildPreset: string;
-  uploadDefaults: Record<string, unknown>;
+  presetOptions?: string[];
+  singleBuildPreset?: string;
+  uploadDefaults?: Record<string, unknown>;
 }) {
   const [status, setStatus] = useState<PackagingStatus | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -188,8 +189,10 @@ export default function PackagingPage({
     setNotice(null);
     try {
       const receipt = await triggerJenkinsBuild(preset, createUploadRequestId());
-      monitor.watch(receipt.queueId);
-      setNotice(`${packageLabel(preset)}已提交，排队编号 #${receipt.queueId}。`);
+      if (receipt.queueId) monitor.watch(receipt.queueId);
+      setNotice(
+        `${packageLabel(preset)}已提交，${receipt.queueId ? `排队编号 #${receipt.queueId}` : `任务 ${receipt.taskId ?? receipt.id}`}。`,
+      );
     } catch (cause) {
       setNotice(submissionError(cause));
     } finally {
@@ -220,6 +223,10 @@ export default function PackagingPage({
           </div>
           <BuildUploadControls
             userId={userId}
+            uploadDefaults={uploadDefaults}
+            presetOptions={presetOptions}
+            singleBuildPreset={singleBuildPreset}
+            allowAutoUpload={buildUploadEnabled}
             checks={compatibility.batch?.checks}
             checking={compatibility.refreshing}
             checkError={compatibility.error}

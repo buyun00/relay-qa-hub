@@ -1,6 +1,7 @@
 package com.relayqahub.android.network
 
 import android.content.Context
+import com.relayqahub.android.BuildConfig
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream

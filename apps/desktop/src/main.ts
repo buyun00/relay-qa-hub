@@ -16,11 +16,23 @@ import {
   Tray,
 } from "electron";
 
-import { APP_HOST, APP_SCHEME, appUrl, isAppUrl, parseDesktopConfig } from "./config.js";
+import {
+  APP_HOST,
+  APP_SCHEME,
+  appUrl,
+  isAppUrl,
+  parseBugDeepLink,
+  parseDesktopConfig,
+} from "./config.js";
 import { isCompatibilityReportUrl, isPackageDownloadUrl } from "./package-downloads.js";
-import { parsePackagingNotice } from "./packaging-notifications.js";
-import type { DesktopBugChange, DesktopConnectionStatus } from "./bridge-types.js";
-import { NotificationHistory } from "./notification-history.js";
+import {
+  buildPackagingNotificationId,
+  parsePackagingNotice,
+} from "./packaging-notifications.js";
+import type { DesktopBugChange, DesktopBugRoute, DesktopConnectionStatus } from "./bridge-types.js";
+import bugRoutes from "./bug-route.cjs";
+import { RendererDeliveryGate } from "./renderer-delivery-gate.js";
+import { NotificationHistory, type NotificationHistoryRoute } from "./notification-history.js";
 import {
   boundedNotificationFailure,
   buildUpdateNotificationId,

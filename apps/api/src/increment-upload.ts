@@ -51,8 +51,8 @@ type WorkerHost = Pick<
   | "resume"
   | "confirmPublish"
   | "folder"
-  | "reconcilePublications"
->;
+> &
+  Partial<Pick<UploaderHost, "reconcilePublications">>;
 interface Options {
   root: string;
   executable?: string;
@@ -243,7 +243,9 @@ export class IncrementUploadService {
           if (url === "/api/v1/auth/me") return { userId: owner };
           if (url === "/api/v1/packaging/builds" && request?.method === "POST")
             return this.options.jenkins.trigger(
-              quickBuildPreset(record(request.body)["preset"])?.id ?? "external",
+              this.options.buildPreset ??
+                quickBuildPreset(record(request.body)["preset"])?.id ??
+                "external",
               `${owner}:${request.headers?.["idempotency-key"]}`,
             );
           if (url.startsWith("/api/v1/packaging/progress?")) {
@@ -327,13 +329,26 @@ export class IncrementUploadService {
     // Enqueue does not wait for Jenkins polling or a platform request. Only the
     // scheduler dispatches; the SQLite insertion itself is atomic and idempotent.
     this.leader();
+    if (this.options.canStart && !(await this.options.canStart(kind)))
+      throw new Error("COMPONENT_DISABLED");
+    if (
+      kind === "build" &&
+      this.options.project?.sourceKind === "ios_directory"
+    )
+      throw new Error("BUILD_PLATFORM_UNSUPPORTED");
     const preset =
-      kind === "build" ? quickBuildPreset(presetValue ?? "android-release-app") : undefined;
-    if (kind === "build" && !preset) throw new Error("INVALID_INPUT");
+      kind === "build" && !this.options.buildPreset
+        ? quickBuildPreset(presetValue ?? "android-release-app")
+        : undefined;
+    if (kind === "build" && !this.options.buildPreset && !preset)
+      throw new Error("INVALID_INPUT");
     const selected = preset ? { preset: preset.id } : {};
     const key = uuid(id),
       input = parseNewUploadInput(
-        preset ? quickUploadInput(parseNewUploadInput(value), preset.id) : value,
+        preset
+          ? quickUploadInput(parseNewUploadInput(value), preset.id)
+          : value,
+        this.options.project?.defaults,
       ),
       prior = this.rows().find((c) => c.id === key);
     if (prior) {
@@ -708,7 +723,7 @@ export class IncrementUploadService {
       for (const owner of owners) {
         // The platform may have been published manually after our worker stopped
         // at status 60. Verify that original publication before reserving lanes.
-        await this.host(owner).reconcilePublications();
+        await this.host(owner).reconcilePublications?.();
         const s = await this.host(owner).snapshot();
         if (s.unreadableJobs) throw new Error("LOCAL_STATE_INVALID");
         snapshots.set(owner, s);

@@ -43,7 +43,9 @@ export interface UploadSourceIdentity {
   sha256?: string;
 }
 export interface BuildUploadChain {
-  preset?: QuickBuildPresetId;
+  projectId?: string;
+  componentVersion?: number;
+  preset?: string;
   buildVersion?: string;
   id: string;
   ownerId: string;

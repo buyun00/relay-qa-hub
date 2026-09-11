@@ -9,7 +9,7 @@ import type {
   UploadInput,
   UploaderSnapshot,
 } from "@relay-qa-hub/upload-contract";
-import { uploadDraftDefaults, UPLOAD_MODES } from "./upload-model";
+import { projectUploadDraft, UPLOAD_MODES } from "./upload-model";
 import {
   QUICK_BUILD_PRESETS,
   quickUploadInput,
@@ -43,6 +43,7 @@ const messages: Record<string, string> = {
 };
 const labels: Record<BuildUploadChain["status"], string> = {
   queued: "服务端等待打包",
+  paused: "已暂停",
   submitting: "正在提交打包",
   submission_unknown: "待核对打包提交结果",
   building: "等待打包完成",
@@ -57,10 +58,14 @@ export function buildUploadError(code: string): string {
 }
 export default function BuildUploadControls({
   userId,
+  uploadDefaults,
   disabled,
   onBuildOnly,
   onSubmitted,
   onOpenUpload,
+  presetOptions,
+  singleBuildPreset,
+  allowAutoUpload = true,
   checks,
   checking = false,
   checkError = false,
@@ -68,7 +73,6 @@ export default function BuildUploadControls({
 }: {
   userId?: string;
   uploadDefaults: Record<string, unknown>;
-  label?: string;
   disabled: boolean;
   onBuildOnly: (preset: QuickBuildPresetId) => void;
   onSubmitted: (queueId: number) => void;
@@ -77,10 +81,20 @@ export default function BuildUploadControls({
   checking?: boolean;
   checkError?: boolean;
   onRefreshChecks?: (() => void) | undefined;
+  presetOptions?: readonly string[];
+  singleBuildPreset?: string;
+  allowAutoUpload?: boolean;
 }) {
   const bridge = serverUploader;
+  const availablePresets = QUICK_BUILD_PRESETS.filter(
+    (candidate) => !presetOptions || presetOptions.includes(candidate.id),
+  );
+  const initialPreset =
+    availablePresets.find((candidate) => candidate.id === singleBuildPreset)?.id ??
+    availablePresets[0]?.id ??
+    "android-release-app";
   const [open, setOpen] = useState(false);
-  const [preset, setPreset] = useState<QuickBuildPresetId>("android-release-app");
+  const [preset, setPreset] = useState<QuickBuildPresetId>(initialPreset);
   const [busy, setBusy] = useState(false);
   const busyRef = useRef(false);
   const root = useRef<HTMLDivElement>(null);
@@ -92,6 +106,12 @@ export default function BuildUploadControls({
   const [notice, setNotice] = useState("");
   const [chains, setChains] = useState<BuildUploadChain[]>([]);
   const [error, setError] = useState("");
+  useEffect(() => {
+    if (!availablePresets.some((candidate) => candidate.id === preset)) {
+      setPreset(initialPreset);
+      setOpen(false);
+    }
+  }, [availablePresets, initialPreset, preset]);
   const refresh = useCallback(async () => {
     if (!bridge?.buildChains) return;
     try {
@@ -137,14 +157,17 @@ export default function BuildUploadControls({
     try {
       setInput(
         quickUploadInput(
-          uploadDraftDefaults(
-            JSON.parse(localStorage.getItem(`qa-hub:upload-draft:${userId}`) ?? "{}"),
+          projectUploadDraft(
+            JSON.parse(
+              localStorage.getItem(projectStorageKey("upload-draft", undefined, userId)) ?? "{}",
+            ),
+            uploadDefaults,
           ),
           selected,
         ),
       );
     } catch {
-      setInput(quickUploadInput(uploadDraftDefaults(null), selected));
+      setInput(quickUploadInput(projectUploadDraft(null, uploadDefaults), selected));
     }
     setOpen(true);
     if (bridge) {
@@ -265,20 +288,22 @@ export default function BuildUploadControls({
           >
             只构建
           </button>
-          <button
-            className="package-combined-action"
-            type="button"
-            disabled={
-              busy ||
-              disabled ||
-              !bridge?.buildAndUpload ||
-              !snapshot?.configured ||
-              !snapshot.available
-            }
-            onClick={() => void combined()}
-          >
-            {busy ? "正在检查并提交…" : "构建完自动上传增量"}
-          </button>
+          {allowAutoUpload ? (
+            <button
+              className="package-combined-action"
+              type="button"
+              disabled={
+                busy ||
+                disabled ||
+                !bridge?.buildAndUpload ||
+                !snapshot?.configured ||
+                !snapshot.available
+              }
+              onClick={() => void combined()}
+            >
+              {busy ? "正在检查并提交…" : "构建完自动上传增量"}
+            </button>
+          ) : null}
           <p>
             产品 {input.productId} · 渠道 {input.channelId} · 测试人 {input.testerId}
           </p>
@@ -362,7 +387,7 @@ export default function BuildUploadControls({
                   checking={checking}
                 />
                 <div className="package-build-buttons">
-                  {QUICK_BUILD_PRESETS.filter(
+                  {availablePresets.filter(
                     (p) => p.platform === platform && p.configuration === configuration,
                   ).map(renderChoice)}
                 </div>

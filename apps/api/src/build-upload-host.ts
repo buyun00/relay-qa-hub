@@ -110,7 +110,13 @@ export class BuildUploadHost {
       )
         throw new Error("LOCAL_STATE_INVALID");
       const chain = raw as unknown as BuildUploadChain;
-      if (chain.preset !== undefined && !quickBuildPreset(chain.preset))
+      if (
+        this.options.projectId &&
+        (chain.projectId !== this.options.projectId ||
+          chain.componentVersion !== this.options.componentVersion)
+      )
+        throw new Error("BUILD_UPLOAD_PROJECT_SCOPE_MISMATCH");
+      if (!this.options.preset && chain.preset !== undefined && !quickBuildPreset(chain.preset))
         throw new Error("LOCAL_STATE_INVALID");
       chain.input = parseNewUploadInput(chain.input);
       if (
@@ -149,24 +155,32 @@ export class BuildUploadHost {
       const raw = record(value),
         id = raw["requestId"];
       this.file(id);
-      const selection = quickBuildPreset(raw["preset"] ?? "android-release-app");
-      if (!selection) throw new Error("INVALID_INPUT");
-      const input = parseNewUploadInput(
-          quickUploadInput(parseNewUploadInput(raw["upload"]), selection.id),
-        ),
+      const selection = this.options.preset
+        ? null
+        : quickBuildPreset(raw["preset"] ?? "android-release-app");
+      if (!this.options.preset && !selection) throw new Error("INVALID_INPUT");
+      const input = this.options.preset
+          ? parseNewUploadInput(raw["upload"], this.options.defaults)
+          : parseNewUploadInput(
+              quickUploadInput(parseNewUploadInput(raw["upload"]), selection!.id),
+            ),
         ownerId = await this.owner();
       const chains = await this.all(),
         prior = chains.find((c) => c.id === id);
       if (prior) {
         if (
           prior.ownerId !== ownerId ||
-          prior.preset !== selection.id ||
-          JSON.stringify({
-            ...prior.input,
-            version: "",
-            summary: "自动版本号",
-            description: "自动版本号",
-          }) !== JSON.stringify(input)
+          prior.preset !== selection?.id ||
+          JSON.stringify(
+            this.options.preset
+              ? prior.input
+              : {
+                  ...prior.input,
+                  version: "",
+                  summary: "自动版本号",
+                  description: "自动版本号",
+                },
+          ) !== JSON.stringify(input)
         )
           throw new Error("BUILD_CHAIN_CONFLICT");
         return prior;
@@ -174,14 +188,14 @@ export class BuildUploadHost {
       if (chains.some((c) => !terminal(c))) throw new Error("BUILD_CHAIN_ACTIVE");
       await this.options.uploader.checkAuth();
       const accountIdentity = await this.options.uploader.accountIdentity();
-      const baseline = null;
+      const baseline = this.options.preset ? await this.source(true) : null;
       const now = new Date().toISOString();
       const chain: BuildUploadChain = {
         ...(this.options.projectId
           ? { projectId: this.options.projectId, componentVersion: this.options.componentVersion! }
           : {}),
         id: String(id),
-        preset: selection.id,
+        ...(selection ? { preset: selection.id } : {}),
         ownerId,
         accountIdentity,
         createdAt: now,
@@ -201,7 +215,7 @@ export class BuildUploadHost {
           await this.options.api.json("/api/v1/packaging/builds", {
             method: "POST",
             headers: { "idempotency-key": chain.id },
-            body: { preset: selection.id },
+            body: { preset: this.options.preset ?? selection!.id },
           }),
         );
         if (!Number.isSafeInteger(result["queueId"]) || Number(result["queueId"]) <= 0)
@@ -341,7 +355,8 @@ export class BuildUploadHost {
     }
     if (
       build["queueId"] !== chain.queueId ||
-      build["preset"] !== (chain.preset ?? "external") ||
+      (build["preset"] !== null &&
+        build["preset"] !== (chain.preset ?? this.options.preset ?? "external")) ||
       !Number.isSafeInteger(build["number"]) ||
       Number(build["number"]) <= 0
     )

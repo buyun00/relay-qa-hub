@@ -1474,6 +1474,54 @@ export class QaHubMcpTools {
   }
 
   async call(name: string, argumentsValue: unknown): Promise<unknown> {
+    if (this.options.sharedApi) {
+      if (!this.sharedDefinitions.some((tool) => tool.name === name))
+        throw new QaHubMcpError("TOOL_NOT_FOUND", `Unknown QA Hub MCP tool: ${name}`, 404);
+      if (name === "qa_materialize_attachment") return this.materializeAttachment(argumentsValue);
+      if (name === "qa_logout")
+        return this.api.json("/api/v1/auth/logout", { method: "POST", body: {} });
+      if (name === "qa_login_gm") {
+        const args = requireRecord(argumentsValue, "arguments");
+        onlyKeys(args, ["request", "projectId"]);
+        const request = requireRecord(args["request"], "request");
+        if (
+          args["projectId"] !== undefined &&
+          request["projectId"] !== undefined &&
+          args["projectId"] !== request["projectId"]
+        )
+          throw new QaHubMcpError("PROJECT_MISMATCH", "Project identifiers must match", 400);
+        return this.api.json("/api/v1/auth/gm/login", {
+          method: "POST",
+          body: {
+            ...request,
+            ...(args["projectId"] ? { projectId: args["projectId"] } : {}),
+            client: "web",
+          },
+        });
+      }
+      if (name === "qa_login") {
+        const args = requireRecord(argumentsValue, "arguments");
+        onlyKeys(args, ["name", "projectId", "projectName", "code"]);
+        const projectCodeLogin = args["projectName"] !== undefined || args["code"] !== undefined;
+        return this.api.json("/api/v1/auth/login", {
+          method: "POST",
+          body: {
+            name: requireString(args, "name", 1, 128),
+            ...(projectCodeLogin
+              ? {
+                  projectName: requireString(args, "projectName", 1, 200),
+                  code: requireString(args, "code", 4, 4),
+                }
+              : { projectId: requireUuid(args, "projectId") }),
+            client: "web",
+          },
+        });
+      }
+      return this.api.json("/api/v1/mcp/call", {
+        method: "POST",
+        body: { name, arguments: argumentsValue },
+      });
+    }
     if (PACKAGING_MCP_TOOLS.some((tool) => tool.name === name))
       return callPackagingTool(name, argumentsValue, this.api);
     if (PRODUCTION_MCP_TOOLS.some((tool) => tool.name === name))

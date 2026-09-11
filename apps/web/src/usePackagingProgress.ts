@@ -11,8 +11,8 @@ export function usePackagingProgress(
   onCompleted: () => void,
   onOpen?: () => void,
 ) {
-  // Jenkins numbers belong to a job. Preserve the old cache without applying its numbers to the new job.
-  const storageKey = `qa-hub:packaging-watch:quick-v1:${userId}`;
+  // Jenkins numbers belong to both a job and a project; never apply another project's cache.
+  const storageKey = projectStorageKey("packaging-watch-quick-v1", undefined, userId);
   const [initialWatched] = useState<WatchedBuild[]>(() => {
     try {
       return readWatchedBuilds(

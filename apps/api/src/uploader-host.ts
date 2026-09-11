@@ -3,7 +3,7 @@ import { createReadStream, promises as fs } from "node:fs";
 import path from "node:path";
 import { spawn } from "node:child_process";
 import { DEFAULT_UPLOAD_PARAMETERS } from "./uploader-types.js";
-import { resolveUploadBuild } from "./upload-source.js";
+import { latestIosUploadSource, resolveUploadBuild } from "./upload-source.js";
 import {
   awaitingPublication,
   publicationDigest,
@@ -371,7 +371,7 @@ export class UploaderHost {
     return {
       available,
       toolVersion: "0.5.1",
-      sourceUrl: UPLOAD_SOURCE,
+      sourceUrl: this.options.project?.sourceUrl ?? UPLOAD_SOURCE,
       configured: !!auth,
       authError,
       account: str(auth?.["account"], 200),
@@ -403,7 +403,7 @@ export class UploaderHost {
           if (!auth?.["accessToken"]) throw new Error("AUTH_REQUIRED");
           const digest = publicationDigest(meta, config, state);
           const detail = await this.request(
-            API_BASE,
+            this.options.project?.apiBase ?? API_BASE,
             `/api/v1/developapi/versions/detail?vid=${num(state["versionId"])}`,
             null,
             str(auth["accessToken"], 20000),
@@ -513,8 +513,10 @@ export class UploaderHost {
       if (input["kind"] !== "email" && input["kind"] !== "subaccount")
         throw new Error("INVALID_INPUT");
       const kind: UploadLogin["kind"] = input["kind"];
+      const loginBase = this.options.project?.loginBase ?? LOGIN_BASE;
+      const apiBase = this.options.project?.apiBase ?? API_BASE;
       const data = await this.request(
-        this.project.loginBase,
+        loginBase,
         `/api/v1/gwapi/login/${kind === "email" ? "unified" : "extension"}`,
         {
           account,
@@ -527,7 +529,7 @@ export class UploaderHost {
       if (!token && kind === "subaccount") {
         try {
           const url = new URL(str(data["new_skip_url"] || data["skip_url"], 30000));
-          if (![this.project.loginBase, this.project.apiBase].includes(url.origin))
+          if (![loginBase, apiBase].includes(url.origin))
             throw new Error();
           const values = [
             ...url.searchParams.getAll("access_token"),
@@ -540,7 +542,7 @@ export class UploaderHost {
       }
       if (!token || /REDACTED|[\r\n]/iu.test(token)) throw new Error("LOGIN_SCHEMA_CHANGED");
       await this.request(
-        this.project.apiBase,
+        apiBase,
         "/api/v1/thirdpartyadminapi/oss_provider",
         null,
         token,
@@ -548,8 +550,8 @@ export class UploaderHost {
       await writeJson(this.options.authFile, {
         accessToken: token,
         refreshToken: str(data["refresh_token"], 20000),
-        apiBase: this.project.apiBase,
-        loginBase: this.project.loginBase,
+        apiBase,
+        loginBase,
         account,
         password: input["password"],
         kind,
@@ -594,7 +596,9 @@ export class UploaderHost {
     const auth = await readJson(this.options.authFile);
     if (!auth || !auth["account"]) throw new Error("AUTH_REQUIRED");
     return createHash("sha256")
-      .update(JSON.stringify([this.project.apiBase, auth["account"], auth["kind"]]))
+      .update(
+        JSON.stringify([this.options.project?.apiBase ?? API_BASE, auth["account"], auth["kind"]]),
+      )
       .digest("hex");
   }
   async hasBuildJob(id: string): Promise<boolean> {
@@ -604,8 +608,10 @@ export class UploaderHost {
     const env = { ...process.env, ...this.options.environment };
     delete env["OZDQP_AUTHORIZATION"];
     env["OZDQP_AUTH_FILE"] = this.options.authFile;
-    env["QA_HUB_PROJECT_ID"] = this.project.projectId;
-    env["QA_HUB_COMPONENT_VERSION"] = String(this.project.componentVersion);
+    if (this.options.project) {
+      env["QA_HUB_PROJECT_ID"] = this.options.project.projectId;
+      env["QA_HUB_COMPONENT_VERSION"] = String(this.options.project.componentVersion);
+    }
     return env;
   }
   private async launch(
@@ -674,14 +680,18 @@ export class UploaderHost {
     accountIdentity?: string,
   ): Promise<string> {
     return this.exclusive(async () => {
-      let input = parseNewUploadInput(value);
+      let input = parseNewUploadInput(
+        value,
+        this.options.project?.defaults ?? DEFAULT_UPLOAD_PARAMETERS,
+      );
       const requestedInput = input;
       const directory = this.folder(id);
       const existing = await readJson(path.join(directory, "job.json"));
       if (existing) {
         if (
-          existing["projectId"] !== this.project.projectId ||
-          existing["componentVersion"] !== this.project.componentVersion
+          this.options.project &&
+          (existing["projectId"] !== this.options.project.projectId ||
+            existing["componentVersion"] !== this.options.project.componentVersion)
         )
           throw new Error("PROJECT_SCOPE_MISMATCH");
         if (
@@ -706,8 +716,15 @@ export class UploaderHost {
       // Resume and lost acknowledgements must never select a newer iOS ZIP.
       if (!existing) {
         const resolved = source
-          ? { downloadUrl: source.url ?? UPLOAD_SOURCE, expectedSource: source }
-          : await resolveUploadBuild(input, this.options.fetch);
+          ? {
+              downloadUrl: source.url ?? this.options.project?.sourceUrl ?? UPLOAD_SOURCE,
+              expectedSource: source,
+            }
+          : this.options.project
+            ? this.project.sourceKind === "ios_directory"
+              ? await latestIosUploadSource(this.options.fetch, this.project.sourceUrl)
+              : { downloadUrl: this.project.sourceUrl }
+            : await resolveUploadBuild(input, this.options.fetch);
         if ("version" in resolved)
           input = parseNewUploadInput({ ...input, version: resolved.version });
         await writeJson(path.join(directory, "job.json"), {
@@ -717,17 +734,21 @@ export class UploaderHost {
           recordedTestWorkflow: true,
           version: input.version || null,
           existingVersionId: null,
-          apiBase: this.project.apiBase,
-          loginBase: this.project.loginBase,
-          projectId: this.project.projectId,
-          componentVersion: this.project.componentVersion,
-          targetPrefix: this.project.targetPrefix,
-          testDirectoryPrefix: this.project.testDirectoryPrefix,
-          releaseDirectoryPrefix: this.project.releaseDirectoryPrefix,
-          sourceRoot: new URL(".", this.project.sourceUrl).toString(),
-          downloadUrl: this.project.sourceUrl,
-          sourceFileName:
-            new URL(this.project.sourceUrl).pathname.split("/").at(-1) ?? "artifact.zip",
+          apiBase: this.options.project?.apiBase ?? API_BASE,
+          ...(this.options.project
+            ? {
+                loginBase: this.options.project.loginBase,
+                projectId: this.options.project.projectId,
+                componentVersion: this.options.project.componentVersion,
+                targetPrefix: this.options.project.targetPrefix,
+                testDirectoryPrefix: this.options.project.testDirectoryPrefix,
+                releaseDirectoryPrefix: this.options.project.releaseDirectoryPrefix,
+                sourceRoot: new URL(".", this.options.project.sourceUrl).toString(),
+                sourceFileName:
+                  new URL(this.options.project.sourceUrl).pathname.split("/").at(-1) ??
+                  "artifact.zip",
+              }
+            : {}),
           workDirectory: directory,
           pollSeconds: 3,
           waitTimeoutSeconds: 1800,

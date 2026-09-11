@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { latestIosUploadSource as configuredIosUploadSource } from "../src/upload-source.js";
+import { latestIosUploadSource } from "../src/upload-source.js";
 
 const origin = "http://10.100.5.129:8000/ozdqp/iOS/";
 const mtime = Date.parse("2026-09-08T09:16:23Z") + 385;

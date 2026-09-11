@@ -3,7 +3,6 @@ import test from "node:test";
 import { QUICK_BUILD_PRESETS, QUICK_JOB_NAME, catalogFetch } from "./quick-build-fixture.mjs";
 import { JenkinsBuildService, packageFiles } from "../dist/jenkins-builds.js";
 import { createApiApp } from "../dist/app.js";
-import { jenkinsConfig } from "./component-test-config.mjs";
 
 const jobPath = `/job/${encodeURIComponent(QUICK_JOB_NAME)}/`;
 const definitions = [{ name: "打包用途" }];
@@ -16,14 +15,7 @@ const job = {
       timestamp: 1788507462526,
       building: false,
       result: "SUCCESS",
-      actions: [
-        {
-          parameters: Object.entries(jenkinsConfig.presets.external).map(([name, value]) => ({
-            name,
-            value,
-          })),
-        },
-      ],
+      actions: [{ parameters: [{ name: "networkScope", value: "外网_保留原参数" }] }],
     },
   ],
 };
@@ -88,7 +80,7 @@ function fixture({ post, overrideJob, failJenkins = false } = {}) {
           });
     }
     throw new Error(`Unexpected request ${url.pathname}`);
-  }, jenkinsConfig);
+  });
   return { service, posts, crumbs: () => crumbs, reads: () => reads };
 }
 

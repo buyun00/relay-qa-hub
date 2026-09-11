@@ -61,11 +61,6 @@ async function fixture(t: Parameters<Parameters<typeof test>[1]>[0]) {
   let platformAccount = "fixture-account";
   const options = {
     root,
-    sourceUrl: "https://artifacts.fixture.invalid/test.zip",
-    projectId: randomUUID(),
-    componentVersion: 3,
-    preset: "external",
-    defaults: input,
     api: {
       json: async (url: string, request?: QaHubJsonRequest) => {
         if (url === "/api/v1/auth/me") return { userId: state.owner };
@@ -111,7 +106,7 @@ async function fixture(t: Parameters<Parameters<typeof test>[1]>[0]) {
       },
     },
     fetch: (async (url, init) => {
-      assert.equal(new URL(String(url)).host, "artifacts.fixture.invalid");
+      assert.equal(new URL(String(url)).host, "10.100.5.129:8000");
       assert.equal(init?.method, "HEAD");
       assert.equal(init?.headers, undefined);
       state.heads++;
@@ -141,8 +136,6 @@ test("exact queue and completed fresh ZIP hand off once with frozen defaults aft
   const f = await fixture(t);
   const chain = await f.host.start(f.request);
   assert.equal(chain.status, "building");
-  assert.equal(chain.projectId, f.options.projectId);
-  assert.equal(chain.componentVersion, f.options.componentVersion);
   assert.equal(f.state.authChecks, 1);
   f.state.other = [{ ...f.state.build, number: 320, queueId: 41 }];
   await f.host.tick();

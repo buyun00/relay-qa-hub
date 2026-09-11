@@ -1,4 +1,3 @@
-import { buildParameters } from "../dist/jenkins-builds.js";
 export const jenkinsConfig = {
   projectId: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
   version: 1,
@@ -9,10 +8,21 @@ export const jenkinsConfig = {
   zipPath: "/pkg_zip/ozdqp/_pkg_cfg_2001_1002.zip",
   apkPath: "/apk/",
   ipaPath: "/ipa/",
-  presets: Object.fromEntries(
-    ["internal-nosdk", "internal-sdk", "external"].map((preset) => [
-      preset,
-      buildParameters(preset),
-    ]),
-  ),
+  presets: {
+    "internal-nosdk": {
+      networkScope: "内网_自动判断",
+      internalUseSdk: "不接入SDK",
+      buildMode: "Auto_自动判断",
+    },
+    "internal-sdk": {
+      networkScope: "内网_自动判断",
+      internalUseSdk: "接入SDK",
+      buildMode: "Auto_自动判断",
+    },
+    external: {
+      networkScope: "外网_保留原参数",
+      internalUseSdk: "不接入SDK",
+      buildMode: "App_资源和包体",
+    },
+  },
 };

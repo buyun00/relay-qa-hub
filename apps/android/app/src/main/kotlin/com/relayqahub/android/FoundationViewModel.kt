@@ -911,15 +911,7 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
                 return@launch
             }
 
-            val preferredKey = "submission:$submissionId:commit"
-            val previous = appContainer.scopedRepository.findOperationByIdempotencyKey(
-                scope = scope,
-                idempotencyKey = preferredKey,
-            )
-            if (previous != null && previous.state != QueueState.FAILED_PERMANENT) {
-                lastAction.value = "$actionLabel 已在持久队列中，无需重复提交。"
-                if (navigateAfterQueue) finishNewBugForm()
-                uploadQueuedBugsNow()
+            if (reuseDurableBugDraft(submissionId, navigateAfterQueue)) {
                 onCompleted()
                 return@launch
             }
@@ -1018,8 +1010,6 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
                         }
                     },
                 )
-                val operationId = appContainer.scopedRepository.enqueue(scope, request)
-                operationId
             }
             result.onSuccess { operationId ->
                 lastAction.value =
@@ -1043,6 +1033,182 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
     private fun finishNewBugForm() {
         // The visible form can close once durable; its identity and text remain until confirmation.
         page.value = QaHubPage.BUG_LIST
+    }
+
+    private suspend fun reuseDurableBugDraft(submissionId: String, navigate: Boolean): Boolean {
+        return try {
+            val pending = appContainer.bugDraftPreferences.pending(draftKey)?.takeIf {
+                it.submissionId == submissionId
+            }
+            pending?.requireScope(scope)
+            val previous = appContainer.scopedRepository.resumeUnconfirmedCreate(
+                scope, "submission:$submissionId:commit",
+            ) ?: run {
+                if (pending == null) return false
+                // A crash before Room insertion can resume only the saved request, never the open form.
+                val request = pending.preparedRequest(scope)
+                appContainer.scopedRepository.seedFoundationScope(scope)
+                val operationId = appContainer.scopedRepository.enqueue(scope, request)
+                appContainer.bugDraftPreferences.markQueued(draftKey, submissionId, operationId)
+                checkNotNull(
+                    appContainer.scopedRepository.findOperationByIdempotencyKey(
+                        scope,
+                        request.idempotencyKey,
+                    ),
+                )
+            }
+            check(pending?.operationId == null || pending.operationId == previous.operationId) {
+                "原提交记录身份不一致，请恢复本地队列。"
+            }
+            if (pending != null && pending.operationId == null) {
+                appContainer.bugDraftPreferences.markQueued(draftKey, submissionId, previous.operationId)
+            }
+            if (previous.state == QueueState.FAILED_PERMANENT) {
+                reconfirmableCreationId.value = previous.operationId.takeIf {
+                    previous.isReconfirmableCreateProtocolFailure()
+                }
+                replaceableRejectedCreationId.value = previous.operationId.takeIf {
+                    previous.noBugPostRejectionFingerprint() != null
+                }
+                lastAction.value = if (replaceableRejectedCreationId.value != null) {
+                    "附件阶段已明确拒绝，尚未发送 Bug 创建。可使用下方按钮保留原失败记录和图片，再修改草稿。"
+                } else if (reconfirmableCreationId.value != null) {
+                    "原提交收到异常成功回执，尚未确认。可点击下方“使用原请求重新确认”，沿用原内容和身份。"
+                } else {
+                    "原提交结果仍无法确认 (${previous.lastErrorCode ?: "UNKNOWN"})；" +
+                        "已保留原内容和身份，请先核对原记录，不能自动换身份新建 Bug。"
+                }
+                return true
+            }
+            if (previous.state == QueueState.SUCCEEDED) {
+                lastAction.value = if (reconcilePendingBugSubmission()) {
+                    "原提交已收到服务端确认，无需重复创建 Bug；保留的修改可另行提交。"
+                } else {
+                    "原提交成功回执暂时无法核对，原身份和当前草稿已保留，不能重复创建。"
+                }
+            } else {
+                uploadQueuedBugsNow()
+                lastAction.value = "正在确认原提交；将沿用已保存的内容和图片。当前修改另行保留，确认后可再提交。"
+            }
+            // Keep the open form, including unsaved annotation-editor strokes, while confirming.
+            if (navigate && page.value != QaHubPage.NEW_BUG) finishNewBugForm()
+            true
+        } catch (failure: Exception) {
+            if (failure is CancellationException) throw failure
+            lastAction.value = "原提交暂时无法确认；当前内容已保留，请稍后重试，避免重复创建。"
+            true // Failure to inspect/rearm an original operation never authorizes a replacement.
+        }
+    }
+
+    private suspend fun reconcilePendingBugSubmission(): Boolean {
+        val pending = appContainer.bugDraftPreferences.pending(draftKey) ?: return false
+        pending.requireScope(scope)
+        val operation = appContainer.scopedRepository.findOperationByIdempotencyKey(
+            scope,
+            "submission:${pending.submissionId}:commit",
+        ) ?: return false
+        if (pending.operationId != null && pending.operationId != operation.operationId) return false
+        if (operation.state != QueueState.SUCCEEDED) return false
+        val receipt = appContainer.scopedRepository.findReceipt(scope, operation.operationId) ?: return false
+        if (receipt.clientSubmissionId != pending.submissionId || receipt.qaItemId != receipt.bugId) {
+            return false
+        }
+        val cleared = appContainer.bugDraftPreferences.confirmPending(
+            draftKey,
+            pending.submissionId,
+            preserveDraft = page.value == QaHubPage.NEW_BUG ||
+                captureDraft.value.captureId != pending.captureId,
+        )
+        if (cleared) {
+            if (captureDraft.value.captureId == pending.captureId) {
+                captureDraft.value = CaptureDraftUiState()
+            }
+            newBugFormRevision.value += 1
+        }
+        lastAction.value = if (cleared) {
+            "${receipt.qaItemKey} 已确认提交。"
+        } else {
+            "${receipt.qaItemKey} 已确认提交；当前文字、截图和批注保留。再次提交会新建 Bug，请先确认内容。"
+        }
+        return true
+    }
+
+    private suspend fun recoverLegacyCreation(draft: PendingCaptureDraft?): Boolean {
+        val candidates = appContainer.scopedRepository
+            .findLegacyUnconfirmedCreates(scope, draft?.clientSubmissionId)
+            .filterNot { appContainer.bugDraftPreferences.isReleasedRejection(draftKey, it) }
+        val original = candidates.firstOrNull() ?: return false
+        val sameCapture = draft?.takeIf {
+            original.idempotencyKey == "submission:${it.clientSubmissionId}:commit"
+        }
+        appContainer.bugDraftPreferences.savePending(
+            draftKey,
+            PendingBugSubmission.fromQueuedCreate(
+                scope,
+                original,
+                sameCapture?.captureId,
+                sameCapture?.clientAttachmentId,
+            ),
+        )
+        replaceableRejectedCreationId.value = original.operationId.takeIf {
+            original.noBugPostRejectionFingerprint() != null
+        }
+        reconfirmableCreationId.value = original.operationId.takeIf {
+            original.isReconfirmableCreateProtocolFailure()
+        }
+        lastAction.value = "找到 ${candidates.size} 条旧版本未确认创建记录；" +
+            "先保留原记录 ${original.operationId.take(8)}，当前文字和图片不变。" +
+            "再次点击提交只会确认这条旧记录，不会提交当前修改。"
+        return true
+    }
+
+    fun preserveRejectedCreationAndEdit() {
+        val candidateId = replaceableRejectedCreationId.value ?: return
+        replaceableRejectedCreationId.value = null
+        viewModelScope.launch {
+            runCatching {
+                val pending = checkNotNull(appContainer.bugDraftPreferences.pending(draftKey))
+                check(pending.operationId == candidateId)
+                val operation = checkNotNull(
+                    appContainer.scopedRepository.findOperationByIdempotencyKey(
+                        scope,
+                        "submission:${pending.submissionId}:commit",
+                    ),
+                )
+                appContainer.bugDraftPreferences.releaseRejectedBeforeBugPost(
+                    draftKey,
+                    scope,
+                    operation,
+                )
+            }.onSuccess {
+                lastAction.value = "旧请求在附件阶段已拒绝，尚未发送 Bug 创建；失败记录和原图片仍保留。" +
+                    "请修改当前草稿或更换图片，再点击提交创建新 Bug。"
+            }.onFailure {
+                lastAction.value = "无法证明原请求尚未创建 Bug，已保留原身份；请先核对原记录。"
+            }
+        }
+    }
+
+    fun reconfirmOriginalCreation() {
+        val candidateId = reconfirmableCreationId.value ?: return
+        reconfirmableCreationId.value = null
+        viewModelScope.launch {
+            runCatching {
+                val pending = checkNotNull(appContainer.bugDraftPreferences.pending(draftKey))
+                pending.requireScope(scope)
+                check(pending.operationId == candidateId)
+                appContainer.scopedRepository.reconfirmCreateProtocolFailure(
+                    scope,
+                    candidateId,
+                    "submission:${pending.submissionId}:commit",
+                )
+                uploadQueuedBugsNow()
+            }.onSuccess {
+                lastAction.value = "正在使用原请求重新确认；原 ID、内容和图片不变，仍须收到归属一致的有效回执。"
+            }.onFailure {
+                lastAction.value = "原请求暂时无法重新确认；原记录和当前草稿仍保留，没有新建替代请求。"
+            }
+        }
     }
 
     private fun uploadQueuedBugsNow() {

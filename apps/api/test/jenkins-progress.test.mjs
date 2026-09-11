@@ -292,8 +292,8 @@ test("monitor follows the precise queue executable, handles canceled/expired que
     if (url.pathname === `${jobPath}1/timestamps/`) return new Response(timed);
     if (url.pathname === `${jobPath}2/timestamps/`) return json({}, 503);
     throw new Error(`Unexpected path ${url.pathname}`);
-  }, jenkinsConfig);
-  const result = await service.progress([101, 103, 104], [2]);
+  });
+  const result = await service.progress([101, 103, 104]);
   assert.equal(result.builds.find((b) => b.queueId === 101).number, 1);
   assert.equal(result.builds.find((b) => b.number === 2).logError, true);
   assert.deepEqual(
@@ -301,6 +301,6 @@ test("monitor follows the precise queue executable, handles canceled/expired que
     ["CANCELLED", "UNKNOWN"],
   );
   const before = seen.length;
-  assert.deepEqual(await service.progress([104, 103, 101], [2]), result);
+  assert.deepEqual(await service.progress([104, 103, 101]), result);
   assert.equal(seen.length, before, "identical watches share cached requests");
 });

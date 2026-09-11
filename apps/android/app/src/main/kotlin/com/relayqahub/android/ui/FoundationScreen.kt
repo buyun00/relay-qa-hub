@@ -2105,6 +2105,24 @@ private fun NewBugPage(
             ) {
                 Text("提交 Bug", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.ExtraBold)
             }
+            if (state.replaceableRejectedCreationId != null) {
+                OutlinedButton(
+                    onClick = onPreserveRejectedAndEdit,
+                    enabled = !draft.isDeleting && !draft.isSubmitting,
+                    modifier = Modifier.fillMaxWidth().testTag("preserve-rejected-and-edit"),
+                ) {
+                    Text("保留附件失败记录，允许修改后新建")
+                }
+            }
+            if (state.reconfirmableCreationId != null) {
+                OutlinedButton(
+                    onClick = onReconfirmOriginalCreation,
+                    enabled = !draft.isDeleting && !draft.isSubmitting,
+                    modifier = Modifier.fillMaxWidth().testTag("reconfirm-original-creation"),
+                ) {
+                    Text("使用原请求重新确认")
+                }
+            }
             SubmissionStatusCard(state)
             if (state.lastAction.isNotBlank()) {
                 Surface(

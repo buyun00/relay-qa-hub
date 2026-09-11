@@ -1,4 +1,4 @@
-import type { UploadSourceIdentity } from "./uploader-types.js";
+import { UPLOAD_TARGETS, type UploadSourceIdentity } from "./uploader-types.js";
 import { artifactCatalog, pinBuildSource } from "./build-artifacts.js";
 import type { UploadInput } from "./uploader-types.js";
 
@@ -35,7 +35,7 @@ const validName = (name: unknown): name is string =>
 
 export async function latestIosUploadSource(
   fetcher: typeof fetch = fetch,
-  directory?: string,
+  directory = UPLOAD_TARGETS.ios.sourceUrl,
 ): Promise<ResolvedUploadSource> {
   if (!directory) throw new Error("COMPONENT_NOT_CONFIGURED");
   try {

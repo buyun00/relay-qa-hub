@@ -179,6 +179,10 @@ test("submission is durable, idempotent, actor-bound and does not launch in the 
 test("iOS persists channel 2004 through queue restart and supports its explicit quick-build preset", async (t) => {
   const f = await fixture(t),
     id = randomUUID();
+  delete f.options.project;
+  delete f.options.buildPreset;
+  delete f.options.canStart;
+  await f.restart();
   const ios = { ...input, channelId: "2004", belongName: "iOS fixture" };
   await f.service.enqueue(f.owner, id, ios);
   await f.restart();
@@ -191,6 +195,23 @@ test("iOS persists channel 2004 through queue restart and supports its explicit 
   assert.equal(chain.preset, "ios-debug-res");
   assert.equal(chain.input.productId, "2001");
   assert.equal(chain.input.channelId, "2004");
+});
+
+test("project iOS source cannot use a configured Android build button", async (t) => {
+  const f = await fixture(t, {
+    sourceKind: "ios_directory",
+    sourceUrl: "https://artifacts.fixture.invalid/ios/",
+    defaults: { ...input, channelId: "2004" },
+  });
+  await assert.rejects(
+    f.service.enqueue(
+      f.owner,
+      randomUUID(),
+      { ...input, channelId: "2004", belongName: "iOS fixture" },
+      "build",
+    ),
+    /BUILD_PLATFORM_UNSUPPORTED/,
+  );
 });
 
 test("all users see existing upload progress and diagnostics without sharing account configuration", async (t) => {
@@ -520,6 +541,10 @@ test("completed build hands off to upload before the next queued build can overw
   const f = await fixture(t),
     first = randomUUID(),
     second = randomUUID();
+  delete f.options.project;
+  delete f.options.buildPreset;
+  delete f.options.canStart;
+  await f.restart();
   const modified = new Date().toUTCString();
   f.jenkins.buildResult = async () => validateBuildResult(buildInfo(), QUICK_BUILD_PRESETS[2]);
   f.options.fetch = async () =>
