@@ -11,4 +11,16 @@
 - 后端上传/构建宿主、资源选择 41 项通过，持久化队列与真实 Worker 进程 20 项通过。
 - 回归覆盖只读 GET、身份与资源目录不匹配、未发布/不可达、运行中不核对、检查中状态改变、重启读取核对收据，以及释放原队列后不重复构建。
 - 原始 140 个 JSON/JSONL 文件和一致性 SQLite 备份在 `work/build-upload-click-fix/server-before/`。使用备份副本运行新代码，真实查询瑞雪 4 次 GET，四项均核对成功，140 个原文件哈希不变；未发起平台写操作。详情在 `live-reconciliation.json`。
-- UI 与部署、恢复原队列的最终回执完成后补充。此次修复不是重新发布四个游戏版本，也不把排队回执当成构建或新版本上传成功。
+- Web 单元测试 56 项通过；独立浏览器交互验证提交回执、渠道等待原因、重复点击复用原任务、只构建、菜单内错误及账号/程序未就绪提示，记录在 `ui-verification.json`。该项使用明确标注的 HTTP 测试数据，不算业务上传成功。
+
+## 部署、用户停止指令与最终状态
+
+后端源码 `886c6b8d9f1183fa4ec79a12ec9b5fc88cb0ddfd` 已于 11:30 部署，readiness 为 ready。四条旧任务通过真实瑞雪 GET 核对后展示 `published=true / remoteStatus=100`，没有重新调用发布。
+
+部署后原任务 `d37c5fd5-c4c4-4179-b6f3-6a6874c0ad49` 曾获得 Jenkins queue 931、快捷构建 17、Android 子构建 10182，证明原来的渠道阻塞已解除。随后用户明确指示“不要恢复原来的任务”：立即通过服务端取消三条原任务，包括另外两条 `a2b7f540-d156-4a1a-a8e9-532d69e2815b`、`bd87042d-8179-48cf-865c-7e4cacdc1255`；三条均为 cancelled、uploadJobId=null。核对父子构建身份后停止快捷构建 17，Jenkins 回读父构建及 Android 10182 均 `building=false / result=ABORTED`。未启动任何新的增量上传。回执为 `cancel-original-tasks.json`、`stop-restored-build.json`。
+
+这次只修复未来提交的功能，原任务保持取消。上传记录仍有 16 条，接口可见的 20 条构建链记录均保留。原始 140 个文件中 139 个哈希完全不变；唯一变化是另一账号 auth.json 中正常续期的 accessToken/refreshToken，账号与其他字段不变。原 Worker 状态、结果、日志、配置和 ZIP 没有覆盖；新发布核对记录单独保留。详见 `production-verification.json`、`auth-preservation.json`。
+
+EXE / Web 3.5.1 已发布，releaseId `20260911T033325460Z`，来源同一提交。安装器 150,487,036 bytes，SHA-256 `2bdaa8ebe471092bb2cc467014ed78c272e6db9d5a87aae8bd32e7bcde8e2bae`；便携 ZIP 155,464,825 bytes，SHA-256 `3c6e92d68c97000b4a4ccfadd0d1e80c315e5b9db5a1dd7d9f17dc9203d2974d`。线上两个下载文件哈希、签名清单、包内 release.json、打包源码及 Web 资源核对一致。
+
+独立真实 EXE 连接生产 API，8 个菜单均验证产品/渠道/测试人和可用状态；MCP 回读四条已发布记录和三条已取消记录。此轮 EXE 验证没有提交打包或上传。日常安装 EXE 未停止或替换；独立验收客户端用后关闭，配置和回滚包保留。客户端发布证据在 `work/windows-3.5.1-release/`。用户更新 EXE 后获得新增的即时提示；后端的已发布状态核对已直接生效。
