@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "recordedAt": "2026-09-11T01:53:09.619Z",
+  "recordedAt": "2026-09-11T02:37:27.705Z",
   "designVersion": "2.1",
   "overallStatus": "not_complete",
   "completionAllowed": false,
@@ -341,7 +341,105 @@
         "continuation-20260911/current-source-revalidation-fd0f0f8/verify-isolated-installed-local-mcp.mjs",
         "../runs/desktop-mcp-core-2026-09-11T00-59-30-586Z.json"
       ],
-      "detail": "The isolated signed-manifest updater completed 0.2.0-preview.19 to 0.2.0-preview.20, relaunched the exact installed executable, preserved the version 19 rollback backup, preview configuration, project, drafts, and local MCP, and passed the post-upgrade read-only reload. A separate fresh profile then executed 13 installed local-MCP checks and exited only its owned process with code 0. Native notification routing remains an environment-blocked acceptance gate; NotSigned is recorded separately as a distribution limitation."
+      "detail": "Historical agent evidence passed the isolated signed-manifest upgrade from 0.2.0-preview.19 to 0.2.0-preview.20, exact installed-executable relaunch, rollback/configuration/project/draft preservation, post-upgrade readback, and a 13-check installed local-MCP subset. This retained PASS describes the executed historical scope only and does not claim the current user-owned Windows EXE acceptance passed. NotSigned remains a separate distribution limitation."
+    },
+    {
+      "id": "windows-exe-user-acceptance",
+      "status": "not_run",
+      "owner": "user",
+      "handoffStatus": "delegated_pending",
+      "agentExecuted": false,
+      "completionImpact": "blocks_final_acceptance",
+      "resultLabel": "用户自测／已移交，代理未执行",
+      "surfaces": [
+        "exe",
+        "local_mcp",
+        "windows_native_notification"
+      ],
+      "userScope": [
+        "install",
+        "upgrade",
+        "run",
+        "desktop_notification_visible_click_project_route",
+        "local_mcp"
+      ],
+      "detail": "All current or further hands-on Windows EXE acceptance is owned by the user and has not been run by the agent under the updated scope. Historical agent package, upgrade, relaunch, readback, and installed local-MCP evidence remains valid reference evidence, while the historical native-notification attempt remains an environment blocker; neither state is a user PASS.",
+      "historicalAgentEvidence": {
+        "disposition": "reference_only_does_not_satisfy_user_acceptance",
+        "passedScopes": [
+          {
+            "id": "windows-package-publication",
+            "status": "pass",
+            "evidence": [
+              "continuation-20260911/postfix-fd0f0f8/summary.json",
+              "continuation-20260911/postfix-fd0f0f8/package/receipt.json",
+              "continuation-20260911/postfix-fd0f0f8/package/publication-result.json",
+              "continuation-20260911/postfix-fd0f0f8/package/signed-manifest.json"
+            ]
+          },
+          {
+            "id": "windows-upgrade-relaunch-and-readback",
+            "status": "pass",
+            "evidence": [
+              "continuation-20260911/postfix-fd0f0f8/upgrade/auto-relaunch-verification.json",
+              "continuation-20260911/postfix-fd0f0f8/upgrade/postupgrade-readonly.json",
+              "continuation-20260911/postfix-fd0f0f8/upgrade/registration-readonly.json"
+            ]
+          },
+          {
+            "id": "installed-local-mcp-executed-subset",
+            "status": "pass",
+            "evidence": [
+              "continuation-20260911/current-source-revalidation-fd0f0f8/desktop-local-mcp/0c1282e0-72ed-444d-922f-ca94492a21dd/proof.json",
+              "continuation-20260911/current-source-revalidation-fd0f0f8/verify-isolated-installed-local-mcp.mjs",
+              "../runs/desktop-mcp-core-2026-09-11T00-59-30-586Z.json"
+            ]
+          }
+        ],
+        "transferredUnfinishedGate": {
+          "id": "desktop-notification-project-route-live",
+          "status": "fail",
+          "classification": "environment_blocker",
+          "productPass": false,
+          "evidence": [
+            "../desktop-notification-project-route-live/81c44b26-5c6f-47c6-a56a-d4eb27f19d7a/proof.json",
+            "../windows-notification-session-current-audit/20260911T005709Z/current-session-wpn-routing.json",
+            "../windows-notification-session-current-audit/20260911T005709Z/validation.json",
+            "../windows-notification-session-current-audit/20260911T005709Z/README.md",
+            "../windows-notification-session-current-audit/20260911T005709Z/validate-evidence.mjs",
+            "../windows-notification-session-current-audit/20260911T005709Z/capture-readonly.ps1",
+            "../windows-notification-luna-acceptance/20260911T014720Z/luna-acceptance-attempt.json",
+            "../windows-notification-luna-acceptance/20260911T014720Z/validation.json",
+            "../windows-notification-luna-acceptance/20260911T014720Z/README.md",
+            "../windows-notification-luna-acceptance/20260911T014720Z/validate-evidence.mjs"
+          ],
+          "semanticProof": "../desktop-notification-project-route-live/81c44b26-5c6f-47c6-a56a-d4eb27f19d7a/proof.json"
+        }
+      },
+      "evidence": [
+        "user-self-test-handoff.md",
+        "continuation-20260911/postfix-fd0f0f8/summary.json",
+        "continuation-20260911/postfix-fd0f0f8/package/receipt.json",
+        "continuation-20260911/postfix-fd0f0f8/package/publication-result.json",
+        "continuation-20260911/postfix-fd0f0f8/package/signed-manifest.json",
+        "continuation-20260911/postfix-fd0f0f8/upgrade/auto-relaunch-verification.json",
+        "continuation-20260911/postfix-fd0f0f8/upgrade/postupgrade-readonly.json",
+        "continuation-20260911/postfix-fd0f0f8/upgrade/registration-readonly.json",
+        "continuation-20260911/current-source-revalidation-fd0f0f8/desktop-local-mcp/0c1282e0-72ed-444d-922f-ca94492a21dd/proof.json",
+        "continuation-20260911/current-source-revalidation-fd0f0f8/verify-isolated-installed-local-mcp.mjs",
+        "../runs/desktop-mcp-core-2026-09-11T00-59-30-586Z.json",
+        "continuation-20260911/current-source-revalidation-fd0f0f8/agent-gates-current.json",
+        "../desktop-notification-project-route-live/81c44b26-5c6f-47c6-a56a-d4eb27f19d7a/proof.json",
+        "../windows-notification-session-current-audit/20260911T005709Z/current-session-wpn-routing.json",
+        "../windows-notification-session-current-audit/20260911T005709Z/validation.json",
+        "../windows-notification-session-current-audit/20260911T005709Z/README.md",
+        "../windows-notification-session-current-audit/20260911T005709Z/validate-evidence.mjs",
+        "../windows-notification-session-current-audit/20260911T005709Z/capture-readonly.ps1",
+        "../windows-notification-luna-acceptance/20260911T014720Z/luna-acceptance-attempt.json",
+        "../windows-notification-luna-acceptance/20260911T014720Z/validation.json",
+        "../windows-notification-luna-acceptance/20260911T014720Z/README.md",
+        "../windows-notification-luna-acceptance/20260911T014720Z/validate-evidence.mjs"
+      ]
     },
     {
       "id": "android-build-feed-install",
@@ -429,14 +527,14 @@
         "continuation-20260911/current-source-revalidation-fd0f0f8/desktop-local-mcp/0c1282e0-72ed-444d-922f-ca94492a21dd/proof.json",
         "../windows-notification-luna-acceptance/20260911T014720Z/luna-acceptance-attempt.json"
       ],
-      "detail": "Build 20 auto-relaunch preserved the production and isolated service owners while local MCP 4642 belonged to the upgraded preview. The fresh current-source API/MCP batch and installed local-MCP batch used separate roots and released only their owned processes and ports while protected listener and health snapshots remained exact. Luna's later notification attempt stopped before any toast or product action. Native toast visibility itself remains unexecuted and failed as an acceptance gate."
+      "detail": "Historical build 20 upgrade and validation evidence preserved the production and isolated service owners while local MCP 4642 belonged to the preview. The fresh current-source API/MCP and installed local-MCP batches used separate roots and released only their owned processes and ports. The later notification attempt stopped before any toast or product action; that historical environment blocker is retained as reference for the user-owned Windows EXE acceptance."
     },
     {
       "id": "final-source-gate",
       "surfaces": [
         "source"
       ],
-      "status": "partial",
+      "status": "pass",
       "evidence": [
         "source-gate/final-summary.json",
         "source-verification-88a6d0f/summary.json",
@@ -473,7 +571,7 @@
         "../windows-notification-luna-acceptance/20260911T014720Z/README.md",
         "../windows-notification-luna-acceptance/20260911T014720Z/validate-evidence.mjs"
       ],
-      "detail": "Product source is anchored at fd0f0f850f907b8a77aac8ec8b6a71b308bdd711, but one or more required agent gates remain failed, pending, or unreported."
+      "detail": "All agent-owned development, delivery, and acceptance gates for product source fd0f0f850f907b8a77aac8ec8b6a71b308bdd711 are complete. The seven delegated user acceptance cases remain NOT_RUN and still block overall final acceptance."
     },
     {
       "id": "final-api-runtime-restart-and-durable-readback",
@@ -499,24 +597,13 @@
   ],
   "blocking": [
     {
-      "id": "desktop-notification-project-route-live",
-      "status": "fail",
-      "owner": "agent",
-      "completionImpact": "blocks_agent_scope_completion",
-      "evidence": [
-        "../desktop-notification-project-route-live/81c44b26-5c6f-47c6-a56a-d4eb27f19d7a/proof.json",
-        "../windows-notification-session-current-audit/20260911T005709Z/current-session-wpn-routing.json",
-        "../windows-notification-session-current-audit/20260911T005709Z/validation.json",
-        "../windows-notification-session-current-audit/20260911T005709Z/README.md",
-        "../windows-notification-session-current-audit/20260911T005709Z/validate-evidence.mjs",
-        "../windows-notification-session-current-audit/20260911T005709Z/capture-readonly.ps1",
-        "../windows-notification-luna-acceptance/20260911T014720Z/luna-acceptance-attempt.json",
-        "../windows-notification-luna-acceptance/20260911T014720Z/validation.json",
-        "../windows-notification-luna-acceptance/20260911T014720Z/README.md",
-        "../windows-notification-luna-acceptance/20260911T014720Z/validate-evidence.mjs"
-      ],
-      "classification": "environment_blocker",
-      "productPass": false
+      "id": "windows-exe-user-acceptance",
+      "status": "not_run",
+      "owner": "user",
+      "handoffStatus": "delegated_pending",
+      "agentExecuted": false,
+      "completionImpact": "blocks_final_acceptance",
+      "resultLabel": "用户自测／已移交，代理未执行"
     },
     {
       "id": "android-physical-device",
@@ -575,9 +662,9 @@
   ],
   "sourceGate": {
     "productSourceCommit": "fd0f0f850f907b8a77aac8ec8b6a71b308bdd711",
-    "status": "incomplete_agent_revalidation_pending",
+    "status": "complete_user_acceptance_pending",
     "agentGateReport": "continuation-20260911/current-source-revalidation-fd0f0f8/agent-gates-current.json",
-    "allRequiredAgentGatesPassed": false,
+    "allRequiredAgentGatesPassed": true,
     "evidence": [
       "continuation-20260911/postfix-fd0f0f8/summary.json",
       "continuation-20260911/current-source-revalidation-fd0f0f8/summary.json",
@@ -614,7 +701,7 @@
     "unavailableReviewedEvidence": 1,
     "note": "Fine-grained not_run and needsRevalidation rows remain retained and are not counted as PASS. They do not replace the explicit agent and user acceptance gates."
   },
-  "agentScopeStatus": "incomplete_agent_revalidation_pending",
+  "agentScopeStatus": "complete_user_acceptance_pending",
   "userAcceptanceStatus": "delegated_pending",
   "sourceProvenance": {
     "productSourceAnchor": "fd0f0f850f907b8a77aac8ec8b6a71b308bdd711",
@@ -663,29 +750,17 @@
     },
     "note": "The product source anchor and Windows/Web build 20 package are fd0f0f8. The retained Android artifact predates that commit but its apps/android Git tree is identical. Historical browser evidence keeps its recorded source; current-source agent revalidation is tracked separately and cannot be inferred from source equivalence."
   },
-  "agentBlocking": [
-    {
-      "id": "desktop-notification-project-route-live",
-      "status": "fail",
-      "owner": "agent",
-      "completionImpact": "blocks_agent_scope_completion",
-      "evidence": [
-        "../desktop-notification-project-route-live/81c44b26-5c6f-47c6-a56a-d4eb27f19d7a/proof.json",
-        "../windows-notification-session-current-audit/20260911T005709Z/current-session-wpn-routing.json",
-        "../windows-notification-session-current-audit/20260911T005709Z/validation.json",
-        "../windows-notification-session-current-audit/20260911T005709Z/README.md",
-        "../windows-notification-session-current-audit/20260911T005709Z/validate-evidence.mjs",
-        "../windows-notification-session-current-audit/20260911T005709Z/capture-readonly.ps1",
-        "../windows-notification-luna-acceptance/20260911T014720Z/luna-acceptance-attempt.json",
-        "../windows-notification-luna-acceptance/20260911T014720Z/validation.json",
-        "../windows-notification-luna-acceptance/20260911T014720Z/README.md",
-        "../windows-notification-luna-acceptance/20260911T014720Z/validate-evidence.mjs"
-      ],
-      "classification": "environment_blocker",
-      "productPass": false
-    }
-  ],
+  "agentBlocking": [],
   "userAcceptancePending": [
+    {
+      "id": "windows-exe-user-acceptance",
+      "status": "not_run",
+      "owner": "user",
+      "handoffStatus": "delegated_pending",
+      "agentExecuted": false,
+      "completionImpact": "blocks_final_acceptance",
+      "resultLabel": "用户自测／已移交，代理未执行"
+    },
     {
       "id": "android-physical-device",
       "status": "not_run",
@@ -751,14 +826,14 @@
   },
   "productAcceptancePassed": false,
   "agentRevalidation": {
-    "schemaVersion": 1,
+    "schemaVersion": 2,
     "sourceCommit": "fd0f0f850f907b8a77aac8ec8b6a71b308bdd711",
     "report": "continuation-20260911/current-source-revalidation-fd0f0f8/agent-gates-current.json",
     "reportSupplied": true,
-    "requiredGateIds": [
-      "desktop-notification-project-route-live"
-    ],
-    "gates": [
+    "reportDisposition": "historical_scope_transferred_to_user",
+    "requiredGateIds": [],
+    "gates": [],
+    "historicalTransferredGates": [
       {
         "id": "desktop-notification-project-route-live",
         "status": "fail",
@@ -780,7 +855,7 @@
         "semanticProof": "../desktop-notification-project-route-live/81c44b26-5c6f-47c6-a56a-d4eb27f19d7a/proof.json"
       }
     ],
-    "allRequiredGatesPassed": false
+    "allRequiredGatesPassed": true
   },
   "knownLimitations": [
     {

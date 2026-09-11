@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "recordedAt": "2026-09-11T02:04:28.923Z",
+  "recordedAt": "2026-09-11T02:38:00.133Z",
   "root": "docs/evidence/project-components/final-v21-20260910",
   "sourceCommit": "fd0f0f850f907b8a77aac8ec8b6a71b308bdd711",
   "productSourceCommit": "fd0f0f850f907b8a77aac8ec8b6a71b308bdd711",
@@ -14,18 +14,18 @@
     "completeTrackedSetVerified": true
   },
   "files": 379,
-  "totalBytes": 47564569,
-  "aggregateSha256": "88610d39caafbf53bd1ce3588db4cfca5cdd003d6bb30767a0836793e31f0ebc",
+  "totalBytes": 47579780,
+  "aggregateSha256": "427070394e13af45472400c12713550dfc36dc99a617b5f35f1c895fbdd4a642",
   "entries": [
     {
       "path": "acceptance-matrix.json",
-      "bytes": 39117,
-      "sha256": "aa544f459175a410b5c5127af1e6e76f8b4f2ea49ce8c2135cdb0e296baee4af"
+      "bytes": 43084,
+      "sha256": "cce91d9589ba8b371688fb4b68c19a5ba25c955b75f48784d71422631eab3cb0"
     },
     {
       "path": "acceptance-matrix.md",
-      "bytes": 16972,
-      "sha256": "7c32a2c2c79c898d57a6d0ce0ef28c72321baf17b0d786b947e453c1255f5cb5"
+      "bytes": 17430,
+      "sha256": "9581e86ae23b178031c4400ee713c4a47dc03e6ec274c1d7ff2c4ac9b0a07b7c"
     },
     {
       "path": "android/acceptance/android-code27-self-update/android-code27-feed-http.json",
@@ -1740,7 +1740,7 @@
     {
       "path": "secret-scan.json",
       "bytes": 1274,
-      "sha256": "e0dc15a097be0040cd213929148d02a466a569477b8b457f94d07441745e466a"
+      "sha256": "a4fcf9e286af4c4b4e57c868cb043c39361867aab8730e2852b3056f442c99d5"
     },
     {
       "path": "source-gate/02-project-components-tests.result.json",
@@ -1809,18 +1809,18 @@
     },
     {
       "path": "update-acceptance-matrix.mjs",
-      "bytes": 67103,
-      "sha256": "ac9b10180448417f3ad484ca1e5f989222138d2561916503bd7a48b9cd1dec63"
+      "bytes": 71668,
+      "sha256": "bbfb215aa54e3e83f13f55b07432d92e4f225612e1ac304a6b3e2d870e7e4c9c"
     },
     {
       "path": "user-self-test-handoff.md",
-      "bytes": 6372,
-      "sha256": "47e617872b66c4a254d3facf61edaf25dc6477c3d36aaa3ce203c9a7f22ef565"
+      "bytes": 9320,
+      "sha256": "cd66f5e82e6e93cc95886dd23e7ae93f2028ffcf801fc8ea47e3ab341fc641cc"
     },
     {
       "path": "validate-final-evidence.mjs",
-      "bytes": 65364,
-      "sha256": "57472f6a56905c3764651a2f2d12563f3d6f6790be659a92dd8749eb3de2e3bf"
+      "bytes": 68637,
+      "sha256": "e883a7e764a4216b5fee073521ec642ee48c1c1c2032976885ebf5a5f8e1dac8"
     },
     {
       "path": "verify-live-http-db-receipt.mjs",

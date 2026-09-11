@@ -71,7 +71,10 @@ const expectedInputFingerprints = [
   },
 ];
 const protectedNotificationPorts = new Set([4174, 4319, 4320, 4639, 4640, 4641, 4642, 9333]);
+const windowsExeUserAcceptanceId = "windows-exe-user-acceptance";
+const transferredAgentGateIds = ["desktop-notification-project-route-live"];
 const delegatedIds = [
+  windowsExeUserAcceptanceId,
   "android-physical-device",
   "external-build-terminal",
   "external-single-build-upload-terminal",
@@ -79,7 +82,8 @@ const delegatedIds = [
   "external-relay-delivery-terminal",
   "external-qingyu-order-terminal",
 ];
-const requiredAdditionalAgentGateIds = ["desktop-notification-project-route-live"];
+assert.equal(delegatedIds.length, 7);
+const requiredAdditionalAgentGateIds = [];
 const indexExcludedPaths = ["evidence-index.json", "final-validation.json"];
 const productSourceRoots = [
   "apps/api/src",
@@ -930,7 +934,7 @@ for (const id of delegatedIds) {
 assert.deepEqual(
   acceptance.userAcceptancePending.map((item) => item.id).sort(),
   [...delegatedIds].sort(),
-  "user acceptance list must contain exactly the six delegated gates",
+  "user acceptance list must contain exactly the seven delegated gates",
 );
 assert.deepEqual(
   acceptance.cases
@@ -938,8 +942,85 @@ assert.deepEqual(
     .map((item) => item.id)
     .sort(),
   [...delegatedIds].sort(),
-  "only the six named cases may be delegated to the user",
+  "only the seven named cases may be delegated to the user",
 );
+const windowsExeUserAcceptance = acceptance.cases.find(
+  (item) => item.id === windowsExeUserAcceptanceId,
+);
+assert.ok(windowsExeUserAcceptance, "missing delegated Windows EXE user acceptance case");
+assert.equal(windowsExeUserAcceptance.status, "not_run");
+assert.equal(windowsExeUserAcceptance.owner, "user");
+assert.equal(windowsExeUserAcceptance.handoffStatus, "delegated_pending");
+assert.equal(windowsExeUserAcceptance.agentExecuted, false);
+assert.equal(windowsExeUserAcceptance.completionImpact, "blocks_final_acceptance");
+assert.equal(windowsExeUserAcceptance.resultLabel, userLabel);
+assert.deepEqual(windowsExeUserAcceptance.surfaces, [
+  "exe",
+  "local_mcp",
+  "windows_native_notification",
+]);
+assert.deepEqual(windowsExeUserAcceptance.userScope, [
+  "install",
+  "upgrade",
+  "run",
+  "desktop_notification_visible_click_project_route",
+  "local_mcp",
+]);
+assert.match(windowsExeUserAcceptance.detail, /owned by the user/u);
+assert.match(windowsExeUserAcceptance.detail, /neither state is a user PASS/u);
+assert.deepEqual(windowsExeUserAcceptance.historicalAgentEvidence, {
+  disposition: "reference_only_does_not_satisfy_user_acceptance",
+  passedScopes: [
+    {
+      id: "windows-package-publication",
+      status: "pass",
+      evidence: [
+        continuationSummaryPath,
+        packageReceiptPath,
+        "continuation-20260911/postfix-fd0f0f8/package/publication-result.json",
+        "continuation-20260911/postfix-fd0f0f8/package/signed-manifest.json",
+      ],
+    },
+    {
+      id: "windows-upgrade-relaunch-and-readback",
+      status: "pass",
+      evidence: [
+        "continuation-20260911/postfix-fd0f0f8/upgrade/auto-relaunch-verification.json",
+        "continuation-20260911/postfix-fd0f0f8/upgrade/postupgrade-readonly.json",
+        registrationVerificationPath,
+      ],
+    },
+    {
+      id: "installed-local-mcp-executed-subset",
+      status: "pass",
+      evidence: [
+        installedLocalMcpProofPath,
+        installedLocalMcpValidatorPath,
+        installedLocalMcpRunPath,
+      ],
+    },
+  ],
+  transferredUnfinishedGate: {
+    id: "desktop-notification-project-route-live",
+    status: "fail",
+    classification: "environment_blocker",
+    productPass: false,
+    evidence: notificationGateEvidencePaths,
+    semanticProof: notificationProofPath,
+  },
+});
+assert.ok(windowsExeUserAcceptance.evidence.includes("user-self-test-handoff.md"));
+const userSelfTestHandoffPath = await repoRegularFile(
+  "user-self-test-handoff.md",
+  "user self-test handoff",
+);
+const userSelfTestHandoff = await readFile(userSelfTestHandoffPath, "utf8");
+assert.match(userSelfTestHandoff, /^## Windows EXE/mu);
+for (const requiredScope of ["安装", "升级", "运行", "桌面通知", "local MCP"]) {
+  assert.match(userSelfTestHandoff, new RegExp(requiredScope, "u"));
+}
+assert.match(userSelfTestHandoff, /历史.*PASS/u);
+assert.match(userSelfTestHandoff, /environment_blocker/u);
 
 assert.equal(
   acceptance.cases.some((item) => item.id === "windows-authenticode"),
@@ -1034,6 +1115,9 @@ const windowsLocalMcpCase = acceptance.cases.find(
   (item) => item.id === "windows-built-in-update-and-local-mcp",
 );
 assert.ok(windowsLocalMcpCase);
+assert.equal(windowsLocalMcpCase.status, "pass");
+assert.match(windowsLocalMcpCase.detail, /Historical agent evidence passed/u);
+assert.match(windowsLocalMcpCase.detail, /does not claim the current user-owned/u);
 assert.ok(windowsLocalMcpCase.evidence.includes(installedLocalMcpProofPath));
 assert.ok(windowsLocalMcpCase.evidence.includes(installedLocalMcpValidatorPath));
 assert.ok(windowsLocalMcpCase.evidence.includes(installedLocalMcpRunPath));
@@ -1041,101 +1125,86 @@ const coexistenceCase = acceptance.cases.find(
   (item) => item.id === "production-and-preview-coexistence",
 );
 assert.ok(coexistenceCase);
+assert.equal(coexistenceCase.status, "pass");
+assert.match(coexistenceCase.detail, /Historical build 20 upgrade/u);
+assert.match(coexistenceCase.detail, /historical environment blocker is retained/u);
 assert.ok(coexistenceCase.evidence.includes(freshApiMcpProofPath));
 assert.ok(coexistenceCase.evidence.includes(freshApiMcpAttemptsPath));
 assert.ok(coexistenceCase.evidence.includes(installedLocalMcpProofPath));
 assert.ok(coexistenceCase.evidence.includes(lunaNotificationAttemptPaths[0]));
 
-assert.equal(acceptance.agentRevalidation.sourceCommit, productSourceCommit);
-assert.ok(acceptance.agentRevalidation.requiredGateIds.length > 0);
-assert.equal(
-  new Set(acceptance.agentRevalidation.requiredGateIds).size,
-  acceptance.agentRevalidation.requiredGateIds.length,
+const agentRevalidation = acceptance.agentRevalidation;
+assert.equal(agentRevalidation.schemaVersion, 2);
+assert.equal(agentRevalidation.sourceCommit, productSourceCommit);
+assert.equal(agentRevalidation.reportSupplied, true);
+assert.equal(agentRevalidation.report, currentAgentGateReportPath);
+assert.equal(agentRevalidation.reportDisposition, "historical_scope_transferred_to_user");
+assert.deepEqual(agentRevalidation.requiredGateIds, requiredAdditionalAgentGateIds);
+assert.deepEqual(agentRevalidation.gates, []);
+assert.equal(agentRevalidation.allRequiredGatesPassed, true);
+
+const reportAbsolute = repoContainedPath(agentRevalidation.report, "historical-agent-gate-report");
+const reportFromRoot = path.relative(root, reportAbsolute);
+assert.ok(
+  reportFromRoot &&
+    reportFromRoot !== ".." &&
+    !reportFromRoot.startsWith(`..${path.sep}`) &&
+    !path.isAbsolute(reportFromRoot),
+  "historical agent gate report must be inside the evidence root",
+);
+await assertEvidenceFile("historical-agent-gate-report", agentRevalidation.report);
+assertIndexedWhenInRoot("historical-agent-gate-report", agentRevalidation.report);
+const historicalAgentGateReport = await json(agentRevalidation.report);
+assert.equal(historicalAgentGateReport.sourceCommit, productSourceCommit);
+assert.deepEqual(
+  [...historicalAgentGateReport.requiredGateIds].sort(),
+  [...transferredAgentGateIds].sort(),
 );
 assert.deepEqual(
-  [...acceptance.agentRevalidation.requiredGateIds].sort(),
-  [...requiredAdditionalAgentGateIds].sort(),
-);
-assert.deepEqual(
-  acceptance.agentRevalidation.gates.map((gate) => gate.id).sort(),
-  [...acceptance.agentRevalidation.requiredGateIds].sort(),
-  "agent revalidation must contain every required gate exactly once",
+  historicalAgentGateReport.gates.map((gate) => gate.id).sort(),
+  [...transferredAgentGateIds].sort(),
 );
 assert.equal(
-  acceptance.agentRevalidation.reportSupplied,
-  acceptance.agentRevalidation.report !== null,
+  historicalAgentGateReport.passed,
+  historicalAgentGateReport.gates.every((gate) => gate.status === "pass"),
 );
-if (acceptance.agentRevalidation.reportSupplied) {
-  const reportAbsolute = repoContainedPath(
-    acceptance.agentRevalidation.report,
-    "agent-revalidation-report",
-  );
-  const reportFromRoot = path.relative(root, reportAbsolute);
-  assert.ok(
-    reportFromRoot &&
-      reportFromRoot !== ".." &&
-      !reportFromRoot.startsWith(`..${path.sep}`) &&
-      !path.isAbsolute(reportFromRoot),
-    "agent revalidation report must be inside the evidence root",
-  );
-  await assertEvidenceFile("agent-revalidation-report", acceptance.agentRevalidation.report);
-  assertIndexedWhenInRoot("agent-revalidation-report", acceptance.agentRevalidation.report);
-  const report = await json(acceptance.agentRevalidation.report);
-  assert.equal(report.sourceCommit, productSourceCommit);
-  assert.deepEqual(
-    [...report.requiredGateIds].sort(),
-    [...acceptance.agentRevalidation.requiredGateIds].sort(),
-  );
-  assert.deepEqual(
-    report.gates.map((gate) => ({ id: gate.id, status: gate.status, evidence: gate.evidence })),
-    acceptance.agentRevalidation.gates.map((gate) => ({
-      id: gate.id,
-      status: gate.status,
-      evidence: gate.evidence,
-    })),
-  );
-  assert.equal(report.passed, report.gates.every((gate) => gate.status === "pass"));
-  assert.equal(report.passed, false);
-  assert.equal(report.overallAcceptanceStatus, "not_complete");
-  assert.equal(report.completionAllowed, false);
-  assert.equal(report.gates[0].classification, "environment_blocker");
-  assert.equal(report.gates[0].productPass, false);
-  assert.deepEqual(report.gates[0].evidence, notificationGateEvidencePaths);
-}
-for (const gate of acceptance.agentRevalidation.gates) {
+assert.equal(historicalAgentGateReport.passed, false);
+assert.equal(historicalAgentGateReport.overallAcceptanceStatus, "not_complete");
+assert.equal(historicalAgentGateReport.completionAllowed, false);
+
+assert.deepEqual(
+  agentRevalidation.historicalTransferredGates.map((gate) => gate.id).sort(),
+  [...transferredAgentGateIds].sort(),
+  "historical transferred gates must be retained exactly once",
+);
+for (const gate of agentRevalidation.historicalTransferredGates) {
   assert.ok(["pass", "fail", "not_run", "pending"].includes(gate.status));
-  assert.ok(gate.evidence.length > 0, `${gate.id} needs evidence`);
+  assert.ok(gate.evidence.length > 0, `${gate.id} needs retained historical evidence`);
   for (const evidence of gate.evidence) {
-    await assertEvidenceFile(gate.id, evidence);
-    assertIndexedWhenInRoot(gate.id, evidence);
-  }
-  if (gate.id === "desktop-notification-project-route-live" && gate.status === "pass") {
-    assert.equal(
-      gate.semanticProof,
-      await validatePassingDesktopNotificationEvidence(gate.evidence),
-    );
-  } else if (gate.id === "desktop-notification-project-route-live") {
-    assert.equal(gate.status, "fail");
-    assert.equal(gate.classification, "environment_blocker");
-    assert.equal(gate.productPass, false);
-    assert.equal(
-      gate.semanticProof,
-      await validateBlockedDesktopNotificationEvidence(gate.evidence),
-    );
+    await assertEvidenceFile(`${gate.id} historical attempt`, evidence);
+    assertIndexedWhenInRoot(`${gate.id} historical attempt`, evidence);
   }
 }
-const notificationGate = acceptance.agentRevalidation.gates.find(
+const historicalNotificationAttempt = agentRevalidation.historicalTransferredGates.find(
   (gate) => gate.id === "desktop-notification-project-route-live",
 );
-assert.ok(notificationGate);
-assert.equal(notificationGate.status, "fail");
-assert.equal(notificationGate.classification, "environment_blocker");
-assert.equal(notificationGate.productPass, false);
-assert.deepEqual(notificationGate.evidence, notificationGateEvidencePaths);
-assert.equal(notificationGate.semanticProof, notificationProofPath);
-assert.equal(acceptance.agentRevalidation.reportSupplied, true);
-assert.equal(acceptance.agentRevalidation.report, currentAgentGateReportPath);
-assert.equal(acceptance.agentRevalidation.allRequiredGatesPassed, false);
+assert.ok(historicalNotificationAttempt);
+assert.equal(historicalNotificationAttempt.status, "fail");
+assert.equal(historicalNotificationAttempt.classification, "environment_blocker");
+assert.equal(historicalNotificationAttempt.productPass, false);
+assert.deepEqual(historicalNotificationAttempt.evidence, notificationGateEvidencePaths);
+assert.equal(
+  historicalNotificationAttempt.semanticProof,
+  await validateBlockedDesktopNotificationEvidence(historicalNotificationAttempt.evidence),
+);
+const historicalNotificationReportGate = historicalAgentGateReport.gates.find(
+  (gate) => gate.id === historicalNotificationAttempt.id,
+);
+assert.ok(historicalNotificationReportGate);
+assert.equal(historicalNotificationReportGate.status, "fail");
+assert.equal(historicalNotificationReportGate.classification, "environment_blocker");
+assert.equal(historicalNotificationReportGate.productPass, false);
+assert.deepEqual(historicalNotificationReportGate.evidence, notificationGateEvidencePaths);
 const delegatedSet = new Set(delegatedIds);
 const nonUserCaseFailures = acceptance.cases.filter(
   (item) =>
@@ -1158,7 +1227,7 @@ assert.equal(
   allReportedAgentGatesPassed,
 );
 const allAgentGatesPassed =
-  acceptance.agentRevalidation.reportSupplied === true &&
+  acceptance.agentRevalidation.allRequiredGatesPassed === true &&
   allReportedAgentGatesPassed &&
   nonUserCaseFailures.length === 0;
 assert.equal(
@@ -1197,16 +1266,11 @@ assert.deepEqual(
   acceptance.blocking,
   [...expectedAgentBlocking, ...acceptance.userAcceptancePending],
 );
-if (allAgentGatesPassed) assert.deepEqual(acceptance.agentBlocking, []);
-else assert.ok(acceptance.agentBlocking.length > 0);
-assert.equal(allAgentGatesPassed, false);
-assert.equal(acceptance.agentScopeStatus, "incomplete_agent_revalidation_pending");
-assert.equal(acceptance.sourceGate.allRequiredAgentGatesPassed, false);
-assert.equal(finalSourceCase.status, "partial");
-assert.deepEqual(
-  acceptance.agentBlocking.map((item) => item.id).sort(),
-  ["desktop-notification-project-route-live"],
-);
+assert.equal(allAgentGatesPassed, true);
+assert.deepEqual(acceptance.agentBlocking, []);
+assert.equal(acceptance.agentScopeStatus, "complete_user_acceptance_pending");
+assert.equal(acceptance.sourceGate.allRequiredAgentGatesPassed, true);
+assert.equal(finalSourceCase.status, "pass");
 assert.equal(acceptance.agentBlocking.some((item) => item.id === "windows-authenticode"), false);
 assert.equal(
   acceptance.blocking.some(
@@ -1214,13 +1278,17 @@ assert.equal(
   ),
   false,
 );
+assert.equal(
+  acceptance.blocking.some((item) => item.id === "desktop-notification-project-route-live"),
+  false,
+);
 assert.ok(
   acceptance.blocking.some(
     (item) =>
-      item.id === "desktop-notification-project-route-live" &&
-      item.status === "fail" &&
-      item.classification === "environment_blocker" &&
-      item.productPass === false,
+      item.id === windowsExeUserAcceptanceId &&
+      item.status === "not_run" &&
+      item.owner === "user" &&
+      item.handoffStatus === "delegated_pending",
   ),
 );
 
@@ -1260,13 +1328,6 @@ const coverageDiff = spawnSync(
 );
 assert.ok([0, 1].includes(coverageDiff.status), "git diff failed while checking coverage provenance");
 const coverageProductSourceMatches = coverageDiff.status === 0;
-if (allAgentGatesPassed) {
-  assert.equal(
-    coverageProductSourceMatches,
-    true,
-    "coverage matrix must match the product source before agent scope can be complete",
-  );
-}
 
 assert.equal(continuationSummary.productSourceCommit, productSourceCommit);
 assert.equal(continuationSummary.release.releaseId, "20260911T000006100Z");
@@ -1439,6 +1500,7 @@ const result = {
   delegatedUserCases: delegatedIds.length,
   delegatedCasesAllNotRun: true,
   agentGatesAllPassed: allAgentGatesPassed,
+  agentOwnedDeliveryComplete: allAgentGatesPassed,
   postfixEvidence: {
     passed: postfixValidation.passed,
     releaseId: postfixValidation.releaseId,
@@ -1449,12 +1511,18 @@ const result = {
   },
   agentBlockers: acceptance.agentBlocking,
   authenticode: acceptance.artifacts.windows.authenticode,
-  notificationGate: {
-    id: notificationGate.id,
-    status: notificationGate.status,
-    classification: notificationGate.classification,
-    productPass: notificationGate.productPass,
-    semanticProof: notificationGate.semanticProof,
+  notificationAcceptance: {
+    owner: windowsExeUserAcceptance.owner,
+    status: windowsExeUserAcceptance.status,
+    handoffStatus: windowsExeUserAcceptance.handoffStatus,
+    userAcceptanceCaseId: windowsExeUserAcceptance.id,
+    historicalAgentAttempt: {
+      id: historicalNotificationAttempt.id,
+      status: historicalNotificationAttempt.status,
+      classification: historicalNotificationAttempt.classification,
+      productPass: historicalNotificationAttempt.productPass,
+      semanticProof: historicalNotificationAttempt.semanticProof,
+    },
   },
   fineGrainedCoverage: {
     items: coverage.items.length,

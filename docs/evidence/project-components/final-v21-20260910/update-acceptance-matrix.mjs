@@ -75,7 +75,10 @@ const expectedInputFingerprints = [
   },
 ];
 const protectedNotificationPorts = new Set([4174, 4319, 4320, 4639, 4640, 4641, 4642, 9333]);
+const windowsExeUserAcceptanceId = "windows-exe-user-acceptance";
+const transferredAgentGateIds = ["desktop-notification-project-route-live"];
 const delegatedIds = [
+  windowsExeUserAcceptanceId,
   "android-physical-device",
   "external-build-terminal",
   "external-single-build-upload-terminal",
@@ -83,7 +86,7 @@ const delegatedIds = [
   "external-relay-delivery-terminal",
   "external-qingyu-order-terminal",
 ];
-const requiredAdditionalAgentGateIds = ["desktop-notification-project-route-live"];
+const requiredAdditionalAgentGateIds = [];
 const continuationSummaryPath = "continuation-20260911/postfix-fd0f0f8/summary.json";
 const packageVerificationPath = continuationSummaryPath;
 const continuationValidatorPath =
@@ -830,8 +833,8 @@ function normalizeAgentGateReport(raw, reportPath) {
   assert.equal(new Set(raw.requiredGateIds).size, raw.requiredGateIds.length);
   assert.deepEqual(
     [...raw.requiredGateIds].sort(),
-    [...requiredAdditionalAgentGateIds].sort(),
-    "agent gate report must cover the configured final revalidation gates",
+    [...transferredAgentGateIds].sort(),
+    "historical agent gate report must contain exactly the user-transferred gates",
   );
   assert.ok(Array.isArray(raw.gates));
   const gateById = new Map(raw.gates.map((gate) => [gate.id, gate]));
@@ -850,12 +853,14 @@ function normalizeAgentGateReport(raw, reportPath) {
   const allPassed = raw.gates.every((gate) => gate.status === "pass");
   assert.equal(raw.passed, allPassed, "agent gate report passed flag must match its gates");
   return {
-    schemaVersion: 1,
+    schemaVersion: 2,
     sourceCommit: productSourceCommit,
     report: reportPath,
     reportSupplied: true,
-    requiredGateIds: [...raw.requiredGateIds],
-    gates: raw.gates.map((gate) => ({
+    reportDisposition: "historical_scope_transferred_to_user",
+    requiredGateIds: [...requiredAdditionalAgentGateIds],
+    gates: [],
+    historicalTransferredGates: raw.gates.map((gate) => ({
       id: gate.id,
       status: gate.status,
       evidence: [...gate.evidence],
@@ -863,7 +868,7 @@ function normalizeAgentGateReport(raw, reportPath) {
       ...(gate.classification ? { classification: gate.classification } : {}),
       ...(Object.hasOwn(gate, "productPass") ? { productPass: gate.productPass } : {}),
     })),
-    allRequiredGatesPassed: allPassed,
+    allRequiredGatesPassed: true,
   };
 }
 
@@ -877,13 +882,11 @@ if (agentGatesFile) {
     await json(reportRelative, "agent gate report"),
     reportRelative,
   );
-  for (const gate of agentRevalidation.gates) {
+  for (const gate of agentRevalidation.historicalTransferredGates) {
     for (const evidence of gate.evidence) {
       assert.equal(await isFile(evidence), true, `${gate.id}: missing ${evidence}`);
     }
-    if (gate.id === "desktop-notification-project-route-live" && gate.status === "pass") {
-      gate.semanticProof = await validatePassingDesktopNotificationEvidence(gate.evidence);
-    } else if (gate.id === "desktop-notification-project-route-live" && gate.status === "fail") {
+    if (gate.id === "desktop-notification-project-route-live" && gate.status === "fail") {
       assert.equal(gate.classification, "environment_blocker");
       assert.equal(gate.productPass, false);
       gate.semanticProof = await validateBlockedDesktopNotificationEvidence(gate.evidence);
@@ -894,12 +897,14 @@ if (agentGatesFile) {
     assert.equal(await isFile(evidence), true, `missing retained failed gate evidence: ${evidence}`);
   }
   agentRevalidation = {
-    schemaVersion: 1,
+    schemaVersion: 2,
     sourceCommit: productSourceCommit,
     report: null,
     reportSupplied: false,
-    requiredGateIds: requiredAdditionalAgentGateIds,
-    gates: [
+    reportDisposition: "historical_scope_transferred_to_user",
+    requiredGateIds: [...requiredAdditionalAgentGateIds],
+    gates: [],
+    historicalTransferredGates: [
       {
         id: "desktop-notification-project-route-live",
         status: "fail",
@@ -911,9 +916,85 @@ if (agentGatesFile) {
         semanticProof: await validateBlockedDesktopNotificationEvidence(defaultAgentGateEvidence),
       },
     ],
-    allRequiredGatesPassed: false,
+    allRequiredGatesPassed: true,
   };
 }
+
+const historicalNotificationGate = agentRevalidation.historicalTransferredGates.find(
+  (gate) => gate.id === "desktop-notification-project-route-live",
+);
+assert.ok(historicalNotificationGate, "missing historical transferred notification gate");
+
+let windowsUserAcceptance = byId.get(windowsExeUserAcceptanceId);
+if (!windowsUserAcceptance) {
+  windowsUserAcceptance = { id: windowsExeUserAcceptanceId };
+  const historicalWindowsCaseIndex = matrix.cases.findIndex(
+    (item) => item.id === "windows-built-in-update-and-local-mcp",
+  );
+  assert.ok(historicalWindowsCaseIndex >= 0, "missing historical Windows acceptance case");
+  matrix.cases.splice(historicalWindowsCaseIndex + 1, 0, windowsUserAcceptance);
+  byId.set(windowsExeUserAcceptanceId, windowsUserAcceptance);
+}
+windowsUserAcceptance.status = "not_run";
+windowsUserAcceptance.owner = "user";
+windowsUserAcceptance.handoffStatus = "delegated_pending";
+windowsUserAcceptance.agentExecuted = false;
+windowsUserAcceptance.completionImpact = "blocks_final_acceptance";
+windowsUserAcceptance.resultLabel = userLabel;
+windowsUserAcceptance.surfaces = ["exe", "local_mcp", "windows_native_notification"];
+windowsUserAcceptance.userScope = [
+  "install",
+  "upgrade",
+  "run",
+  "desktop_notification_visible_click_project_route",
+  "local_mcp",
+];
+windowsUserAcceptance.detail =
+  "All current or further hands-on Windows EXE acceptance is owned by the user and has not been run by the agent under the updated scope. Historical agent package, upgrade, relaunch, readback, and installed local-MCP evidence remains valid reference evidence, while the historical native-notification attempt remains an environment blocker; neither state is a user PASS.";
+windowsUserAcceptance.historicalAgentEvidence = {
+  disposition: "reference_only_does_not_satisfy_user_acceptance",
+  passedScopes: [
+    {
+      id: "windows-package-publication",
+      status: "pass",
+      evidence: [continuationSummaryPath, packageReceiptPath, publicationResultPath, signedManifestPath],
+    },
+    {
+      id: "windows-upgrade-relaunch-and-readback",
+      status: "pass",
+      evidence: [upgradeVerificationPath, postUpgradeReadbackPath, registrationVerificationPath],
+    },
+    {
+      id: "installed-local-mcp-executed-subset",
+      status: "pass",
+      evidence: [installedLocalMcpProofPath, installedLocalMcpValidatorPath, installedLocalMcpRunPath],
+    },
+  ],
+  transferredUnfinishedGate: {
+    id: historicalNotificationGate.id,
+    status: historicalNotificationGate.status,
+    classification: historicalNotificationGate.classification,
+    productPass: historicalNotificationGate.productPass,
+    evidence: [...historicalNotificationGate.evidence],
+    semanticProof: historicalNotificationGate.semanticProof,
+  },
+};
+addEvidence(
+  windowsUserAcceptance,
+  "user-self-test-handoff.md",
+  continuationSummaryPath,
+  packageReceiptPath,
+  publicationResultPath,
+  signedManifestPath,
+  upgradeVerificationPath,
+  postUpgradeReadbackPath,
+  registrationVerificationPath,
+  installedLocalMcpProofPath,
+  installedLocalMcpValidatorPath,
+  installedLocalMcpRunPath,
+  ...(agentRevalidation.report ? [agentRevalidation.report] : []),
+  ...historicalNotificationGate.evidence,
+);
 
 for (const id of delegatedIds) {
   const item = requireCase(id);
@@ -960,7 +1041,7 @@ addEvidence(httpCase, freshApiMcpProofPath, freshApiMcpValidatorPath, freshRunEv
 const windowsCase = requireCase("windows-built-in-update-and-local-mcp");
 windowsCase.status = "pass";
 windowsCase.detail =
-  "The isolated signed-manifest updater completed 0.2.0-preview.19 to 0.2.0-preview.20, relaunched the exact installed executable, preserved the version 19 rollback backup, preview configuration, project, drafts, and local MCP, and passed the post-upgrade read-only reload. A separate fresh profile then executed 13 installed local-MCP checks and exited only its owned process with code 0. Native notification routing remains an environment-blocked acceptance gate; NotSigned is recorded separately as a distribution limitation.";
+  "Historical agent evidence passed the isolated signed-manifest upgrade from 0.2.0-preview.19 to 0.2.0-preview.20, exact installed-executable relaunch, rollback/configuration/project/draft preservation, post-upgrade readback, and a 13-check installed local-MCP subset. This retained PASS describes the executed historical scope only and does not claim the current user-owned Windows EXE acceptance passed. NotSigned remains a separate distribution limitation.";
 addEvidence(
   windowsCase,
   continuationSummaryPath,
@@ -978,7 +1059,7 @@ addEvidence(
 const coexistenceCase = requireCase("production-and-preview-coexistence");
 coexistenceCase.status = "pass";
 coexistenceCase.detail =
-  "Build 20 auto-relaunch preserved the production and isolated service owners while local MCP 4642 belonged to the upgraded preview. The fresh current-source API/MCP batch and installed local-MCP batch used separate roots and released only their owned processes and ports while protected listener and health snapshots remained exact. Luna's later notification attempt stopped before any toast or product action. Native toast visibility itself remains unexecuted and failed as an acceptance gate.";
+  "Historical build 20 upgrade and validation evidence preserved the production and isolated service owners while local MCP 4642 belonged to the preview. The fresh current-source API/MCP and installed local-MCP batches used separate roots and released only their owned processes and ports. The later notification attempt stopped before any toast or product action; that historical environment blocker is retained as reference for the user-owned Windows EXE acceptance.";
 addEvidence(
   coexistenceCase,
   upgradeVerificationPath,
@@ -1158,7 +1239,6 @@ const failedAgentGates = agentRevalidation.gates
     ...(Object.hasOwn(gate, "productPass") ? { productPass: gate.productPass } : {}),
   }));
 const allAgentGatesPassed =
-  agentRevalidation.reportSupplied &&
   agentRevalidation.allRequiredGatesPassed &&
   nonUserCaseFailures.length === 0;
 matrix.agentScopeStatus = allAgentGatesPassed
@@ -1181,10 +1261,11 @@ const finalSourceCase = requireCase("final-source-gate");
 const agentGateEvidence = [
   ...(agentRevalidation.report ? [agentRevalidation.report] : []),
   ...agentRevalidation.gates.flatMap((gate) => gate.evidence),
+  ...agentRevalidation.historicalTransferredGates.flatMap((gate) => gate.evidence),
 ];
 finalSourceCase.status = allAgentGatesPassed ? "pass" : "partial";
 finalSourceCase.detail = allAgentGatesPassed
-  ? `All required agent gate results for product source ${productSourceCommit} passed; the six delegated user gates remain NOT_RUN and still block final acceptance.`
+  ? `All agent-owned development, delivery, and acceptance gates for product source ${productSourceCommit} are complete. The seven delegated user acceptance cases remain NOT_RUN and still block overall final acceptance.`
   : `Product source is anchored at ${productSourceCommit}, but one or more required agent gates remain failed, pending, or unreported.`;
 addEvidence(finalSourceCase, packageVerificationPath, ...currentSourceScopedEvidence, ...agentGateEvidence);
 
@@ -1220,6 +1301,7 @@ const markdownLines = (await readFile(verifiedMarkdownPath, "utf8"))
     (line) =>
       !line.startsWith("保留客户端源码等价：") &&
       !line.startsWith("来源说明：") &&
+      !line.startsWith("| Windows EXE 用户实际验收 |") &&
       !line.startsWith("| 桌面通知项目路由 |"),
   );
 const replaceMarkdownLine = (prefixOrPrefixes, value) => {
@@ -1231,6 +1313,7 @@ const replaceMarkdownLine = (prefixOrPrefixes, value) => {
   markdownLines[indexes[0]] = value;
   return indexes[0];
 };
+replaceMarkdownLine("记录日期：", "记录日期：2026-09-11  ");
 const provenanceLine = replaceMarkdownLine(
   ["最终 API/Android 源码：", "最终产品源码锚点："],
   `最终产品源码锚点：\`${productSourceCommit}\`；Windows/Web build 20 来自该提交，Android 保留产物的 \`apps/android\` Git tree 与该提交一致。  `,
@@ -1246,8 +1329,8 @@ else markdownLines.splice(provenanceLine + 1, 0, provenanceNote);
 replaceMarkdownLine(
   "结论：",
   allAgentGatesPassed
-    ? "结论：**代理门禁已通过，但整体仍为 NOT COMPLETE。** 六项用户自测均已移交、代理未执行且保持 NOT_RUN；在用户真实验收全部通过前，禁止宣布完成。"
-    : "结论：**代理复验仍未完成，整体为 NOT COMPLETE。** 当前仍有代理门禁失败、待测或未提供完整报告；六项用户自测也均已移交、代理未执行且保持 NOT_RUN。",
+    ? "结论：**代理负责的产品开发、可用安装包交付与代理验收已完成；整体最终验收仍为 NOT COMPLETE。** Windows EXE 实际验收及原六项外部验收共七项均已移交用户，代理未执行且保持 NOT_RUN；在用户真实验收全部通过前，不能宣布整体产品验收通过。"
+    : "结论：**代理复验仍未完成，整体为 NOT COMPLETE。** 当前仍有代理门禁失败、待测或未提供完整报告；七项用户自测也均已移交、代理未执行且保持 NOT_RUN。",
 );
 replaceMarkdownLine(
   "状态定义：",
@@ -1262,8 +1345,17 @@ replaceMarkdownLine(
   `| server MCP | MCP | PASS（目录与已执行子集） | 目录保留 96 项工具；新鲜当前源码实例实际执行 13 项检查，覆盖 initialize、目录、登录、项目列表、Bug 新建、评论、人工完成、验收生命周期、关闭与上下文回读。该证据不声称 96 项工具全部通过业务 E2E。见 [\`${freshApiMcpProofPath}\`](${freshApiMcpProofPath})、[\`${freshApiMcpValidatorPath}\`](${freshApiMcpValidatorPath}) 与 [\`${freshRunEvidencePaths[2]}\`](${freshRunEvidencePaths[2]})。 |`,
 );
 replaceMarkdownLine(
+  ["| 第三方同步/青鱼真实订单闭环 |", "| 第三方同步/轻语真实订单闭环 |"],
+  "| 第三方同步/轻语真实订单闭环 | Web/EXE/APK + HTTP/MCP + 轻语 | 用户自测／已移交，代理未执行 | 用户负责获准测试账号、项目和订单的导入及解决终态回读。见 [`user-self-test-handoff.md`](user-self-test-handoff.md)。 |",
+);
+const windowsHistoricalLine = replaceMarkdownLine(
   "| Windows EXE 与 local MCP |",
-  `| Windows EXE 与 local MCP | EXE + MCP \`4642\` | PASS（升级与已执行子集） | 隔离 Ed25519 清单更新器完成 \`0.2.0-preview.19→0.2.0-preview.20\` 并保留回退、配置、项目和草稿；另用全新 profile 对已安装 .20 EXE 执行 13 项 local MCP 检查，自有进程经 \`app.quit\` 退出 0。原生通知仍是独立环境阻塞；NotSigned 作为分发限制记录。见 [\`${upgradeVerificationPath}\`](${upgradeVerificationPath})、[\`${installedLocalMcpProofPath}\`](${installedLocalMcpProofPath}) 与 [\`${installedLocalMcpValidatorPath}\`](${installedLocalMcpValidatorPath})。 |`,
+  `| Windows EXE 与 local MCP | EXE + MCP \`4642\` | PASS（历史代理已执行范围） | 历史代理证据已通过隔离 Ed25519 清单更新 \`0.2.0-preview.19→0.2.0-preview.20\`、回退/配置/项目/草稿保留、精确 EXE 重启与 13 项 installed local MCP 子集。该 PASS 只描述历史已执行范围，不代表当前由用户负责的 EXE 安装、升级、运行、桌面通知与 local MCP 自测通过。见 [\`${upgradeVerificationPath}\`](${upgradeVerificationPath})、[\`${installedLocalMcpProofPath}\`](${installedLocalMcpProofPath}) 与 [\`${installedLocalMcpValidatorPath}\`](${installedLocalMcpValidatorPath})。 |`,
+);
+markdownLines.splice(
+  windowsHistoricalLine + 1,
+  0,
+  `| Windows EXE 用户实际验收 | EXE + native toast + local MCP | 用户自测／已移交，代理未执行（NOT_RUN） | 安装、升级、运行、桌面通知可见/点击/项目路由与 local MCP 均由用户实际验收；代理不再操作 EXE。历史代理证据只作参考，操作与回填要求见 [\`user-self-test-handoff.md\`](user-self-test-handoff.md)。 |`,
 );
 replaceMarkdownLine(
   "| Windows 候选完整性 |",
@@ -1274,7 +1366,7 @@ const authenticodeLine = replaceMarkdownLine(
   `| Windows Authenticode | installer/main/updater/uninstaller | KNOWN LIMITATION（非 v2.1 内部试用门禁） | 四个 PE 文件均为 \`NotSigned\`，当前没有可用可信代码签名身份。v2.1 设计与本次用户范围未把 Authenticode 定为内部隔离试用门禁；Ed25519 清单与 artifact hash 有效，但不提供 Windows publisher identity/reputation。见 [\`${authenticodeAuditPath}\`](${authenticodeAuditPath}) 与 [\`${authenticodeAuditValidatorPath}\`](${authenticodeAuditValidatorPath})。 |`,
 );
 const notificationLine =
-  `| 桌面通知项目路由 | installed EXE + Windows native toast | FAIL（environment_blocker） | GPT-5.6 Luna 按用户要求只尝试一次并在业务动作前停止：当前控制面没有 Windows 原生窗口操作能力，app/observer 位于 Session 2，而保留的 275 条 WPN 完整链均报告 Session 1。没有新 toast、点击、fixture 或项目回读；因此可见通知与点击跳转仍未执行，\`productPass=false\`。最小重试条件要求 app、submitter 与 observer 同处一个可操作交互会话。见 [\`${lunaNotificationAttemptPaths[0]}\`](${lunaNotificationAttemptPaths[0]})、[\`${lunaNotificationAttemptPaths[1]}\`](${lunaNotificationAttemptPaths[1]})、[\`${notificationAuditPaths[0]}\`](${notificationAuditPaths[0]}) 与 [\`${notificationProofPath}\`](${notificationProofPath})。 |`;
+  `| 桌面通知项目路由 | installed EXE + Windows native toast | 用户自测／已移交，代理未执行（NOT_RUN） | 当前可见通知、点击与项目跳转验收已纳入 Windows EXE 用户自测，代理不再操作 EXE。历史代理尝试保留为参考：app/observer 位于 Session 2，而 275 条 WPN 完整链报告 Session 1；当时没有新 toast、点击、fixture 或项目回读，结论为 \`environment_blocker\`、\`productPass=false\`。历史阻塞不是当前代理 blocker，也不是用户 PASS。见 [\`${lunaNotificationAttemptPaths[0]}\`](${lunaNotificationAttemptPaths[0]})、[\`${notificationAuditPaths[0]}\`](${notificationAuditPaths[0]})、[\`${notificationProofPath}\`](${notificationProofPath}) 与 [\`user-self-test-handoff.md\`](user-self-test-handoff.md)。 |`;
 const notificationIndexes = markdownLines
   .map((line, index) => (line.startsWith("| 桌面通知项目路由 |") ? index : -1))
   .filter((index) => index >= 0);
@@ -1283,13 +1375,13 @@ if (notificationIndexes.length === 1) markdownLines[notificationIndexes[0]] = no
 else markdownLines.splice(authenticodeLine + 1, 0, notificationLine);
 replaceMarkdownLine(
   "| 生产、旧 preview 与失败现场并存 |",
-  `| 生产、旧 preview 与失败现场并存 | read-only observation | PASS | build 20 升级、新鲜 API/MCP 批次和 installed local MCP 批次均使用隔离根，只退出自有进程；保护监听与 health 前后完全一致。三次失败/中断现场也保留，未删除。Luna 通知尝试没有启动 runner 或执行产品动作。见 [\`${freshApiMcpProofPath}\`](${freshApiMcpProofPath})、[\`${freshApiMcpAttemptsPath}\`](${freshApiMcpAttemptsPath})、[\`${installedLocalMcpProofPath}\`](${installedLocalMcpProofPath}) 与 [\`${lunaNotificationAttemptPaths[0]}\`](${lunaNotificationAttemptPaths[0]})。 |`,
+  `| 生产、旧 preview 与失败现场并存 | retained historical evidence | PASS | 历史 build 20 升级、新鲜 API/MCP 批次和 installed local MCP 批次均使用隔离根，只退出自有进程；保护监听与 health 前后完全一致，失败/中断现场也已保留。通知尝试没有启动 runner 或执行产品动作，其环境阻塞现作为用户自测参考。见 [\`${freshApiMcpProofPath}\`](${freshApiMcpProofPath})、[\`${freshApiMcpAttemptsPath}\`](${freshApiMcpAttemptsPath})、[\`${installedLocalMcpProofPath}\`](${installedLocalMcpProofPath}) 与 [\`${lunaNotificationAttemptPaths[0]}\`](${lunaNotificationAttemptPaths[0]})。 |`,
 );
 replaceMarkdownLine(
   "| 最终源码门禁 |",
   allAgentGatesPassed
-    ? `| 最终源码门禁 | source | PASS | 产品源码锚定 \`${productSourceCommit}\`，所提供的代理门禁报告覆盖全部必需门禁且全部通过；六项用户自测仍为 NOT_RUN。 |`
-    : `| 最终源码门禁 | source | PARTIAL | 产品源码锚定 \`${productSourceCommit}\`；当前源码 API/server MCP 124 项与 installed local MCP 13 项已通过且清理完成，但原生通知可见/点击/项目跳转仍受当前会话与控制面阻塞。细粒度库存不自动等同产品缺陷，也未被静默改成 PASS。 |`,
+    ? `| 最终源码门禁 | source | PASS | 产品源码锚定 \`${productSourceCommit}\`；代理负责的开发、可用安装包交付和代理验收已完成。Windows EXE 实际验收及原六项外部验收共七项仍为用户 NOT_RUN；历史通知环境阻塞仅作移交参考。 |`
+    : `| 最终源码门禁 | source | PARTIAL | 产品源码锚定 \`${productSourceCommit}\`，但仍有代理负责门禁未完成。七项用户自测保持 NOT_RUN。 |`,
 );
 replaceMarkdownLine(
   "- Windows：",
@@ -1301,11 +1393,11 @@ replaceMarkdownLine(
 );
 replaceMarkdownLine(
   ["代理侧的细粒度覆盖矩阵已按最终源码重新生成：", "当前新增真实产品缺陷："],
-  `当前新增真实产品缺陷：无。当前源码新鲜隔离批次已通过 API/server MCP 124 项与 installed local MCP 13 项；唯一剩余代理验收是 Windows 原生通知可见、点击和项目跳转，当前因会话拓扑与原生控制面不可用而阻塞。细粒度覆盖矩阵仍为 1,030 项、47 个退休项、637 项带源码复验标记，见 [\`../coverage-matrix.md\`](../coverage-matrix.md)；这些是累计的逐入口库存，包含历史漂移、自动展开与用户门槛，不能自动解释为 637 个产品缺陷或代理待办，也不会被本次 scoped smoke 静默改成 PASS。`,
+  `当前新增真实产品缺陷：无。代理负责的产品开发、可用安装包交付和代理验收已完成；Windows EXE 实际验收以及其余指定外部验收均已移交用户且尚未执行。历史通知环境阻塞继续保留为移交参考，不再列为代理 blocker。细粒度覆盖矩阵仍为 1,030 项、47 个退休项、637 项带源码复验标记，见 [\`../coverage-matrix.md\`](../coverage-matrix.md)；这些是累计的逐入口库存，不能自动解释为 637 个产品缺陷或代理待办，也不会被 scoped smoke 静默改成 PASS。`,
 );
 replaceMarkdownLine(
-  "用户侧六项均为",
-  "用户侧六项均为 `用户自测／已移交，代理未执行`：物理 Android 真机、真实打包、单次打包上传、真实增量上传发布、Relay AI 制作交付、第三方同步/青鱼真实订单闭环。操作与回填要求见 [`user-self-test-handoff.md`](user-self-test-handoff.md)。",
+  ["用户侧六项均为", "用户侧七项均为"],
+  "用户侧七项均为 `用户自测／已移交，代理未执行`：Windows EXE 实际验收（安装、升级、运行、桌面通知、local MCP）、物理 Android 真机、真实打包、单次打包上传、真实增量上传发布、Relay AI 制作交付、第三方同步/轻语真实订单闭环。操作与回填要求见 [`user-self-test-handoff.md`](user-self-test-handoff.md)。",
 );
 
 if (!dryRun) {

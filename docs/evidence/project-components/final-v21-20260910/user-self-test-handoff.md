@@ -1,10 +1,18 @@
 # QA Hub v2.1 用户自测移交清单
 
-记录日期：2026-09-10。以下项目已按用户决定移交用户执行，代理未执行，也不记为 PASS。建议只使用 v2.1 隔离实例（API `4639`、Web `4640`、server MCP `4641`、local MCP `4642`）、独立测试项目和独立外部目标；不要把 `4319/4174/4320` 或日常客户端作为写入目标。
+记录日期：2026-09-11。以下七项已按用户最新范围移交用户执行，当前状态统一为 `用户自测／已移交，代理未执行`，也不记为 PASS。Windows EXE 的任何当前或后续实际验收均由用户自行完成，代理不再安装、升级、启动、点击或操作 EXE。建议只使用 v2.1 隔离实例（API `4639`、Web `4640`、server MCP `4641`、local MCP `4642`）、独立测试项目和独立外部目标；不要把 `4319/4174/4320` 或日常客户端作为写入目标。
 
 ## 共用留证
 
 每项至少保存：项目 ID、人员 ID、组件键与配置版本、请求或幂等键、外部任务 ID、关键状态时间线、最终 UI 截图、HTTP 或 MCP 回读、外部终态回读、产物文件名/字节数/SHA-256。凭据只保存引用名，不把口令、令牌、Cookie 或二维码内容写进证据。
+
+## Windows EXE 实际验收（安装、升级、运行、桌面通知、local MCP）
+
+- **当前登记**：`用户自测／已移交，代理未执行`。本项包括现有或后续候选 EXE 的安装、从旧版本升级、启动和运行、桌面原生通知可见与点击后的项目路由，以及 local MCP 的实际使用。代理不再操作 EXE，也不会把历史证据改写为本项 PASS。
+- **候选产物**：隔离 Windows release `20260911T000006100Z` / `0.2.0-preview.20`；installer SHA-256 `e0e68a626657f4431447764d96f0cf95ded8b6b081c8b13f809ccacd252e7e41`。使用隔离安装目录、preview 配置和端口，保持生产客户端与日常 EXE 原样。
+- **预期**：安装包可完成安装并启动；旧隔离 preview 可经应用内更新升级，升级后版本、项目、草稿、配置和回退备份符合预期；运行期间只连接隔离 API/Web/MCP；桌面通知在用户当前交互会话可见，点击后打开通知所属项目并可回读；local MCP `4642` 可初始化、列出工具并完成用户选择的只读或隔离测试操作。
+- **边界**：不要关闭、替换、卸载或升级日常 EXE，不要清除生产/preview 应用数据，也不要把生产项目作为写入目标。失败时保留安装日志、版本与路径、通知截图、会话信息、local MCP 请求/响应和原始错误；由用户明确记录 PASS/FAIL。
+- **历史代理参考**：代理曾验证 build 20 发布事务、隔离 `0.2.0-preview.19→0.2.0-preview.20` 升级/重启/只读回读，以及 13 项 installed local MCP 子集。这些历史 PASS 继续有效，但不代表本项用户自测通过。原生通知的历史尝试因 app/observer 在 Session 2、WPN 路由在 Session 1 而记为 `environment_blocker`、`productPass=false`；它只说明当时环境，现已作为用户自测参考移交，不再是代理 blocker。证据见 [`continuation-20260911/postfix-fd0f0f8/summary.json`](continuation-20260911/postfix-fd0f0f8/summary.json)、[`continuation-20260911/postfix-fd0f0f8/upgrade/auto-relaunch-verification.json`](continuation-20260911/postfix-fd0f0f8/upgrade/auto-relaunch-verification.json)、[`continuation-20260911/current-source-revalidation-fd0f0f8/desktop-local-mcp/0c1282e0-72ed-444d-922f-ca94492a21dd/proof.json`](continuation-20260911/current-source-revalidation-fd0f0f8/desktop-local-mcp/0c1282e0-72ed-444d-922f-ca94492a21dd/proof.json) 与 [`../windows-notification-luna-acceptance/20260911T014720Z/luna-acceptance-attempt.json`](../windows-notification-luna-acceptance/20260911T014720Z/luna-acceptance-attempt.json)。
 
 ## 物理 Android 真机
 
@@ -53,6 +61,7 @@
 
 | 自测项 | 当前登记 | 用户结果 | 关键证据位置 |
 | --- | --- | --- | --- |
+| Windows EXE 实际验收（安装、升级、运行、桌面通知、local MCP） | 用户自测／已移交，代理未执行 | 待用户填写 |  |
 | 物理 Android 真机 | 用户自测／已移交，代理未执行 | 待用户填写 |  |
 | 真实打包 | 用户自测／已移交，代理未执行 | 待用户填写 |  |
 | 单次打包上传 | 用户自测／已移交，代理未执行 | 待用户填写 |  |

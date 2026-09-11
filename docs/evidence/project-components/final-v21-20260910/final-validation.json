@@ -1,15 +1,16 @@
 {
   "schemaVersion": 2,
-  "validatedAt": "2026-09-11T02:05:05.324Z",
+  "validatedAt": "2026-09-11T02:38:23.327Z",
   "validationScope": "evidence_structure_and_declared_gate_consistency",
   "sourceCommit": "fd0f0f850f907b8a77aac8ec8b6a71b308bdd711",
   "productSourceCommit": "fd0f0f850f907b8a77aac8ec8b6a71b308bdd711",
   "acceptanceOverallStatus": "not_complete",
-  "agentScopeStatus": "incomplete_agent_revalidation_pending",
+  "agentScopeStatus": "complete_user_acceptance_pending",
   "completionAllowed": false,
-  "delegatedUserCases": 6,
+  "delegatedUserCases": 7,
   "delegatedCasesAllNotRun": true,
-  "agentGatesAllPassed": false,
+  "agentGatesAllPassed": true,
+  "agentOwnedDeliveryComplete": true,
   "postfixEvidence": {
     "passed": true,
     "releaseId": "20260911T000006100Z",
@@ -18,28 +19,7 @@
     "installedUpgradePassed": true,
     "registrationPassed": true
   },
-  "agentBlockers": [
-    {
-      "id": "desktop-notification-project-route-live",
-      "status": "fail",
-      "owner": "agent",
-      "completionImpact": "blocks_agent_scope_completion",
-      "evidence": [
-        "../desktop-notification-project-route-live/81c44b26-5c6f-47c6-a56a-d4eb27f19d7a/proof.json",
-        "../windows-notification-session-current-audit/20260911T005709Z/current-session-wpn-routing.json",
-        "../windows-notification-session-current-audit/20260911T005709Z/validation.json",
-        "../windows-notification-session-current-audit/20260911T005709Z/README.md",
-        "../windows-notification-session-current-audit/20260911T005709Z/validate-evidence.mjs",
-        "../windows-notification-session-current-audit/20260911T005709Z/capture-readonly.ps1",
-        "../windows-notification-luna-acceptance/20260911T014720Z/luna-acceptance-attempt.json",
-        "../windows-notification-luna-acceptance/20260911T014720Z/validation.json",
-        "../windows-notification-luna-acceptance/20260911T014720Z/README.md",
-        "../windows-notification-luna-acceptance/20260911T014720Z/validate-evidence.mjs"
-      ],
-      "classification": "environment_blocker",
-      "productPass": false
-    }
-  ],
+  "agentBlockers": [],
   "authenticode": {
     "requiredForV21InternalTrial": false,
     "status": "not_signed",
@@ -54,12 +34,18 @@
       "../windows-authenticode-current-audit/20260911T005413530Z/validate-audit.mjs"
     ]
   },
-  "notificationGate": {
-    "id": "desktop-notification-project-route-live",
-    "status": "fail",
-    "classification": "environment_blocker",
-    "productPass": false,
-    "semanticProof": "../desktop-notification-project-route-live/81c44b26-5c6f-47c6-a56a-d4eb27f19d7a/proof.json"
+  "notificationAcceptance": {
+    "owner": "user",
+    "status": "not_run",
+    "handoffStatus": "delegated_pending",
+    "userAcceptanceCaseId": "windows-exe-user-acceptance",
+    "historicalAgentAttempt": {
+      "id": "desktop-notification-project-route-live",
+      "status": "fail",
+      "classification": "environment_blocker",
+      "productPass": false,
+      "semanticProof": "../desktop-notification-project-route-live/81c44b26-5c6f-47c6-a56a-d4eb27f19d7a/proof.json"
+    }
   },
   "fineGrainedCoverage": {
     "items": 1030,
