@@ -2,6 +2,8 @@
 
 This runbook covers only the isolated `qa-hub-lan-v22-0911` instance. It must not be used against daily production or the earlier preview instance.
 
+The evidence and user-self-test handoff for the 2026-09-11 deployment are recorded in [lan-project-onboarding-v2.2-delivery.md](./lan-project-onboarding-v2.2-delivery.md).
+
 ## Fixed boundaries
 
 | Resource                   | LAN v2.2 value                                               |
