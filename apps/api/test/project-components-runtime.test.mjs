@@ -316,6 +316,37 @@ test("Relay actions retain the task's original component endpoint after configur
     items: [{ title: "Fixture", message: "Fixture task", uploadIds: [] }],
   });
   await finished(created.id);
+  const listed = await f.runtime.productionOperation(f.a, f.gmUserId, "batches");
+  assert.equal(listed.items.length, 1);
+  assert.equal(listed.items[0].id, created.id);
+  assert.equal(listed.items[0].kind, "create");
+  assert.equal(listed.items[0].items.length, 1);
+  assert.equal("result" in listed.items[0], false);
+  assert.equal(
+    (await f.runtime.productionOperation(f.a, f.gmUserId, "batch", undefined, created.id)).id,
+    created.id,
+  );
+  const otherActorId = randomUUID();
+  const other = await f.runtime.productionOperation(f.a, otherActorId, "submit", {
+    requestId: randomUUID(),
+    kind: "create",
+    items: [{ title: "Other fixture", message: "Other actor task", uploadIds: [] }],
+  });
+  await finished(other.id);
+  assert.deepEqual(
+    (await f.runtime.productionOperation(f.a, f.gmUserId, "batches")).items.map((item) => item.id),
+    [created.id],
+  );
+  assert.deepEqual(
+    (await f.runtime.productionOperation(f.a, otherActorId, "batches")).items.map(
+      (item) => item.id,
+    ),
+    [other.id],
+  );
+  await assert.rejects(
+    f.runtime.productionOperation(f.a, f.gmUserId, "batch", undefined, other.id),
+    { code: "NOT_FOUND" },
+  );
   await configure("https://relay-new.invalid", 1);
   const boundary = requests.length;
   const continued = await f.runtime.productionOperation(f.a, f.gmUserId, "submit", {

@@ -915,7 +915,7 @@ export class ProjectComponentsRuntime {
       now: stamp(),
     });
   }
-  async productionHistory(projectId: string): Promise<Json> {
+  async productionHistory(projectId: string, actorId?: string): Promise<Json> {
     const items: Json[] = [];
     for (const snapshot of this.snapshots.values())
       if (snapshot.projectId === projectId && snapshot.key === "relay.production") {
@@ -936,6 +936,7 @@ export class ProjectComponentsRuntime {
           const batch = object(JSON.parse(readFileSync(join(folder, file), "utf8")));
           if (batch["projectId"] !== projectId || batch["componentVersion"] !== snapshot.version)
             throw new ComponentRuntimeError("COMPONENT_HISTORY_SCOPE_MISMATCH", "历史归属校验失败");
+          if (actorId !== undefined && batch["actorId"] !== actorId) continue;
           const entries = Array.isArray(batch["items"]) ? batch["items"].map(object) : [];
           const state = entries.some((item) => item["status"] === "running")
             ? "running"
@@ -971,6 +972,29 @@ export class ProjectComponentsRuntime {
       items: items.sort((a, b) => String(b["createdAt"]).localeCompare(String(a["createdAt"]))),
     };
   }
+  async productionBatches(
+    projectId: string,
+    actorId: string,
+    limit: number | null = 8,
+  ): Promise<Json> {
+    const history = await this.productionHistory(projectId, actorId);
+    const entries = history["items"] as Json[];
+    return {
+      items: (limit === null ? entries : entries.slice(0, limit)).map((entry) => {
+        const result = object(entry["result"]);
+        return {
+          id: entry["id"],
+          projectId: entry["projectId"],
+          componentVersion: entry["componentVersion"],
+          kind: result["kind"],
+          status: entry["status"],
+          createdAt: entry["createdAt"],
+          updatedAt: entry["updatedAt"],
+          items: Array.isArray(result["items"]) ? result["items"] : [],
+        };
+      }),
+    };
+  }
   async productionOperation(
     projectId: string,
     actorId: string,
@@ -979,7 +1003,7 @@ export class ProjectComponentsRuntime {
     taskId?: string,
   ): Promise<unknown> {
     if (!["batches", "batch"].includes(operation)) this.requireExecution();
-    if (operation === "batches") return this.productionHistory(projectId);
+    if (operation === "batches") return this.productionBatches(projectId, actorId);
     if (operation === "batch" || operation === "retry") {
       if (!/^[a-f0-9]{64}$/u.test(taskId ?? ""))
         throw new ComponentRuntimeError("NOT_FOUND", "批次不存在", 404);
@@ -998,10 +1022,13 @@ export class ProjectComponentsRuntime {
       );
       if (!snapshot || !/^[a-f0-9]{64}$/u.test(taskId ?? ""))
         throw new ComponentRuntimeError("NOT_FOUND", "批次不存在", 404);
-      if (operation === "batch")
-        return ((await this.productionHistory(projectId))["items"] as Json[]).find(
-          (item) => item["id"] === taskId,
-        );
+      if (operation === "batch") {
+        const batch = (
+          (await this.productionBatches(projectId, actorId, null))["items"] as Json[]
+        ).find((item) => item["id"] === taskId);
+        if (!batch) throw new ComponentRuntimeError("NOT_FOUND", "批次不存在", 404);
+        return batch;
+      }
       return this.production(snapshot).batch(actorId, projectId, taskId!, true);
     }
     const actions =

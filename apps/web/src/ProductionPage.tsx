@@ -67,6 +67,43 @@ export function compareProductionBugPriority(
 }
 const importStatusLabel = (bug: BugListItem) =>
   taskStatusForBugState(bug.state) === "pending" ? "待制作" : taskStatusLabel(bug.state);
+const record = (value: unknown): Record<string, unknown> | null =>
+  value !== null && typeof value === "object" && !Array.isArray(value)
+    ? (value as Record<string, unknown>)
+    : null;
+export function normalizeProductionBatches(value: unknown): ProductionBatch[] {
+  const response = record(value);
+  if (!response || !Array.isArray(response.items)) return [];
+  return response.items.flatMap((raw) => {
+    const batch = record(raw);
+    if (!batch) return [];
+    const legacyResult = record(batch.result);
+    const kind = typeof batch.kind === "string" ? batch.kind : legacyResult?.kind;
+    const items = Array.isArray(batch.items)
+      ? batch.items
+      : Array.isArray(legacyResult?.items)
+        ? legacyResult.items
+        : [];
+    if (
+      typeof batch.id !== "string" ||
+      typeof kind !== "string" ||
+      typeof batch.status !== "string" ||
+      typeof batch.createdAt !== "string" ||
+      typeof batch.updatedAt !== "string"
+    )
+      return [];
+    return [
+      {
+        id: batch.id,
+        kind,
+        status: batch.status,
+        createdAt: batch.createdAt,
+        updatedAt: batch.updatedAt,
+        items: items.filter((item) => record(item) !== null) as ProductionBatch["items"],
+      },
+    ];
+  });
+}
 function readDraft(key: string): Draft {
   try {
     const saved = JSON.parse(localStorage.getItem(key) ?? "null") as Partial<Draft> | null;
@@ -322,7 +359,8 @@ export default function ProductionPage({
         if (results[0].status === "fulfilled") setProject(results[0].value);
         if (results[1].status === "fulfilled") setTasks(results[1].value.items);
         if (results[2].status === "fulfilled") setBugs(results[2].value.items);
-        if (results[3].status === "fulfilled") setBatches(results[3].value.items);
+        if (results[3].status === "fulfilled")
+          setBatches(normalizeProductionBatches(results[3].value));
         const failed = results.find((result) => result.status === "rejected");
         if (failed?.status === "rejected") setError(productionError(failed.reason));
         else setError("");
