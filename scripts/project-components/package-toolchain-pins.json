@@ -3,7 +3,7 @@
   "lock": {
     "path": "package-lock.json",
     "bytes": 244912,
-    "sha256": "ffaf907f6d2ed5d1420d5cedbec2a6b09a8bb85e624b8aba61ac5cf9cc24d544"
+    "sha256": "c421b27a355e29355e14f423a5f64d2f237706f3e22f278b667355858a03e454"
   },
   "node": {
     "version": "v24.19.0",
@@ -17,8 +17,8 @@
     "algorithm": "sha256-path-content-v1",
     "files": 19199,
     "links": 408,
-    "bytes": 699275125,
-    "digest": "ec3d59d7b1cf816f4441a16dfede05f375993974cd3c54ccde1a87b04c9f574f"
+    "bytes": 699275127,
+    "digest": "976e8c5daf75178d92fb7af6073935dd59955a1f7145cf6f895896af6f9e7d3a"
   },
   "electron": {
     "checksumsPath": "node_modules/electron/checksums.json",
