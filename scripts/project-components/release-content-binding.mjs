@@ -26,7 +26,9 @@ import { moveFileWriteThrough } from "./windows-write-through.mjs";
 
 const SHA256 = /^[0-9a-f]{64}$/u;
 const RELEASE_ID = /^\d{8}T\d{9}Z$/u;
-const VERSION = /^0\.2\.0-(?:preview|lan)\.[1-9]\d*$/u;
+const LEGACY_VERSION = /^0\.2\.0-(?:preview|lan)\.[1-9]\d*$/u;
+const STABLE_VERSION = /^1\.0\.0$/u;
+const VERSION = /^(?:0\.2\.0-(?:preview|lan)\.[1-9]\d*|1\.0\.0)$/u;
 const ED25519_SIGNATURE = /^[A-Za-z0-9+/]{86}==$/u;
 const MAX_INSTALLER_BYTES = 350 * 1024 * 1024;
 
@@ -397,7 +399,8 @@ export function validatePreparedPreviewPublicationReceipt({ transaction, phase }
   const installerName = publication?.installerName;
   assert.ok(
     typeof installerName === "string" &&
-      /^[A-Za-z0-9._-]+\.exe$/u.test(installerName) &&
+      /^[\p{L}\p{N}._-]+\.exe$/u.test(installerName) &&
+      installerName.length <= 200 &&
       path.basename(installerName) === installerName,
     "PREPARED_RECEIPT_INSTALLER_NAME_INVALID",
   );
@@ -425,7 +428,7 @@ export function validatePreparedPreviewPublicationReceipt({ transaction, phase }
   const expectedInstallerPathname = `/downloads/${installerName}`;
   assert.equal(manifestUrl.protocol, "http:", "PREPARED_RECEIPT_MANIFEST_URL_INVALID");
   assert.equal(
-    receipt.version.includes("-lan.")
+    receipt.version.includes("-lan.") || STABLE_VERSION.test(receipt.version)
       ? isPrivateLanHostname(manifestUrl.hostname)
       : manifestUrl.hostname === "127.0.0.1",
     true,
@@ -452,7 +455,7 @@ export function validatePreparedPreviewPublicationReceipt({ transaction, phase }
   assert.equal(installerUrl.username, "", "PREPARED_RECEIPT_INSTALLER_URL_INVALID");
   assert.equal(installerUrl.password, "", "PREPARED_RECEIPT_INSTALLER_URL_INVALID");
   assert.equal(
-    installerUrl.pathname,
+    decodeURI(installerUrl.pathname),
     expectedInstallerPathname,
     "PREPARED_RECEIPT_INSTALLER_URL_INVALID",
   );
@@ -763,12 +766,21 @@ export function assertUpdateManifestSuccessor(previous, next) {
   assert.match(next.releaseId, RELEASE_ID, "NEXT_UPDATE_RELEASE_ID_INVALID");
   assert.match(previous.version, VERSION, "PREVIOUS_UPDATE_VERSION_INVALID");
   assert.match(next.version, VERSION, "NEXT_UPDATE_VERSION_INVALID");
-  const previousBuild = Number(previous.version.slice(previous.version.lastIndexOf(".") + 1));
-  const nextBuild = Number(next.version.slice(next.version.lastIndexOf(".") + 1));
+  const order = (version) =>
+    STABLE_VERSION.test(version)
+      ? [1, 0, 0, 0]
+      : [0, 2, 0, Number(version.slice(version.lastIndexOf(".") + 1))];
+  const previousOrder = order(previous.version);
+  const nextOrder = order(next.version);
+  const newer = nextOrder.some(
+    (value, index) =>
+      value > previousOrder[index] &&
+      nextOrder.slice(0, index).every((part, earlier) => part === previousOrder[earlier]),
+  );
   assert.ok(
-    Number.isSafeInteger(previousBuild) &&
-      Number.isSafeInteger(nextBuild) &&
-      nextBuild > previousBuild,
+    (LEGACY_VERSION.test(previous.version) || STABLE_VERSION.test(previous.version)) &&
+      (LEGACY_VERSION.test(next.version) || STABLE_VERSION.test(next.version)) &&
+      newer,
     "UPDATE_VERSION_NOT_MONOTONIC",
   );
   assert.ok(next.releaseId > previous.releaseId, "UPDATE_RELEASE_ID_NOT_MONOTONIC");

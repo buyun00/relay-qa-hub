@@ -924,6 +924,21 @@ test("signed update manifest rejects field, archive, and signature drift", () =>
     ),
   };
   assert.equal(assertSignedUpdateManifest(lanManifest, publicKey), lanManifest);
+  const stablePayload = {
+    ...payload,
+    version: "1.0.0",
+    archive: {
+      ...payload.archive,
+      url: "/downloads/Relay-QA-Hub-团队版-1.0.0-20260911T123456789Z.exe",
+    },
+  };
+  const stableManifest = {
+    ...stablePayload,
+    signature: sign(null, serializeUpdateManifestPayload(stablePayload), pair.privateKey).toString(
+      "base64",
+    ),
+  };
+  assert.equal(assertSignedUpdateManifest(stableManifest, publicKey), stableManifest);
   assert.throws(
     () => assertSignedUpdateManifest({ ...manifest, releaseId: "20260911T123456788Z" }, publicKey),
     /UPDATE_MANIFEST_SIGNATURE_INVALID/u,
@@ -946,6 +961,22 @@ test("latest publication only accepts a strictly newer build and release time", 
     publishedAt: "2026-09-11T12:34:56.789Z",
   };
   assert.equal(assertUpdateManifestSuccessor(previous, next), next);
+  const stable = {
+    ...next,
+    releaseId: "20260912T123456789Z",
+    version: "1.0.0",
+    publishedAt: "2026-09-12T12:34:56.789Z",
+  };
+  assert.equal(assertUpdateManifestSuccessor(next, stable), stable);
+  assert.throws(
+    () =>
+      assertUpdateManifestSuccessor(stable, {
+        ...stable,
+        releaseId: "20260913T123456789Z",
+        publishedAt: "2026-09-13T12:34:56.789Z",
+      }),
+    /UPDATE_VERSION_NOT_MONOTONIC/u,
+  );
   assert.throws(
     () => assertUpdateManifestSuccessor(previous, { ...next, version: previous.version }),
     /UPDATE_VERSION_NOT_MONOTONIC/u,
