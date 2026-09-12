@@ -949,7 +949,7 @@ test("signed update manifest rejects field, archive, and signature drift", () =>
   );
 });
 
-test("latest publication only accepts a strictly newer build and release time", () => {
+test("latest publication accepts a newer preview build or stable release transaction", () => {
   const previous = {
     releaseId: "20260910T123456789Z",
     version: "0.2.0-preview.18",
@@ -968,14 +968,20 @@ test("latest publication only accepts a strictly newer build and release time", 
     publishedAt: "2026-09-12T12:34:56.789Z",
   };
   assert.equal(assertUpdateManifestSuccessor(next, stable), stable);
+  const stablePatch = {
+    ...stable,
+    releaseId: "20260913T123456789Z",
+    publishedAt: "2026-09-13T12:34:56.789Z",
+  };
+  assert.equal(assertUpdateManifestSuccessor(stable, stablePatch), stablePatch);
+  assert.throws(
+    () => assertUpdateManifestSuccessor(stable, { ...stablePatch, releaseId: stable.releaseId }),
+    /UPDATE_RELEASE_ID_NOT_MONOTONIC/u,
+  );
   assert.throws(
     () =>
-      assertUpdateManifestSuccessor(stable, {
-        ...stable,
-        releaseId: "20260913T123456789Z",
-        publishedAt: "2026-09-13T12:34:56.789Z",
-      }),
-    /UPDATE_VERSION_NOT_MONOTONIC/u,
+      assertUpdateManifestSuccessor(stable, { ...stablePatch, publishedAt: stable.publishedAt }),
+    /UPDATE_PUBLISHED_AT_NOT_MONOTONIC/u,
   );
   assert.throws(
     () => assertUpdateManifestSuccessor(previous, { ...next, version: previous.version }),

@@ -772,11 +772,15 @@ export function assertUpdateManifestSuccessor(previous, next) {
       : [0, 2, 0, Number(version.slice(version.lastIndexOf(".") + 1))];
   const previousOrder = order(previous.version);
   const nextOrder = order(next.version);
-  const newer = nextOrder.some(
-    (value, index) =>
-      value > previousOrder[index] &&
-      nextOrder.slice(0, index).every((part, earlier) => part === previousOrder[earlier]),
-  );
+  const sameStableVersion =
+    STABLE_VERSION.test(previous.version) && STABLE_VERSION.test(next.version);
+  const newer =
+    sameStableVersion ||
+    nextOrder.some(
+      (value, index) =>
+        value > previousOrder[index] &&
+        nextOrder.slice(0, index).every((part, earlier) => part === previousOrder[earlier]),
+    );
   assert.ok(
     (LEGACY_VERSION.test(previous.version) || STABLE_VERSION.test(previous.version)) &&
       (LEGACY_VERSION.test(next.version) || STABLE_VERSION.test(next.version)) &&
