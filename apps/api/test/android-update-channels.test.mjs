@@ -9,6 +9,7 @@ import { createApiApp } from "../dist/index.js";
 import { parseAndroidUpdateChannel } from "../dist/android-updates.js";
 
 const apkName = "Relay-QA-Hub-Android-23-0.2.0-preview.9.apk";
+const teamApkName = "Relay-QA-Hub-团队版-Android-1.0.0-27.apk";
 // Transport fixture bytes, deliberately not represented as an installable/signed APK.
 const apkBytes = Buffer.from("isolated-preview-download\u0000\u0001\u0002", "utf8");
 const sha256 = createHash("sha256").update(apkBytes).digest("hex");
@@ -28,6 +29,7 @@ async function fixture(t, channel) {
   const root = join(directory, "feed");
   await mkdir(root);
   await writeFile(join(root, apkName), apkBytes);
+  await writeFile(join(root, teamApkName), apkBytes);
   await writeFile(join(directory, "outside.apk"), "outside-private-fixture");
   await writeFile(join(root, "unpublished.apk"), "unpublished-private-fixture");
   const app = createApiApp({
@@ -123,6 +125,27 @@ test("real HTTP explicit preview serves exact metadata/APK bytes, HEAD, ranges a
     assert.equal((await f.get(`/api/v1/android-updates/${channel}/latest.json`)).status, 404);
     assert.equal((await f.get(`/api/v1/android-updates/${channel}/${apkName}`)).status, 404);
   }
+});
+
+test("real HTTP preview serves the stable team-edition APK name safely", async (t) => {
+  const f = await fixture(t, "preview");
+  const manifest = {
+    ...previewManifest,
+    versionCode: 27,
+    versionName: "1.0.0",
+    fileName: teamApkName,
+  };
+  await f.write(manifest);
+  const base = "/api/v1/android-updates/preview/";
+  const metadata = await f.get(base + "latest.json");
+  assert.equal(metadata.status, 200);
+  assert.deepEqual(await metadata.json(), manifest);
+  const apk = await f.get(base + encodeURIComponent(teamApkName), {
+    headers: { connection: "close" },
+  });
+  assert.equal(apk.status, 200);
+  assert.match(apk.headers.get("content-disposition"), /filename\*=UTF-8''Relay-QA-Hub-/u);
+  assert.deepEqual(Buffer.from(await apk.arrayBuffer()), apkBytes);
 });
 
 test("real HTTP preview refuses wrong channel/package or malformed manifest without changing stable compatibility", async (t) => {

@@ -415,5 +415,5 @@ private val VERSION_NAME_PATTERN = Regex("^[0-9A-Za-z][0-9A-Za-z.+-]{0,63}$")
 private val PACKAGE_NAME_PATTERN = Regex("^[A-Za-z][A-Za-z0-9_]*(?:\\.[A-Za-z][A-Za-z0-9_]*)+$")
 private val SHA256_PATTERN = Regex("^[0-9a-f]{64}$")
 private val ANDROID_UPDATE_FILE_PATTERN =
-    Regex("^Relay-QA-Hub-Android-[1-9][0-9]{0,9}-[0-9A-Za-z][0-9A-Za-z.+-]{0,63}\\.apk$")
+    Regex("^(?:Relay-QA-Hub-Android-[1-9][0-9]{0,9}-[0-9A-Za-z][0-9A-Za-z.+-]{0,63}|Relay-QA-Hub-团队版-Android-[0-9A-Za-z][0-9A-Za-z.+-]{0,63}-[1-9][0-9]{0,9})\\.apk$")
 private val GAME_VERSION_PATTERN = Regex("_(\\d+(?:\\.\\d+){1,3})_")

@@ -40,6 +40,25 @@ class ApkDistributionClientTest {
                 )
             }.isFailure,
         )
+
+        val teamRelease = parseAndroidUpdateManifest(
+            json = """
+                {
+                  "schemaVersion": 1,
+                  "versionCode": 27,
+                  "versionName": "1.0.0",
+                  "packageName": "com.relayqahub.android.lan.v22.debug",
+                  "fileName": "Relay-QA-Hub-团队版-Android-1.0.0-27.apk",
+                  "size": 33000000,
+                  "sha256": "${"ab".repeat(32)}"
+                }
+            """.trimIndent(),
+            feedUrl = "http://10.100.5.157:4740/api/v1/android-updates/preview/latest.json"
+                .toHttpUrl(),
+        )
+        assertEquals(27L, teamRelease.versionCode)
+        assertEquals("Relay-QA-Hub-团队版-Android-1.0.0-27.apk", teamRelease.fileName)
+        assertTrue(teamRelease.downloadUrl.contains("%E5%9B%A2%E9%98%9F%E7%89%88"))
     }
 
     @Test

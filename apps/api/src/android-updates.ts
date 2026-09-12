@@ -24,7 +24,7 @@ export function parseAndroidUpdateChannel(value: string | undefined): AndroidUpd
 }
 
 const UPDATE_FILE_PATTERN =
-  /^(?:latest\.json|Relay-QA-Hub-Android-[1-9][0-9]{0,9}-[0-9A-Za-z][0-9A-Za-z.+-]{0,63}\.apk)$/u;
+  /^(?:latest\.json|Relay-QA-Hub-Android-[1-9][0-9]{0,9}-[0-9A-Za-z][0-9A-Za-z.+-]{0,63}\.apk|Relay-QA-Hub-团队版-Android-[0-9A-Za-z][0-9A-Za-z.+-]{0,63}-[1-9][0-9]{0,9}\.apk)$/u;
 const MAX_METADATA_BYTES = 64 * 1024;
 const MAX_APK_BYTES = 512 * 1024 * 1024;
 
@@ -104,7 +104,10 @@ async function previewMetadata(
       !/^[0-9A-Za-z][0-9A-Za-z.+-]{0,63}$/u.test(versionName) ||
       typeof record["fileName"] !== "string" ||
       !UPDATE_FILE_PATTERN.test(record["fileName"]) ||
-      record["fileName"] !== `Relay-QA-Hub-Android-${versionCode}-${versionName}.apk` ||
+      ![
+        `Relay-QA-Hub-Android-${versionCode}-${versionName}.apk`,
+        `Relay-QA-Hub-团队版-Android-${versionName}-${versionCode}.apk`,
+      ].includes(record["fileName"]) ||
       typeof size !== "number" ||
       !Number.isSafeInteger(size) ||
       size <= 0 ||
@@ -151,6 +154,9 @@ export function registerAndroidUpdateRoutes(
     }
     const size = metadataBytes?.length ?? fileStat.size;
     const etag = weakEtag(size, fileStat.mtimeMs);
+    const contentDispositionName = /^[\x20-\x7e]+$/u.test(fileName)
+      ? `filename="${fileName}"`
+      : `filename="Relay-QA-Hub-Team-Edition.apk"; filename*=UTF-8''${encodeURIComponent(fileName)}`;
     reply
       .header("accept-ranges", "bytes")
       .header("cache-control", metadata ? "no-store" : "public, max-age=31536000, immutable")
@@ -160,7 +166,7 @@ export function registerAndroidUpdateRoutes(
       )
       .header(
         "content-disposition",
-        `${metadata ? "inline" : "attachment"}; filename="${fileName}"`,
+        `${metadata ? "inline" : "attachment"}; ${contentDispositionName}`,
       )
       .header("etag", etag)
       .header("x-content-type-options", "nosniff");
