@@ -885,8 +885,19 @@ export class JenkinsBuildService {
                   if (parsed.lockWait.start !== null) parsed.lockWait.start += offset;
                   if (parsed.lockWait.end !== null) parsed.lockWait.end += offset;
                 }
-                if (parentLog.markers.finalize !== undefined)
-                  parsed.markers.finalize = parentLog.markers.finalize;
+                if (parentLog.markers.finalize !== undefined) {
+                  // The wrapper's console may be untimed. Its verified child end
+                  // still gives a real boundary between packaging and final checks.
+                  const childEnd =
+                    !child.building &&
+                    child.result === "SUCCESS" &&
+                    Number.isFinite(child.duration) &&
+                    child.duration! > 0
+                      ? offset + child.duration!
+                      : null;
+                  parsed.markers.finalize =
+                    parentLog.markers.finalize ?? parsed.markers.finalize ?? childEnd;
+                }
               } catch {
                 /* Keep visible parent progress if its downstream log cannot currently be read. */
               }
@@ -903,7 +914,7 @@ export class JenkinsBuildService {
               const compile = description.stages.find((s) => s.id === "apk");
               if (compile) {
                 compile.label = "编译 IPA";
-                compile.work = "Xcode 编译、签名并导出 IPA";
+                compile.work = "安装 iOS 依赖、Xcode 编译、签名并导出 IPA";
               }
             }
             descriptions.push(description);

@@ -95,3 +95,28 @@ describe("shared build environment queue display", () => {
     expect(result.watched[0]?.number).toBe(10159);
   });
 });
+
+describe("build progress with total-duration history", () => {
+  it("renders an estimated bar and distinguishes missing stage timing from missing history", () => {
+    const html = renderToStaticMarkup(
+      <PackagingProgressPanel
+        progress={snapshot({
+          ...build,
+          queueWait: { ...queueWait, active: false },
+          expectedMs: 696706,
+          historySampleCount: 2,
+          progressBasis: "build_history",
+          percent: 63,
+          stages: [{ ...stage, state: "running", elapsedMs: 300000, timing: "recorded" }],
+        })}
+        error={false}
+      />,
+    );
+    expect(html).toContain('aria-valuenow="63"');
+    expect(html).toContain("width:63%");
+    expect(html).toContain("2 次成功记录");
+    expect(html).toContain("整体进度按同类成功构建总耗时估算");
+    expect(html).toContain("历史记录未提供本阶段耗时");
+    expect(html).not.toContain("正在积累同类构建耗时");
+  });
+});
