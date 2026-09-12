@@ -34,6 +34,7 @@ if (
 )
   throw new Error("Explicit NSIS executable and positive build number required");
 const packageIdentity = derivePreviewPackageIdentity(config.instanceId);
+const teamEdition = config.deploymentMode === "lan";
 // This gate precedes every runtime/package mutation. Recheck before publication below.
 const { sourceCommit, sourceDirty } = assertCleanPreviewPackageSource(config.sourceRoot);
 // No dependency package is imported before the complete ignored tool tree, Node
@@ -77,7 +78,8 @@ const {
   writeFileExclusiveDurable,
 } = releaseContent;
 const releaseId = new Date().toISOString().replace(/[-:.]/gu, "");
-const version = `0.2.0-${config.deploymentMode}.${buildNumber}`;
+const version = teamEdition ? "1.0.0" : `0.2.0-${config.deploymentMode}.${buildNumber}`;
+const executableFileVersion = teamEdition ? `1.0.0.${buildNumber}` : `0.2.0.${buildNumber}`;
 const packagesRoot = join(config.runtimeRoot, "packages");
 mkdirSync(packagesRoot, { recursive: true });
 const root = join(packagesRoot, releaseId);
@@ -185,7 +187,15 @@ mkdirSync(assets);
 const icon = join(assets, "RelayQaHub.ico");
 execFileSync(
   process.execPath,
-  [join(config.sourceRoot, "apps/desktop/scripts/generate-windows-icon.mjs"), icon],
+  [
+    join(
+      config.sourceRoot,
+      teamEdition
+        ? "apps/desktop/scripts/generate-team-windows-icon.mjs"
+        : "apps/desktop/scripts/generate-windows-icon.mjs",
+    ),
+    icon,
+  ],
   { stdio: "pipe" },
 );
 const keyRoot = join(config.runtimeRoot, "desktop-signing");
@@ -271,11 +281,11 @@ const packaged = await packager({
   asar: true,
   icon,
   appVersion: version,
-  buildVersion: `0.2.0.${buildNumber}`,
+  buildVersion: executableFileVersion,
   electronVersion: "43.4.1",
   electronZipDir: electronCache,
   win32metadata: {
-    CompanyName: "QA Hub Preview",
+    CompanyName: teamEdition ? "Relay QA Hub" : "QA Hub Preview",
     FileDescription: packageIdentity.displayName,
     ProductName: packageIdentity.displayName,
   },
@@ -386,7 +396,7 @@ writeFileSync(
   join(root, "updater-build.log"),
   compile([
     "/V2",
-    "/DPRODUCT_VERSION=0.2.0",
+    `/DPRODUCT_VERSION=${teamEdition ? "1.0.0" : "0.2.0"}`,
     `/DICON_FILE=${icon}`,
     `/DOUTPUT_FILE=${join(packageDirectory, "RelayQaHubUpdater.exe")}`,
     "/DFAIL_CLOSED_INSTALLER_FAILURES=1",
@@ -394,7 +404,9 @@ writeFileSync(
   ]),
 );
 const installerPayloadContent = snapshotReleaseDirectory(packageDirectory);
-const installerName = `${config.instanceId}-windows-${version}-${releaseId}.exe`;
+const installerName = teamEdition
+  ? `Relay-QA-Hub-团队版-${version}-${releaseId}.exe`
+  : `${config.instanceId}-windows-${version}-${releaseId}.exe`;
 const stagedInstaller = join(root, installerName);
 writeFileSync(
   join(root, "installer-build.log"),
@@ -404,6 +416,7 @@ writeFileSync(
     `/DPACKAGE_DIR=${packageDirectory}`,
     `/DICON_FILE=${icon}`,
     `/DBUILD_NUMBER=${buildNumber}`,
+    `/DFILE_VERSION=${executableFileVersion}`,
     `/DAPP_VERSION=${version}`,
     `/DRELEASE_ID=${releaseId}`,
     `/DINSTANCE_ID=${config.instanceId}`,

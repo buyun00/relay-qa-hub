@@ -22,6 +22,7 @@ import {
   type JenkinsProjectConfiguration,
   type PackagingStatus,
 } from "./jenkins-builds.js";
+import { BuildCompatibilityService, type CompatibilityBatch } from "./build-compatibility.js";
 import { IncrementUploadService } from "./increment-upload.js";
 import { parseNewUploadInput, type UploadProjectConfiguration } from "./uploader-host.js";
 import type { UploadInput, UploaderSnapshot, BuildUploadChain } from "./uploader-types.js";
@@ -165,6 +166,7 @@ export interface ProjectComponentsRuntimeOptions {
 export class ProjectComponentsRuntime {
   private readonly db: DatabaseSync;
   private readonly builds = new Map<string, JenkinsBuildService>();
+  private readonly compatibilities = new Map<string, BuildCompatibilityService>();
   private readonly uploaders = new Map<string, IncrementUploadService>();
   private readonly snapshots = new Map<string, VersionSnapshot>();
   private readonly productions = new Map<string, ProductionTasks>();
@@ -442,6 +444,20 @@ export class ProjectComponentsRuntime {
     this.builds.set(mapKey, service);
     return service;
   }
+  private compatibility(snapshot: VersionSnapshot): BuildCompatibilityService {
+    const mapKey = this.key(snapshot.projectId, snapshot.key, snapshot.version);
+    const previous = this.compatibilities.get(mapKey);
+    if (previous) return previous;
+    const service = new BuildCompatibilityService(
+      this.jenkins(snapshot),
+      join(
+        this.folder(snapshot.projectId, snapshot.key, snapshot.version),
+        "legacy-build-compatibility",
+      ),
+    );
+    this.compatibilities.set(mapKey, service);
+    return service;
+  }
   private tasks(projectId?: string): BuildTask[] {
     return this.db
       .prepare("SELECT * FROM build_tasks WHERE (? IS NULL OR projectId=?) ORDER BY createdAt,id")
@@ -516,6 +532,17 @@ export class ProjectComponentsRuntime {
           reason: task.errorCode || "等待已登记任务的后台状态更新",
         })),
     };
+  }
+  async startBuildCompatibility(
+    projectId: string,
+    requestId: unknown,
+  ): Promise<CompatibilityBatch> {
+    const snapshot = await this.latest(projectId, "build");
+    return this.compatibility(snapshot).start(uuid(requestId));
+  }
+  async buildCompatibility(projectId: string, requestId: unknown): Promise<CompatibilityBatch> {
+    const snapshot = await this.latest(projectId, "build", false);
+    return this.compatibility(snapshot).status(uuid(requestId));
   }
   async enqueueBuild(
     projectId: string,
@@ -1421,7 +1448,11 @@ export class ProjectComponentsRuntime {
     this.removeListener();
     await Promise.allSettled([...this.relayPumps.values()].map((pump) => pump.stop()));
     await Promise.allSettled(
-      [...this.uploaders.values(), ...this.productions.values()].map((service) => service.close()),
+      [
+        ...this.compatibilities.values(),
+        ...this.uploaders.values(),
+        ...this.productions.values(),
+      ].map((service) => service.close()),
     );
     this.db.close();
   }
@@ -1481,6 +1512,12 @@ export function registerProjectComponentRoutes(
   );
   route("GET", "/api/v1/packaging/progress", (projectId) =>
     options.runtime.savedBuildProgress(projectId),
+  );
+  route("POST", "/api/v1/packaging/compatibility", (projectId, _actorId, request) =>
+    options.runtime.startBuildCompatibility(projectId, key(request)),
+  );
+  route("GET", "/api/v1/packaging/compatibility", (projectId, _actorId, request) =>
+    options.runtime.buildCompatibility(projectId, object(request.query)["id"]),
   );
   route("POST", "/api/v1/packaging/builds", (projectId, actorId, request) =>
     options.runtime.enqueueBuild(projectId, actorId, key(request), request.body),

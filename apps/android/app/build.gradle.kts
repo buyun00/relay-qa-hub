@@ -33,13 +33,13 @@ require(URI(qaHubApiBaseUrl.get()).port != 4319) { "Preview cannot use productio
 val qaHubGameApkDirectoryUrl = providers.gradleProperty("qaHubGameApkDirectoryUrl")
     .orElse("https://qa-hub.invalid/disabled/")
 val qaHubVersionCode = providers.gradleProperty("qaHubVersionCode")
-    .orElse("16")
+    .orElse("26")
     .map { value ->
         value.toIntOrNull()?.takeIf { it > 0 }
             ?: error("qaHubVersionCode must be a positive integer")
     }
 val qaHubVersionName = providers.gradleProperty("qaHubVersionName")
-    .orElse("0.1.15-debug")
+    .orElse("1.0.0")
 val qaHubPocoPort = providers.gradleProperty("qaHubPocoPort")
     .orElse("5001")
     .map { value ->

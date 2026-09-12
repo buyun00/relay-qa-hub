@@ -436,6 +436,8 @@ test("component HTTP routes preserve JSON string receipts and accept batch and o
     start() {},
     async close() {},
     uploadOperation: async () => jobId,
+    startBuildCompatibility: async (project, id) => ({ project, id, operation: "start" }),
+    buildCompatibility: async (project, id) => ({ project, id, operation: "status" }),
     productionOperation: async (_project, _actor, operation, _body, id) => ({ id, operation }),
     relayQueue: async (_project, _actor, _operation, id) => ({ id }),
   };
@@ -467,6 +469,27 @@ test("component HTTP routes preserve JSON string receipts and accept batch and o
   });
   assert.equal(resumed.statusCode, 200);
   assert.equal(resumed.json().id, jobId);
+  const compatibilityId = randomUUID();
+  const compatibility = await app.inject({
+    method: "POST",
+    url: "/api/v1/packaging/compatibility",
+    headers: { "idempotency-key": compatibilityId },
+  });
+  assert.equal(compatibility.statusCode, 200);
+  assert.deepEqual(compatibility.json(), {
+    project: projectId,
+    id: compatibilityId,
+    operation: "start",
+  });
+  const compatibilityStatus = await app.inject({
+    url: `/api/v1/projects/${projectId}/packaging/compatibility?id=${compatibilityId}`,
+  });
+  assert.equal(compatibilityStatus.statusCode, 200);
+  assert.deepEqual(compatibilityStatus.json(), {
+    project: projectId,
+    id: compatibilityId,
+    operation: "status",
+  });
 });
 
 test("iOS project source keeps its directory separator for scoped listing and ZIP resolution", async (t) => {

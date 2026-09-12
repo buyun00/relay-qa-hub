@@ -47,7 +47,7 @@ export function derivePreviewPackageIdentity(instanceId) {
   if (!suffix || suffix.includes("--")) fail("PREVIEW_PACKAGE_INSTANCE_ID_INVALID");
   const legacy = instanceId === LEGACY_INSTANCE_ID;
   const label = mode === "lan" ? "LAN" : "Preview";
-  const productLabel = mode === "lan" ? "QA Hub LAN" : "QA Hub Project Preview";
+  const productLabel = mode === "lan" ? "Relay QA Hub 团队版" : "QA Hub Project Preview";
   const identitySegment = mode === "lan" ? "lan" : "preview";
   const executableBaseName = legacy ? "RelayQaHubPreview" : `RelayQaHub${label}-${suffix}`;
   const appUserModelId = legacy
@@ -58,11 +58,19 @@ export function derivePreviewPackageIdentity(instanceId) {
     executableBaseName,
     installDirectoryName: executableBaseName,
     uninstallRegistryKey: executableBaseName,
-    shortcutName: legacy ? "QA Hub Project Preview" : `${productLabel} - ${suffix}`,
+    shortcutName: legacy
+      ? "QA Hub Project Preview"
+      : mode === "lan"
+        ? productLabel
+        : `${productLabel} - ${suffix}`,
     protocolScheme: legacy ? "qa-hub-preview" : instanceId,
     appUserModelId,
     toastActivatorClsid: deriveToastActivatorClsid(appUserModelId),
-    displayName: legacy ? "QA Hub Project Preview" : `${productLabel} (${suffix})`,
+    displayName: legacy
+      ? "QA Hub Project Preview"
+      : mode === "lan"
+        ? productLabel
+        : `${productLabel} (${suffix})`,
   });
 }
 

@@ -2790,10 +2790,10 @@ test("package identity preserves only the explicit legacy identity and isolates 
   assert.equal(lan.executableBaseName, "RelayQaHubLAN-v22-0911");
   assert.equal(lan.installDirectoryName, "RelayQaHubLAN-v22-0911");
   assert.equal(lan.uninstallRegistryKey, "RelayQaHubLAN-v22-0911");
-  assert.equal(lan.shortcutName, "QA Hub LAN - v22-0911");
+  assert.equal(lan.shortcutName, "Relay QA Hub 团队版");
   assert.equal(lan.protocolScheme, "qa-hub-lan-v22-0911");
   assert.equal(lan.appUserModelId, "com.relayqahub.desktop.lan.v22.0911");
-  assert.equal(lan.displayName, "QA Hub LAN (v22-0911)");
+  assert.equal(lan.displayName, "Relay QA Hub 团队版");
 
   assert.equal(
     deriveToastActivatorClsid("COM.Example.MixedCase"),
@@ -2824,6 +2824,35 @@ test("package identity preserves only the explicit legacy identity and isolates 
     'qa-hub-preview-bad"define',
   ]) {
     assert.throws(() => derivePreviewPackageIdentity(invalid), /INSTANCE_ID_INVALID/u);
+  }
+});
+
+test("LAN release exposes stable 1.0.0 team branding while retaining its install identity", () => {
+  assert.match(
+    packageSource,
+    /const version = teamEdition \? "1\.0\.0" : `0\.2\.0-\$\{config\.deploymentMode\}\.\$\{buildNumber\}`/u,
+  );
+  assert.match(packageSource, /Relay-QA-Hub-团队版-\$\{version\}-\$\{releaseId\}\.exe/u);
+  assert.match(packageSource, /generate-team-windows-icon\.mjs/u);
+  assert.match(packageSource, /`\/DFILE_VERSION=\$\{executableFileVersion\}`/u);
+  assert.match(installerSource, /VIProductVersion "\$\{FILE_VERSION\}"/u);
+
+  const root = mkdtempSync(join(tmpdir(), "qa-team-icon-"));
+  try {
+    const icon = join(root, "RelayQaHub.ico");
+    const generated = spawnSync(
+      process.execPath,
+      [resolve(sourceRoot, "apps/desktop/scripts/generate-team-windows-icon.mjs"), icon],
+      { encoding: "utf8", windowsHide: true },
+    );
+    assert.equal(generated.status, 0, generated.stderr);
+    const bytes = readFileSync(icon);
+    assert.equal(bytes.readUInt16LE(0), 0);
+    assert.equal(bytes.readUInt16LE(2), 1);
+    assert.equal(bytes.readUInt16LE(4), 8);
+    assert.ok(bytes.length > 300_000);
+  } finally {
+    rmSync(root, { recursive: true, force: true });
   }
 });
 

@@ -32,6 +32,9 @@ SetCompressor /SOLID lzma
 !ifndef DISPLAY_NAME
   !error "DISPLAY_NAME is required"
 !endif
+!ifndef FILE_VERSION
+  !error "FILE_VERSION is required"
+!endif
 ; The updater waits for the main PID, but a child can retain an image or directory
 ; handle briefly. Each rename phase is bounded to 40 attempts and 9.75s asleep.
 !define INSTALL_RENAME_MAX_ATTEMPTS 40
@@ -47,7 +50,7 @@ Name "${DISPLAY_NAME}"
 OutFile "${OUTPUT_FILE}"
 InstallDir "$LOCALAPPDATA\Programs\${INSTALL_DIRECTORY_NAME}"
 Icon "${ICON_FILE}"
-VIProductVersion "0.2.0.${BUILD_NUMBER}"
+VIProductVersion "${FILE_VERSION}"
 VIAddVersionKey /LANG=1033 "ProductName" "${DISPLAY_NAME}"
 VIAddVersionKey /LANG=1033 "FileDescription" "${DISPLAY_NAME} installer"
 VIAddVersionKey /LANG=1033 "FileVersion" "${APP_VERSION}"

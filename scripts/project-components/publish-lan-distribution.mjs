@@ -29,7 +29,7 @@ if (apk.length === 0 || apk.length > 512 * 1024 * 1024) throw new Error("ANDROID
 const sha256 = (value) => createHash("sha256").update(value).digest("hex");
 const apkSha256 = sha256(apk);
 const packageName = "com.relayqahub.android.lan.v22.debug";
-const apkName = `Relay-QA-Hub-Android-${versionCode}-${versionName}.apk`;
+const apkName = `Relay-QA-Hub-团队版-Android-${versionName}-${versionCode}.apk`;
 const androidRoot = join(config.downloadsRoot, "android", config.releaseChannel);
 mkdirSync(androidRoot, { recursive: true });
 const apkTarget = join(androidRoot, apkName);
@@ -106,8 +106,8 @@ writeFileSync(
 const size = (bytes) => `${(bytes / 1024 / 1024).toFixed(1)} MiB`;
 const html = `<!doctype html>
 <html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>QA Hub 局域网客户端下载</title><style>body{font-family:system-ui,sans-serif;max-width:760px;margin:48px auto;padding:0 24px;color:#17211b}article{border:1px solid #dfe6df;border-radius:16px;padding:20px;margin:16px 0}a{display:inline-block;background:#17211b;color:white;padding:10px 16px;border-radius:10px;text-decoration:none}code{word-break:break-all}small{display:block;margin:10px 0;color:#5f6e64}</style></head>
-<body><h1>QA Hub 局域网客户端下载</h1><p>服务器入口：<a href="${config.publicWebBaseUrl}">${config.publicWebBaseUrl}</a></p>
+<title>Relay QA Hub 团队版下载</title><style>body{font-family:system-ui,sans-serif;max-width:760px;margin:48px auto;padding:0 24px;color:#17211b}article{border:1px solid #dfe6df;border-radius:16px;padding:20px;margin:16px 0}a{display:inline-block;background:#17211b;color:white;padding:10px 16px;border-radius:10px;text-decoration:none}code{word-break:break-all}small{display:block;margin:10px 0;color:#5f6e64}</style></head>
+<body><h1>Relay QA Hub 团队版下载</h1><p>服务器入口：<a href="${config.publicWebBaseUrl}">${config.publicWebBaseUrl}</a></p>
 <article><h2>Windows</h2><p>${distribution.windows.version} · ${size(installer.length)}</p><a href="${distribution.windows.installerUrl}">下载 Windows 安装器</a><small>SHA-256</small><code>${distribution.windows.sha256}</code></article>
 <article><h2>Android</h2><p>${versionName} (${versionCode}) · ${size(apk.length)}</p><a href="${distribution.android.downloadUrl}">下载 Android APK</a><small>SHA-256</small><code>${apkSha256}</code></article>
 <p><a href="/downloads/distribution.json">机器可读交付清单</a></p><p>使用前请确保设备连接同一办公局域网；服务器断网、休眠或关机时不可连接，客户端草稿仍保留。</p></body></html>\n`;
