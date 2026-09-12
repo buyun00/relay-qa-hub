@@ -1,4 +1,5 @@
 import { type FormEvent, useCallback, useEffect, useRef, useState } from "react";
+import AppIcon from "./AppIcon";
 import { listManagedProjectUsers, QaHubApiError, type ManagedProjectUser } from "./api";
 import {
   componentLabels,
@@ -102,7 +103,10 @@ function ComponentEditor({
     }
   };
   return (
-    <form className="project-component-card" onSubmit={(event) => void save(event)}>
+    <form
+      className={`project-component-card${enabled ? " is-enabled" : ""}`}
+      onSubmit={(event) => void save(event)}
+    >
       <div className="project-component-heading">
         <strong>{componentLabels[component.key] ?? component.key}</strong>
         <span>
@@ -234,11 +238,11 @@ export default function ProjectManagementPage({
   };
   return (
     <main className="project-management-page">
-      <section className="hero">
+      <section className="hero project-management-hero">
         <div>
-          <p className="eyebrow">GM</p>
+          <p className="eyebrow">TEAM CONSOLE · GM</p>
           <h1>项目管理</h1>
-          <p>管理项目、人员归属及可选组件。每个新项目默认只有 Bug 管理。</p>
+          <p className="hero-copy">管理项目、人员归属及可选组件。每个新项目默认只有 Bug 管理。</p>
         </div>
         <button
           className="secondary-button"
@@ -246,10 +250,14 @@ export default function ProjectManagementPage({
             void refresh().catch((cause) => setError(projectManagementErrorMessage(cause)))
           }
         >
+          <AppIcon name="refresh" size={15} />
           刷新
         </button>
       </section>
-      <section className="project-settings-summary" aria-labelledby="lan-delivery-title">
+      <section
+        className="project-settings-summary project-delivery-panel"
+        aria-labelledby="lan-delivery-title"
+      >
         <h2 id="lan-delivery-title">局域网交付</h2>
         <p>
           员工入口：<code>{publicOrigin}</code>
@@ -407,7 +415,13 @@ export default function ProjectManagementPage({
           )}
           {current.active && current.initializationStatus !== "pending" && (
             <>
-              <h2>组件设置</h2>
+              <div className="project-section-heading">
+                <div>
+                  <p className="eyebrow">PROJECT CAPABILITIES</p>
+                  <h2>组件设置</h2>
+                </div>
+                <p>配置只作用于当前项目，历史记录不会因停用而删除。</p>
+              </div>
               <div className="project-component-grid">
                 {components.map((component) => (
                   <ComponentEditor
@@ -423,8 +437,13 @@ export default function ProjectManagementPage({
                 ))}
               </div>
               <section className="project-members-panel">
-                <h2>人员归属</h2>
-                <p>人员可以属于多个项目；在这里停用只影响当前项目。</p>
+                <div className="project-section-heading">
+                  <div>
+                    <p className="eyebrow">MEMBERS</p>
+                    <h2>人员归属</h2>
+                  </div>
+                  <p>人员可以属于多个项目；在这里停用只影响当前项目。</p>
+                </div>
                 <form
                   onSubmit={(event) => {
                     event.preventDefault();

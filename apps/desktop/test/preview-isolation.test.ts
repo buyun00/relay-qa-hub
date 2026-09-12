@@ -1,10 +1,10 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { mkdtempSync, writeFileSync, rmSync, mkdirSync } from "node:fs";
+import { existsSync, mkdtempSync, writeFileSync, rmSync, mkdirSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { generateKeyPairSync } from "node:crypto";
-import { loadPreviewDesktopIdentity } from "../src/preview-config.js";
+import { canonicalPreviewPath, loadPreviewDesktopIdentity } from "../src/preview-config.js";
 import { deriveToastActivatorClsid } from "../src/notification-activation.js";
 import { DesktopBrowserSessionCookieStore, proxyRendererApiRequest } from "../src/network.js";
 import { parseDesktopConfig } from "../src/config.js";
@@ -181,6 +181,23 @@ test("LAN desktop config derives a recipient-local profile and uses the shared W
     rmSync(root, { recursive: true, force: true });
   }
 });
+
+test(
+  "LAN isolation allows production-only blocked roots on a missing recipient volume",
+  { skip: process.platform !== "win32" },
+  () => {
+    const missingVolume = ["Z:\\", "Y:\\", "X:\\", "W:\\"].find(
+      (candidate) => !existsSync(candidate),
+    );
+    assert.ok(missingVolume, "the regression test needs one unmounted Windows drive letter");
+    const blockedRoot = path.join(missingVolume, "Relay-QA-Hub-Data");
+    assert.equal(
+      canonicalPreviewPath(blockedRoot, { allowMissingVolume: true }),
+      path.resolve(blockedRoot),
+    );
+    assert.throws(() => canonicalPreviewPath(blockedRoot), /PREVIEW_PATH_INVALID/);
+  },
+);
 
 test("preview cookie and completed request scope remain isolated across a late project response", async () => {
   const session = new DesktopBrowserSessionCookieStore("qa-hub-preview-unit-session");

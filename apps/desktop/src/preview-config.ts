@@ -19,8 +19,16 @@ export interface PreviewDesktopIdentity {
   readonly environment: NodeJS.ProcessEnv;
 }
 
-function canonical(value: string): string {
+export function canonicalPreviewPath(
+  value: string,
+  options: { readonly allowMissingVolume?: boolean } = {},
+): string {
   let cursor = path.resolve(value);
+  const volumeRoot = path.parse(cursor).root;
+  if (volumeRoot && !existsSync(volumeRoot)) {
+    if (options.allowMissingVolume) return cursor;
+    throw new Error("PREVIEW_PATH_INVALID");
+  }
   const suffix: string[] = [];
   while (!existsSync(cursor)) {
     try {
@@ -29,7 +37,13 @@ function canonical(value: string): string {
       if ((error as NodeJS.ErrnoException).code !== "ENOENT") throw error;
     }
     const parent = path.dirname(cursor);
-    if (parent === cursor) throw new Error("PREVIEW_PATH_INVALID");
+    if (parent === cursor) {
+      // Recipient PCs commonly have only C:. A production-only blocked root on an
+      // absent D:/E: volume cannot overlap the selected profile, so retain its
+      // normalized lexical form instead of aborting desktop startup.
+      if (options.allowMissingVolume) return path.resolve(value);
+      throw new Error("PREVIEW_PATH_INVALID");
+    }
     suffix.unshift(path.basename(cursor));
     cursor = parent;
   }
@@ -98,7 +112,7 @@ export function loadPreviewDesktopIdentity(
         })()
       : text("profileDirectory");
   if (!path.isAbsolute(profile)) throw new Error("PREVIEW_PROFILE_MUST_BE_ABSOLUTE");
-  const profileDirectory = canonical(profile);
+  const profileDirectory = canonicalPreviewPath(profile);
   if (!profileDirectory.split(/[\\/]/u).includes(instanceId))
     throw new Error("PREVIEW_PROFILE_ID_MISMATCH");
   const blocked = [
@@ -110,7 +124,7 @@ export function loadPreviewDesktopIdentity(
     path.join(source["APPDATA"] ?? "C:\\", "Relay QA Hub"),
   ];
   for (const root of blocked) {
-    const candidate = canonical(root).toLowerCase();
+    const candidate = canonicalPreviewPath(root, { allowMissingVolume: true }).toLowerCase();
     const selected = profileDirectory.toLowerCase();
     if (
       selected === candidate ||
