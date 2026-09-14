@@ -21,7 +21,10 @@ const toolchain = verifyPinnedPackageToolchain({
   makensisPath: requestedMakensis,
 });
 const releaseId = new Date().toISOString().replace(/[-:.]/gu, "");
-const versionCode = Number(releaseId.slice(0, 14));
+const versionCode = Number(releaseId.replace(/\D/gu, "").slice(0, 14));
+if (!Number.isSafeInteger(versionCode) || versionCode < 1) {
+  throw new Error("LEGACY_CLEANER_VERSION_INVALID");
+}
 const root = join(config.runtimeRoot, "packages", "legacy-cleaner", releaseId);
 mkdirSync(root, { recursive: true });
 const icon = join(root, "RelayQaHub.ico");

@@ -52,6 +52,8 @@ test("legacy cleaner publisher uses clean source, pinned tools, unique bytes and
   assert.match(builder, /verifyPinnedPackageToolchain/u);
   assert.match(builder, /publishFileExclusiveDurable/u);
   assert.match(builder, /publishVersionedJson/u);
+  assert.match(builder, /releaseId\.replace\(\/\\D\/gu, ""\)\.slice\(0, 14\)/u);
+  assert.match(builder, /Number\.isSafeInteger\(versionCode\)/u);
   assert.match(builder, /downloaded\.equals\(bytes\)/u);
   assert.match(builder, /Relay-QA-Hub-旧版本清理工具-\$\{releaseId\}\.exe/u);
   assert.match(distribution, /qa-hub-legacy-cleaner-latest\.json/u);
