@@ -3,7 +3,7 @@
   "lock": {
     "path": "package-lock.json",
     "bytes": 244912,
-    "sha256": "c421b27a355e29355e14f423a5f64d2f237706f3e22f278b667355858a03e454"
+    "sha256": "612f9b1eafbfae3d9b2eb58a63f2dabed1f3cb5fb1edb000a2950bd91064f1bc"
   },
   "node": {
     "version": "v24.19.0",
