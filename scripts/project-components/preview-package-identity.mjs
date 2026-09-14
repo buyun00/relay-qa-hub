@@ -49,7 +49,18 @@ export function derivePreviewPackageIdentity(instanceId) {
   const label = mode === "lan" ? "LAN" : "Preview";
   const productLabel = mode === "lan" ? "Relay QA Hub 团队版" : "QA Hub Project Preview";
   const identitySegment = mode === "lan" ? "lan" : "preview";
-  const executableBaseName = legacy ? "RelayQaHubPreview" : `RelayQaHub${label}-${suffix}`;
+  // Team Edition moved away from the broken LAN bootstrap directory. Keep the
+  // prior uninstall key so Windows exposes one product entry, while installing
+  // the repaired executable beside (and without deleting) a possibly locked
+  // legacy payload. The profile, protocol, AUMID and update channel remain tied
+  // to instanceId, so logins and drafts survive the migration.
+  const executableBaseName = legacy
+    ? "RelayQaHubPreview"
+    : mode === "lan"
+      ? `RelayQaHubTeam-${suffix}`
+      : `RelayQaHub${label}-${suffix}`;
+  const uninstallRegistryKey =
+    mode === "lan" && !legacy ? `RelayQaHubLAN-${suffix}` : executableBaseName;
   const appUserModelId = legacy
     ? "com.relayqahub.desktop.preview"
     : `com.relayqahub.desktop.${identitySegment}.${suffix.replaceAll("-", ".")}`;
@@ -57,7 +68,7 @@ export function derivePreviewPackageIdentity(instanceId) {
     instanceId,
     executableBaseName,
     installDirectoryName: executableBaseName,
-    uninstallRegistryKey: executableBaseName,
+    uninstallRegistryKey,
     shortcutName: legacy
       ? "QA Hub Project Preview"
       : mode === "lan"

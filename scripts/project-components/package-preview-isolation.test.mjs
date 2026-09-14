@@ -2824,8 +2824,8 @@ test("package identity preserves only the explicit legacy identity and isolates 
   assert.equal(final.displayName, "QA Hub Project Preview (final-sol-0909)");
 
   const lan = derivePreviewPackageIdentity("qa-hub-lan-v22-0911");
-  assert.equal(lan.executableBaseName, "RelayQaHubLAN-v22-0911");
-  assert.equal(lan.installDirectoryName, "RelayQaHubLAN-v22-0911");
+  assert.equal(lan.executableBaseName, "RelayQaHubTeam-v22-0911");
+  assert.equal(lan.installDirectoryName, "RelayQaHubTeam-v22-0911");
   assert.equal(lan.uninstallRegistryKey, "RelayQaHubLAN-v22-0911");
   assert.equal(lan.shortcutName, "Relay QA Hub 团队版");
   assert.equal(lan.protocolScheme, "qa-hub-lan-v22-0911");
@@ -2864,7 +2864,7 @@ test("package identity preserves only the explicit legacy identity and isolates 
   }
 });
 
-test("LAN release exposes stable 1.0.0 team branding while retaining its install identity", () => {
+test("LAN release exposes stable 1.0.0 branding with a preserved profile and migrated payload", () => {
   assert.match(
     packageSource,
     /const version = teamEdition \? "1\.0\.0" : `0\.2\.0-\$\{config\.deploymentMode\}\.\$\{buildNumber\}`/u,
