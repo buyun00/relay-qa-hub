@@ -1098,11 +1098,11 @@ uninstall_payload_deleted:
   SetErrorLevel 0
   Goto uninstall_finished
 uninstall_payload_cleanup_failed:
-  MessageBox MB_ICONSTOP|MB_OK "卸载器无法核验待删除的程序目录。为保护数据，程序文件已保留，请重新安装最新版后再卸载。"
+  MessageBox MB_ICONSTOP|MB_OK "The uninstaller could not verify the program directory. Files were retained for safety. Reinstall the latest version and try again."
   SetErrorLevel 35
   Goto uninstall_finished
 uninstall_failed:
-  MessageBox MB_ICONSTOP|MB_OK "${DISPLAY_NAME} 仍在运行，无法完成卸载。请从系统托盘退出后重试；如果托盘程序无响应，请重启 Windows 后再卸载。"
+  MessageBox MB_ICONSTOP|MB_OK "${DISPLAY_NAME} is still running. Exit it from the system tray and try again. If it does not respond, restart Windows before uninstalling."
   SetErrorLevel 32
   Goto uninstall_finished
 uninstall_cleanup_failed:
@@ -1123,13 +1123,13 @@ uninstall_verify_restored_payload:
   Call un.VerifyPreviewInstallDirectory
   StrCmp $VerificationSucceeded 1 uninstall_cleanup_failed_rolled_back uninstall_rollback_failed
 uninstall_cleanup_failed_rolled_back:
-  MessageBox MB_ICONSTOP|MB_OK "Windows 卸载注册信息未能完整清理，程序文件已经安全恢复。请重启 Windows 后再试。"
+  MessageBox MB_ICONSTOP|MB_OK "Windows registration cleanup was incomplete and the program files were restored safely. Restart Windows and try again."
   SetErrorLevel 33
   Goto uninstall_finished
 uninstall_rollback_failed:
   ; The verified payload could not be restored and reverified at the canonical
   ; path. Delete neither location; distinguish this manual-recovery state from 33.
-  MessageBox MB_ICONSTOP|MB_OK "卸载未完成，程序文件已保留以避免数据丢失。请联系管理员处理安装目录。"
+  MessageBox MB_ICONSTOP|MB_OK "Uninstall did not complete. Program files were retained to prevent data loss. Contact an administrator to repair the installation."
   SetErrorLevel 34
 uninstall_finished:
 SectionEnd
