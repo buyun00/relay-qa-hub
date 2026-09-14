@@ -25,6 +25,7 @@ import asar from "@electron/asar";
 
 import {
   assertCleanPreviewPackageSource,
+  assertIncrementedStableVersion,
   derivePreviewPackageIdentity,
   deriveToastActivatorClsid,
 } from "./preview-package-identity.mjs";
@@ -2870,10 +2871,18 @@ test("package identity preserves only the explicit legacy identity and isolates 
   }
 });
 
-test("LAN release exposes stable 1.0.0 branding and reuses the established magnifier icon", () => {
+test("LAN release requires an incremented stable version and reuses the established magnifier icon", () => {
+  assert.equal(assertIncrementedStableVersion("1.0.1", "1.0.0"), "1.0.1");
+  assert.equal(assertIncrementedStableVersion("1.1.0", "1.0.99"), "1.1.0");
+  assert.throws(() => assertIncrementedStableVersion("1.0.0", "1.0.0"), /NOT_INCREMENTED/u);
+  assert.throws(() => assertIncrementedStableVersion("1.0.0-preview", "1.0.0"), /INVALID/u);
   assert.match(
     packageSource,
-    /const version = teamEdition \? "1\.0\.0" : `0\.2\.0-\$\{config\.deploymentMode\}\.\$\{buildNumber\}`/u,
+    /assertIncrementedStableVersion\(desktopPackage\.version, previousTeamVersion\)/u,
+  );
+  assert.equal(
+    JSON.parse(readFileSync(resolve(sourceRoot, "apps/desktop/package.json"), "utf8")).version,
+    "1.0.1",
   );
   assert.match(packageSource, /Relay-QA-Hub-团队版-\$\{version\}-\$\{releaseId\}\.exe/u);
   assert.match(packageSource, /generate-windows-icon\.mjs/u);

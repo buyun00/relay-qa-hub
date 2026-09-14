@@ -16,6 +16,7 @@ import { createHash, createPublicKey, generateKeyPairSync, sign, verify } from "
 import { readParallelInstanceConfig } from "../../apps/api/src/parallel-instance.ts";
 import {
   assertCleanPreviewPackageSource,
+  assertIncrementedStableVersion,
   derivePreviewPackageIdentity,
 } from "./preview-package-identity.mjs";
 import {
@@ -78,8 +79,21 @@ const {
   writeFileExclusiveDurable,
 } = releaseContent;
 const releaseId = new Date().toISOString().replace(/[-:.]/gu, "");
-const version = teamEdition ? "1.0.0" : `0.2.0-${config.deploymentMode}.${buildNumber}`;
-const executableFileVersion = teamEdition ? `1.0.0.${buildNumber}` : `0.2.0.${buildNumber}`;
+const desktopPackage = JSON.parse(
+  readFileSync(join(config.sourceRoot, "apps", "desktop", "package.json"), "utf8"),
+);
+const previousTeamManifestPath = join(
+  config.downloadsRoot,
+  `${config.instanceId}-windows-latest.json`,
+);
+const previousTeamVersion =
+  teamEdition && existsSync(previousTeamManifestPath)
+    ? JSON.parse(readFileSync(previousTeamManifestPath, "utf8")).version
+    : undefined;
+const version = teamEdition
+  ? assertIncrementedStableVersion(desktopPackage.version, previousTeamVersion)
+  : `0.2.0-${config.deploymentMode}.${buildNumber}`;
+const executableFileVersion = teamEdition ? `${version}.${buildNumber}` : `0.2.0.${buildNumber}`;
 const packagesRoot = join(config.runtimeRoot, "packages");
 mkdirSync(packagesRoot, { recursive: true });
 const root = join(packagesRoot, releaseId);
@@ -388,7 +402,7 @@ writeFileSync(
   join(root, "updater-build.log"),
   compile([
     "/V2",
-    `/DPRODUCT_VERSION=${teamEdition ? "1.0.0" : "0.2.0"}`,
+    `/DPRODUCT_VERSION=${teamEdition ? version : "0.2.0"}`,
     `/DICON_FILE=${icon}`,
     `/DOUTPUT_FILE=${join(packageDirectory, "RelayQaHubUpdater.exe")}`,
     "/DFAIL_CLOSED_INSTALLER_FAILURES=1",

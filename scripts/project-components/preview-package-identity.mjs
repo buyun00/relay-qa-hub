@@ -20,6 +20,28 @@ function fail(code) {
   throw new Error(code);
 }
 
+function parseStableVersion(value) {
+  if (typeof value !== "string" || !/^\d+\.\d+\.\d+$/u.test(value)) {
+    fail("TEAM_VERSION_INVALID");
+  }
+  const parts = value.split(".").map(Number);
+  if (parts.some((part) => !Number.isSafeInteger(part) || part < 0 || part > 65_535)) {
+    fail("TEAM_VERSION_INVALID");
+  }
+  return parts;
+}
+
+export function assertIncrementedStableVersion(candidate, previous) {
+  const next = parseStableVersion(candidate);
+  if (previous === undefined) return candidate;
+  const current = parseStableVersion(previous);
+  for (let index = 0; index < next.length; index += 1) {
+    if (next[index] > current[index]) return candidate;
+    if (next[index] < current[index]) fail("TEAM_VERSION_NOT_INCREMENTED");
+  }
+  fail("TEAM_VERSION_NOT_INCREMENTED");
+}
+
 export function deriveToastActivatorClsid(appUserModelId) {
   if (
     typeof appUserModelId !== "string" ||

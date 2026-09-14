@@ -27,6 +27,25 @@ if (!/^[0-9A-Za-z][0-9A-Za-z.+-]{0,63}$/u.test(versionName))
 const apk = readFileSync(apkSource);
 if (apk.length === 0 || apk.length > 512 * 1024 * 1024) throw new Error("ANDROID_APK_INVALID");
 const sha256 = (value) => createHash("sha256").update(value).digest("hex");
+const windowsManifestName = `${config.instanceId}-windows-latest.json`;
+const windowsManifestPath = join(config.downloadsRoot, windowsManifestName);
+const windowsManifest = JSON.parse(readFileSync(windowsManifestPath, "utf8"));
+if (
+  typeof windowsManifest.version !== "string" ||
+  typeof windowsManifest.archive?.url !== "string" ||
+  typeof windowsManifest.archive?.sha256 !== "string" ||
+  !Number.isSafeInteger(windowsManifest.archive?.size)
+)
+  throw new Error("WINDOWS_MANIFEST_INVALID");
+if (versionName !== windowsManifest.version) throw new Error("DISTRIBUTION_VERSION_MISMATCH");
+const installerName = basename(windowsManifest.archive.url);
+const installerPath = join(config.downloadsRoot, installerName);
+const installer = readFileSync(installerPath);
+if (
+  installer.length !== windowsManifest.archive.size ||
+  sha256(installer) !== windowsManifest.archive.sha256
+)
+  throw new Error("WINDOWS_INSTALLER_BINDING_MISMATCH");
 const apkSha256 = sha256(apk);
 const packageName = "com.relayqahub.android.lan.v22.debug";
 const apkName = `Relay-QA-Hub-团队版-Android-${versionName}-${versionCode}.apk`;
@@ -57,23 +76,6 @@ publishVersionedJson({
   versionCode,
 });
 
-const windowsManifestName = `${config.instanceId}-windows-latest.json`;
-const windowsManifestPath = join(config.downloadsRoot, windowsManifestName);
-const windowsManifest = JSON.parse(readFileSync(windowsManifestPath, "utf8"));
-if (
-  typeof windowsManifest.archive?.url !== "string" ||
-  typeof windowsManifest.archive?.sha256 !== "string" ||
-  !Number.isSafeInteger(windowsManifest.archive?.size)
-)
-  throw new Error("WINDOWS_MANIFEST_INVALID");
-const installerName = basename(windowsManifest.archive.url);
-const installerPath = join(config.downloadsRoot, installerName);
-const installer = readFileSync(installerPath);
-if (
-  installer.length !== windowsManifest.archive.size ||
-  sha256(installer) !== windowsManifest.archive.sha256
-)
-  throw new Error("WINDOWS_INSTALLER_BINDING_MISMATCH");
 const cleanerManifestPath = join(config.downloadsRoot, "qa-hub-legacy-cleaner-latest.json");
 let legacyCleaner = null;
 if (existsSync(cleanerManifestPath)) {
@@ -171,7 +173,7 @@ const html = `<!doctype html>
       <p class="hero-copy">Windows 与 Android 共用当前项目、人员和 Bug 数据。覆盖升级会保留本机登录信息与未提交草稿。</p>
       <div class="connection"><i></i><span>当前局域网服务</span><code>${config.publicWebBaseUrl}</code></div>
     </section>
-    <div class="section-head"><h2>选择你的设备</h2><p>正式版本 1.0.0 · 仅限办公局域网</p></div>
+    <div class="section-head"><h2>选择你的设备</h2><p>正式版本 ${distribution.windows.version} · 仅限办公局域网</p></div>
     <section class="package-grid" aria-label="客户端下载">
       <article class="package-card">
         <div class="package-head"><span class="platform-mark">WIN</span><span class="recommended">推荐</span></div>
