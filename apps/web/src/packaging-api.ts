@@ -1,8 +1,10 @@
 import { requestJson } from "./api";
 import { QUICK_BUILD_PRESETS, type QuickBuildPresetId } from "@relay-qa-hub/upload-contract";
+import type { BuildBranchCatalog, BuildBranchSelections } from "@relay-qa-hub/upload-contract";
 
 export const BUILD_PRESETS = QUICK_BUILD_PRESETS;
 export interface CompatibilityCheck {
+  sourceBranch?: string;
   target: { id: string; platform: "Android" | "iOS"; configuration: "Debug" | "Release" };
   state: "pending" | "submitting" | "queued" | "running" | "complete" | "error";
   queueId: number | null;
@@ -11,6 +13,8 @@ export interface CompatibilityCheck {
   reportUrl: string | null;
   errorCode: string | null;
   report: {
+    sourceBranch?: string;
+    reasonCode?: "BASE_NOT_ANCESTOR";
     result: "PLAYER_REBUILD_REQUIRED" | "HOT_UPDATE_ALLOWED" | "NO_BASELINE" | "UNKNOWN";
     targetRevision: string | null;
     baseRevision: string | null;
@@ -22,6 +26,7 @@ export interface CompatibilityCheck {
   } | null;
 }
 export interface CompatibilityBatch {
+  branches?: BuildBranchSelections;
   id: string;
   requestedAt: string;
   checks: CompatibilityCheck[];
@@ -29,10 +34,12 @@ export interface CompatibilityBatch {
 export async function refreshBuildCompatibility(
   requestId: string,
   signal: AbortSignal,
+  branches?: BuildBranchSelections,
 ): Promise<CompatibilityBatch> {
   return (await requestJson("/api/v1/packaging/compatibility", {
     method: "POST",
-    headers: { "idempotency-key": requestId },
+    headers: { "idempotency-key": requestId, "content-type": "application/json" },
+    body: JSON.stringify({ branches }),
     signal,
   })) as CompatibilityBatch;
 }
@@ -53,6 +60,8 @@ export interface BuildArtifactFile {
   kind: "apk" | "aab" | "ipa" | "zip";
 }
 export interface BuildArtifactResult {
+  sourceBranch?: string;
+  sourceRevision?: string;
   version: string;
   buildNumber: number;
   platform: "Android" | "iOS";
@@ -139,6 +148,12 @@ export interface PackagingStatus {
 export async function getPackagingStatus(signal?: AbortSignal): Promise<PackagingStatus> {
   return (await requestJson("/api/v1/packaging", signal ? { signal } : {})) as PackagingStatus;
 }
+export async function getBuildBranches(signal?: AbortSignal): Promise<BuildBranchCatalog> {
+  return (await requestJson(
+    "/api/v1/packaging/branches",
+    signal ? { signal } : {},
+  )) as BuildBranchCatalog;
+}
 
 export async function getPackagingProgress(
   queues: number[],
@@ -157,10 +172,11 @@ export async function getPackagingProgress(
 export async function triggerJenkinsBuild(
   preset: BuildPreset,
   requestId: string,
+  sourceBranch?: string,
 ): Promise<{ queueId: number }> {
   return (await requestJson("/api/v1/packaging/builds", {
     method: "POST",
     headers: { "content-type": "application/json", "idempotency-key": requestId },
-    body: JSON.stringify({ preset }),
+    body: JSON.stringify({ preset, sourceBranch }),
   })) as { queueId: number };
 }

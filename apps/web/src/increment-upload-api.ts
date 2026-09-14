@@ -79,7 +79,11 @@ export const serverUploader: UploaderBridge = {
   cancel: (id) => call(`/jobs/${encodeURIComponent(id)}/cancel`, {}),
   buildChains: () => call("/build-chains"),
   buildAndUpload: (input) =>
-    call("/build-chains", { upload: input.upload, preset: input.preset }, true),
+    call(
+      "/build-chains",
+      { upload: input.upload, preset: input.preset, sourceBranch: input.sourceBranch },
+      true,
+    ),
   cancelBuildUpload: (id) => call(`/build-chains/${encodeURIComponent(id)}/cancel`, {}),
   openFolder: async (id) => {
     const result = await call<unknown>(`/jobs/${encodeURIComponent(id)}/logs`);

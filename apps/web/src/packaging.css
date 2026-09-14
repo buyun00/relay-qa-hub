@@ -852,3 +852,25 @@
     padding: 20px;
   }
 }
+
+.package-branch-selector {
+  display: grid;
+  gap: 6px;
+  margin: 10px 0 12px;
+  min-width: 0;
+  font-size: 13px;
+}
+.package-branch-selector select {
+  width: 100%;
+  min-width: 0;
+  padding: 9px 10px;
+  border: 1px solid var(--border, #d6deeb);
+  border-radius: 8px;
+  color: inherit;
+  background: var(--surface, #fff);
+  font: inherit;
+}
+.package-branch-selector small {
+  color: var(--muted, #667085);
+  line-height: 1.5;
+}

@@ -1,16 +1,22 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createUploadRequestId } from "./increment-upload-api";
+import type { BuildBranchSelections } from "@relay-qa-hub/upload-contract";
 import {
   getBuildCompatibility,
   refreshBuildCompatibility,
   type CompatibilityBatch,
 } from "./packaging-api";
 
-export function useBuildCompatibility(active: boolean) {
+export function useBuildCompatibility(active: boolean, branches?: BuildBranchSelections) {
   const [batch, setBatch] = useState<CompatibilityBatch | null>(null);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState(false);
   const [requestId, setRequestId] = useState<string | null>(null);
+  const selectedBranches = useRef(branches);
+  const requestedBranches = useRef(branches);
+  useEffect(() => {
+    selectedBranches.current = branches;
+  }, [branches]);
   const busy = useRef(false);
   const previousActive = useRef(active);
   const entryTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
@@ -22,6 +28,7 @@ export function useBuildCompatibility(active: boolean) {
     setRefreshing(true);
     setError(false);
     setBatch(null);
+    requestedBranches.current = selectedBranches.current;
     setRequestId(createUploadRequestId());
   }, []);
 
@@ -58,7 +65,10 @@ export function useBuildCompatibility(active: boolean) {
         fail();
       }
     };
-    void refreshBuildCompatibility(requestId, controller.signal).then(display, fail);
+    void refreshBuildCompatibility(requestId, controller.signal, requestedBranches.current).then(
+      display,
+      fail,
+    );
     // Observe the same server-owned batch even while another tab is selected.
     return () => {
       controller.abort();

@@ -12,10 +12,16 @@ import { uploadDraftDefaults, UPLOAD_MODES } from "./upload-model";
 import {
   QUICK_BUILD_PRESETS,
   quickUploadInput,
+  buildSourceBranches,
+  type BuildBranchCatalog,
+  type BuildBranchSelections,
   type QuickBuildPresetId,
 } from "@relay-qa-hub/upload-contract";
 
 const messages: Record<string, string> = {
+  INVALID_BUILD_BRANCH: "构建分支无效，请重新选择。",
+  BUILD_BRANCH_UNAVAILABLE: "所选分支已不可用，请刷新分支后重新选择。",
+  BUILD_BRANCHES_UNAVAILABLE: "暂时无法读取构建分支，请稍后重试。",
   UPLOAD_CHANNEL_HELD:
     "已提交，正在等待同产品、渠道的上一任务结束。服务端会自动核对瑞雪发布状态并继续，请勿重复提交。",
   UPLOADER_MISSING: "服务端上传程序暂未就绪，请稍后重试。",
@@ -64,10 +70,20 @@ export default function BuildUploadControls({
   checking = false,
   checkError = false,
   onRefreshChecks,
+  branches = buildSourceBranches(),
+  branchCatalog,
+  branchError = false,
+  onBranchChange,
+  onRefreshBranches,
 }: {
   userId?: string;
   disabled: boolean;
-  onBuildOnly: (preset: QuickBuildPresetId) => void;
+  onBuildOnly: (preset: QuickBuildPresetId, sourceBranch: string) => void;
+  branches?: BuildBranchSelections;
+  branchCatalog?: BuildBranchCatalog | null;
+  branchError?: boolean;
+  onBranchChange?: (target: keyof BuildBranchSelections, value: string) => void;
+  onRefreshBranches?: () => void;
   onSubmitted: (queueId: number) => void;
   onOpenUpload?: ((jobId?: string) => void) | undefined;
   checks?: CompatibilityCheck[] | undefined;
@@ -78,6 +94,7 @@ export default function BuildUploadControls({
   const bridge = serverUploader;
   const [open, setOpen] = useState(false);
   const [preset, setPreset] = useState<QuickBuildPresetId>("android-release-app");
+  const sourceBranch = branches[preset.replace(/-(app|res)$/, "") as keyof BuildBranchSelections];
   const [busy, setBusy] = useState(false);
   const busyRef = useRef(false);
   const root = useRef<HTMLDivElement>(null);
@@ -163,6 +180,7 @@ export default function BuildUploadControls({
       (chain) =>
         chain.canManage !== false &&
         chain.preset === preset &&
+        (chain.sourceBranch ?? (preset.includes("-debug-") ? "main" : "auto")) === sourceBranch &&
         !["failed", "cancelled", "upload_started"].includes(chain.status),
     );
     if (existing) {
@@ -177,6 +195,7 @@ export default function BuildUploadControls({
       const result = await bridge.buildAndUpload({
         requestId: createUploadRequestId(),
         preset,
+        sourceBranch,
         upload: input,
       });
       if (!result.ok) {
@@ -214,6 +233,19 @@ export default function BuildUploadControls({
     (c) => !["failed", "cancelled", "upload_started"].includes(c.status),
   );
   const latest = activeChain ?? chains[0];
+  const branchUnavailable = (selection: (typeof QUICK_BUILD_PRESETS)[number]) =>
+    Boolean(
+      onBranchChange &&
+      (!branchCatalog ||
+        branchError ||
+        !branchCatalog[selection.configuration].some(
+          (b) =>
+            b.value ===
+            branches[
+              `${selection.platform.toLowerCase()}-${selection.configuration.toLowerCase()}` as keyof BuildBranchSelections
+            ],
+        )),
+    );
   const renderChoice = (selection: (typeof QUICK_BUILD_PRESETS)[number]) => (
     <div className="package-external-control" key={selection.id} data-mode={selection.mode}>
       <button
@@ -222,7 +254,7 @@ export default function BuildUploadControls({
         data-build-preset={selection.id}
         aria-label={selection.label}
         type="button"
-        disabled={disabled || busy}
+        disabled={disabled || busy || branchUnavailable(selection)}
         aria-expanded={open && preset === selection.id}
         aria-controls={`build-options-${selection.id}`}
         onClick={() => void toggle(selection.id)}
@@ -252,12 +284,13 @@ export default function BuildUploadControls({
           aria-label={`${selection.label} 操作选项`}
         >
           <strong>选择本次操作</strong>
+          <p>源码分支：{sourceBranch === "auto" ? "自动选择最新封板分支" : sourceBranch}</p>
           <button
             type="button"
-            disabled={busy || disabled}
+            disabled={busy || disabled || branchUnavailable(selection)}
             onClick={() => {
               setOpen(false);
-              onBuildOnly(selection.id);
+              onBuildOnly(selection.id, sourceBranch);
             }}
           >
             只构建
@@ -268,6 +301,7 @@ export default function BuildUploadControls({
             disabled={
               busy ||
               disabled ||
+              branchUnavailable(selection) ||
               !bridge?.buildAndUpload ||
               !snapshot?.configured ||
               !snapshot.available
@@ -323,6 +357,11 @@ export default function BuildUploadControls({
       ) : null}
       <div className="package-check-toolbar">
         <span>四组并行检测 · 切回本页停留 2 秒自动检测，也可手动开始</span>
+        {onRefreshBranches ? (
+          <button type="button" onClick={onRefreshBranches}>
+            刷新分支
+          </button>
+        ) : null}
         {onRefreshChecks ? (
           <button type="button" onClick={onRefreshChecks} disabled={checking}>
             <AppIcon name="refresh" busy={checking} size={15} />
@@ -330,6 +369,11 @@ export default function BuildUploadControls({
           </button>
         ) : null}
       </div>
+      {branchError ? (
+        <p className="banner error-banner" role="alert">
+          分支读取失败，请点击“刷新分支”后再构建。
+        </p>
+      ) : null}
       <div className="package-platform-grid">
         {(["Android", "iOS"] as const).map((platform) => (
           <section
@@ -350,13 +394,89 @@ export default function BuildUploadControls({
                     {configuration}
                   </span>
                 </h3>
+                {onBranchChange ? (
+                  <label className="package-branch-selector">
+                    <span>源码分支</span>
+                    <select
+                      aria-label={`${platform} ${configuration} 源码分支`}
+                      value={
+                        branches[
+                          `${platform.toLowerCase()}-${configuration.toLowerCase()}` as keyof BuildBranchSelections
+                        ]
+                      }
+                      disabled={busy || !branchCatalog || branchError}
+                      onChange={(e) =>
+                        onBranchChange(
+                          `${platform.toLowerCase()}-${configuration.toLowerCase()}` as keyof BuildBranchSelections,
+                          e.target.value,
+                        )
+                      }
+                    >
+                      {!branchCatalog ? (
+                        <option value={configuration === "Debug" ? "main" : "auto"}>
+                          {branchError ? "分支读取失败，请刷新" : "正在读取分支…"}
+                        </option>
+                      ) : null}
+                      {branchCatalog &&
+                      !branchCatalog[configuration].some(
+                        (b) =>
+                          b.value ===
+                          branches[
+                            `${platform.toLowerCase()}-${configuration.toLowerCase()}` as keyof BuildBranchSelections
+                          ],
+                      ) ? (
+                        <option
+                          disabled
+                          value={
+                            branches[
+                              `${platform.toLowerCase()}-${configuration.toLowerCase()}` as keyof BuildBranchSelections
+                            ]
+                          }
+                        >
+                          原分支已不可用，请重新选择
+                        </option>
+                      ) : null}
+                      {branchCatalog?.[configuration].map((branch) => (
+                        <option key={branch.value} value={branch.value}>
+                          {branch.label.replace(/^auto \| /, " ").trim()}
+                        </option>
+                      ))}
+                    </select>
+                    <small>
+                      {configuration === "Debug"
+                        ? "主分支 main"
+                        : "默认最新封板分支；开始执行时固定提交，可手动切换"}
+                    </small>
+                  </label>
+                ) : null}
                 <BuildCompatibilitySummary
                   check={checks?.find(
                     (c) =>
-                      c.target.platform === platform && c.target.configuration === configuration,
+                      c.target.platform === platform &&
+                      c.target.configuration === configuration &&
+                      (!onBranchChange ||
+                        c.sourceBranch ===
+                          branches[
+                            `${platform.toLowerCase()}-${configuration.toLowerCase()}` as keyof BuildBranchSelections
+                          ]) &&
+                      (!c.report?.sourceBranch ||
+                        !branchCatalog ||
+                        c.report.sourceBranch ===
+                          branchCatalog[configuration].find((b) => b.value === c.sourceBranch)
+                            ?.resolvedBranch),
                   )}
                   unavailable={checkError}
-                  checking={checking}
+                  checking={
+                    checking &&
+                    (!checks ||
+                      checks.some(
+                        (c) =>
+                          c.sourceBranch ===
+                          branches[
+                            `${platform.toLowerCase()}-${configuration.toLowerCase()}` as keyof BuildBranchSelections
+                          ],
+                      ))
+                  }
                 />
                 <div className="package-build-buttons">
                   {QUICK_BUILD_PRESETS.filter(
@@ -384,6 +504,9 @@ export default function BuildUploadControls({
                 ? `排队 #${latest.queueId}`
                 : "等待构建"}{" "}
             {latest.buildVersion ? ` · ${latest.buildVersion}` : ""}
+            {latest.resolvedBranch || latest.sourceBranch
+              ? ` · ${latest.resolvedBranch ?? (latest.sourceBranch === "auto" ? "自动封板分支" : latest.sourceBranch)}`
+              : ""}
             {latest.preset
               ? ` · ${QUICK_BUILD_PRESETS.find((p) => p.id === latest.preset)?.label}`
               : ""}

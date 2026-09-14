@@ -8,6 +8,7 @@ import { BuildUploadHost } from "./build-upload-host.js";
 import { JenkinsBuildService } from "./jenkins-builds.js";
 import {
   quickBuildPreset,
+  buildSourceBranch,
   quickUploadInput,
   type QuickBuildPresetId,
 } from "@relay-qa-hub/upload-contract";
@@ -62,6 +63,7 @@ interface Options {
 type Kind = "upload" | "build" | "resume" | "confirm";
 interface Payload {
   preset?: QuickBuildPresetId;
+  sourceBranch?: string;
   input: UploadInput;
   accountIdentity: string;
   source?: UploadSourceIdentity;
@@ -198,6 +200,7 @@ export class IncrementUploadService {
             return this.options.jenkins.trigger(
               quickBuildPreset(record(request.body)["preset"])?.id ?? "external",
               `${owner}:${request.headers?.["idempotency-key"]}`,
+              record(request.body)["sourceBranch"],
             );
           if (url.startsWith("/api/v1/packaging/progress?")) {
             const params = new URL(url, "http://localhost").searchParams;
@@ -240,7 +243,11 @@ export class IncrementUploadService {
         prior.kind !== kind ||
         JSON.stringify(old.input) !== JSON.stringify(payload.input) ||
         JSON.stringify(old.source) !== JSON.stringify(payload.source) ||
-        old.preset !== payload.preset
+        old.preset !== payload.preset ||
+        (old.sourceBranch ??
+          (old.preset
+            ? buildSourceBranch(undefined, quickBuildPreset(old.preset)!.configuration)
+            : undefined)) !== payload.sourceBranch
       )
         throw new Error("UPLOAD_REQUEST_CONFLICT");
       return prior;
@@ -274,6 +281,7 @@ export class IncrementUploadService {
     value: unknown,
     kind: "upload" | "build" = "upload",
     presetValue?: unknown,
+    branchValue?: unknown,
   ): Promise<string> {
     // Enqueue does not wait for Jenkins polling or a platform request. Only the
     // scheduler dispatches; the SQLite insertion itself is atomic and idempotent.
@@ -281,7 +289,9 @@ export class IncrementUploadService {
     const preset =
       kind === "build" ? quickBuildPreset(presetValue ?? "android-release-app") : undefined;
     if (kind === "build" && !preset) throw new Error("INVALID_INPUT");
-    const selected = preset ? { preset: preset.id } : {};
+    const selected = preset
+      ? { preset: preset.id, sourceBranch: buildSourceBranch(branchValue, preset.configuration) }
+      : {};
     const key = uuid(id),
       input = parseNewUploadInput(
         preset ? quickUploadInput(parseNewUploadInput(value), preset.id) : value,
@@ -515,6 +525,7 @@ export class IncrementUploadService {
         accountIdentity: p.accountIdentity,
         input: p.input,
         ...(p.preset ? { preset: p.preset } : {}),
+        ...(p.sourceBranch ? { sourceBranch: p.sourceBranch } : {}),
         createdAt: c.createdAt,
         updatedAt: c.updatedAt,
         queueId: null,
@@ -651,6 +662,7 @@ export class IncrementUploadService {
               requestId: c.jobId,
               upload: p.input,
               preset: p.preset,
+              sourceBranch: p.sourceBranch,
             });
           else if (c.kind === "upload") {
             if (p.source) await host.startForBuild(p.input, c.jobId, p.source, p.accountIdentity);
@@ -732,6 +744,7 @@ export function registerIncrementUploadRoutes(
       record(r.body)["upload"],
       "build",
       record(r.body)["preset"],
+      record(r.body)["sourceBranch"],
     );
     return (await service!.buildChains(owner)).find((c) => c.id === jobId);
   });

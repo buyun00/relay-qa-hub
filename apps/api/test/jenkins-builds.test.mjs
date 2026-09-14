@@ -5,7 +5,7 @@ import { JenkinsBuildService, packageFiles } from "../dist/jenkins-builds.js";
 import { createApiApp } from "../dist/app.js";
 
 const jobPath = `/job/${encodeURIComponent(QUICK_JOB_NAME)}/`;
-const definitions = [{ name: "打包用途" }];
+const definitions = [{ name: "打包用途" }, { name: "源码分支" }];
 const job = {
   buildable: true,
   property: [{ parameterDefinitions: definitions }],
@@ -84,7 +84,7 @@ function fixture({ post, overrideJob, failJenkins = false } = {}) {
   return { service, posts, crumbs: () => crumbs, reads: () => reads };
 }
 
-test("all eight presets submit only the visible quick-build purpose", async () => {
+test("all eight presets submit their purpose and configuration-specific branch default", async () => {
   const { service, posts } = fixture();
   for (const preset of QUICK_BUILD_PRESETS)
     assert.deepEqual(await service.trigger(preset.id, preset.id), {
@@ -93,7 +93,10 @@ test("all eight presets submit only the visible quick-build purpose", async () =
     });
   assert.deepEqual(
     posts,
-    QUICK_BUILD_PRESETS.map((p) => ({ 打包用途: p.label })),
+    QUICK_BUILD_PRESETS.map((p) => ({
+      打包用途: p.label,
+      源码分支: p.configuration === "Debug" ? "main" : "auto",
+    })),
   );
 });
 
@@ -107,6 +110,29 @@ test("expired crumb/session reauthenticates once, then submits with the new cook
   assert.equal((await f.service.trigger("ios-release-res", "retry")).queueId, 18);
   assert.equal(f.crumbs(), 2);
   assert.equal(f.posts.length, 2);
+});
+
+test("manual branch reaches Jenkins and cannot change when a request ID is reused", async () => {
+  const f = fixture();
+  f.service.branches = async () => ({
+    checkedAt: new Date().toISOString(),
+    Debug: [],
+    Release: [{ value: "release/2026-08-30" }],
+  });
+  await f.service.trigger("ios-release-res", "branch-request", "release/2026-08-30");
+  assert.equal(f.posts[0]["源码分支"], "release/2026-08-30");
+  await f.service.trigger("ios-release-res", "branch-request", "release/2026-08-30");
+  assert.equal(f.posts.length, 1);
+  await assert.rejects(f.service.trigger("ios-release-res", "branch-request", "auto"), {
+    code: "IDEMPOTENCY_CONFLICT",
+  });
+  await assert.rejects(f.service.trigger("ios-release-res", "missing-branch", "release/deleted"), {
+    code: "BUILD_BRANCH_UNAVAILABLE",
+  });
+  await assert.rejects(f.service.trigger("ios-debug-app", "wrong-debug", "release/2026-08-30"), {
+    code: "INVALID_BUILD_BRANCH",
+  });
+  assert.equal(f.posts.length, 1);
 });
 
 test("concurrent duplicate submissions reuse the receipt; conflicting reuse is rejected", async () => {

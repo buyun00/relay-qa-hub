@@ -1,6 +1,10 @@
 import { promises as fs } from "node:fs";
 import path from "node:path";
-import { quickBuildPreset, quickUploadInput } from "@relay-qa-hub/upload-contract";
+import {
+  quickBuildPreset,
+  quickUploadInput,
+  buildSourceBranch,
+} from "@relay-qa-hub/upload-contract";
 import { pinBuildSource, type BuildResult } from "./build-artifacts.js";
 import {
   parseNewUploadInput,
@@ -145,6 +149,7 @@ export class BuildUploadHost {
       this.file(id);
       const selection = quickBuildPreset(raw["preset"] ?? "android-release-app");
       if (!selection) throw new Error("INVALID_INPUT");
+      const sourceBranch = buildSourceBranch(raw["sourceBranch"], selection.configuration);
       const input = parseNewUploadInput(
           quickUploadInput(parseNewUploadInput(raw["upload"]), selection.id),
         ),
@@ -155,6 +160,8 @@ export class BuildUploadHost {
         if (
           prior.ownerId !== ownerId ||
           prior.preset !== selection.id ||
+          (prior.sourceBranch ?? buildSourceBranch(undefined, selection.configuration)) !==
+            sourceBranch ||
           JSON.stringify({
             ...prior.input,
             version: "",
@@ -173,6 +180,7 @@ export class BuildUploadHost {
       const chain: BuildUploadChain = {
         id: String(id),
         preset: selection.id,
+        sourceBranch,
         ownerId,
         accountIdentity,
         createdAt: now,
@@ -192,7 +200,7 @@ export class BuildUploadHost {
           await this.options.api.json("/api/v1/packaging/builds", {
             method: "POST",
             headers: { "idempotency-key": chain.id },
-            body: { preset: selection.id },
+            body: { preset: selection.id, sourceBranch },
           }),
         );
         if (!Number.isSafeInteger(result["queueId"]) || Number(result["queueId"]) <= 0)
@@ -204,6 +212,9 @@ export class BuildUploadHost {
         // A timeout/lost response may follow an accepted build. Do not replay POST on restart.
         chain.status = [
           "JENKINS_PARAMETERS_CHANGED",
+          "INVALID_BUILD_BRANCH",
+          "BUILD_BRANCH_UNAVAILABLE",
+          "BUILD_BRANCHES_UNAVAILABLE",
           "JENKINS_JOB_DISABLED",
           "JENKINS_AUTH_FAILED",
           "FORBIDDEN",
@@ -357,6 +368,13 @@ export class BuildUploadHost {
       )) as BuildResult;
       const preset = quickBuildPreset(chain.preset)!;
       if (
+        chain.sourceBranch &&
+        (!result.sourceBranch ||
+          !result.sourceRequestId ||
+          (chain.sourceBranch !== "auto" && result.sourceBranch !== chain.sourceBranch))
+      )
+        throw new Error("BUILD_IDENTITY_MISMATCH");
+      if (
         result.productId !== preset.productId ||
         result.channelId !== preset.channelId ||
         result.platform !== preset.platform ||
@@ -366,6 +384,8 @@ export class BuildUploadHost {
         throw new Error("BUILD_ARTIFACT_MISMATCH");
       chain.source = await pinBuildSource(result, this.options.fetch);
       chain.buildVersion = result.version;
+      if (result.sourceBranch) chain.resolvedBranch = result.sourceBranch;
+      chain.sourceRevision = result.sourceRevision;
       chain.input = parseNewUploadInput({ ...chain.input, version: result.version });
       chain.status = "starting_upload";
       await this.save(chain);

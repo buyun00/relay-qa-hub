@@ -31,6 +31,49 @@ test("checker source contract rejects missing, corrupt and unexpected modules", 
   ])
     assert.throws(() => compatibilitySource(config), /CHECK_SOURCE_CHANGED/);
 });
+
+test("check requests retain branches, coalesce only matching selections, and reject a different branch report", async (t) => {
+  const root = await temp(t),
+    launches = [];
+  const jenkins = {
+    startCompatibilityBatch: async (branches) => {
+      launches.push(branches);
+      return launches.length;
+    },
+    compatibilityProgress: async (c) => c,
+  };
+  const service = new BuildCompatibilityService(jenkins, root),
+    id = randomUUID();
+  const a = await service.start(id, { "ios-release": "release/2026-09-11" });
+  const b = await service.start(randomUUID(), { "ios-release": "release/2026-08-30" });
+  assert.notEqual(a.id, b.id);
+  await assert.rejects(
+    service.start(id, { "ios-release": "release/2026-08-30" }),
+    /IDEMPOTENCY_CONFLICT/,
+  );
+  await service.close();
+  const restored = new BuildCompatibilityService(jenkins, root);
+  assert.equal((await restored.status(a.id)).branches["ios-release"], "release/2026-09-11");
+  await restored.close();
+  assert.equal(launches.length, 2);
+  const target = COMPATIBILITY_TARGETS[3],
+    r = {
+      ...report(target),
+      requestedBranch: "release/2026-09-11",
+      sourceBranch: "release/2026-09-11",
+    };
+  assert.equal(
+    validateCompatibilityReport(r, target, "release/2026-09-11").sourceBranch,
+    r.sourceBranch,
+  );
+  assert.throws(() =>
+    validateCompatibilityReport(
+      { ...r, sourceBranch: "release/2026-08-30" },
+      target,
+      "release/2026-09-11",
+    ),
+  );
+});
 function report(t = COMPATIBILITY_TARGETS[0]) {
   const ref = t.platform + "/" + t.configuration + "/2.5.1/12";
   return {
@@ -198,7 +241,11 @@ function fixture(overrides = {}) {
     assert.ok(headers.has("authorization"));
     assert.equal(init.redirect, "manual");
     if (url.pathname === "/job/" + encodeURIComponent("00-【OZDQP】【快捷打包】") + "/config.xml")
-      return new Response(`base64.b64decode('${checkerSource}')`);
+      return new Response(
+        overrides.branchAware
+          ? "/source-routing/current/build_source.py"
+          : `base64.b64decode('${checkerSource}')`,
+      );
     if (url.pathname === jobPath + "api/json")
       return Response.json({
         buildable: true,
@@ -208,6 +255,7 @@ function fixture(overrides = {}) {
     if (url.pathname === jobPath + "config.xml")
       return new Response(
         COMPATIBILITY_BATCH_PURPOSE +
+          (overrides.branchAware ? " QA_HUB_CHECK_ONLY_V3" : "") +
           "\n" +
           COMPATIBILITY_TARGETS.map((t) => t.platform + " " + t.configuration + " · 快捷检测").join(
             "\n",
@@ -295,7 +343,7 @@ test("Jenkins adapter submits only Check purposes and verifies queue, build and 
     );
 });
 test("refresh endpoint requires authentication and accepts no build choice or arbitrary command", async () => {
-  const f = fixture(),
+  const f = fixture({ branchAware: true }),
     app = await createApiApp({
       jenkinsBuildService: f.service,
       debugBearerToken: "compatibility-fixture",

@@ -1,4 +1,5 @@
 import { inflateSync } from "node:zlib";
+import { buildSourceBranch } from "@relay-qa-hub/upload-contract";
 
 /** Accept only the two checker modules embedded by the existing trusted job. */
 export function compatibilitySource(config: string): string {
@@ -31,6 +32,8 @@ export const COMPATIBILITY_TARGETS = [
 ] as const;
 export type CompatibilityTarget = (typeof COMPATIBILITY_TARGETS)[number];
 export interface CompatibilityReport {
+  sourceBranch?: string;
+  reasonCode?: "BASE_NOT_ANCESTOR";
   result: "PLAYER_REBUILD_REQUIRED" | "HOT_UPDATE_ALLOWED" | "NO_BASELINE" | "UNKNOWN";
   targetRevision: string | null;
   baseRevision: string | null;
@@ -41,6 +44,7 @@ export interface CompatibilityReport {
   changeCounts: Record<string, number>;
 }
 export interface CompatibilityCheck {
+  sourceBranch?: string;
   target: CompatibilityTarget;
   state: "pending" | "submitting" | "queued" | "running" | "complete" | "error";
   queueId: number | null;
@@ -53,10 +57,20 @@ export interface CompatibilityCheck {
 export function validateCompatibilityReport(
   value: unknown,
   target: CompatibilityTarget,
+  requestedBranch?: string,
 ): CompatibilityReport {
   if (!value || typeof value !== "object") throw new Error("CHECK_INVALID_REPORT");
   const r = value as Record<string, unknown>;
   const result = r["result"];
+  if (
+    requestedBranch !== undefined &&
+    (r["requestedBranch"] !== requestedBranch ||
+      typeof r["sourceBranch"] !== "string" ||
+      r["sourceBranch"] === "auto" ||
+      buildSourceBranch(r["sourceBranch"], target.configuration) !== r["sourceBranch"] ||
+      (requestedBranch !== "auto" && r["sourceBranch"] !== requestedBranch))
+  )
+    throw new Error("CHECK_INVALID_REPORT");
   const sha = (v: unknown): v is string => typeof v === "string" && /^[a-f0-9]{40}$/u.test(v);
   const ref = (v: unknown): v is string =>
     typeof v === "string" &&
@@ -102,6 +116,10 @@ export function validateCompatibilityReport(
   if (confirmed && Boolean(counts["player"]) !== (result === "PLAYER_REBUILD_REQUIRED"))
     throw new Error("CHECK_INVALID_REPORT");
   return {
+    ...(typeof r["sourceBranch"] === "string" ? { sourceBranch: r["sourceBranch"] } : {}),
+    ...(r["reason"] === "base revision is not an ancestor of target revision"
+      ? { reasonCode: "BASE_NOT_ANCESTOR" as const }
+      : {}),
     result: result as CompatibilityReport["result"],
     targetRevision: sha(r["targetRevision"]) ? r["targetRevision"] : null,
     baseRevision: sha(r["baseRevision"]) ? r["baseRevision"] : null,

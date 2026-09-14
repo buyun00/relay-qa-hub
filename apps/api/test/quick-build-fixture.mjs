@@ -14,6 +14,8 @@ export function buildInfo(preset = QUICK_BUILD_PRESETS[2], number = 46, version 
     releaseVersion: version,
     buildNumber: number,
     sourceRevision: "b".repeat(40),
+    sourceBranch: preset.configuration === "Debug" ? "main" : "release/2026-09-11",
+    sourceRequestId: "c".repeat(32),
     productId: preset.productId,
     channelId: preset.channelId,
     platform: preset.platform,

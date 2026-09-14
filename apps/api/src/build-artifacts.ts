@@ -1,6 +1,7 @@
 import {
   BUILD_DOWNLOAD_ROOT,
   QUICK_BUILD_PRESETS,
+  buildSourceBranch,
   type QuickBuildPreset,
 } from "@relay-qa-hub/upload-contract";
 import type { UploadSourceIdentity } from "./uploader-types.js";
@@ -18,6 +19,8 @@ export interface BuildArtifact {
   kind: "apk" | "aab" | "ipa" | "zip";
 }
 export interface BuildResult {
+  sourceBranch?: string;
+  sourceRequestId?: string;
   modifiedAt?: string;
   childBuildNumber?: number;
   version: string;
@@ -106,7 +109,29 @@ export function validateBuildResult(
     : "";
   const childBuildNumber = /^[1-9]\d{0,9}$/.test(childText) ? Number(childText) : undefined;
   if (requireRequest && !childBuildNumber) fail();
+  const sourceBranch = info["sourceBranch"],
+    sourceRequestId = info["sourceRequestId"];
+  if (sourceBranch !== undefined) {
+    try {
+      if (
+        sourceBranch === "auto" ||
+        buildSourceBranch(sourceBranch, preset.configuration) !== sourceBranch
+      )
+        fail();
+    } catch {
+      fail();
+    }
+  }
+  if (
+    sourceRequestId !== undefined &&
+    (typeof sourceRequestId !== "string" ||
+      !/^[a-f0-9]{32}$/.test(sourceRequestId) ||
+      !sourceBranch)
+  )
+    fail();
   return {
+    ...(typeof sourceBranch === "string" ? { sourceBranch } : {}),
+    ...(typeof sourceRequestId === "string" ? { sourceRequestId } : {}),
     version: String(version),
     buildNumber: Number(number),
     requestId,

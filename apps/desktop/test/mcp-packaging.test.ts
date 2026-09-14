@@ -27,6 +27,23 @@ function fixture(response: (url: string, request?: QaHubJsonRequest) => unknown 
   };
   return { calls, tools: new QaHubMcpTools(api, "unused") };
 }
+
+test("MCP exposes branch discovery and forwards manual branches for both build actions", async () => {
+  const f = fixture(() => ({ queueId: 42, id: "chain" }));
+  await f.tools.call("qa_get_build_branches", {});
+  assert.equal(f.calls[0]!.url, "/api/v1/packaging/branches");
+  for (const name of ["qa_start_build", "qa_build_and_upload"]) {
+    await f.tools.call(name, {
+      requestId: randomUUID(),
+      preset: "ios-release-res",
+      sourceBranch: "release/2026-09-11",
+    });
+    assert.equal(
+      (f.calls.at(-1)!.request!.body as Record<string, unknown>).sourceBranch,
+      "release/2026-09-11",
+    );
+  }
+});
 test("one-click command uses shared defaults and reuses request ID without waiting for a build", async () => {
   const requestId = randomUUID();
   const f = fixture(() => ({ id: requestId, status: "queued" }));
@@ -170,8 +187,8 @@ test("backend auth, ownership and uncertain-submission errors pass through witho
 });
 test("MCP definitions distinguish reads, external writes and ordinary build retry limits", () => {
   const f = fixture();
-  assert.equal(f.tools.definitions.length, 27);
-  assert.equal(new Set(f.tools.definitions.map((t) => t.name)).size, 27);
+  assert.equal(f.tools.definitions.length, 28);
+  assert.equal(new Set(f.tools.definitions.map((t) => t.name)).size, 28);
   assert.equal(
     f.tools.definitions.find((t) => t.name === "qa_get_packaging_status")!.annotations.readOnlyHint,
     true,

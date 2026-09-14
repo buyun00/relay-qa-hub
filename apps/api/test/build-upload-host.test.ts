@@ -67,7 +67,12 @@ async function fixture(t: Parameters<Parameters<typeof test>[1]>[0]) {
         if (url === "/api/v1/packaging/builds") {
           state.posts++;
           assert.equal(request?.method, "POST");
-          assert.deepEqual(request.body, { preset: "android-release-app" });
+          assert.equal((request.body as Record<string, unknown>).preset, "android-release-app");
+          assert.ok(
+            ["auto", "release/2026-09-11"].includes(
+              String((request.body as Record<string, unknown>).sourceBranch),
+            ),
+          );
           assert.ok(request.headers?.["idempotency-key"]);
           if (state.lostPost) throw new Error("REQUEST_TIMEOUT");
           return { queueId: 42 };

@@ -11,6 +11,8 @@ export function compatibilityVerdict(
   if (check.errorCode) return "检测连接暂时中断，正在重试…";
   if (check.state === "queued") return "检测排队中…";
   if (check.state === "running") return "正在比较累计修改…";
+  if (check.report?.result === "UNKNOWN" && check.report.reasonCode === "BASE_NOT_ANCESTOR")
+    return "参考安装包与当前分支不兼容，请打完整包";
   switch (check.report?.result) {
     case "PLAYER_REBUILD_REQUIRED":
       return "需要重新打完整包";
@@ -54,6 +56,12 @@ export default function BuildCompatibilitySummary({
             检测依据 · {new Date(check.checkedAt).toLocaleTimeString("zh-CN", { hour12: false })}
           </summary>
           <dl>
+            {report.sourceBranch ? (
+              <div>
+                <dt>检测分支</dt>
+                <dd>{report.sourceBranch}</dd>
+              </div>
+            ) : null}
             <div>
               <dt>参考版本</dt>
               <dd>{versionLabel(report.selectedVersion)}</dd>

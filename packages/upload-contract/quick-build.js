@@ -28,6 +28,34 @@ export const QUICK_BUILD_PRESETS = Object.freeze(
 export function quickBuildPreset(id) {
   return QUICK_BUILD_PRESETS.find((p) => p.id === id);
 }
+export function buildSourceBranch(value, configuration) {
+  const branch = value === undefined ? (configuration === "Debug" ? "main" : "auto") : value;
+  if (
+    typeof branch !== "string" ||
+    !/^[A-Za-z0-9][A-Za-z0-9_./-]{0,150}$/.test(branch) ||
+    branch.includes("..") ||
+    branch.includes("//") ||
+    /(?:\/|\.|\.lock)$/.test(branch) ||
+    (configuration === "Debug"
+      ? branch !== "main" && branch !== "auto"
+      : branch !== "auto" && !branch.startsWith("release/"))
+  )
+    throw new Error("INVALID_BUILD_BRANCH");
+  return configuration === "Debug" ? "main" : branch;
+}
+export function buildSourceBranches(value) {
+  if (value !== undefined && (!value || typeof value !== "object" || Array.isArray(value)))
+    throw new Error("INVALID_BUILD_BRANCH");
+  const targets = ["android-debug", "android-release", "ios-debug", "ios-release"];
+  if (value && Object.keys(value).some((k) => !targets.includes(k)))
+    throw new Error("INVALID_BUILD_BRANCH");
+  return Object.fromEntries(
+    targets.map((k) => [
+      k,
+      buildSourceBranch(value?.[k], k.endsWith("-debug") ? "Debug" : "Release"),
+    ]),
+  );
+}
 export function quickUploadInput(input, id) {
   const p = quickBuildPreset(id);
   if (!p) throw new Error("INVALID_INPUT");

@@ -15,6 +15,8 @@ import {
   type PackagingStatus,
 } from "./packaging-api";
 import "./packaging.css";
+import { buildSourceBranches, type BuildBranchCatalog } from "@relay-qa-hub/upload-contract";
+import { getBuildBranches } from "./packaging-api";
 
 function packageLabel(preset: BuildPreset | null): string {
   return BUILD_PRESETS.find((item) => item.id === preset)?.packageLabel ?? "其他构建";
@@ -26,6 +28,9 @@ function formatSize(bytes: number): string {
 }
 function submissionError(error: unknown): string {
   const code = error instanceof QaHubApiError ? error.code : null;
+  if (code === "INVALID_BUILD_BRANCH" || code === "BUILD_BRANCH_UNAVAILABLE")
+    return "所选分支已不可用，请刷新分支后重新选择。";
+  if (code === "BUILD_BRANCHES_UNAVAILABLE") return "暂时无法读取构建分支，请稍后重试。";
   if (code === "JENKINS_PARAMETERS_CHANGED")
     return "Jenkins 的打包选项已变更，请核对 job 后再打包。";
   if (code === "JENKINS_JOB_DISABLED") return "Jenkins 当前已禁用这个打包任务。";
@@ -71,6 +76,9 @@ export function PackageDownloads({ status }: { status: PackagingStatus }) {
             </h3>
             <span>
               构建 #{result.buildNumber} · 产品 {result.productId} / 渠道 {result.channelId}
+              {result.sourceBranch
+                ? ` · ${result.sourceBranch} @ ${result.sourceRevision?.slice(0, 10)}`
+                : ""}
             </span>
           </div>
           <div
@@ -131,6 +139,10 @@ export default function PackagingPage({
   onOpenUpload?: (jobId?: string) => void;
 }) {
   const [status, setStatus] = useState<PackagingStatus | null>(null);
+  const [branches, setBranches] = useState(() => buildSourceBranches());
+  const [branchCatalog, setBranchCatalog] = useState<BuildBranchCatalog | null>(null);
+  const [branchError, setBranchError] = useState(false);
+  const [branchRevision, setBranchRevision] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const [pending, setPending] = useState<BuildPreset | null>(null);
@@ -156,7 +168,23 @@ export default function PackagingPage({
   }, [refresh]);
   useEffect(() => () => clearTimeout(completedRefresh.current), []);
   const monitor = usePackagingProgress(userId, active, refreshRevision, onCompleted, onOpen);
-  const compatibility = useBuildCompatibility(active);
+  const compatibility = useBuildCompatibility(active, branches);
+  useEffect(() => {
+    if (!active) return;
+    const controller = new AbortController();
+    void getBuildBranches(controller.signal).then(
+      (value) => {
+        if (!controller.signal.aborted) {
+          setBranchCatalog(value);
+          setBranchError(false);
+        }
+      },
+      () => {
+        if (!controller.signal.aborted) setBranchError(true);
+      },
+    );
+    return () => controller.abort();
+  }, [active, branchRevision, refreshRevision]);
   useEffect(() => {
     if (!active) return;
     const controller = new AbortController();
@@ -172,16 +200,18 @@ export default function PackagingPage({
     };
   }, [active, refreshRevision, refresh]);
 
-  const build = async (preset: BuildPreset) => {
+  const build = async (preset: BuildPreset, sourceBranch: string) => {
     if (submitting.current) return;
     requestPackagingNotificationPermission();
     submitting.current = true;
     setPending(preset);
     setNotice(null);
     try {
-      const receipt = await triggerJenkinsBuild(preset, createUploadRequestId());
+      const receipt = await triggerJenkinsBuild(preset, createUploadRequestId(), sourceBranch);
       monitor.watch(receipt.queueId);
-      setNotice(`${packageLabel(preset)}已提交，排队编号 #${receipt.queueId}。`);
+      setNotice(
+        `${packageLabel(preset)}已提交，分支 ${sourceBranch === "auto" ? "自动选择最新封板分支" : sourceBranch}，排队编号 #${receipt.queueId}。`,
+      );
     } catch (cause) {
       setNotice(submissionError(cause));
     } finally {
@@ -216,8 +246,15 @@ export default function PackagingPage({
             checking={compatibility.refreshing}
             checkError={compatibility.error}
             onRefreshChecks={compatibility.refresh}
+            branches={branches}
+            branchCatalog={branchCatalog}
+            branchError={branchError}
+            onBranchChange={(target, value) =>
+              setBranches((current) => ({ ...current, [target]: value }))
+            }
+            onRefreshBranches={() => setBranchRevision((n) => n + 1)}
             disabled={pending !== null || !status?.jenkins?.buildable || error !== null}
-            onBuildOnly={(id) => void build(id)}
+            onBuildOnly={(id, branch) => void build(id, branch)}
             onSubmitted={(queueId) => {
               monitor.watch(queueId);
               void refresh();

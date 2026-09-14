@@ -4,7 +4,7 @@ import PackagingPage, { PackageDownloads } from "./PackagingPage";
 import { type PackagingStatus } from "./packaging-api";
 
 describe("packaging page", () => {
-  it("has precisely eight build purposes and no editable Jenkins settings", () => {
+  it("has eight build purposes and one source branch selector for each platform/configuration", () => {
     const markup = renderToStaticMarkup(<PackagingPage active={true} refreshRevision={0} />);
     expect(markup.match(/data-build-preset=/gu)).toHaveLength(8);
     expect(markup).toContain("开始检测");
@@ -13,7 +13,8 @@ describe("packaging page", () => {
     for (const label of ["Android Debug", "Android Release", "iOS Debug", "iOS Release"])
       expect(markup).toContain(label);
     expect(markup).toContain("APK、AAB、完整热更");
-    expect(markup).not.toMatch(/<(input|select|textarea)\b/u);
+    expect(markup.match(/<select\b/gu)).toHaveLength(4);
+    expect(markup).not.toMatch(/<(input|textarea)\b/u);
   });
 
   it("download rows and QR links use only the selected build's versioned artifact paths", () => {

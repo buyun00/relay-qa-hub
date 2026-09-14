@@ -44,6 +44,9 @@ export interface UploadSourceIdentity {
 }
 export interface BuildUploadChain {
   preset?: QuickBuildPresetId;
+  sourceBranch?: string;
+  resolvedBranch?: string;
+  sourceRevision?: string;
   buildVersion?: string;
   id: string;
   ownerId: string;
@@ -145,6 +148,7 @@ export interface UploaderBridge {
   buildAndUpload: (input: {
     requestId: string;
     preset?: QuickBuildPresetId;
+    sourceBranch?: string;
     upload: UploadInput;
   }) => Promise<UploadReply<BuildUploadChain>>;
   cancelBuildUpload: (id: string) => Promise<UploadReply<boolean>>;

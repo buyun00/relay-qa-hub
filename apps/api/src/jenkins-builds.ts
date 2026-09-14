@@ -4,9 +4,15 @@ import {
   COMPATIBILITY_JOB_NAME,
   QUICK_BUILD_PRESETS,
   quickBuildPreset,
+  buildSourceBranch,
+  buildSourceBranches,
+  type BuildBranchCatalog,
+  type BuildBranchSelections,
   type QuickBuildPresetId,
 } from "@relay-qa-hub/upload-contract";
 import { artifactCatalog, validateBuildResult, type BuildResult } from "./build-artifacts.js";
+import { readBuildBranches } from "./jenkins-branches.js";
+import { readFile } from "node:fs/promises";
 import {
   COMPATIBILITY_TARGETS,
   COMPATIBILITY_BATCH_PURPOSE,
@@ -75,10 +81,17 @@ export class PackagingError extends Error {
 
 /** Only these choices change. Jenkins supplies every other parameter's current default,
  * including the Json Editor plugin's BuildParam startval and the blank version. */
-export function buildParameters(preset: BuildPreset): Record<string, string> {
+export function buildParameters(preset: BuildPreset, branch?: unknown): Record<string, string> {
   const selection = quickBuildPreset(preset === "external" ? "android-release-app" : preset);
   if (!selection) throw new PackagingError("JENKINS_PARAMETERS_CHANGED", 409);
-  return { 打包用途: selection.label };
+  try {
+    return {
+      打包用途: selection.label,
+      源码分支: buildSourceBranch(branch, selection.configuration),
+    };
+  } catch {
+    throw new PackagingError("INVALID_BUILD_BRANCH", 400);
+  }
 }
 
 function presetForParameters(actions: JenkinsParameters[] = []): BuildPreset | null {
@@ -148,6 +161,7 @@ export function packageFiles(files: DirectoryFile[], kind: "apk" | "ipa"): Packa
 }
 
 export class JenkinsBuildService {
+  private branchCache: { until: number; value: Promise<BuildBranchCatalog> } | null = null;
   private cookies = new Map<string, string>();
   private crumb: { crumbRequestField: string; crumb: string } | null = null;
   private crumbLoading: Promise<void> | null = null;
@@ -159,6 +173,7 @@ export class JenkinsBuildService {
     string,
     {
       preset: BuildPreset;
+      sourceBranch: string;
       createdAt: number;
       result: Promise<{ queueId: number; preset: BuildPreset }>;
     }
@@ -287,6 +302,8 @@ export class JenkinsBuildService {
     const definitions = job.property?.flatMap((p) => p.parameterDefinitions ?? []) ?? [];
     if (!definitions.some((p) => p.name === "打包用途"))
       throw new PackagingError("JENKINS_PARAMETERS_CHANGED", 409);
+    if (parameters["源码分支"] !== undefined && !definitions.some((p) => p.name === "源码分支"))
+      throw new PackagingError("JENKINS_PARAMETERS_CHANGED", 409);
     // Active Choices does not expose choices in api/json. Read its installed script without executing it.
     const configResponse = await this.request(`${jobPath}config.xml`, { signal });
     if (!configResponse.ok) {
@@ -296,6 +313,8 @@ export class JenkinsBuildService {
     const config = await configResponse.text();
     if (config.length > MAX_JSON_BYTES || !config.includes(parameters["打包用途"]!))
       throw new PackagingError("JENKINS_PARAMETERS_CHANGED", 409);
+    if (parameters["CHECK_BRANCHES"] !== undefined && !config.includes("QA_HUB_CHECK_ONLY_V3"))
+      throw new PackagingError("CHECK_SOURCE_CHANGED", 409);
     if (!this.crumb) await this.loadCrumb(signal);
     for (let attempt = 0; attempt < 2; attempt++) {
       const crumb = this.crumb!;
@@ -336,11 +355,29 @@ export class JenkinsBuildService {
     throw new PackagingError("JENKINS_AUTH_FAILED");
   }
 
-  private async submit(preset: BuildPreset): Promise<{ queueId: number; preset: BuildPreset }> {
-    return { preset, queueId: await this.submitParameters(buildParameters(preset)) };
+  async branches(): Promise<BuildBranchCatalog> {
+    if (this.branchCache && this.branchCache.until > Date.now()) return this.branchCache.value;
+    const value = readBuildBranches(this.fetchImpl, JENKINS_ORIGIN, JENKINS_AUTH).catch(() => {
+      this.branchCache = null;
+      throw new PackagingError("BUILD_BRANCHES_UNAVAILABLE", 503);
+    });
+    this.branchCache = { until: Date.now() + 30_000, value };
+    return value;
+  }
+  private async submit(
+    preset: BuildPreset,
+    sourceBranch: string,
+  ): Promise<{ queueId: number; preset: BuildPreset }> {
+    if (
+      sourceBranch !== "auto" &&
+      sourceBranch !== "main" &&
+      !(await this.branches()).Release.some((c) => c.value === sourceBranch)
+    )
+      throw new PackagingError("BUILD_BRANCH_UNAVAILABLE", 409);
+    return { preset, queueId: await this.submitParameters(buildParameters(preset, sourceBranch)) };
   }
 
-  async startCompatibilityBatch(): Promise<number> {
+  async startCompatibilityBatch(branches?: BuildBranchSelections): Promise<number> {
     const sourceResponse = await this.request(`${JOB_PATH}config.xml`);
     if (!sourceResponse.ok) {
       await sourceResponse.body?.cancel();
@@ -348,6 +385,22 @@ export class JenkinsBuildService {
     }
     const config = await sourceResponse.text();
     if (config.length > MAX_JSON_BYTES) throw new PackagingError("CHECK_SOURCE_CHANGED", 502);
+    if (config.includes("/source-routing/current/build_source.py")) {
+      const script = await readFile(
+        new URL("../../../scripts/jenkins-branch-checks.py", import.meta.url),
+        "utf8",
+      );
+      return this.submitParameters(
+        {
+          打包用途: COMPATIBILITY_BATCH_PURPOSE,
+          参考版本: "自动：最新成功版本",
+          CHECK_BRANCHES: JSON.stringify(buildSourceBranches(branches)),
+          CHECK_SOURCE: Buffer.from(script).toString("base64"),
+        },
+        CHECK_JOB_PATH,
+      );
+    }
+    if (branches) throw new PackagingError("CHECK_SOURCE_CHANGED", 502);
     let source: string;
     try {
       source = compatibilitySource(config);
@@ -417,6 +470,16 @@ export class JenkinsBuildService {
       !["自动：最新成功版本", "latest"].includes(String(params["参考版本"]))
     )
       throw new PackagingError("CHECK_IDENTITY_MISMATCH");
+    if (check.sourceBranch !== undefined) {
+      let selected: BuildBranchSelections;
+      try {
+        selected = buildSourceBranches(JSON.parse(String(params["CHECK_BRANCHES"])));
+      } catch {
+        throw new PackagingError("CHECK_IDENTITY_MISMATCH");
+      }
+      if (selected[check.target.id] !== check.sourceBranch)
+        throw new PackagingError("CHECK_IDENTITY_MISMATCH");
+    }
     if (b.building) return { ...check, buildNumber: number, state: "running", errorCode: null };
     if (!["SUCCESS", "UNSTABLE"].includes(b.result ?? "")) throw new PackagingError("CHECK_FAILED");
     // Old single-target history remains readable after the job is renamed.
@@ -432,7 +495,7 @@ export class JenkinsBuildService {
     const value = await this.readJson<unknown>(reportResponse);
     let report;
     try {
-      report = validateCompatibilityReport(value, check.target);
+      report = validateCompatibilityReport(value, check.target, check.sourceBranch);
     } catch {
       throw new PackagingError("CHECK_INVALID_REPORT");
     }
@@ -450,13 +513,17 @@ export class JenkinsBuildService {
     };
   }
 
-  trigger(
+  async trigger(
     preset: BuildPreset,
     requestId: string,
+    branch?: unknown,
   ): Promise<{ queueId: number; preset: BuildPreset }> {
     const previous = this.submissions.get(requestId);
+    if (previous && previous.preset !== preset)
+      throw new PackagingError("IDEMPOTENCY_CONFLICT", 409);
+    const sourceBranch = buildParameters(preset, branch)["源码分支"]!;
     if (previous) {
-      if (previous.preset !== preset)
+      if (previous.preset !== preset || previous.sourceBranch !== sourceBranch)
         return Promise.reject(new PackagingError("IDEMPOTENCY_CONFLICT", 409));
       return previous.result;
     }
@@ -465,8 +532,8 @@ export class JenkinsBuildService {
     }
     if (this.submissions.size >= 5_000)
       return Promise.reject(new PackagingError("PACKAGING_BUSY", 429));
-    const result = this.submit(preset);
-    this.submissions.set(requestId, { preset, result, createdAt: Date.now() });
+    const result = this.submit(preset, sourceBranch);
+    this.submissions.set(requestId, { preset, sourceBranch, result, createdAt: Date.now() });
     return result;
   }
 
@@ -828,6 +895,24 @@ export class JenkinsBuildService {
       await this.request(`${JOB_PATH}${number}/artifact/build-result.json`),
     );
     const result = validateBuildResult(value, preset, true);
+    if (result.sourceRequestId) {
+      const source = await this.readJson<Record<string, unknown>>(
+        await this.request(`${JOB_PATH}${number}/artifact/source-request.json`),
+      );
+      const selected = (parent.actions ?? [])
+        .flatMap((a) => a.parameters ?? [])
+        .find((p) => p.name === "源码分支")?.value;
+      const requested = typeof selected === "string" ? selected.split(" | ")[0] : "auto";
+      if (
+        source["requestId"] !== result.sourceRequestId ||
+        source["sourceRevision"] !== result.sourceRevision ||
+        source["sourceBranch"] !== result.sourceBranch ||
+        source["platform"] !== preset.platform ||
+        source["configuration"] !== preset.configuration ||
+        (requested !== "auto" && requested !== result.sourceBranch)
+      )
+        throw new PackagingError("BUILD_IDENTITY_MISMATCH", 409);
+    }
     if (
       preset.mode === "App" &&
       (result.hotUpdateMode !== "full" ||
@@ -904,6 +989,9 @@ export function registerPackagingRoutes(
     }
   };
   app.get(JENKINS_BUILDS_PATH, (request, reply) => respond(request, reply, () => service.status()));
+  app.get(`${JENKINS_BUILDS_PATH}/branches`, (request, reply) =>
+    respond(request, reply, () => service.branches()),
+  );
   app.get(`${JENKINS_BUILDS_PATH}/progress`, (request, reply) =>
     respond(request, reply, () => {
       const query = request.query as Record<string, unknown>;
@@ -921,12 +1009,12 @@ export function registerPackagingRoutes(
   );
   app.post(`${JENKINS_BUILDS_PATH}/builds`, (request, reply) =>
     respond(request, reply, async (actorId) => {
-      const body = request.body as { preset?: unknown } | null;
+      const body = request.body as { preset?: unknown; sourceBranch?: unknown } | null;
       const preset = body?.preset;
       const key = request.headers["idempotency-key"];
       if (
         !body ||
-        Object.keys(body).length !== 1 ||
+        Object.keys(body).some((k) => !["preset", "sourceBranch"].includes(k)) ||
         typeof preset !== "string" ||
         (!BUILD_PRESETS.includes(preset as QuickBuildPresetId) && preset !== "external") ||
         typeof key !== "string" ||
@@ -934,7 +1022,11 @@ export function registerPackagingRoutes(
       ) {
         throw new PackagingError("INVALID_REQUEST", 400);
       }
-      const receipt = await service.trigger(preset as BuildPreset, `${actorId}:${key}`);
+      const receipt = await service.trigger(
+        preset as BuildPreset,
+        `${actorId}:${key}`,
+        body.sourceBranch,
+      );
       request.log.info(
         { actorId, preset, queueId: receipt.queueId },
         "Jenkins build queued from QA Hub",

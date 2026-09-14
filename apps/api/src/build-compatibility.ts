@@ -4,8 +4,10 @@ import type { FastifyInstance, FastifyRequest } from "fastify";
 import { JenkinsBuildService, PackagingError } from "./jenkins-builds.js";
 import { COMPATIBILITY_TARGETS, type CompatibilityCheck } from "./jenkins-compatibility.js";
 import { writeCompatibilityState } from "./build-compatibility-store.js";
+import { buildSourceBranches, type BuildBranchSelections } from "@relay-qa-hub/upload-contract";
 
 export interface CompatibilityBatch {
+  branches?: BuildBranchSelections;
   id: string;
   requestedAt: string;
   checks: CompatibilityCheck[];
@@ -94,7 +96,7 @@ export class BuildCompatibilityService {
       // checks inside one executor, so they do not queue behind each other.
       await this.persist(b);
       try {
-        const queueId = await this.jenkins.startCompatibilityBatch();
+        const queueId = await this.jenkins.startCompatibilityBatch(b.branches);
         for (const c of pending) {
           c.queueId = queueId;
           c.state = "queued";
@@ -111,24 +113,38 @@ export class BuildCompatibilityService {
     this.launches.set(b.id, work);
     void work.catch(() => undefined); // Durable state remains unresolved if storage fails.
   }
-  async start(id: string): Promise<CompatibilityBatch> {
+  async start(id: string, selection?: unknown): Promise<CompatibilityBatch> {
     if (!UUID.test(id)) throw new PackagingError("INVALID_REQUEST", 400);
+    let branches: BuildBranchSelections;
+    try {
+      branches = buildSourceBranches(selection);
+    } catch {
+      throw new PackagingError("INVALID_BUILD_BRANCH", 400);
+    }
     const operation = this.gate.then(async () => {
       await this.ready;
       const existing = await this.load(id);
       if (existing) {
+        if (JSON.stringify(buildSourceBranches(existing.branches)) !== JSON.stringify(branches))
+          throw new PackagingError("IDEMPOTENCY_CONFLICT", 409);
         this.launch(existing);
         return structuredClone(existing);
       }
-      if (this.current && !finished(this.current)) {
+      if (
+        this.current &&
+        !finished(this.current) &&
+        JSON.stringify(buildSourceBranches(this.current.branches)) === JSON.stringify(branches)
+      ) {
         const current = await this.status(this.current.id);
         if (!finished(current)) return current; // Coalesce overlapping page entries.
       }
       const b: CompatibilityBatch = {
         id,
         requestedAt: new Date().toISOString(),
+        branches,
         checks: COMPATIBILITY_TARGETS.map((target) => ({
           target,
+          sourceBranch: branches[target.id],
           state: "pending",
           queueId: null,
           buildNumber: null,
@@ -234,11 +250,15 @@ export function registerCompatibilityRoutes(
           (request.method === "POST" &&
             request.body !== undefined &&
             request.body !== null &&
-            Object.keys(request.body as object).length !== 0)
+            (typeof request.body !== "object" ||
+              Array.isArray(request.body) ||
+              Object.keys(request.body as object).some((k) => k !== "branches")))
         )
           throw new PackagingError("INVALID_REQUEST", 400);
         const result =
-          request.method === "POST" ? await service.start(id) : await service.status(id);
+          request.method === "POST"
+            ? await service.start(id, (request.body as { branches?: unknown } | null)?.branches)
+            : await service.status(id);
         return reply
           .header("cache-control", "no-store")
           .code(request.method === "POST" ? 202 : 200)

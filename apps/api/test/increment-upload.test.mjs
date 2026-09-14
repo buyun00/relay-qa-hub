@@ -342,6 +342,27 @@ test("restart retains active and failed checkpoints without replaying writes", a
   await f.service.continue(f.owner, id, key, "resume", {});
   assert.equal(f.launches.length, 2);
 });
+
+test("queued build branch survives restart and conflicts cannot replace it", async (t) => {
+  const f = await fixture(t),
+    id = randomUUID(),
+    calls = [];
+  f.jenkins.trigger = async (preset, key, sourceBranch) => {
+    calls.push({ preset, sourceBranch });
+    return { queueId: 760 };
+  };
+  await f.service.enqueue(f.owner, id, input, "build", "ios-release-res", "release/2026-09-11");
+  await f.restart();
+  assert.equal((await f.service.buildChains(f.owner))[0].sourceBranch, "release/2026-09-11");
+  await assert.rejects(
+    f.service.enqueue(f.owner, id, input, "build", "ios-release-res", "auto"),
+    /UPLOAD_REQUEST_CONFLICT/,
+  );
+  await f.service.tick();
+  await f.restart();
+  await f.service.tick();
+  assert.deepEqual(calls, [{ preset: "ios-release-res", sourceBranch: "release/2026-09-11" }]);
+});
 test("a second API instance cannot claim the scheduler while the owner lives", async (t) => {
   const f = await fixture(t);
   await f.service.enqueue(f.owner, randomUUID(), input);

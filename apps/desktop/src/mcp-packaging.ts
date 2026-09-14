@@ -7,6 +7,12 @@ const requestId = {
   ...uuid,
   description: "本次操作的 UUID。超时或重试必须复用同一个值，不能重新生成。",
 };
+const sourceBranch = {
+  type: "string",
+  maxLength: 151,
+  description:
+    "源码分支；省略时 Debug 使用 main，Release 使用 auto（执行时最新封板分支）。可传 qa_get_build_branches 返回的 release/*。",
+};
 const modes = ["publish_workflow", "prepare_publish"] as const;
 const presets = QUICK_BUILD_PRESETS.map((p) => p.id);
 // These public defaults are checked against upload-contract by the MCP tests.
@@ -65,6 +71,12 @@ const numbers = {
 };
 export const PACKAGING_MCP_TOOLS: readonly McpToolDefinition[] = [
   tool(
+    "qa_get_build_branches",
+    "查询可选构建分支",
+    "读取 Jenkins 实时分支选项与预览提交，不触发构建。Debug 为 main，Release 默认 auto，可选择其他 release/*。",
+    {},
+  ),
+  tool(
     "qa_get_packaging_status",
     "查询打包进度与下载",
     "不传参数读取构建队列、最近构建与包下载；传 queueIds/buildNumbers 读取对应排队原因、阶段和进度。",
@@ -74,7 +86,11 @@ export const PACKAGING_MCP_TOOLS: readonly McpToolDefinition[] = [
     "qa_start_build",
     "提交打包",
     "提交统一快捷打包入口的 8 种预设：Android/iOS、Debug/Release、app 安装包与完整热更或 res 增量热更。只构建；自动上传用 qa_build_and_upload。返回排队回执；未知结果先查询，不得自动重提。单独构建的去重不跨 API 重启。",
-    { requestId, preset: { type: "string", enum: presets, default: "android-release-app" } },
+    {
+      requestId,
+      sourceBranch,
+      preset: { type: "string", enum: presets, default: "android-release-app" },
+    },
     ["requestId"],
     true,
   ),
@@ -100,6 +116,7 @@ export const PACKAGING_MCP_TOOLS: readonly McpToolDefinition[] = [
       requestId,
       mode: uploadProperties.mode,
       testerId: uploadProperties.testerId,
+      sourceBranch,
       preset: { type: "string", enum: presets, default: "android-release-app" },
     },
     ["requestId"],
@@ -207,6 +224,7 @@ export async function callPackagingTool(
   if (Object.keys(input).some((key) => !Object.hasOwn(allowed, key))) invalid("包含不支持的参数");
   for (const key of definition.inputSchema["required"] as string[])
     if (input[key] === undefined) invalid(`缺少 ${key}`);
+  if (name === "qa_get_build_branches") return api.json("/api/v1/packaging/branches");
   if (name === "qa_get_packaging_status") {
     const query = new URLSearchParams();
     for (const [key, field] of [
@@ -269,7 +287,16 @@ export async function callPackagingTool(
   if (name === "qa_start_build") {
     const key = id(input["requestId"]),
       preset = choice(input["preset"], presets, "android-release-app");
-    const receipt = record(await post("/api/v1/packaging/builds", { preset }, key));
+    const receipt = record(
+      await post(
+        "/api/v1/packaging/builds",
+        {
+          preset,
+          ...(input["sourceBranch"] !== undefined ? { sourceBranch: input["sourceBranch"] } : {}),
+        },
+        key,
+      ),
+    );
     return {
       accepted: true,
       execution: "server",
@@ -286,7 +313,11 @@ export async function callPackagingTool(
       const chain = record(
         await post(
           `${base}/build-chains`,
-          { upload, preset: choice(input["preset"], presets, "android-release-app") },
+          {
+            upload,
+            preset: choice(input["preset"], presets, "android-release-app"),
+            ...(input["sourceBranch"] !== undefined ? { sourceBranch: input["sourceBranch"] } : {}),
+          },
           key,
         ),
       );

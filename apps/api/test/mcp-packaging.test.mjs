@@ -85,6 +85,7 @@ async function fixture(t, presetId = "android-release-app") {
         jobs: structuredClone(jobs),
       }),
       checkAuth: async () => true,
+      reconcilePublications: async () => {},
       accountIdentity: async () => "private-platform-binding",
       hasBuildJob: async (id) => jobs.some((j) => j.id === id),
       startWithId: launch,
