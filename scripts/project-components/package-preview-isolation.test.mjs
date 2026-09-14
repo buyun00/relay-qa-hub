@@ -927,10 +927,10 @@ test("signed update manifest rejects field, archive, and signature drift", () =>
   assert.equal(assertSignedUpdateManifest(lanManifest, publicKey), lanManifest);
   const stablePayload = {
     ...payload,
-    version: "1.0.0",
+    version: "1.0.1",
     archive: {
       ...payload.archive,
-      url: "/downloads/Relay-QA-Hub-团队版-1.0.0-20260911T123456789Z.exe",
+      url: "/downloads/Relay-QA-Hub-团队版-1.0.1-20260911T123456789Z.exe",
     },
   };
   const stableManifest = {
@@ -972,9 +972,14 @@ test("latest publication accepts a newer preview build or stable release transac
   const stablePatch = {
     ...stable,
     releaseId: "20260913T123456789Z",
+    version: "1.0.1",
     publishedAt: "2026-09-13T12:34:56.789Z",
   };
   assert.equal(assertUpdateManifestSuccessor(stable, stablePatch), stablePatch);
+  assert.throws(
+    () => assertUpdateManifestSuccessor(stable, { ...stablePatch, version: stable.version }),
+    /UPDATE_VERSION_NOT_MONOTONIC/u,
+  );
   assert.throws(
     () => assertUpdateManifestSuccessor(stable, { ...stablePatch, releaseId: stable.releaseId }),
     /UPDATE_RELEASE_ID_NOT_MONOTONIC/u,

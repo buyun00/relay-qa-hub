@@ -27,8 +27,9 @@ import { moveFileWriteThrough } from "./windows-write-through.mjs";
 const SHA256 = /^[0-9a-f]{64}$/u;
 const RELEASE_ID = /^\d{8}T\d{9}Z$/u;
 const LEGACY_VERSION = /^0\.2\.0-(?:preview|lan)\.[1-9]\d*$/u;
-const STABLE_VERSION = /^1\.0\.0$/u;
-const VERSION = /^(?:0\.2\.0-(?:preview|lan)\.[1-9]\d*|1\.0\.0)$/u;
+const STABLE_VERSION = /^(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)$/u;
+const VERSION =
+  /^(?:0\.2\.0-(?:preview|lan)\.[1-9]\d*|(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)\.(?:0|[1-9]\d*))$/u;
 const ED25519_SIGNATURE = /^[A-Za-z0-9+/]{86}==$/u;
 const MAX_INSTALLER_BYTES = 350 * 1024 * 1024;
 
@@ -768,19 +769,15 @@ export function assertUpdateManifestSuccessor(previous, next) {
   assert.match(next.version, VERSION, "NEXT_UPDATE_VERSION_INVALID");
   const order = (version) =>
     STABLE_VERSION.test(version)
-      ? [1, 0, 0, 0]
+      ? [1, ...version.split(".").map(Number)]
       : [0, 2, 0, Number(version.slice(version.lastIndexOf(".") + 1))];
   const previousOrder = order(previous.version);
   const nextOrder = order(next.version);
-  const sameStableVersion =
-    STABLE_VERSION.test(previous.version) && STABLE_VERSION.test(next.version);
-  const newer =
-    sameStableVersion ||
-    nextOrder.some(
-      (value, index) =>
-        value > previousOrder[index] &&
-        nextOrder.slice(0, index).every((part, earlier) => part === previousOrder[earlier]),
-    );
+  const newer = nextOrder.some(
+    (value, index) =>
+      value > previousOrder[index] &&
+      nextOrder.slice(0, index).every((part, earlier) => part === previousOrder[earlier]),
+  );
   assert.ok(
     (LEGACY_VERSION.test(previous.version) || STABLE_VERSION.test(previous.version)) &&
       (LEGACY_VERSION.test(next.version) || STABLE_VERSION.test(next.version)) &&
