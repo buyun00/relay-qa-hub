@@ -74,6 +74,37 @@ if (
   sha256(installer) !== windowsManifest.archive.sha256
 )
   throw new Error("WINDOWS_INSTALLER_BINDING_MISMATCH");
+const cleanerManifestPath = join(config.downloadsRoot, "qa-hub-legacy-cleaner-latest.json");
+let legacyCleaner = null;
+if (existsSync(cleanerManifestPath)) {
+  const cleanerManifest = JSON.parse(readFileSync(cleanerManifestPath, "utf8"));
+  if (
+    typeof cleanerManifest.archive?.url !== "string" ||
+    typeof cleanerManifest.archive?.sha256 !== "string" ||
+    !Number.isSafeInteger(cleanerManifest.archive?.size)
+  ) {
+    throw new Error("LEGACY_CLEANER_MANIFEST_INVALID");
+  }
+  const cleanerName = basename(cleanerManifest.archive.url);
+  if (cleanerManifest.archive.url !== `/downloads/${cleanerName}`) {
+    throw new Error("LEGACY_CLEANER_MANIFEST_INVALID");
+  }
+  const cleanerBytes = readFileSync(join(config.downloadsRoot, cleanerName));
+  if (
+    cleanerBytes.length !== cleanerManifest.archive.size ||
+    sha256(cleanerBytes) !== cleanerManifest.archive.sha256
+  ) {
+    throw new Error("LEGACY_CLEANER_BINDING_MISMATCH");
+  }
+  legacyCleaner = {
+    version: cleanerManifest.version,
+    releaseId: cleanerManifest.releaseId,
+    downloadUrl: `${config.publicWebBaseUrl}${cleanerManifest.archive.url}`,
+    fileName: cleanerName,
+    size: cleanerBytes.length,
+    sha256: cleanerManifest.archive.sha256,
+  };
+}
 const generatedAt = new Date().toISOString();
 const distribution = {
   schemaVersion: 1,
@@ -98,12 +129,17 @@ const distribution = {
     size: apk.length,
     sha256: apkSha256,
   },
+  ...(legacyCleaner === null ? {} : { legacyCleaner }),
 };
 writeFileSync(
   join(config.downloadsRoot, "distribution.json"),
   `${JSON.stringify(distribution, null, 2)}\n`,
 );
 const size = (bytes) => `${(bytes / 1024 / 1024).toFixed(1)} MiB`;
+const cleanerLink =
+  legacyCleaner === null
+    ? ""
+    : `<a class="manifest-link cleanup-link" href="${legacyCleaner.downloadUrl}">下载旧版本清理工具</a>`;
 const html = `<!doctype html>
 <html lang="zh-CN">
 <head>
@@ -116,8 +152,8 @@ const html = `<!doctype html>
     *{box-sizing:border-box}html{min-height:100%;background:var(--canvas)}body{min-height:100vh;margin:0;color:var(--ink);background:radial-gradient(circle at 85% 0,rgba(185,243,74,.12),transparent 28rem),var(--canvas);-webkit-font-smoothing:antialiased}a{color:inherit}.shell{width:min(1180px,calc(100% - 48px));margin:0 auto}.topbar{height:78px;display:flex;align-items:center;justify-content:space-between}.brand{display:flex;align-items:center;gap:12px;text-decoration:none}.brand-mark{position:relative;width:42px;height:42px;display:grid;place-items:center;border-radius:14px;color:var(--lime);background:var(--forest);font-size:14px;font-weight:900;letter-spacing:-.04em;box-shadow:0 9px 22px rgba(23,43,33,.18)}.brand-mark:after{content:"";position:absolute;right:-2px;bottom:-2px;width:11px;height:11px;border:3px solid var(--canvas);border-radius:50%;background:var(--orange)}.brand-copy{display:grid;gap:2px}.brand-copy strong{font-size:17px;letter-spacing:-.02em}.brand-copy small{color:#7f8b84;font-size:11px}.workspace-link{display:inline-flex;align-items:center;gap:7px;padding:9px 13px;border:1px solid #dce4dc;border-radius:11px;background:rgba(255,255,255,.72);font-size:12px;font-weight:800;text-decoration:none;transition:.18s ease}.workspace-link:hover{border-color:#bdc9bf;background:#fff;transform:translateY(-1px)}
     main{padding:20px 0 64px}.hero{position:relative;overflow:hidden;min-height:292px;padding:48px;border-radius:28px;color:#fff;background:linear-gradient(135deg,#172b21 0%,#224c37 100%);box-shadow:var(--shadow)}.hero:before,.hero:after{content:"";position:absolute;border-radius:50%;pointer-events:none}.hero:before{right:-90px;top:-130px;width:350px;height:350px;border:1px solid rgba(255,255,255,.11)}.hero:after{right:72px;bottom:-126px;width:250px;height:250px;background:rgba(185,243,74,.1)}.eyebrow{margin:0 0 12px;color:var(--lime);font-size:12px;font-weight:850;letter-spacing:.11em}.hero h1{position:relative;z-index:1;max-width:720px;margin:0;font-size:clamp(34px,5vw,58px);line-height:1.04;letter-spacing:-.055em}.hero-copy{position:relative;z-index:1;max-width:650px;margin:18px 0 0;color:#c9d7cf;font-size:15px;line-height:1.8}.connection{position:relative;z-index:1;margin-top:27px;display:inline-flex;align-items:center;gap:9px;padding:9px 12px;border:1px solid rgba(255,255,255,.13);border-radius:12px;background:rgba(255,255,255,.07);color:#edf4ef;font-size:12px}.connection i{width:8px;height:8px;border-radius:50%;background:var(--lime);box-shadow:0 0 0 5px rgba(185,243,74,.12)}.connection code{color:#fff;font:700 12px/1.4 ui-monospace,SFMono-Regular,Consolas,monospace}
     .section-head{margin:42px 0 17px;display:flex;align-items:end;justify-content:space-between;gap:18px}.section-head h2{margin:0;font-size:25px;letter-spacing:-.035em}.section-head p{margin:0;color:var(--muted);font-size:13px}.package-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}.package-card{position:relative;overflow:hidden;min-height:330px;padding:27px;border:1px solid var(--line);border-radius:22px;background:var(--surface);box-shadow:0 12px 34px rgba(31,48,39,.045);transition:.2s ease}.package-card:hover{transform:translateY(-2px);border-color:#c5d1c7;box-shadow:0 18px 40px rgba(31,48,39,.08)}.package-head{display:flex;align-items:center;justify-content:space-between}.platform-mark{width:48px;height:48px;display:grid;place-items:center;border-radius:15px;color:var(--forest);background:var(--lime-soft);font-size:17px;font-weight:900}.platform-mark.android{color:#b64c16;background:var(--orange-soft)}.recommended{padding:5px 9px;border-radius:999px;color:#416219;background:var(--lime-soft);font-size:10px;font-weight:850}.package-card h3{margin:24px 0 8px;font-size:22px;letter-spacing:-.03em}.package-card>p{min-height:44px;margin:0;color:var(--muted);font-size:13px;line-height:1.65}.release-meta{margin:20px 0;display:flex;gap:8px;flex-wrap:wrap}.release-meta span{padding:6px 9px;border:1px solid #e7ebe7;border-radius:9px;color:#536159;background:#f8faf8;font-size:11px;font-weight:750}.download-button{width:100%;min-height:46px;display:flex;align-items:center;justify-content:center;gap:9px;border-radius:13px;color:#fff;background:var(--forest);font-size:13px;font-weight:850;text-decoration:none;box-shadow:0 10px 24px rgba(23,43,33,.13);transition:.18s ease}.download-button:hover{transform:translateY(-1px);box-shadow:0 14px 28px rgba(23,43,33,.2)}.download-button svg{width:17px;height:17px;stroke:var(--lime)}details{margin-top:15px;color:#7e8982;font-size:11px}summary{width:max-content;cursor:pointer;font-weight:750}details code{display:block;margin-top:8px;padding:10px;border-radius:9px;background:#f6f8f6;color:#5f6d64;font:10px/1.55 ui-monospace,SFMono-Regular,Consolas,monospace;overflow-wrap:anywhere}
-    .guide{margin-top:18px;padding:25px 27px;border:1px solid var(--line);border-radius:22px;display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:18px;background:rgba(255,255,255,.78)}.guide-mark{width:42px;height:42px;display:grid;place-items:center;border-radius:13px;color:var(--orange);background:var(--orange-soft);font-size:18px;font-weight:900}.guide h3{margin:0 0 5px;font-size:15px}.guide p{margin:0;color:var(--muted);font-size:12px;line-height:1.65}.manifest-link{padding:9px 12px;border:1px solid #dce4dc;border-radius:10px;background:#fff;font-size:11px;font-weight:800;text-decoration:none}.footer{padding:25px 0 0;display:flex;justify-content:space-between;gap:16px;color:#89938d;font-size:11px}.footer p{margin:0}
-    @media(max-width:760px){.shell{width:min(100% - 28px,1180px)}.topbar{height:68px}.brand-copy small{display:none}.workspace-link{padding:8px 10px}.hero{min-height:auto;padding:34px 25px;border-radius:22px}.hero h1{font-size:36px}.package-grid{grid-template-columns:1fr}.section-head{align-items:start;flex-direction:column}.package-card{min-height:0}.guide{grid-template-columns:auto 1fr}.manifest-link{grid-column:1/-1;text-align:center}.footer{flex-direction:column}}
+    .guide{margin-top:18px;padding:25px 27px;border:1px solid var(--line);border-radius:22px;display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:18px;background:rgba(255,255,255,.78)}.guide-mark{width:42px;height:42px;display:grid;place-items:center;border-radius:13px;color:var(--orange);background:var(--orange-soft);font-size:18px;font-weight:900}.guide h3{margin:0 0 5px;font-size:15px}.guide p{margin:0;color:var(--muted);font-size:12px;line-height:1.65}.guide-actions{display:flex;align-items:center;justify-content:flex-end;gap:8px;flex-wrap:wrap}.manifest-link{padding:9px 12px;border:1px solid #dce4dc;border-radius:10px;background:#fff;font-size:11px;font-weight:800;text-decoration:none}.cleanup-link{color:#9e451b;border-color:#f0d9ca;background:#fff8f3}.footer{padding:25px 0 0;display:flex;justify-content:space-between;gap:16px;color:#89938d;font-size:11px}.footer p{margin:0}
+    @media(max-width:760px){.shell{width:min(100% - 28px,1180px)}.topbar{height:68px}.brand-copy small{display:none}.workspace-link{padding:8px 10px}.hero{min-height:auto;padding:34px 25px;border-radius:22px}.hero h1{font-size:36px}.package-grid{grid-template-columns:1fr}.section-head{align-items:start;flex-direction:column}.package-card{min-height:0}.guide{grid-template-columns:auto 1fr}.guide-actions{grid-column:1/-1;justify-content:stretch}.manifest-link{flex:1;text-align:center}.footer{flex-direction:column}}
   </style>
 </head>
 <body data-page="team-downloads">
@@ -156,8 +192,8 @@ const html = `<!doctype html>
     </section>
     <section class="guide">
       <div class="guide-mark">!</div>
-      <div><h3>安装前保持局域网连接</h3><p>服务器断网、休眠或关机时客户端暂时无法连接；本机已有草稿仍会保留。</p></div>
-      <a class="manifest-link" href="/downloads/distribution.json">查看交付清单</a>
+      <div><h3>安装前保持局域网连接</h3><p>服务器断网、休眠或关机时客户端暂时无法连接；清理旧版本不会删除本机登录信息和草稿。</p></div>
+      <div class="guide-actions">${cleanerLink}<a class="manifest-link" href="/downloads/distribution.json">查看交付清单</a></div>
     </section>
     <footer class="footer"><p>Relay QA Hub 团队版</p><p>统一项目数据 · 独立客户端配置</p></footer>
   </main>
@@ -170,9 +206,11 @@ console.log(
     downloadPage: `${config.publicWebBaseUrl}/downloads/`,
     windows: distribution.windows,
     android: distribution.android,
+    legacyCleaner: distribution.legacyCleaner ?? null,
     files: {
       installer: statSync(installerPath).size,
       apk: statSync(apkTarget).size,
+      ...(legacyCleaner === null ? {} : { cleaner: legacyCleaner.size }),
     },
   }),
 );

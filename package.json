@@ -24,7 +24,7 @@
     "format:check": "prettier --check \"**/*.{ts,tsx,js,mjs,css,html}\"",
     "lint": "eslint . --ignore-pattern apps/web && npm run lint --workspace @relay-qa-hub/web",
     "typecheck": "npm run typecheck --workspaces --if-present",
-    "test:unit": "node --test tests/unit/*.test.mjs scripts/project-components/package-preview-isolation.test.mjs && npm run test --workspaces --if-present",
+    "test:unit": "node --test tests/unit/*.test.mjs scripts/project-components/package-preview-isolation.test.mjs scripts/project-components/legacy-client-cleaner.test.mjs && npm run test --workspaces --if-present",
     "test:contract": "npm run check:contracts && npm run check:contract-breaking && npm run check:contracts:app-first && npm run check:contract-additive && npm run check:contract-breaking:app-first",
     "test:e2e": "npm run build --workspace @relay-qa-hub/api && node --test tests/e2e/skeleton.test.mjs",
     "test": "npm run test:unit && npm run test:contract && npm run test:e2e",
