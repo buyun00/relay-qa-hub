@@ -2827,10 +2827,16 @@ test("package identity preserves only the explicit legacy identity and isolates 
   assert.equal(lan.executableBaseName, "RelayQaHubTeam-v22-0911");
   assert.equal(lan.installDirectoryName, "RelayQaHubTeam-v22-0911");
   assert.equal(lan.uninstallRegistryKey, "RelayQaHubLAN-v22-0911");
+  assert.equal(lan.supersededInstallDirectoryName, "RelayQaHubLAN-v22-0911");
+  assert.equal(lan.supersededExecutableBaseName, "RelayQaHubLAN-v22-0911");
   assert.equal(lan.shortcutName, "Relay QA Hub 团队版");
   assert.equal(lan.protocolScheme, "qa-hub-lan-v22-0911");
   assert.equal(lan.appUserModelId, "com.relayqahub.desktop.lan.v22.0911");
   assert.equal(lan.displayName, "Relay QA Hub 团队版");
+  assert.match(
+    packageSource,
+    /SUPERSEDED_INSTALL_DIRECTORY_NAME=\$\{packageIdentity\.supersededInstallDirectoryName\}[\s\S]+SUPERSEDED_EXECUTABLE_BASENAME=\$\{packageIdentity\.supersededExecutableBaseName\}/u,
+  );
 
   assert.equal(
     deriveToastActivatorClsid("COM.Example.MixedCase"),
@@ -3008,6 +3014,36 @@ test("preview installer binds Electron's canonical Start Menu shortcut and COM a
     uninstallSection,
     /StrCmp \$RegistrationCleanupSucceeded 1 uninstall_cleanup_confirmed uninstall_cleanup_failed/u,
   );
+  const shutdownRequest = uninstallSection.indexOf(
+    "Exec '\"$INSTDIR\\${EXECUTABLE_BASENAME}.exe\" --qa-hub-uninstall-shutdown'",
+  );
+  const payloadRename = uninstallSection.indexOf(
+    'StrCpy $RenameSource "$INSTDIR"\n  StrCpy $RenameDestination "$BackupDirectory"\n  Call un.RetryRenameDirectory',
+  );
+  assert.ok(
+    shutdownRequest >= 0 && payloadRename > shutdownRequest,
+    "uninstall must request a graceful tray shutdown before proving the directory is unlocked",
+  );
+  const uninstallCleanupSuccess = uninstallSection.slice(
+    uninstallSection.indexOf("uninstall_cleanup_confirmed:"),
+    uninstallSection.indexOf("uninstall_failed:"),
+  );
+  assert.match(
+    uninstallCleanupSuccess,
+    /StrCpy \$VerificationDirectory "\$BackupDirectory"\s+Call un\.VerifyPreviewInstallDirectory\s+StrCmp \$VerificationSucceeded 1 uninstall_delete_payload uninstall_payload_cleanup_failed/u,
+  );
+  assert.match(uninstallCleanupSuccess, /RMDir \/r "\$BackupDirectory"/u);
+  assert.match(uninstallCleanupSuccess, /RMDir \/r \/REBOOTOK "\$BackupDirectory"/u);
+  assert.match(
+    uninstallCleanupSuccess,
+    /uninstall_payload_cleanup_failed:[\s\S]+SetErrorLevel 35/u,
+  );
+  assert.doesNotMatch(uninstallSection, /AppData\\Roaming|userData|profileDirectory/u);
+  assert.match(
+    installerSource,
+    /Function un\.CleanupSupersededInstallDirectory[\s\S]+GetFileAttributesW\(w "\$SupersededDirectory"\)[\s\S]+IntOp \$1 \$0 & 0x400[\s\S]+IfFileExists "\$SupersededDirectory\\\.preview-instance-id"[\s\S]+IfFileExists "\$SupersededDirectory\\\$\{SUPERSEDED_EXECUTABLE_BASENAME\}\.exe"[\s\S]+StrCmp \$ExistingIdentity "\$\{INSTANCE_ID\}"[\s\S]+RMDir \/r "\$SupersededDirectory"[\s\S]+RMDir \/r \/REBOOTOK "\$SupersededDirectory"/u,
+    "team uninstall removes only the marker-bound superseded LAN payload",
+  );
   const uninstallCleanupFailure = uninstallSection.slice(
     uninstallSection.indexOf("uninstall_cleanup_failed:"),
   );
@@ -3025,7 +3061,7 @@ test("preview installer binds Electron's canonical Start Menu shortcut and COM a
   );
   assert.match(
     uninstallCleanupFailure,
-    /uninstall_cleanup_failed_rolled_back:\s+SetErrorLevel 33\s+Goto uninstall_finished/u,
+    /uninstall_cleanup_failed_rolled_back:[\s\S]+SetErrorLevel 33\s+Goto uninstall_finished/u,
   );
   assert.match(uninstallCleanupFailure, /uninstall_rollback_failed:[\s\S]+SetErrorLevel 34/u);
   assert.doesNotMatch(uninstallSection, /Relay QA Hub|com\.relayqahub\.desktop(?!\.preview)/u);
@@ -3033,6 +3069,7 @@ test("preview installer binds Electron's canonical Start Menu shortcut and COM a
 
 test("preview installer bounds every update rename and verifies safe terminal states", () => {
   assert.match(installerSource, /!define INSTALL_RENAME_MAX_ATTEMPTS 40/u);
+  assert.match(installerSource, /!define UNINSTALL_RENAME_MAX_ATTEMPTS 80/u);
   assert.match(installerSource, /!define INSTALL_RENAME_RETRY_DELAY_MS 250/u);
 
   const retryFunction = installerSource.slice(
@@ -3196,7 +3233,7 @@ test("preview installer bounds every update rename and verifies safe terminal st
   );
   assert.match(
     uninstallerRetryFunction,
-    /StrCpy \$RenameAttemptsRemaining \$\{INSTALL_RENAME_MAX_ATTEMPTS\}/u,
+    /StrCpy \$RenameAttemptsRemaining \$\{UNINSTALL_RENAME_MAX_ATTEMPTS\}/u,
   );
   assert.match(
     uninstallerRetryFunction,

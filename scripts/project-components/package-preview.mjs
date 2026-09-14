@@ -422,6 +422,12 @@ writeFileSync(
     `/DINSTANCE_ID=${config.instanceId}`,
     `/DINSTALL_DIRECTORY_NAME=${packageIdentity.installDirectoryName}`,
     `/DEXECUTABLE_BASENAME=${packageIdentity.executableBaseName}`,
+    ...(packageIdentity.supersededInstallDirectoryName === undefined
+      ? []
+      : [
+          `/DSUPERSEDED_INSTALL_DIRECTORY_NAME=${packageIdentity.supersededInstallDirectoryName}`,
+          `/DSUPERSEDED_EXECUTABLE_BASENAME=${packageIdentity.supersededExecutableBaseName}`,
+        ]),
     `/DUNINSTALL_REGISTRY_KEY=${packageIdentity.uninstallRegistryKey}`,
     `/DSHORTCUT_NAME=${packageIdentity.shortcutName}`,
     `/DPROTOCOL_SCHEME=${packageIdentity.protocolScheme}`,

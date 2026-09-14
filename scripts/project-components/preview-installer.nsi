@@ -14,6 +14,11 @@ SetCompressor /SOLID lzma
 !ifndef EXECUTABLE_BASENAME
   !error "EXECUTABLE_BASENAME is required"
 !endif
+!ifdef SUPERSEDED_INSTALL_DIRECTORY_NAME
+  !ifndef SUPERSEDED_EXECUTABLE_BASENAME
+    !error "SUPERSEDED_EXECUTABLE_BASENAME is required with SUPERSEDED_INSTALL_DIRECTORY_NAME"
+  !endif
+!endif
 !ifndef UNINSTALL_REGISTRY_KEY
   !error "UNINSTALL_REGISTRY_KEY is required"
 !endif
@@ -36,8 +41,10 @@ SetCompressor /SOLID lzma
   !error "FILE_VERSION is required"
 !endif
 ; The updater waits for the main PID, but a child can retain an image or directory
-; handle briefly. Each rename phase is bounded to 40 attempts and 9.75s asleep.
+; handle briefly. Install renames are bounded to 40 attempts (9.75s asleep);
+; uninstall allows 80 attempts (19.75s) for the tray process to quit cleanly.
 !define INSTALL_RENAME_MAX_ATTEMPTS 40
+!define UNINSTALL_RENAME_MAX_ATTEMPTS 80
 !define INSTALL_RENAME_RETRY_DELAY_MS 250
 !define MIN_UNINSTALLER_BYTES 1024
 ; Shortcut and instance-owned registry exports are small. Bound the byte loop so
@@ -93,6 +100,7 @@ Var RegistryViewAccess
 Var RegistryViewName
 Var ShortcutPath
 Var ShortcutWriteSucceeded
+Var SupersededDirectory
 Var UninstallKeyWasPresent
 Var VerificationDirectory
 Var VerificationOutputDirectory
@@ -192,7 +200,7 @@ verification_finished:
 FunctionEnd
 
 Function un.RetryRenameDirectory
-  StrCpy $RenameAttemptsRemaining ${INSTALL_RENAME_MAX_ATTEMPTS}
+  StrCpy $RenameAttemptsRemaining ${UNINSTALL_RENAME_MAX_ATTEMPTS}
   StrCpy $RenameSucceeded 0
 un_rename_directory_attempt:
   ClearErrors
@@ -226,6 +234,46 @@ un_verification_read_failed:
   FileClose $0
 un_verification_finished:
 FunctionEnd
+
+!ifdef SUPERSEDED_INSTALL_DIRECTORY_NAME
+Function un.CleanupSupersededInstallDirectory
+  ; Team Edition 1.0.0 moved to a new bootstrap directory while retaining the
+  ; same profile and uninstall identity. Remove only an exact old-instance
+  ; payload. A missing marker, mismatched identity, reparse point, or missing
+  ; legacy executable makes this a no-op rather than a broad filesystem delete.
+  StrCpy $SupersededDirectory "$LOCALAPPDATA\Programs\${SUPERSEDED_INSTALL_DIRECTORY_NAME}"
+  System::Call 'kernel32::GetFileAttributesW(w "$SupersededDirectory") i.r0'
+  IntCmp $0 -1 un_superseded_cleanup_finished un_superseded_path_exists un_superseded_path_exists
+un_superseded_path_exists:
+  IntOp $1 $0 & 0x10
+  IntCmp $1 0 un_superseded_cleanup_finished un_superseded_path_directory un_superseded_path_directory
+un_superseded_path_directory:
+  IntOp $1 $0 & 0x400
+  IntCmp $1 0 un_superseded_marker_check un_superseded_cleanup_finished un_superseded_cleanup_finished
+un_superseded_marker_check:
+  IfFileExists "$SupersededDirectory\.preview-instance-id" 0 un_superseded_cleanup_finished
+  IfFileExists "$SupersededDirectory\${SUPERSEDED_EXECUTABLE_BASENAME}.exe" 0 un_superseded_cleanup_finished
+  ClearErrors
+  FileOpen $0 "$SupersededDirectory\.preview-instance-id" r
+  IfErrors un_superseded_cleanup_finished
+  FileRead $0 $ExistingIdentity
+  IfErrors un_superseded_marker_read_failed
+  FileClose $0
+  StrCmp $ExistingIdentity "${INSTANCE_ID}" 0 un_superseded_cleanup_finished
+  ClearErrors
+  RMDir /r "$SupersededDirectory"
+  System::Call 'kernel32::GetFileAttributesW(w "$SupersededDirectory") i.r0'
+  IntCmp $0 -1 un_superseded_cleanup_finished un_superseded_schedule_cleanup un_superseded_schedule_cleanup
+un_superseded_marker_read_failed:
+  FileClose $0
+  Goto un_superseded_cleanup_finished
+un_superseded_schedule_cleanup:
+  ClearErrors
+  RMDir /r /REBOOTOK "$SupersededDirectory"
+  SetRebootFlag true
+un_superseded_cleanup_finished:
+FunctionEnd
+!endif
 
 Function VerifyRegistryKeyAbsent
   StrCpy $RegistryKeyAbsent 0
@@ -1000,9 +1048,20 @@ uninstall_next_backup:
   StrCpy $BackupDirectory "$INSTDIR.uninstalled-${RELEASE_ID}-$OperationSuffix"
   Goto uninstall_choose_backup
 uninstall_backup_ready:
+  ; Closing a window only hides the tray application. Start the same, uniquely
+  ; named executable with an internal argument so Electron's single-instance
+  ; channel asks the primary process to stop transports and quit normally. A
+  ; fresh probe also exits before creating UI. The bounded rename remains the
+  ; final proof that no process still owns this exact installation.
+  IfFileExists "$INSTDIR\${EXECUTABLE_BASENAME}.exe" 0 uninstall_shutdown_requested
   ClearErrors
-  Rename "$INSTDIR" "$BackupDirectory"
-  IfErrors uninstall_failed
+  Exec '"$INSTDIR\${EXECUTABLE_BASENAME}.exe" --qa-hub-uninstall-shutdown'
+uninstall_shutdown_requested:
+  StrCpy $RenameSource "$INSTDIR"
+  StrCpy $RenameDestination "$BackupDirectory"
+  Call un.RetryRenameDirectory
+  StrCmp $RenameSucceeded 1 uninstall_payload_quarantined uninstall_failed
+uninstall_payload_quarantined:
   Delete "$DESKTOP\${SHORTCUT_NAME}.lnk"
   Delete "$SMPROGRAMS\${DISPLAY_NAME}.lnk"
   Delete "$SMPROGRAMS\${SHORTCUT_NAME}.lnk"
@@ -1017,9 +1076,33 @@ uninstall_backup_ready:
   Call un.VerifyRegistrationRemoved
   StrCmp $RegistrationCleanupSucceeded 1 uninstall_cleanup_confirmed uninstall_cleanup_failed
 uninstall_cleanup_confirmed:
+  ; Registration is gone, so the verified quarantined payload can now be
+  ; deleted without risking a half-registered application. User profile data is
+  ; outside INSTDIR and is intentionally retained for reinstall/recovery.
+  StrCpy $VerificationDirectory "$BackupDirectory"
+  Call un.VerifyPreviewInstallDirectory
+  StrCmp $VerificationSucceeded 1 uninstall_delete_payload uninstall_payload_cleanup_failed
+uninstall_delete_payload:
+  ClearErrors
+  RMDir /r "$BackupDirectory"
+  System::Call 'kernel32::GetFileAttributesW(w "$BackupDirectory") i.r0'
+  IntCmp $0 -1 uninstall_payload_deleted uninstall_schedule_payload_cleanup uninstall_schedule_payload_cleanup
+uninstall_schedule_payload_cleanup:
+  ClearErrors
+  RMDir /r /REBOOTOK "$BackupDirectory"
+  SetRebootFlag true
+uninstall_payload_deleted:
+!ifdef SUPERSEDED_INSTALL_DIRECTORY_NAME
+  Call un.CleanupSupersededInstallDirectory
+!endif
   SetErrorLevel 0
   Goto uninstall_finished
+uninstall_payload_cleanup_failed:
+  MessageBox MB_ICONSTOP|MB_OK "卸载器无法核验待删除的程序目录。为保护数据，程序文件已保留，请重新安装最新版后再卸载。"
+  SetErrorLevel 35
+  Goto uninstall_finished
 uninstall_failed:
+  MessageBox MB_ICONSTOP|MB_OK "${DISPLAY_NAME} 仍在运行，无法完成卸载。请从系统托盘退出后重试；如果托盘程序无响应，请重启 Windows 后再卸载。"
   SetErrorLevel 32
   Goto uninstall_finished
 uninstall_cleanup_failed:
@@ -1040,11 +1123,13 @@ uninstall_verify_restored_payload:
   Call un.VerifyPreviewInstallDirectory
   StrCmp $VerificationSucceeded 1 uninstall_cleanup_failed_rolled_back uninstall_rollback_failed
 uninstall_cleanup_failed_rolled_back:
+  MessageBox MB_ICONSTOP|MB_OK "Windows 卸载注册信息未能完整清理，程序文件已经安全恢复。请重启 Windows 后再试。"
   SetErrorLevel 33
   Goto uninstall_finished
 uninstall_rollback_failed:
   ; The verified payload could not be restored and reverified at the canonical
   ; path. Delete neither location; distinguish this manual-recovery state from 33.
+  MessageBox MB_ICONSTOP|MB_OK "卸载未完成，程序文件已保留以避免数据丢失。请联系管理员处理安装目录。"
   SetErrorLevel 34
 uninstall_finished:
 SectionEnd

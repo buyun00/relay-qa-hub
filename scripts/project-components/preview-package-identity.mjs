@@ -61,6 +61,13 @@ export function derivePreviewPackageIdentity(instanceId) {
       : `RelayQaHub${label}-${suffix}`;
   const uninstallRegistryKey =
     mode === "lan" && !legacy ? `RelayQaHubLAN-${suffix}` : executableBaseName;
+  const supersededInstall =
+    mode === "lan" && !legacy
+      ? {
+          supersededInstallDirectoryName: `RelayQaHubLAN-${suffix}`,
+          supersededExecutableBaseName: `RelayQaHubLAN-${suffix}`,
+        }
+      : {};
   const appUserModelId = legacy
     ? "com.relayqahub.desktop.preview"
     : `com.relayqahub.desktop.${identitySegment}.${suffix.replaceAll("-", ".")}`;
@@ -69,6 +76,7 @@ export function derivePreviewPackageIdentity(instanceId) {
     executableBaseName,
     installDirectoryName: executableBaseName,
     uninstallRegistryKey,
+    ...supersededInstall,
     shortcutName: legacy
       ? "QA Hub Project Preview"
       : mode === "lan"

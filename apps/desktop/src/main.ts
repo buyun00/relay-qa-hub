@@ -18,17 +18,13 @@ import {
 
 import {
   APP_HOST,
-  APP_SCHEME,
   appUrl,
   isAppUrl,
   parseBugDeepLink,
   parseDesktopConfig,
 } from "./config.js";
 import { isCompatibilityReportUrl, isPackageDownloadUrl } from "./package-downloads.js";
-import {
-  buildPackagingNotificationId,
-  parsePackagingNotice,
-} from "./packaging-notifications.js";
+import { buildPackagingNotificationId, parsePackagingNotice } from "./packaging-notifications.js";
 import type { DesktopBugChange, DesktopBugRoute, DesktopConnectionStatus } from "./bridge-types.js";
 import bugRoutes from "./bug-route.cjs";
 import { RendererDeliveryGate } from "./renderer-delivery-gate.js";
@@ -74,6 +70,7 @@ import {
 import { createAuthenticatedWssClient, createBrowserSessionWssClient } from "./wss-client.js";
 import { PortableUpdater, type DesktopUpdateState } from "./portable-updater.js";
 import { acknowledgeUpdateRelaunch } from "./update-relaunch.js";
+import { isUninstallShutdownRequest } from "./uninstall-shutdown.js";
 
 const currentDirectory = path.dirname(fileURLToPath(import.meta.url));
 const MAX_ASSET_BYTES = 50 * 1024 * 1024;
@@ -593,6 +590,11 @@ function closeScopedNotificationsForScopeChange(): void {
 }
 
 function handleSecondInstanceArguments(args: readonly unknown[]): void {
+  if (isUninstallShutdownRequest(args)) {
+    process.stdout.write('{"event":"desktop.uninstall.shutdown-requested"}\n');
+    quitApplication();
+    return;
+  }
   for (const value of args) {
     if (typeof value !== "string") continue;
     const bugId = parseBugDeepLink(value, config.appScheme);
@@ -985,7 +987,7 @@ function showNativeNotification(
 function quitApplication(): void {
   if (quitting) return;
   quitting = true;
-  transport.stop();
+  transport?.stop();
   closeScopedNotificationsForScopeChange();
   void mcpServer?.stop();
   tray?.destroy();
@@ -1722,72 +1724,83 @@ async function startApplication(): Promise<void> {
   recurringUpdateTimer.unref();
 }
 
+const initialUninstallShutdownRequest = isUninstallShutdownRequest(process.argv);
 const hasLock = app.requestSingleInstanceLock();
 if (!hasLock) {
   app.quit();
 } else {
-  if (process.platform === "win32") {
-    Notification.handleActivation((details) => {
-      const updateReleaseId = parseWindowsUpdateNotificationActivation(details);
-      if (updateReleaseId !== null) {
-        queueUpdateActivation(updateReleaseId, "global");
-        return;
-      }
-      const notificationId = parseWindowsNotificationActivation(details);
-      if (notificationId === null) {
-        process.stderr.write(
-          `${JSON.stringify({
-            event: "desktop.notification.activation.ignored",
-            type: details.type,
-            reason: "ACTIVATION_ARGUMENTS_INVALID",
-          })}\n`,
-        );
-        return;
-      }
-      queueOrActivateGlobalNotification(notificationId);
-    });
-  }
-  protocol.registerSchemesAsPrivileged([
-    {
-      scheme: config.appScheme,
-      privileges: {
-        standard: true,
-        secure: true,
-        supportFetchAPI: true,
-        corsEnabled: true,
-        stream: true,
-      },
-    },
-  ]);
   app.on("second-instance", (...args: readonly unknown[]) => {
     const commandLine = Array.isArray(args[1]) ? args[1] : [];
     handleSecondInstanceArguments(commandLine);
   });
-  app.on("before-quit", () => {
-    if (!quitting) {
-      quitting = true;
-      transport?.stop();
-      void mcpServer?.stop();
+  if (initialUninstallShutdownRequest) {
+    void app
+      .whenReady()
+      .then(() => {
+        process.stdout.write('{"event":"desktop.uninstall.shutdown-probe-complete"}\n');
+        quitApplication();
+      })
+      .catch(() => app.quit());
+  } else {
+    if (process.platform === "win32") {
+      Notification.handleActivation((details) => {
+        const updateReleaseId = parseWindowsUpdateNotificationActivation(details);
+        if (updateReleaseId !== null) {
+          queueUpdateActivation(updateReleaseId, "global");
+          return;
+        }
+        const notificationId = parseWindowsNotificationActivation(details);
+        if (notificationId === null) {
+          process.stderr.write(
+            `${JSON.stringify({
+              event: "desktop.notification.activation.ignored",
+              type: details.type,
+              reason: "ACTIVATION_ARGUMENTS_INVALID",
+            })}\n`,
+          );
+          return;
+        }
+        queueOrActivateGlobalNotification(notificationId);
+      });
     }
-    closeScopedNotificationsForScopeChange();
-  });
-  app.on("window-all-closed", () => {
-    // The hidden window and notification transport intentionally keep the tray app alive.
-  });
-  void app
-    .whenReady()
-    .then(startApplication)
-    .catch((error: unknown) => {
-      process.stderr.write(
-        `${JSON.stringify({
-          event: "desktop.startup.failed",
-          error: error instanceof Error ? error.name : "UNKNOWN_ERROR",
-        })}\n`,
-      );
-      quitting = true;
-      transport?.stop();
+    protocol.registerSchemesAsPrivileged([
+      {
+        scheme: config.appScheme,
+        privileges: {
+          standard: true,
+          secure: true,
+          supportFetchAPI: true,
+          corsEnabled: true,
+          stream: true,
+        },
+      },
+    ]);
+    app.on("before-quit", () => {
+      if (!quitting) {
+        quitting = true;
+        transport?.stop();
+        void mcpServer?.stop();
+      }
       closeScopedNotificationsForScopeChange();
-      void mcpServer?.stop();
-      app.quit();
     });
+    app.on("window-all-closed", () => {
+      // The hidden window and notification transport intentionally keep the tray app alive.
+    });
+    void app
+      .whenReady()
+      .then(startApplication)
+      .catch((error: unknown) => {
+        process.stderr.write(
+          `${JSON.stringify({
+            event: "desktop.startup.failed",
+            error: error instanceof Error ? error.name : "UNKNOWN_ERROR",
+          })}\n`,
+        );
+        quitting = true;
+        transport?.stop();
+        closeScopedNotificationsForScopeChange();
+        void mcpServer?.stop();
+        app.quit();
+      });
+  }
 }

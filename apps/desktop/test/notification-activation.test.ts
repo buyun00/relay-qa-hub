@@ -274,7 +274,7 @@ test("scope changes dismiss scoped toasts and every Bug activation gates before 
   );
   assert.match(
     quit,
-    /transport\.stop\(\);\s+closeScopedNotificationsForScopeChange\(\);[\s\S]+app\.quit\(\)/u,
+    /transport\?\.stop\(\);\s+closeScopedNotificationsForScopeChange\(\);[\s\S]+app\.quit\(\)/u,
   );
   const beforeQuit = source.slice(
     source.indexOf('app.on("before-quit"'),
