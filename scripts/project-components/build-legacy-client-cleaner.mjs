@@ -30,7 +30,7 @@ mkdirSync(root, { recursive: true });
 const icon = join(root, "RelayQaHub.ico");
 execFileSync(
   process.execPath,
-  [join(config.sourceRoot, "apps/desktop/scripts/generate-team-windows-icon.mjs"), icon],
+  [join(config.sourceRoot, "apps/desktop/scripts/generate-windows-icon.mjs"), icon],
   { stdio: "pipe" },
 );
 const fileName = `Relay-QA-Hub-旧版本清理工具-${releaseId}.exe`;

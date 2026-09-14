@@ -187,15 +187,7 @@ mkdirSync(assets);
 const icon = join(assets, "RelayQaHub.ico");
 execFileSync(
   process.execPath,
-  [
-    join(
-      config.sourceRoot,
-      teamEdition
-        ? "apps/desktop/scripts/generate-team-windows-icon.mjs"
-        : "apps/desktop/scripts/generate-windows-icon.mjs",
-    ),
-    icon,
-  ],
+  [join(config.sourceRoot, "apps/desktop/scripts/generate-windows-icon.mjs"), icon],
   { stdio: "pipe" },
 );
 const keyRoot = join(config.runtimeRoot, "desktop-signing");

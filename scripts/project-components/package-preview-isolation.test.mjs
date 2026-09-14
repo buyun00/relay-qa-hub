@@ -2870,13 +2870,14 @@ test("package identity preserves only the explicit legacy identity and isolates 
   }
 });
 
-test("LAN release exposes stable 1.0.0 branding with a preserved profile and migrated payload", () => {
+test("LAN release exposes stable 1.0.0 branding and reuses the established magnifier icon", () => {
   assert.match(
     packageSource,
     /const version = teamEdition \? "1\.0\.0" : `0\.2\.0-\$\{config\.deploymentMode\}\.\$\{buildNumber\}`/u,
   );
   assert.match(packageSource, /Relay-QA-Hub-团队版-\$\{version\}-\$\{releaseId\}\.exe/u);
-  assert.match(packageSource, /generate-team-windows-icon\.mjs/u);
+  assert.match(packageSource, /generate-windows-icon\.mjs/u);
+  assert.doesNotMatch(packageSource, /generate-team-windows-icon\.mjs/u);
   assert.match(packageSource, /`\/DFILE_VERSION=\$\{executableFileVersion\}`/u);
   assert.match(installerSource, /VIProductVersion "\$\{FILE_VERSION\}"/u);
 
@@ -2885,7 +2886,7 @@ test("LAN release exposes stable 1.0.0 branding with a preserved profile and mig
     const icon = join(root, "RelayQaHub.ico");
     const generated = spawnSync(
       process.execPath,
-      [resolve(sourceRoot, "apps/desktop/scripts/generate-team-windows-icon.mjs"), icon],
+      [resolve(sourceRoot, "apps/desktop/scripts/generate-windows-icon.mjs"), icon],
       { encoding: "utf8", windowsHide: true },
     );
     assert.equal(generated.status, 0, generated.stderr);
