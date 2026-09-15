@@ -20,3 +20,4 @@ export const UPLOAD_TARGETS = Object.freeze({
     sourceUrl: "http://10.100.5.129:8000/ozdqp/iOS/",
   }),
 });
+export * from "./ios-install.js";

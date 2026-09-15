@@ -153,3 +153,4 @@ export interface UploaderBridge {
   }) => Promise<UploadReply<BuildUploadChain>>;
   cancelBuildUpload: (id: string) => Promise<UploadReply<boolean>>;
 }
+export * from "./ios-install.js";

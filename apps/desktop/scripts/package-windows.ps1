@@ -89,7 +89,7 @@ try {
   Copy-Item -LiteralPath $desktopDist -Destination (Join-Path $stageRoot "dist") -Recurse
   $contractDestination = Join-Path $stageRoot "node_modules\@relay-qa-hub\upload-contract"
   New-Item -ItemType Directory -Path $contractDestination -Force | Out-Null
-  foreach ($contractFile in @("package.json", "index.js", "index.d.ts", "quick-build.js", "quick-build.d.ts")) {
+  foreach ($contractFile in @("package.json", "index.js", "index.d.ts", "quick-build.js", "quick-build.d.ts", "ios-install.js", "ios-install.d.ts")) {
     Copy-Item -LiteralPath (Join-Path $repoRoot "packages\upload-contract\$contractFile") -Destination $contractDestination
   }
   foreach ($legacyName in @("uploader-host", "uploader-runner", "build-upload-host")) {

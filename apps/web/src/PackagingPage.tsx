@@ -17,6 +17,8 @@ import {
 import "./packaging.css";
 import { buildSourceBranches, type BuildBranchCatalog } from "@relay-qa-hub/upload-contract";
 import { getBuildBranches } from "./packaging-api";
+import { useIosInstall } from "./useIosInstall";
+import IosInstallControls from "./IosInstallControls";
 
 function packageLabel(preset: BuildPreset | null): string {
   return BUILD_PRESETS.find((item) => item.id === preset)?.packageLabel ?? "其他构建";
@@ -40,8 +42,15 @@ function submissionError(error: unknown): string {
   }
   return "暂时无法连接打包服务，请稍后重试。";
 }
-export function PackageDownloads({ status }: { status: PackagingStatus }) {
+export function PackageDownloads({
+  status,
+  userId = "current",
+}: {
+  status: PackagingStatus;
+  userId?: string;
+}) {
   const [target, setTarget] = useState("Android/Release");
+  const iosInstaller = useIosInstall(target.startsWith("iOS/"), userId);
   const results = (status.artifacts ?? []).filter(
     (r) => r.platform + "/" + r.configuration === target,
   );
@@ -63,6 +72,7 @@ export function PackageDownloads({ status }: { status: PackagingStatus }) {
           </button>
         ))}
       </div>
+      {target.startsWith("iOS/") ? <IosInstallControls installer={iosInstaller} /> : null}
       {status.artifactError ? (
         <p className="banner error-banner">构建产物目录暂时无法读取，稍后自动重试。</p>
       ) : results.length === 0 ? (
@@ -101,6 +111,24 @@ export function PackageDownloads({ status }: { status: PackagingStatus }) {
                 <span role="cell">{formatSize(file.size)}</span>
                 <span role="cell">{result.version}</span>
                 <span className="package-file-actions" role="cell">
+                  {file.kind === "ipa" ? (
+                    <button
+                      type="button"
+                      className="package-install-button"
+                      aria-label={`快速安装 ${file.name}`}
+                      disabled={!iosInstaller.canInstall}
+                      onClick={() =>
+                        iosInstaller.install({
+                          configuration: result.configuration,
+                          version: result.version,
+                          buildNumber: result.buildNumber,
+                          filename: file.name,
+                        })
+                      }
+                    >
+                      {iosInstaller.pending ? "正在提交…" : "快速安装"}
+                    </button>
+                  ) : null}
                   <a className="package-link" href={file.url} target="_blank" rel="noreferrer">
                     下载
                   </a>
@@ -293,7 +321,7 @@ export default function PackagingPage({
           ]}
         />
         {status ? (
-          <PackageDownloads status={status} />
+          <PackageDownloads status={status} userId={userId} />
         ) : (
           <div className="loading-row">正在读取可下载文件…</div>
         )}

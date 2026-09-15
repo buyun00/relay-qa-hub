@@ -707,7 +707,7 @@
 }
 .package-file-row {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 86px 105px 104px;
+  grid-template-columns: minmax(0, 1fr) 86px 105px auto;
   align-items: center;
   gap: 16px;
   padding: 14px 20px;
@@ -735,6 +735,8 @@
 }
 .package-file-actions {
   display: flex;
+  flex-wrap: wrap;
+  max-width: 220px;
   gap: 14px;
   align-items: center;
 }
@@ -840,13 +842,16 @@
     flex-direction: column;
   }
   .package-file-row {
-    grid-template-columns: minmax(0, 1fr) 90px;
+    grid-template-columns: minmax(0, 1fr) 110px;
     gap: 10px;
     padding: 14px;
   }
   .package-file-row > :nth-child(2),
   .package-file-row > :nth-child(3) {
     display: none;
+  }
+  .package-file-actions {
+    max-width: 110px;
   }
   .package-build-panel {
     padding: 20px;
@@ -873,4 +878,81 @@
 .package-branch-selector small {
   color: var(--muted, #667085);
   line-height: 1.5;
+}
+.ios-install-panel {
+  padding: 18px;
+  margin: 16px 0;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface);
+}
+.ios-install-panel h3 {
+  margin: 0;
+}
+.ios-install-panel p {
+  margin: 8px 0;
+  font-size: 12px;
+  line-height: 1.65;
+}
+.ios-device-selection {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 14px 0;
+  font-size: 13px;
+}
+.ios-device-selection select {
+  max-width: 100%;
+  padding: 9px;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  color: var(--ink);
+  background: var(--surface);
+}
+.ios-install-panel button,
+.package-install-button {
+  padding: 9px 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  cursor: pointer;
+}
+.package-install-button {
+  background: var(--forest);
+  color: white;
+  white-space: nowrap;
+}
+.package-install-button:disabled,
+.ios-install-panel button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+.ios-device-online {
+  color: var(--forest);
+}
+.ios-device-offline,
+.ios-install-warning {
+  color: #ad5b13;
+}
+.ios-install-history {
+  display: grid;
+  gap: 8px;
+  margin-top: 14px;
+}
+.ios-install-record {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 12px;
+  padding: 10px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  font-size: 12px;
+}
+.ios-install-record.is-failed,
+.ios-install-record.is-unconfirmed {
+  color: #a34631;
+}
+.ios-install-record.is-complete {
+  color: var(--forest);
 }

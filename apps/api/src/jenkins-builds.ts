@@ -12,6 +12,7 @@ import {
 } from "@relay-qa-hub/upload-contract";
 import { artifactCatalog, validateBuildResult, type BuildResult } from "./build-artifacts.js";
 import { readBuildBranches } from "./jenkins-branches.js";
+import { JenkinsIosInstallBackend, IOS_JOB_PATH } from "./jenkins-ios-install.js";
 import { readFile } from "node:fs/promises";
 import {
   COMPATIBILITY_TARGETS,
@@ -181,6 +182,13 @@ export class JenkinsBuildService {
 
   constructor(private readonly fetchImpl: typeof fetch = fetch) {}
 
+  iosInstallBackend(): JenkinsIosInstallBackend {
+    return new JenkinsIosInstallBackend({
+      request: (path) => this.request(path),
+      submit: (parameters) => this.submitParameters(parameters, IOS_JOB_PATH),
+    });
+  }
+
   private async request(
     path: string,
     init: RequestInit = {},
@@ -315,6 +323,8 @@ export class JenkinsBuildService {
       throw new PackagingError("JENKINS_PARAMETERS_CHANGED", 409);
     if (parameters["CHECK_BRANCHES"] !== undefined && !config.includes("QA_HUB_CHECK_ONLY_V3"))
       throw new PackagingError("CHECK_SOURCE_CHANGED", 409);
+    if (parameters["INSTALL_REQUEST"] !== undefined && !config.includes("QA_HUB_IOS_INSTALL_V1"))
+      throw new PackagingError("IOS_INSTALL_JOB_UNAVAILABLE", 409);
     if (!this.crumb) await this.loadCrumb(signal);
     for (let attempt = 0; attempt < 2; attempt++) {
       const crumb = this.crumb!;
