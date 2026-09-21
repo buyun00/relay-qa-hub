@@ -7,6 +7,7 @@ import test from "node:test";
 import { catalogFetch } from "./quick-build-fixture.mjs";
 import {
   UploaderHost,
+  parseNewUploadInput,
   parseUploadInput,
   parseUploadEvents,
   writeJson,
@@ -140,6 +141,13 @@ test("upload inputs exclude arbitrary paths, commands and historical version IDs
     { version: "../x" },
   ])
     assert.throws(() => parseUploadInput({ ...input, ...changed }), /INVALID_INPUT/);
+});
+test("new Release uploads always stop for final review while Debug keeps its mode", () => {
+  assert.equal(parseNewUploadInput(input).mode, "prepare_publish");
+  assert.equal(
+    parseNewUploadInput({ ...input, productId: "2001", mode: "publish_workflow" }).mode,
+    "publish_workflow",
+  );
 });
 test("event projection tolerates partial JSONL and never returns tokens or raw error text", () => {
   const events = parseUploadEvents(

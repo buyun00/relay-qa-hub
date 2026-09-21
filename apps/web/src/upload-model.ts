@@ -25,11 +25,18 @@ export function uploadDraftDefaults(value: unknown): UploadInput {
       ? (value as Partial<UploadInput> & { defaultsVersion?: number })
       : {};
   const version = typeof draft.version === "string" ? draft.version : "";
+  const productId =
+    (typeof draft.productId === "string" && draft.productId.trim()) ||
+    DEFAULT_UPLOAD_PARAMETERS.productId;
+  const requestedMode =
+    draft.mode === "prepare_publish" ||
+    draft.mode === "upload_only" ||
+    draft.mode === "prepare_test"
+      ? "prepare_publish"
+      : "publish_workflow";
   return {
     ...DEFAULT_UPLOAD_PARAMETERS,
-    productId:
-      (typeof draft.productId === "string" && draft.productId.trim()) ||
-      DEFAULT_UPLOAD_PARAMETERS.productId,
+    productId,
     channelId:
       (typeof draft.channelId === "string" && draft.channelId.trim()) ||
       DEFAULT_UPLOAD_PARAMETERS.channelId,
@@ -46,12 +53,7 @@ export function uploadDraftDefaults(value: unknown): UploadInput {
     summary: version,
     description: version,
     testResultReference: "",
-    mode:
-      draft.mode === "prepare_publish" ||
-      draft.mode === "upload_only" ||
-      draft.mode === "prepare_test"
-        ? "prepare_publish"
-        : "publish_workflow",
+    mode: productId === "2002" ? "prepare_publish" : requestedMode,
   };
 }
 

@@ -66,7 +66,7 @@ test("one-click command uses shared defaults and reuses request ID without waiti
       summary: "",
       description: "",
       testResultReference: "",
-      mode: "publish_workflow",
+      mode: "prepare_publish",
     },
   });
 });
@@ -87,6 +87,29 @@ test("iOS source, final-confirmation mode and version-only notes are explicit", 
   assert.equal(body["mode"], "prepare_publish");
   assert.equal(body["summary"], "2.4.36");
   assert.equal(body["description"], "2.4.36");
+});
+test("Release cannot bypass final review while Debug retains the requested workflow", async () => {
+  const releaseId = randomUUID(),
+    debugId = randomUUID(),
+    f = fixture(() => releaseId);
+  await f.tools.call("qa_start_increment_upload", {
+    requestId: releaseId,
+    configuration: "Release",
+    mode: "publish_workflow",
+  });
+  assert.equal(
+    (f.calls.at(-1)!.request!.body as Record<string, unknown>)["mode"],
+    "prepare_publish",
+  );
+  await f.tools.call("qa_start_increment_upload", {
+    requestId: debugId,
+    configuration: "Debug",
+    mode: "publish_workflow",
+  });
+  assert.equal(
+    (f.calls.at(-1)!.request!.body as Record<string, unknown>)["mode"],
+    "publish_workflow",
+  );
 });
 test("all build presets and selected queue progress use the authenticated API", async () => {
   const f = fixture(() => ({ queueId: 123 }));

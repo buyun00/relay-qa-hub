@@ -97,7 +97,7 @@ export function parseNewUploadInput(value: unknown): UploadInput {
     testResultReference: "",
   });
   if (input.testerId <= 0) throw new Error("INVALID_INPUT");
-  return input;
+  return input.productId === "2002" ? { ...input, mode: "prepare_publish" } : input;
 }
 export async function writeJson(file: string, value: unknown): Promise<void> {
   const temporary = `${file}.${randomUUID()}.tmp`;

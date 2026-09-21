@@ -492,6 +492,7 @@ export default function UploadIncrementPage({
                         setForm((current) => ({
                           ...current,
                           productId,
+                          mode: productId === "2002" ? "prepare_publish" : current.mode,
                           version: "",
                           belongName: current.belongName.replace(/^\[[0-9]+\]/, `[${productId}]`),
                         }));
@@ -576,24 +577,31 @@ export default function UploadIncrementPage({
                     onChange={(event) => setField("testerId", Number(event.target.value))}
                   />
                 </label>
-                <fieldset className="upload-mode-picker">
-                  <legend>执行到哪一步</legend>
-                  {UPLOAD_MODES.map((mode) => (
-                    <label key={mode.id} className={form.mode === mode.id ? "is-selected" : ""}>
-                      <input
-                        type="radio"
-                        name="upload-mode"
-                        value={mode.id}
-                        checked={form.mode === mode.id}
-                        onChange={() => setField("mode", mode.id)}
-                      />
-                      <span>
-                        <strong>{mode.label}</strong>
-                        <small>{mode.description}</small>
-                      </span>
-                    </label>
-                  ))}
-                </fieldset>
+                {form.productId === "2002" ? (
+                  <div className="upload-review" role="note" aria-label="Release 发布审核策略">
+                    <strong>Release 必须最终审核</strong>
+                    <p>完成上传、提测及发布准备后会停止，只有人工确认后才会正式发布。</p>
+                  </div>
+                ) : (
+                  <fieldset className="upload-mode-picker">
+                    <legend>执行到哪一步</legend>
+                    {UPLOAD_MODES.map((mode) => (
+                      <label key={mode.id} className={form.mode === mode.id ? "is-selected" : ""}>
+                        <input
+                          type="radio"
+                          name="upload-mode"
+                          value={mode.id}
+                          checked={form.mode === mode.id}
+                          onChange={() => setField("mode", mode.id)}
+                        />
+                        <span>
+                          <strong>{mode.label}</strong>
+                          <small>{mode.description}</small>
+                        </span>
+                      </label>
+                    ))}
+                  </fieldset>
+                )}
                 <p className="upload-muted">沿用上次上传的提测流程，自动登记平台测试状态。</p>
                 {review ? (
                   <div className="upload-review" role="region" aria-label="确认上传任务">

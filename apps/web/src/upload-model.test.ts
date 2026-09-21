@@ -70,11 +70,17 @@ describe("upload progress and terminal states", () => {
       channelId: "1002",
       testerId: 11562,
       belongName: "[2002]Baloot Go|[1002]谷歌-国际正式",
-      mode: "publish_workflow",
+      mode: "prepare_publish",
     });
     expect(UPLOAD_MODES.map((mode) => mode.id)).toEqual(["publish_workflow", "prepare_publish"]);
     expect(uploadDraftDefaults({ testerId: 1 }).testerId).toBe(11562);
     expect(uploadDraftDefaults({ testerId: 1, defaultsVersion: 2 }).testerId).toBe(1);
+    expect(uploadDraftDefaults({ productId: "2002", mode: "publish_workflow" }).mode).toBe(
+      "prepare_publish",
+    );
+    expect(uploadDraftDefaults({ productId: "2001", mode: "publish_workflow" }).mode).toBe(
+      "publish_workflow",
+    );
     expect(uploadDraftDefaults({ productId: 12, channelId: "", testerId: 0 })).toMatchObject({
       productId: "2002",
       channelId: "1002",

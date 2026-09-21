@@ -258,8 +258,11 @@ test("one MCP call persists one build, survives API/MCP restart and hands the ex
   assert.equal(f.builds[0].preset, "android-release-app");
   await f.restart();
   await f.ok("qa_build_and_upload", { requestId, mode: "prepare_publish" });
-  const conflict = await f.call("qa_build_and_upload", { requestId, mode: "publish_workflow" });
-  assert.equal(JSON.parse(conflict.content[0].text).code, "UPLOAD_REQUEST_CONFLICT");
+  const releaseRetry = await f.ok("qa_build_and_upload", {
+    requestId,
+    mode: "publish_workflow",
+  });
+  assert.equal(releaseRetry.chainId, requestId, "Release retry is normalized to final review");
   const waiting = await f.ok("qa_get_packaging_status", { queueIds: [760] });
   assert.equal(waiting.queues[0].reason, "等待执行器");
   f.setReady();

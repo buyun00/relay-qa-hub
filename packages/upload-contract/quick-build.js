@@ -67,5 +67,8 @@ export function quickUploadInput(input, id) {
     version: "",
     summary: "",
     description: "",
+    // Production Release uploads must stop before the external publish write.
+    // Debug keeps the operator's selected workflow.
+    mode: p.configuration === "Release" ? "prepare_publish" : input.mode,
   };
 }

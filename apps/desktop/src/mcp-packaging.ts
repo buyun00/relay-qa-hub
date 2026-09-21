@@ -1,5 +1,9 @@
 import { QaHubMcpError, type McpToolDefinition, type QaHubApiTransport } from "./mcp-api.js";
-import { QUICK_BUILD_PRESETS, quickUploadInput } from "@relay-qa-hub/upload-contract";
+import {
+  QUICK_BUILD_PRESETS,
+  quickBuildPreset,
+  quickUploadInput,
+} from "@relay-qa-hub/upload-contract";
 
 const uuidPattern = "^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$";
 const uuid = { type: "string", pattern: uuidPattern };
@@ -30,8 +34,9 @@ const uploadProperties = {
   mode: {
     type: "string",
     enum: modes,
-    default: "publish_workflow",
-    description: "publish_workflow 完成正式发布；prepare_publish 只停在最终确认前。",
+    default: "prepare_publish",
+    description:
+      "Release 固定为 prepare_publish 并停在最终确认前；Debug 可用 publish_workflow 完成正式发布。",
   },
   version: {
     type: "string",
@@ -111,7 +116,7 @@ export const PACKAGING_MCP_TOOLS: readonly McpToolDefinition[] = [
   tool(
     "qa_build_and_upload",
     "一键构建并上传增量",
-    "提交 8 种快捷打包预设之一，后端等待该构建成功后读取本次产物清单，校验上下游构建、平台配置、产品渠道、版本、ZIP SHA-256，再自动上传。瑞雪版本与构建完全一致；按 mode 发布或等最终确认。关闭 EXE 继续执行，复用 requestId，用 chainId 跟踪。",
+    "提交 8 种快捷打包预设之一，后端等待该构建成功后读取本次产物清单，校验上下游构建、平台配置、产品渠道、版本、ZIP SHA-256，再自动上传。瑞雪版本与构建完全一致；Release 一律停在最终确认前，Debug 按 mode 执行。关闭 EXE 继续执行，复用 requestId，用 chainId 跟踪。",
     {
       requestId,
       mode: uploadProperties.mode,
@@ -174,9 +179,20 @@ function choice<T extends string>(value: unknown, allowed: readonly T[], fallbac
   return value as T;
 }
 function uploadInput(input: Record<string, unknown>, build: boolean) {
-  const platform = choice(input["platform"], ["android", "ios"], "android");
-  const configuration = choice(input["configuration"], ["Debug", "Release"], "Release");
-  const mode = choice(input["mode"], modes, "publish_workflow");
+  const selectedPreset = build
+    ? quickBuildPreset(choice(input["preset"], presets, "android-release-app"))
+    : undefined;
+  if (build && !selectedPreset) invalid("不支持的打包预设");
+  const platform = selectedPreset
+    ? selectedPreset.platform.toLowerCase() === "ios"
+      ? "ios"
+      : "android"
+    : choice(input["platform"], ["android", "ios"], "android");
+  const configuration = selectedPreset
+    ? selectedPreset.configuration
+    : choice(input["configuration"], ["Debug", "Release"], "Release");
+  const requestedMode = choice(input["mode"], modes, "prepare_publish");
+  const mode = configuration === "Release" ? "prepare_publish" : requestedMode;
   const version = input["version"] === undefined ? "" : input["version"];
   if (
     typeof version !== "string" ||
@@ -201,9 +217,7 @@ function uploadInput(input: Record<string, unknown>, build: boolean) {
     testResultReference: "",
     mode,
   };
-  return build
-    ? quickUploadInput(upload, choice(input["preset"], presets, "android-release-app"))
-    : upload;
+  return selectedPreset ? quickUploadInput(upload, selectedPreset.id) : upload;
 }
 function items(value: unknown): Record<string, unknown>[] {
   if (!Array.isArray(value))
@@ -271,7 +285,7 @@ export async function callPackagingTool(
       authError: snapshot["authError"],
       toolVersion: snapshot["toolVersion"],
       unreadableJobs: snapshot["unreadableJobs"],
-      defaults: { ...defaults, mode: "publish_workflow", version: "", concurrency: 8 },
+      defaults: { ...defaults, mode: "prepare_publish", version: "", concurrency: 8 },
       ...(jobId || chainId ? { job: job ?? null, chain: chain ?? null } : { jobs, chains }),
       ...(input["includeLogs"] && job
         ? { logs: await api.json(`${base}/jobs/${id(job["id"])}/logs`) }
