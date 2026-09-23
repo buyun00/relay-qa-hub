@@ -60,6 +60,17 @@ const labels: Record<BuildUploadChain["status"], string> = {
 export function buildUploadError(code: string): string {
   return messages[code] ?? `暂时无法完成操作，稍后重试（${code}）。`;
 }
+export function buildUploadActionDisabled(input: {
+  busy: boolean;
+  pageDisabled: boolean;
+  branchUnavailable: boolean;
+  bridgeAvailable: boolean;
+  snapshot: Pick<UploaderSnapshot, "available" | "configured"> | null;
+}): boolean {
+  // Account/service prerequisites must remain clickable so the user receives a
+  // concrete explanation instead of a native disabled button that does nothing.
+  return input.busy || input.pageDisabled || input.branchUnavailable || !input.bridgeAvailable;
+}
 export default function BuildUploadControls({
   userId,
   disabled,
@@ -192,6 +203,24 @@ export default function BuildUploadControls({
     setBusy(true);
     setError("");
     try {
+      let currentSnapshot = snapshot;
+      if (!currentSnapshot) {
+        const snapshotResult = await bridge.snapshot();
+        if (!snapshotResult.ok) {
+          setError(snapshotResult.code);
+          return;
+        }
+        currentSnapshot = snapshotResult.value;
+        setSnapshot(currentSnapshot);
+      }
+      if (!currentSnapshot.available) {
+        setError("UPLOADER_MISSING");
+        return;
+      }
+      if (!currentSnapshot.configured) {
+        setError("AUTH_REQUIRED");
+        return;
+      }
       const result = await bridge.buildAndUpload({
         requestId: createUploadRequestId(),
         preset,
@@ -298,14 +327,13 @@ export default function BuildUploadControls({
           <button
             className="package-combined-action"
             type="button"
-            disabled={
-              busy ||
-              disabled ||
-              branchUnavailable(selection) ||
-              !bridge?.buildAndUpload ||
-              !snapshot?.configured ||
-              !snapshot.available
-            }
+            disabled={buildUploadActionDisabled({
+              busy,
+              pageDisabled: disabled,
+              branchUnavailable: branchUnavailable(selection),
+              bridgeAvailable: Boolean(bridge?.buildAndUpload),
+              snapshot,
+            })}
             onClick={() => void combined()}
           >
             {busy ? "正在检查并提交…" : "构建完自动上传增量"}

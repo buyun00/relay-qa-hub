@@ -1,6 +1,6 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, it, expect } from "vitest";
-import BuildUploadControls from "./BuildUploadControls";
+import BuildUploadControls, { buildUploadActionDisabled } from "./BuildUploadControls";
 import { compatibilityVerdict } from "./BuildCompatibilitySummary";
 import { buildSourceBranches, type BuildBranchCatalog } from "@relay-qa-hub/upload-contract";
 import type { CompatibilityCheck } from "./packaging-api";
@@ -72,5 +72,16 @@ describe("build branch controls", () => {
         report: { ...check.report, result: "UNKNOWN", reasonCode: "BASE_NOT_ANCESTOR" },
       }),
     ).toBe("参考安装包与当前分支不兼容，请打完整包");
+  });
+  it("keeps build-and-upload clickable so missing account setup is explained", () => {
+    expect(
+      buildUploadActionDisabled({
+        busy: false,
+        pageDisabled: false,
+        branchUnavailable: false,
+        bridgeAvailable: true,
+        snapshot: { available: true, configured: false },
+      }),
+    ).toBe(false);
   });
 });
