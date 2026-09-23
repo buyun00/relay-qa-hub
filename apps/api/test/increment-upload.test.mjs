@@ -231,7 +231,7 @@ test("shared build records retain creator, queue and handoff across restart with
   await assert.rejects(f.service.cancel(f.other, id, true), /JOB_NOT_FOUND/);
   assert.equal(f.builds.length, 1);
 });
-test("global queue serializes workers across users; confirmation reserves the channel", async (t) => {
+test("a new upload supersedes an older upload awaiting publish confirmation", async (t) => {
   const f = await fixture(t),
     a = randomUUID(),
     b = randomUUID();
@@ -246,30 +246,16 @@ test("global queue serializes workers across users; confirmation reserves the ch
     stage: "AWAITING_PUBLISH_CONFIRMATION",
   });
   await f.service.tick();
-  assert.equal(f.launches.length, 1);
-  assert.equal(
-    (await f.service.snapshot(f.other)).jobs.find((j) => j.id === b).errorCode,
-    "UPLOAD_CHANNEL_HELD",
-  );
+  assert.equal(f.launches.length, 2);
+  assert.equal(f.launches[1].id, b);
+  const replaced = (await f.service.snapshot(f.owner)).jobs.find((j) => j.id === a);
+  assert.equal(replaced.status, "cancelled");
+  assert.equal(replaced.errorCode, "SUPERSEDED_BY_NEW_UPLOAD");
+  await assert.rejects(f.service.continue(f.owner, a, randomUUID(), "resume", {}), /JOB_NOT_FOUND/);
   await assert.rejects(
-    f.service.continue(f.owner, a, randomUUID(), "resume", {}),
-    /PUBLISH_NOT_READY/,
+    f.service.continue(f.owner, a, randomUUID(), "confirm", {}),
+    /JOB_NOT_FOUND/,
   );
-  const key = randomUUID();
-  await f.service.continue(f.owner, a, key, "confirm", {});
-  await f.service.tick();
-  assert.equal(f.launches.length, 2);
-  assert.equal(f.launches[1].id, a);
-  await f.service.continue(f.owner, a, key, "confirm", {});
-  assert.equal(f.launches.length, 2);
-  Object.assign(f.hosts.get(f.owner).jobs[0], {
-    active: false,
-    status: "succeeded",
-    published: true,
-  });
-  await f.service.tick();
-  assert.equal(f.launches.length, 3);
-  assert.equal(f.launches[2].id, b);
 });
 test("unfinished failed task blocks its channel but not other products", async (t) => {
   const f = await fixture(t),
@@ -299,19 +285,14 @@ test("reconciling a manual publication releases the original queued build withou
   await f.service.tick();
   const host = f.hosts.get(f.owner);
   Object.assign(host.jobs[0], { active: false, status: "awaiting_publish", remoteStatus: 60 });
-  await f.service.enqueue(f.other, queued, input, "build");
-  await f.service.tick();
-  assert.equal(f.builds.length, 0);
-  assert.equal(
-    (await f.service.buildChains(f.other)).find((c) => c.id === queued).errorCode,
-    "UPLOAD_CHANNEL_HELD",
-  );
   host.reconcilePublications = async () => {
     Object.assign(host.jobs[0], { status: "succeeded", published: true, remoteStatus: 100 });
   };
+  await f.service.enqueue(f.other, queued, input, "build");
   await f.service.tick();
   assert.equal(f.launches.length, 1, "No upload/recovery/confirmation was launched");
   assert.equal(f.builds.length, 1);
+  assert.equal(host.jobs[0].status, "succeeded");
   const chain = (await f.service.buildChains(f.other)).find((c) => c.id === queued);
   assert.equal(chain.status, "building");
   assert.equal(chain.queueId, 760);

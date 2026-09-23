@@ -23,7 +23,7 @@ const messages: Record<string, string> = {
   BUILD_BRANCH_UNAVAILABLE: "所选分支已不可用，请刷新分支后重新选择。",
   BUILD_BRANCHES_UNAVAILABLE: "暂时无法读取构建分支，请稍后重试。",
   UPLOAD_CHANNEL_HELD:
-    "已提交，正在等待同产品、渠道的上一任务结束。服务端会自动核对瑞雪发布状态并继续，请勿重复提交。",
+    "已提交，正在等待同产品、渠道的上一项执行中任务结束。等待最终审核的旧任务会被新上传覆盖，请勿重复提交。",
   UPLOADER_MISSING: "服务端上传程序暂未就绪，请稍后重试。",
   UPLOAD_QUEUE_BUSY: "服务端正在核对任务，请稍后重试。",
   BUILD_PROJECT_PATH_INVALID: "打包机的 Unity 项目路径配置无效，构建未完成，没有上传。",
@@ -45,6 +45,8 @@ const messages: Record<string, string> = {
   BUILD_TIMED_OUT: "等待构建超过 24 小时，已停止自动上传。",
   BUILD_IDENTITY_MISMATCH: "构建身份不匹配，已停止自动上传。",
   BUILD_LOG_UNAVAILABLE: "正在等待构建日志恢复，以核对 ZIP 生成结果。",
+  SUPERSEDED_BY_NEW_UPLOAD: "已由后续上传覆盖，不能再确认发布此版本。",
+  DISCARDED_AWAITING_PUBLISH: "已放弃此版本的发布确认。",
 };
 const labels: Record<BuildUploadChain["status"], string> = {
   queued: "服务端等待打包",

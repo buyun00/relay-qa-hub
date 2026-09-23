@@ -352,7 +352,12 @@ export class IncrementUploadService {
   }
   private async ownedJob(owner: string, id: unknown): Promise<UploadJob> {
     const key = uuid(id);
-    if (!this.rows().some((c) => c.owner === owner && c.jobId === key && c.kind !== "build"))
+    if (
+      !this.rows().some(
+        (c) =>
+          c.owner === owner && c.jobId === key && c.kind !== "build" && c.state !== "cancelled",
+      )
+    )
       throw new Error("JOB_NOT_FOUND");
     const job = (await this.host(owner).snapshot()).jobs.find((j) => j.id === key);
     if (!job) throw new Error("JOB_NOT_FOUND");
@@ -501,6 +506,16 @@ export class IncrementUploadService {
           rows
             .filter((r) => r.kind !== "build" && ["queued", "dispatching"].includes(r.state))
             .findIndex((r) => r.id === c.id) + 1;
+      } else if (c.state === "cancelled") {
+        job.status = "cancelled";
+        job.active = false;
+        job.stage =
+          c.error === "SUPERSEDED_BY_NEW_UPLOAD"
+            ? "SUPERSEDED"
+            : c.error === "DISCARDED_AWAITING_PUBLISH"
+              ? "DISCARDED"
+              : "QUEUED";
+        job.errorCode = c.error;
       } else if (c.state === "failed" && !job.active) job.errorCode = c.error || job.errorCode;
     }
     return {
@@ -616,8 +631,49 @@ export class IncrementUploadService {
         }
       }
       if (active) return;
+      const pendingReplacements = rows.filter(
+        (c) => ["queued", "dispatching"].includes(c.state) && ["upload", "build"].includes(c.kind),
+      );
+      const latestUploads = new Map(
+        rows.filter((c) => c.kind !== "build").map((c) => [c.jobId, c]),
+      );
+      for (const [jobId, latest] of latestUploads) {
+        const job = snapshots.get(latest.owner)?.jobs.find((candidate) => candidate.id === jobId);
+        if (
+          !job ||
+          job.status !== "awaiting_publish" ||
+          rows.some(
+            (c) =>
+              c.jobId === jobId &&
+              c.kind === "confirm" &&
+              ["queued", "dispatching"].includes(c.state),
+          ) ||
+          !pendingReplacements.some(
+            (c) =>
+              c.jobId !== jobId &&
+              lane(JSON.parse(c.payload) as Payload) ===
+                lane(JSON.parse(latest.payload) as Payload),
+          )
+        )
+          continue;
+        for (const c of rows.filter(
+          (candidate) =>
+            candidate.jobId === jobId &&
+            candidate.kind !== "build" &&
+            !["failed", "cancelled"].includes(candidate.state),
+        )) {
+          c.state = "cancelled";
+          c.error = "SUPERSEDED_BY_NEW_UPLOAD";
+          this.save(c);
+        }
+        job.active = false;
+        job.status = "cancelled";
+        job.stage = "SUPERSEDED";
+        job.errorCode = "SUPERSEDED_BY_NEW_UPLOAD";
+        this.audit(latest.owner, jobId, "superseded_by_new_upload");
+      }
       const held = new Set<string>();
-      for (const c of rows.filter((c) => c.kind !== "build")) {
+      for (const c of rows.filter((c) => c.kind !== "build" && c.state !== "cancelled")) {
         const job = snapshots.get(c.owner)?.jobs.find((j) => j.id === c.jobId);
         if ((job && job.status !== "succeeded") || (!job && c.state === "started"))
           held.add(lane(JSON.parse(c.payload) as Payload));
