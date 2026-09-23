@@ -506,7 +506,10 @@ export class IncrementUploadService {
           rows
             .filter((r) => r.kind !== "build" && ["queued", "dispatching"].includes(r.state))
             .findIndex((r) => r.id === c.id) + 1;
-      } else if (c.state === "cancelled") {
+      } else if (
+        c.state === "cancelled" &&
+        ["SUPERSEDED_BY_NEW_UPLOAD", "DISCARDED_AWAITING_PUBLISH"].includes(c.error)
+      ) {
         job.status = "cancelled";
         job.active = false;
         job.stage =
