@@ -135,6 +135,14 @@ describe("upload progress and terminal states", () => {
     expect(uploadJobLabel({ ...job, active: false, status: "succeeded", published: true })).toBe(
       "正式发布完成",
     );
+    expect(
+      uploadJobLabel({
+        ...job,
+        active: false,
+        status: "cancelled",
+        errorCode: "DISCARDED_UPLOAD_TASK",
+      }),
+    ).toBe("任务已放弃");
   });
   it("unknown download length remains indeterminate and copy waits are visible", () => {
     const event = job.events[0];

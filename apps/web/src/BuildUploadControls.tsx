@@ -47,6 +47,7 @@ const messages: Record<string, string> = {
   BUILD_LOG_UNAVAILABLE: "正在等待构建日志恢复，以核对 ZIP 生成结果。",
   SUPERSEDED_BY_NEW_UPLOAD: "已由后续上传覆盖，不能再确认发布此版本。",
   DISCARDED_AWAITING_PUBLISH: "已放弃此版本的发布确认。",
+  DISCARDED_UPLOAD_TASK: "任务已主动放弃，通道已释放。",
 };
 const labels: Record<BuildUploadChain["status"], string> = {
   queued: "服务端等待打包",

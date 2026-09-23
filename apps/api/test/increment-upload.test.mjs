@@ -400,6 +400,53 @@ test("queued tasks can be cancelled; started work and another user's tasks canno
   await f.service.tick();
   await assert.rejects(f.service.cancel(f.owner, active), /UPLOAD_ALREADY_STARTED/);
 });
+test("inactive failed and awaiting-publish tasks can be explicitly discarded", async (t) => {
+  const f = await fixture(t),
+    failed = randomUUID(),
+    queued = randomUUID();
+  await f.service.enqueue(f.owner, failed, input);
+  await f.service.tick();
+  Object.assign(f.hosts.get(f.owner).jobs[0], {
+    active: false,
+    status: "failed",
+    errorCode: "VERSION_CONFLICT",
+  });
+  await f.service.enqueue(f.other, queued, input);
+  await f.service.tick();
+  assert.equal(f.launches.length, 1);
+  await f.service.cancel(f.owner, failed);
+  const discarded = (await f.service.snapshot(f.owner)).jobs.find((j) => j.id === failed);
+  assert.equal(discarded.status, "cancelled");
+  assert.equal(discarded.errorCode, "DISCARDED_UPLOAD_TASK");
+  await assert.rejects(
+    f.service.continue(f.owner, failed, randomUUID(), "resume", {}),
+    /JOB_NOT_FOUND/,
+  );
+  await f.service.tick();
+  assert.equal(f.launches.at(-1).id, queued);
+
+  const waiting = randomUUID();
+  await f.service.enqueue(f.owner, waiting, input);
+  Object.assign(f.hosts.get(f.other).jobs.at(-1), {
+    active: false,
+    status: "succeeded",
+    published: true,
+  });
+  await f.service.tick();
+  Object.assign(f.hosts.get(f.owner).jobs.at(-1), {
+    active: false,
+    status: "awaiting_publish",
+  });
+  await f.service.cancel(f.owner, waiting);
+  assert.equal(
+    (await f.service.snapshot(f.owner)).jobs.find((j) => j.id === waiting).errorCode,
+    "DISCARDED_UPLOAD_TASK",
+  );
+  await assert.rejects(
+    f.service.continue(f.owner, waiting, randomUUID(), "confirm", {}),
+    /JOB_NOT_FOUND/,
+  );
+});
 test("account replacement cannot retarget queued uploads", async (t) => {
   const f = await fixture(t);
   await f.service.enqueue(f.owner, randomUUID(), input);

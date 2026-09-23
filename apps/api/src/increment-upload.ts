@@ -445,10 +445,29 @@ export class IncrementUploadService {
       if (build && latest.state === "started") {
         await this.chain(owner).cancel(jobId);
       } else {
-        if (latest.state !== "queued" && latest.state !== "cancelled")
-          throw new Error("UPLOAD_ALREADY_STARTED");
-        latest.state = "cancelled";
-        this.save(latest);
+        if (["queued", "cancelled"].includes(latest.state)) {
+          latest.state = "cancelled";
+          this.save(latest);
+        } else {
+          const job = (await this.host(owner).snapshot()).jobs.find(
+            (candidate) => candidate.id === jobId,
+          );
+          if (job?.active) throw new Error("UPLOAD_ALREADY_STARTED");
+          if (job?.status === "succeeded") throw new Error("JOB_COMPLETED");
+          if (
+            job &&
+            !["failed", "interrupted", "awaiting_test", "awaiting_publish"].includes(job.status)
+          )
+            throw new Error("UPLOAD_ALREADY_STARTED");
+          if (!job && latest.state !== "failed") throw new Error("UPLOAD_ALREADY_STARTED");
+          for (const command of commands) {
+            command.state = "cancelled";
+            command.error = "DISCARDED_UPLOAD_TASK";
+            this.save(command);
+          }
+          this.audit(owner, jobId, "discard_task");
+          return true;
+        }
       }
       this.audit(owner, jobId, "cancel_queue");
       return true;
@@ -508,7 +527,11 @@ export class IncrementUploadService {
             .findIndex((r) => r.id === c.id) + 1;
       } else if (
         c.state === "cancelled" &&
-        ["SUPERSEDED_BY_NEW_UPLOAD", "DISCARDED_AWAITING_PUBLISH"].includes(c.error)
+        [
+          "SUPERSEDED_BY_NEW_UPLOAD",
+          "DISCARDED_AWAITING_PUBLISH",
+          "DISCARDED_UPLOAD_TASK",
+        ].includes(c.error)
       ) {
         job.status = "cancelled";
         job.active = false;
@@ -517,7 +540,9 @@ export class IncrementUploadService {
             ? "SUPERSEDED"
             : c.error === "DISCARDED_AWAITING_PUBLISH"
               ? "DISCARDED"
-              : "QUEUED";
+              : c.error === "DISCARDED_UPLOAD_TASK"
+                ? "DISCARDED"
+                : "QUEUED";
         job.errorCode = c.error;
       } else if (c.state === "failed" && !job.active) job.errorCode = c.error || job.errorCode;
     }

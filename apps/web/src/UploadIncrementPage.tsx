@@ -213,6 +213,7 @@ export default function UploadIncrementPage({
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
   const [review, setReview] = useState(false);
+  const [discardReview, setDiscardReview] = useState("");
   const [testDrafts, setTestDrafts] = useState<
     Record<string, { testerId: number; testResultReference: string }>
   >({});
@@ -306,6 +307,21 @@ export default function UploadIncrementPage({
       setNotice("已确认发布，正在执行最后一步并核验发布结果。");
     });
   };
+  const discard = () => {
+    const cancel = bridge?.cancel;
+    if (!cancel || !job || job.canManage === false || job.active) return;
+    void action("discard", async () => {
+      unwrap(await cancel(job.id));
+      setDiscardReview("");
+      setNotice("任务已放弃，后续不能再恢复或确认发布。通道已释放。");
+    });
+  };
+  const canDiscard = Boolean(
+    job &&
+    job.canManage !== false &&
+    !job.active &&
+    ["failed", "interrupted", "awaiting_test", "awaiting_publish"].includes(job.status),
+  );
 
   return (
     <div className="upload-page">
@@ -683,6 +699,43 @@ export default function UploadIncrementPage({
                 </section>
               ) : null}
               <JobProgress job={job} />
+              {job && canDiscard && bridge.cancel ? (
+                <section className="upload-card upload-resume">
+                  <h2>放弃此任务</h2>
+                  <p>放弃后不能再恢复或确认发布；同产品、同渠道的下一任务可立即继续。</p>
+                  {discardReview === job.id ? (
+                    <div className="upload-review" role="alert" aria-label="确认放弃上传任务">
+                      <strong>确认放弃 {job.version || job.input.version || "当前版本"}？</strong>
+                      <p>已上传的历史证据会保留，但此任务不会再执行发布动作。</p>
+                      <div className="upload-review-actions">
+                        <button
+                          type="button"
+                          disabled={!!busy}
+                          onClick={() => setDiscardReview("")}
+                        >
+                          返回
+                        </button>
+                        <button
+                          type="button"
+                          className="upload-primary"
+                          disabled={!!busy}
+                          onClick={discard}
+                        >
+                          {busy === "discard" ? "正在放弃…" : "确认放弃任务"}
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <button
+                      type="button"
+                      disabled={!!busy}
+                      onClick={() => setDiscardReview(job.id)}
+                    >
+                      放弃任务
+                    </button>
+                  )}
+                </section>
+              ) : null}
               {job &&
               job.canManage !== false &&
               !job.active &&

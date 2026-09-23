@@ -136,6 +136,7 @@ const ERRORS: Record<string, string> = {
   UPLOAD_CHANNEL_HELD: "同产品和渠道有正在执行或待核对的任务，正在等待它结束。",
   SUPERSEDED_BY_NEW_UPLOAD: "此任务已由后续上传覆盖，不能再确认发布。",
   DISCARDED_AWAITING_PUBLISH: "已放弃此版本的发布确认。",
+  DISCARDED_UPLOAD_TASK: "此任务已主动放弃，不能再恢复或确认发布。",
   UPLOAD_QUEUE_BUSY: "服务端正在核对任务，稍后重试即可；提交标识已保留。",
   UPLOAD_SERVICE_UNAVAILABLE: "暂时无法连接上传服务，已有任务仍保存在服务端。",
   UPLOAD_ACCOUNT_IN_USE: "账号有未完成任务，暂不能切换或移除；可使用原账号重新登录。",
@@ -172,6 +173,7 @@ export const uploadErrorLabel = (code: string): string =>
 export function uploadJobLabel(job: UploadJob): string {
   if (job.errorCode === "SUPERSEDED_BY_NEW_UPLOAD") return "已由后续上传覆盖";
   if (job.errorCode === "DISCARDED_AWAITING_PUBLISH") return "已放弃发布确认";
+  if (job.errorCode === "DISCARDED_UPLOAD_TASK") return "任务已放弃";
   if (job.status === "queued") return "服务端排队中";
   if (job.status === "cancelled") return "已取消排队";
   if (job.active) return uploadStageLabel(job.stage);
